@@ -48,7 +48,23 @@ class Genome:
             Path to an indexed FASTA file.
             File should contain the target organism's genome sequence.
         """
-        self.genome=Fasta(fafile)
+        self.genome = Fasta(fafile)
+        self.chrs = sorted(genome.keys())
+        self.chrs_distribution = self._get_chrs_distribution()
+
+        self.geneanno['p'] = (
+            (self.geneanno['end_shifted'] - self.geneanno['start_shifted'] + 1) / (
+                np.sum(self.geneanno['end_shifted'] - self.geneanno['start_shifted']) + self.geneanno.shape[0]))
+        self.geneanno['p'] = (
+            np.asarray(self.geneanno['p'] * (self.geneanno['p']>=0))/np.sum(self.geneanno['p'] * (self.geneanno['p']>=0)))
+
+    def _get_chrs_distribution(self):
+        len_each_chr = np.array([len(genome[chrom] for chrom in genome.keys()])
+        total_bases = float(np.sum(len_each_chr))
+        proba_chrs = len_each_chr / total_bases
+        squared_proba_chrs = np.square(proba_chrs) / np.sum(np.square(proba_chrs))
+        return squared_proba_chrs
+
 
     def get_sequence(self, chrom, start, end, strand='+'):
         """Get the genomic sequence given the chromosome, sequence start,
@@ -56,8 +72,8 @@ class Genome:
 
         Parameters
         ----------
-        chrom : char|str|int
-            Chromosome number or X/Y.
+        chrom : str
+            Chromosome number or X/Y, e.g. "chr1".
         start : int
         end : int
         strand : {'+', '-'}, optional
@@ -122,8 +138,8 @@ class GenomicData:
 
         Parameters
         ----------
-        chrom : char|str|int
-            Chromosome number or X/Y.
+        chrom : str
+            Chromosome number or X/Y, e.g. "chr1".
         start : int
         end : int
         strand : {'+', '-'}, optional
@@ -171,7 +187,7 @@ class GenomicData:
 
 class SplicingDataset:
 
-    def __init__(self, genome, genome_data, features, holdout_chrs, radius=100, mode="all"):
+    def __init__(self, genome, genome_data_tbi, genome_data, features, holdout_chrs, radius=100, mode="all"):
         """TODO: documentation
 
         Parameters
@@ -199,16 +215,29 @@ class SplicingDataset:
         radius : int
         mode : {"all", "train", "test"}
 
+
+        Raises
+        ------
+        ValueError
+            If the input str to `mode` is not one of the specified choices.
         """
         MODES = ["all", "train", "test"]
         if mode not in MODES:
             raise ValueError("Mode must be one of {0}. Input was '{1}'.".format(MODES, mode))
+
+        self.genome = Genome(genome, holdout_chrs, mode)
+        self.genome_features = GenomicData(genome_data_tbi, features)
+        self._features_dataframe = pd.read_table(
+            genome_data, header=None, names=["chr", "start", "end", "strand", "feature"])
+
+        self.holdout_chrs = holdout_chrs
+        self._training_indices = pd.match(self._features_dataframe["chr"], self.holdout_chrs) == -1
+
         self.set_mode(mode)
 
-        self.genome = Genome(genome)
-        self.genome_features = GenomicData(genome_data, features)
-        self.holdout_chrs = holdout_chrs
         self.radius = radius
+
+        self._randcache = []
 
         #self.genome = Genome(os.path.join(DIR, "hg38.fa"))
         #self.data = GenomicData(os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),nfeatures=2,featureDict={'5p':0, '3p':1})
@@ -222,8 +251,12 @@ class SplicingDataset:
         #self.positives['traininds']=pd.match(self.positives.iloc[:,0], ['chr8','chr9']) == -1
         #self.geneanno['start_shifted']=self.geneanno.iloc[:,3]+self.radius
         #self.geneanno['end_shifted']=self.geneanno.iloc[:,4]-self.radius
-        #self.geneanno['p'] = (self.geneanno['end_shifted'] - self.geneanno['start_shifted']+1)/np.sum(self.geneanno['end_shifted'] - self.geneanno['start_shifted']+self.geneanno.shape[0])
-        #self.geneanno['p'] = np.asarray(self.geneanno['p'] * (self.geneanno['p']>=0))/np.sum(self.geneanno['p'] * (self.geneanno['p']>=0))
+
+        #self.geneanno['p'] = (
+        #    (self.geneanno['end_shifted'] - self.geneanno['start_shifted'] + 1) / (
+        #        np.sum(self.geneanno['end_shifted'] - self.geneanno['start_shifted']) + self.geneanno.shape[0]))
+        #self.geneanno['p'] = (
+        #    np.asarray(self.geneanno['p'] * (self.geneanno['p']>=0))/np.sum(self.geneanno['p'] * (self.geneanno['p']>=0)))
 
 
         #if mode == "all":
@@ -234,6 +267,13 @@ class SplicingDataset:
         #    self.train_mode(mode='test')
         #else:
         #    raise ValueError('Mode has to be one of "all", "train", and "test".')
+
+   def set_mode(self, mode):
+        if mode == "train":
+            indices = np.asarray(self.training_indices)
+        elif mode == "test":
+            indices = ~np.asarray(self.training_indices)
+        self._features_dataframe = self._features_dataframe[indices]
 
     def _retrieve(self, chrom, position, strand, radius,
                   sequence_only=False, verbose=False, padding=(0, 0)):
@@ -273,37 +313,43 @@ class SplicingDataset:
                 chrom, pos - radius, pos + radius + 1, strand, verbose=verbose)
             return (retrieved_sequence, retrieved_data)
 
-"""
-    def sample_background(self, sequence_only=False, verbose=False, padding=[0,0]):
+    def sample_background(self, sequence_only=False, verbose=False, padding=(0, 0)):
         # TODO: documentation
         # TODO: random seed
-        if len(self._randcache)==0:
-            self._randcache = list(np.random.choice(self._inds, p=self._genep, size=2000))
-        randind = self._randcache.pop()
+        if len(self._randcache) == 0:
+            self._randcache = list(
+                np.random.choice(
+                    self.genome.chrs, p=self.genome.chrs_distribution, size=2000))
+        randchr = self._randcache.pop()
+        randpos = np.random.choice(len(self.genome[randchr])
+        # randpos = np.random.uniform() * len(self.genome.chrs[randchr])
+        # strand = "."
+        strand_choices = ["+", "-"]
+        randstrand = np.random.choice(strand_choices)
 
-        gene_length = self._geneend[randind] - self._genestart[randind]
-        chrom = self._genechr[randind]
-        position = int(self._genestart[randind] + np.random.uniform() * gene_length
-        strand = self._genestrand[randind]
-
-        return self._retrieve(chrom, position, strand, self.radius,
+        return self._retrieve(chrom, position, randstrand, self.radius,
                               sequence_only=sequence_only,
                               verbose=verbose,
                               padding=padding)
 
+    def sample_positive(self, sequence_only=False, verbose=False, padding=(0, 0)):
 
-    def sample_positive(self, sequence_only=False, verbose=False, padding=[0,0]):
-        randind = np.random.randint(0,self._poschr.shape[0])
-
-        gene_length = self._posend[randind] - self._posstart[randind]
-        chrom = self._poschr[randind]
+        randind = np.random.randint(0, self._features_dataframe.shape[0])
+        row = self._features_dataframe.iloc[randind]
+        gene_length = row["end"] - row["start"]  # + 1?
+        chrom = row["chr"]
 
         rand_in_gene = np.random.uniform() * gene_length
         rand_in_radius = np.random.uniform() * self.radius
+        # TODO: I'm not sure why we have to include radius here
+        # (particularly since we include it only in one direction)
         position = int(
-            self._posstart[randind] + rand_in_gene + rand_in_radius)
+            row["start"] + rand_in_gene + rand_in_radius)
 
-        strand = self._posstrand[randind]
+        strand = row["strand"]
+        if strand == ".":
+            strand_choices = ["+", "-"]
+            strand = np.random.choice(strand_choices)
 
         if verbose:
             print chrom, position, strand
@@ -312,48 +358,13 @@ class SplicingDataset:
                               verbose=verbose,
                               padding=padding)
 
-    def sample_mixture(self, positive_prop=0.5, sequence_only=False, verbose=False, padding=[0,0]):
-        if np.random.uniform() < positive_prop:
+    def sample_mixture(self, positive_proportion=0.5, sequence_only=False, verbose=False, padding=(0, 0)):
+        """Gets a mixture of positive and background samples
+        """
+        if np.random.uniform() < positive_proportion:
             return self.sample_positive(sequence_only=sequence_only, verbose=verbose, padding=padding)
         else:
             return self.sample_background(sequence_only=sequence_only, verbose=verbose, padding=padding)
-
-    def all_mode(self):
-        self._genechr=np.asarray(self.geneanno.iloc[:,0])
-        self._genestrand=np.asarray(self.geneanno.iloc[:,6])
-        self._genestart=np.asarray(self.geneanno['start_shifted'])
-        self._geneend=np.asarray(self.geneanno['end_shifted'])
-        self._genep=np.asarray(self.geneanno['p']).copy()
-        self._poschr=np.asarray(self.positives.iloc[:,0])
-        self._posstrand=np.asarray(self.positives.iloc[:,3])
-        self._posstart=np.asarray(self.positives.iloc[:,1])
-        self._posend=np.asarray(self.positives.iloc[:,2])
-        self._inds=np.arange(self.geneanno.shape[0])
-        self._randcache=[]
-
-    def train_mode(self, mode='train'):
-        if mode == 'train':
-            ind = np.asarray(self.geneanno['traininds'])
-            pind = np.asarray(self.positives['traininds'])
-        elif mode =='test':
-            ind = ~np.asarray(self.geneanno['traininds'])
-            pind = ~np.asarray(self.positives['traininds'])
-        else:
-            raise ValueError('mode has to be one of train and test.')
-
-        self._genep=np.asarray(self.geneanno['p'])[ind].copy()
-        self._genep=self._genep/np.sum(self._genep)
-        self._genechr=np.asarray(self.geneanno.iloc[:,0])[ind]
-        self._genestrand=np.asarray(self.geneanno.iloc[:,6])[ind]
-        self._genestart=np.asarray(self.geneanno['start_shifted'])[ind]
-        self._geneend=np.asarray(self.geneanno['end_shifted'])[ind]
-        self._inds=np.arange(np.sum(ind))
-        self._poschr=np.asarray(self.positives.iloc[:,0])[pind]
-        self._posstrand=np.asarray(self.positives.iloc[:,3])[pind]
-        self._posstart=np.asarray(self.positives.iloc[:,1])[pind]
-        self._posend=np.asarray(self.positives.iloc[:,2])[pind]
-        self._randcache=[]
-"""
 
 hiddenSizes = [100,2]
 n_lstm_layers = 2
@@ -370,29 +381,21 @@ if useCuda:
     for module in model:
         module.cuda()
 
-optimizers = [optim.SGD(module.parameters(), lr = 0.05, momentum=0.95) for module in model]
-criterion = nn.MSELoss()
-
-sdata = SplicingDataset(
-    os.path.join(DIR, "hg38.fa"),
-    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    ["5p", "3p"],
-    ["chr8", "chr9"],
-    radius=100,
-    mode="train")
-
 padding = (0, 0)
-
+criterion = nn.MSELoss()
+optimizer = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
 
 def runBatch(batchSize=16, update=True, plot=False):
-    region_len = sdata.radius * 2 + 1 + sum(padding)
-    inputs = np.zeros((batchSize, region_len, len(BASES)))
+    window = sdata.radius * 2 + 1 + sum(padding)
+    inputs = np.zeros((batchSize, window, len(BASES)))
+    # should there be padding here?
+    # also the '2' looks like it should be replaced with n_features
     targets = np.zeros((batchSize, sdata.radius * 2 + 1, 2))
     for i in range(batchSize):
         sequence, target = sdata.sample_mixture(0.5, padding=padding)
         inputs[i, :, :] = sequence
         #targets[i,:,:] = np.log10(target+1e-6)+6
-        targets[i, :, :] = target
+        targets[i, :, :] = target  # score of just 1 ok?
 
     if useCuda:
         inputs = Variable(torch.Tensor(inputs).cuda(), requires_grad=True)
@@ -422,6 +425,16 @@ def runBatch(batchSize=16, update=True, plot=False):
         plt.plot(outputs.data.numpy().flatten(),targets.data.numpy().flatten(),'.',alpha=0.2)
         plt.show()
     return loss.data[0]
+
+
+sdata = SplicingDataset(
+    os.path.join(DIR, "hg38.fa"),
+    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
+    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
+    ["5p", "3p"],
+    ["chr8", "chr9"],
+    radius=100,
+    mode="train")
 
 
 for _ in range(10000):
