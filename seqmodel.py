@@ -114,7 +114,7 @@ class Genome:
                     strand))
 
 
-class GenomicData:
+class GenomeTargets:
 
     def __init__(self, dataset, features):
         """Stores the dataset specifying sequence regions and features..
@@ -142,10 +142,23 @@ class GenomicData:
         features_map : dict
         """
         self.data = tabix.open(dataset)
-        print(type(self.data))
         self.n_features = len(features)
         self.features_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
+
+    def is_positive(self, chrom, start, end, radius, verbose):
+        try:
+            rows = self.data.query(chrom, start, end)
+            for row in rows:
+                feat_start = int(row[1])
+                feat_end = int(row[2])
+                section_start = max(feat_start, start)
+                section_end = min(feat_end, end)
+                if section_start - section_end > (start - end - 1) / 2:
+                    return True
+            return False
+        except tabix.TabixError:
+            return False
 
     def get_feature_data(self, chrom, start, end, strand='+',
             verbose=False):
@@ -179,7 +192,7 @@ class GenomicData:
         encoding = np.zeros((end - start, self.n_features))
         #print("{0} ({1}), {2} ({3}), {4} ({5})".format(chrom, type(chrom), start, type(start), end, type(end)))
         try:
-            rows = self.data.query(str(chrom), start, end)
+            rows = self.data.query(chrom, start, end)
             if strand == '+':
                 for row in rows:
                     if verbose:
@@ -338,49 +351,51 @@ class Sampler:
                 strand, verbose=verbose)
             return (retrieved_sequence, retrieved_data)
 
-    def sample_background(self, sequence_only=False, verbose=False, padding=(0, 0)):
+    def sample_background(self, sequence_only=False, verbose=False):
         # TODO: documentation
         # TODO: random seed
+        # should this be sample_negative now?
         if len(self._randcache) == 0:
             self._randcache = list(
                 np.random.choice(self.genome.chrs, size=2000))
                 #np.random.choice(
                 #    self.genome.chrs, p=self.genome.chrs_distribution, size=2000))
         randchr = self._randcache.pop()
-        randpos = np.random.choice(range(self.radius, len(self.genome.get(randchr) - self.radius)))
+        randpos = np.random.choice(range(
+            self.radius, len(self.genome.get(randchr) - self.radius)))
         randstrand = np.random.choice(self.strand_choices)
+        # should query to make sure this is a true negative?
+        is_positive = self.query_targets.is_positive(
+            randchr, randpos - self.radius, randpos + self.radius + 1,
+            self.radius, verbose=verbose)
+        if is_positive:
+            print("sampled background overlapped with positive examples")
+            return self.sample_background(sequence_only, verbose)
+        else:
+            return self._retrieve(randchr, randpos, randstrand,
+                sequence_only=sequence_only, verbose=verbose)
 
-        return self._retrieve(randchr, randpos, randstrand,
-                              sequence_only=sequence_only,
-                              verbose=verbose)
+    def sample_positive(self, sequence_only=False, verbose=False):
 
-    def sample_positive(self, sequence_only=False, verbose=False, padding=(0, 0)):
-
-        randind = np.random.randint(0, self._features_dataframe.shape[0])
+        randind = np.random.randint(0, self._features_df.shape[0])
         row = self._features_dataframe.iloc[randind]
 
-        gene_length = row["end"] - row["start"]  # + 1?
-        print(gene_length)
+        gene_length = row["end"] - row["start"]
         chrom = row["chr"]
 
         rand_in_gene = np.random.uniform() * gene_length
-        rand_in_radius = np.random.uniform() * self.radius
-        # TODO: I'm not sure why we have to include radius here
-        # (particularly since we include it only in one direction)
         position = int(
-            row["start"] + rand_in_gene + rand_in_radius)
+            row["start"] + rand_in_gene)
 
         strand = row["strand"]
         if strand == '.':
-            strand_choices = ['+', '-']
-            strand = np.random.choice(strand_choices)
+            strand = np.random.choice(self.strand_choices)
 
         if verbose:
             print chrom, position, strand
-        return self._retrieve(chrom, position, strand, self.radius,
+        return self._retrieve(chrom, position, strand,
                               sequence_only=sequence_only,
-                              verbose=verbose,
-                              padding=padding)
+                              verbose=verbose)
 
     def sample_mixture(self, positive_proportion=0.5, sequence_only=False, verbose=False, padding=(0, 0)):
         """Gets a mixture of positive and background samples
@@ -388,7 +403,6 @@ class Sampler:
         if np.random.uniform() < positive_proportion:
             return self.sample_positive(sequence_only=sequence_only, verbose=verbose, padding=padding)
         else:
-            print("sample positive")
             return self.sample_background(sequence_only=sequence_only, verbose=verbose, padding=padding)
 
 hiddenSizes = [100, 381]
