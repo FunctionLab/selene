@@ -51,7 +51,7 @@ from torch.autograd import Variable
 torch.set_num_threads(32)  # TODO: should this be a parameter?
 
 # model specifications
-
+# TODO: this would be great as a config file. e.g. model_specifications.py
 N_FEATURES = 4
 HEIGHT = 1
 # WIDTH = # number of inputs or the window size...? TBD
