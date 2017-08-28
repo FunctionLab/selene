@@ -210,9 +210,9 @@ class GenomicData:
         #return encoding
 
 
-class SplicingDataset:
+class Sampler:
 
-    def __init__(self, genome, genome_data_tbi, genome_data, holdout_chrs, radius=100, mode="all"):
+    def __init__(self, genome, query_targets, genome_targets, holdout_chrs, radius=100, window_size=1001, mode="all"):
         """TODO: documentation
         TODO: nothing about validation needed here? Separate script + processing?
 
@@ -221,27 +221,32 @@ class SplicingDataset:
         genome : str
             Path to the FASTA file of a target organism's complete
             genome sequence.
-        genome_data_tbi : str
-            Path to tabix-indexed .bed file that contains information
-            about genomic features.
-        genome_data : str
+        genome_targets : str
             Path to the .bed file that contains information about
             genomic features.
-        features : list[str]
-            List of genomic features.
+        query_targets : str
+            Used for fast querying. Path to tabix-indexed .bed file that
+            contains information about genomic features.
         holdout_chrs : list[str]
             Chromosomes that act as our holdout (test) dataset.
         radius : int, optional
-            Default is 100.
+            Default is 100. The bin is composed of
+            <sequence length radius> + position + <sequence length radius>
+        window_size : int, optional
+            Default is 1001. The input sequence size.
+            (e.g. defaults result in 400 bp on either side of a 201 bp bin)
         mode : {"all", "train", "test"}, optional
             Default is "all".
 
         Attributes
         ----------
         genome : Genome
-        genome_features : GenomicData
+        features : list[str]
+        query_targets : GenomeTargets
         holdout_chrs : list[str]
         radius : int
+        padding : int
+            Should be identical on both sides
         mode : {"all", "train", "test"}
 
 
@@ -257,26 +262,35 @@ class SplicingDataset:
         self.genome = Genome(genome, holdout_chrs, mode)
 
         # TODO: not very elegant to have to do this...
-        self._features_dataframe = pd.read_table(
+        # I might only load the 1st 3 cols into memory.
+
+        self._features_df = pd.read_table(
             genome_data, header=None, names=["chr", "start", "end", "strand", "feature"])
 
-        self._feats_df = pd.read_table(
+        self._dup_features_df = pd.read_table(
             genome_data, header=None, names=["chr", "start", "end", "strand", "feature"])
 
         self.features = self._features_dataframe["feature"].unique()
         print(len(self.features))
-        print(genome_data_tbi)
-        self.genome_features = GenomicData(genome_data_tbi, self.features)
+
+        self.query_targets = GenomeTargets(query_targets, self.features)
 
         self.holdout_chrs = holdout_chrs
 
         self._training_indices = ~self._features_dataframe["chr"].isin(self.holdout_chrs)
 
+        self.radius = radius
+        self.padding = 0
+
+        # TODO: no error checking here yet.
+        remaining_space = window_size - self.radius * 2 + 1
+        if remaining_space > 0:
+            self.padding = remaining_space / 2
+
         self.set_mode(mode)
 
-        self.radius = radius
-
         self._randcache = []
+        self._strand_choices = ['+', '-']
 
     def set_mode(self, mode):
         if mode == "all":
@@ -287,24 +301,20 @@ class SplicingDataset:
         elif mode == "test":
             indices = ~np.asarray(self._training_indices)
 
-        self._features_dataframe = self._feats_df[indices]
+        self._features_df = self._dup_features_df[indices]
 
-    def _retrieve(self, chrom, position, strand, radius,
-                  sequence_only=False, verbose=False, padding=(0, 0)):
+    def _retrieve(self, chrom, position, strand,
+                  sequence_only=False, verbose=False):
         """
         Parameters
         ----------
         chrom : char|str|int
         position : int
         strand : {'+', '-'}
-        radius : int
         sequence_only : bool, optional
             Default is False.
         verbose : bool, optional
             Default is False.
-        padding : tuple(int, int), optional
-            Default is (0, 0). Represents the amount of padding at the
-            (start, end) of the region.
 
         Returns
         -------
@@ -315,17 +325,17 @@ class SplicingDataset:
         """
         if verbose:
             print("{0}, {1}, {2}".format(chrom, position, strand))
-        start = position - radius - padding[0]
-        end = position + radius + padding[1] + 1
-
+        sequence_start = position - self.radius - self.padding
+        sequence_end = position + self.radius + self.padding + 1
         retrieved_sequence = sequence_encoding(
-            self.genome.get_sequence(chrom, start, end, strand))
+            self.genome.get_sequence(
+                chrom, sequence_start, sequence_end, strand))
         if sequence_only:
             return retrieved_sequence
         else:
-            # TODO: need padding here?
             retrieved_data = self.genome_features.get_feature_data(
-                chrom, position - radius, position + radius + 1, strand, verbose=verbose)
+                chrom, position - self.radius, position + self.radius + 1,
+                strand, verbose=verbose)
             return (retrieved_sequence, retrieved_data)
 
     def sample_background(self, sequence_only=False, verbose=False, padding=(0, 0)):
@@ -333,19 +343,16 @@ class SplicingDataset:
         # TODO: random seed
         if len(self._randcache) == 0:
             self._randcache = list(
-                np.random.choice(
-                    self.genome.chrs, p=self.genome.chrs_distribution, size=2000))
+                np.random.choice(self.genome.chrs, size=2000))
+                #np.random.choice(
+                #    self.genome.chrs, p=self.genome.chrs_distribution, size=2000))
         randchr = self._randcache.pop()
-        randpos = np.random.choice(len(self.genome.get(randchr)))
-        # randpos = np.random.uniform() * len(self.genome.chrs[randchr])
-        # strand = "."
-        strand_choices = ['+', '-']
-        randstrand = np.random.choice(strand_choices)
+        randpos = np.random.choice(range(self.radius, len(self.genome.get(randchr) - self.radius)))
+        randstrand = np.random.choice(self.strand_choices)
 
-        return self._retrieve(randchr, randpos, randstrand, self.radius,
+        return self._retrieve(randchr, randpos, randstrand,
                               sequence_only=sequence_only,
-                              verbose=verbose,
-                              padding=padding)
+                              verbose=verbose)
 
     def sample_positive(self, sequence_only=False, verbose=False, padding=(0, 0)):
 
@@ -401,7 +408,7 @@ if useCuda:
         module.cuda()
 n_features = 381
 padding = (0, 0)
-criterion = nn.MSELoss()
+criterion = nn.BCELoss()
 optimizers = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
 
 def runBatch(batchSize=16, update=True, plot=False):
@@ -414,9 +421,6 @@ def runBatch(batchSize=16, update=True, plot=False):
         if sequence.shape[0] != target.shape[0]:
             continue
         inputs[i, :, :] = sequence
-        #targets[i,:,:] = np.log10(target+1e-6)+6
-        #print(targets.shape)
-        #print(target.shape)
         targets[i, :, :] = target  # score of just 1 ok?
 
     if useCuda:
