@@ -15,7 +15,7 @@ torch.set_num_threads(32)
 
 
 BASES = np.array(['A', 'G', 'C', 'T'])
-DIR="./splicing"  # TODO: REMOVE
+DIR = "./data"  # TODO: REMOVE
 
 
 def sequence_encoding(sequence):
@@ -39,32 +39,42 @@ def sequence_encoding(sequence):
 
 class Genome:
 
-    def __init__(self, fa_file):
+    def __init__(self, fa_file, holdout_chrs, mode):
         """Wrapper class around the pyfaix.Fasta class
 
         Parameters
         ----------
         fa_file : str
-            Path to an indexed FASTA file.
+            Path to a FASTA file.
             File should contain the target organism's genome sequence.
+
+        Attributes
+        ----------
+        genome : Fasta
+        chrs : list[str]
+        chrs_distribution : list[float]
         """
-        self.genome = Fasta(fafile)
-        self.chrs = sorted(genome.keys())
+        self.genome = Fasta(fa_file)
+        # TODO: need to change chrs distribution each time the mode changes
+        # For simplicity right now, I'm ignoring that and hence the
+        # other 2 params in this constructor
+        self.chrs = sorted(self.genome.keys())
+        # get the probability distribution for the chromosomes based
+        # on their lengths.
         self.chrs_distribution = self._get_chrs_distribution()
 
-        self.geneanno['p'] = (
-            (self.geneanno['end_shifted'] - self.geneanno['start_shifted'] + 1) / (
-                np.sum(self.geneanno['end_shifted'] - self.geneanno['start_shifted']) + self.geneanno.shape[0]))
-        self.geneanno['p'] = (
-            np.asarray(self.geneanno['p'] * (self.geneanno['p']>=0))/np.sum(self.geneanno['p'] * (self.geneanno['p']>=0)))
-
     def _get_chrs_distribution(self):
-        len_each_chr = np.array([len(genome[chrom] for chrom in genome.keys()])
+        """This is based on code written for the genome annotations file in
+        the original script.
+        """
+        len_each_chr = np.array([len(self.genome[chrom]) for chrom in self.genome.keys()])
         total_bases = float(np.sum(len_each_chr))
         proba_chrs = len_each_chr / total_bases
         squared_proba_chrs = np.square(proba_chrs) / np.sum(np.square(proba_chrs))
         return squared_proba_chrs
 
+    def get(self, chrom):
+        return self.genome[chrom]
 
     def get_sequence(self, chrom, start, end, strand='+'):
         """Get the genomic sequence given the chromosome, sequence start,
@@ -89,6 +99,11 @@ class Genome:
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
+        print("get seq")
+        print(chrom, start, end, strand)
+        if start >= len(self.genome[chrom]):
+            return ""
+        end = min(end, len(self.genome[chrom]))
         if strand == '+':
             return self.genome[chrom][start:end].seq
         elif strand == '-':
@@ -108,22 +123,26 @@ class GenomicData:
         Additional columns are ignored.
 
         TODO: consider renaming this class?
+            Genome + GenomicData is a bit confusing, though with proper
+            descriptions it should also be fine.
 
         Parameters
         ----------
         dataset : str
             Path to the dataset.
         features : list[str]
-            TODO: these could be retrieved from the dataset?
+            TODO: these could be retrieved from the dataset - do we need
+            to pass them in explicitly?
             The list of features (labels) we are interested in predicting.
 
         Attributes
         ----------
-        data : TODO
+        data : tabix.open
         n_features : int
         features_map : dict
         """
         self.data = tabix.open(dataset)
+        print(type(self.data))
         self.n_features = len(features)
         self.features_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
@@ -157,47 +176,57 @@ class GenomicData:
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        encoding = np.zeros(end - start, self.n_features))
-        rows = self.data.query(chrom, start, end)  # TODO: need strand?
-        if strand == '+':
-            for row in rows:
-                if verbose:
-                    print(row)
-                # TODO: this could be a helper
-                feat_start = int(row[1]) - start
-                feat_end = int(row[2]) - start
-                feature = row[4]
-                feat_index = self.features_mapping[feature]
-                code[feat_start:feat_end, feat_index] = 1
-        elif strand == '-':
-            for row in rows:
-                if verbose:
-                    print(row)
-                feat_start = end - int(row[2])
-                feat_end = end - int(row[1])
-                feature = row[4]
-                feat_index = self.features_mapping[feature]
-                code[feat_start:feat_end, feat_index] = 1
-        else:
-            raise ValueError(
-                "Strand must be one of '+' or '-'. Input was {0}".format(
-                    strand))
-        return encoding
+        encoding = np.zeros((end - start, self.n_features))
+        #print("{0} ({1}), {2} ({3}), {4} ({5})".format(chrom, type(chrom), start, type(start), end, type(end)))
+        try:
+            rows = self.data.query(str(chrom), start, end)
+            if strand == '+':
+                for row in rows:
+                    if verbose:
+                        print(row)
+                    # TODO: this could be a helper
+                    feat_start = int(row[1]) - start
+                    feat_end = int(row[2]) - start
+                    feature = row[4]
+                    feat_index = self.features_map[feature]
+                    encoding[feat_start:feat_end, feat_index] = 1
+            elif strand == '-':
+                for row in rows:
+                    if verbose:
+                        print(row)
+                    feat_start = end - int(row[2])
+                    feat_end = end - int(row[1])
+                    feature = row[4]
+                    feat_index = self.features_map[feature]
+                    encoding[feat_start:feat_end, feat_index] = 1
+            else:
+                raise ValueError(
+                    "Strand must be one of '+' or '-'. Input was {0}".format(
+                        strand))
+            return encoding
+        except tabix.TabixError as e:
+            print(e)
+            return encoding
+        #return encoding
 
 
 class SplicingDataset:
 
-    def __init__(self, genome, genome_data_tbi, genome_data, features, holdout_chrs, radius=100, mode="all"):
+    def __init__(self, genome, genome_data_tbi, genome_data, holdout_chrs, radius=100, mode="all"):
         """TODO: documentation
+        TODO: nothing about validation needed here? Separate script + processing?
 
         Parameters
         ----------
         genome : str
-            Path to indexed FASTA file of target organism's complete
+            Path to the FASTA file of a target organism's complete
             genome sequence.
-        genome_data : str
+        genome_data_tbi : str
             Path to tabix-indexed .bed file that contains information
             about genomic features.
+        genome_data : str
+            Path to the .bed file that contains information about
+            genomic features.
         features : list[str]
             List of genomic features.
         holdout_chrs : list[str]
@@ -226,12 +255,22 @@ class SplicingDataset:
             raise ValueError("Mode must be one of {0}. Input was '{1}'.".format(MODES, mode))
 
         self.genome = Genome(genome, holdout_chrs, mode)
-        self.genome_features = GenomicData(genome_data_tbi, features)
+
+        # TODO: not very elegant to have to do this...
         self._features_dataframe = pd.read_table(
             genome_data, header=None, names=["chr", "start", "end", "strand", "feature"])
 
+        self._feats_df = pd.read_table(
+            genome_data, header=None, names=["chr", "start", "end", "strand", "feature"])
+
+        self.features = self._features_dataframe["feature"].unique()
+        print(len(self.features))
+        print(genome_data_tbi)
+        self.genome_features = GenomicData(genome_data_tbi, self.features)
+
         self.holdout_chrs = holdout_chrs
-        self._training_indices = pd.match(self._features_dataframe["chr"], self.holdout_chrs) == -1
+
+        self._training_indices = ~self._features_dataframe["chr"].isin(self.holdout_chrs)
 
         self.set_mode(mode)
 
@@ -239,41 +278,16 @@ class SplicingDataset:
 
         self._randcache = []
 
-        #self.genome = Genome(os.path.join(DIR, "hg38.fa"))
-        #self.data = GenomicData(os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),nfeatures=2,featureDict={'5p':0, '3p':1})
+    def set_mode(self, mode):
+        if mode == "all":
+            return
 
-        #self.geneanno=pd.read_csv(os.path.join(DIR, "gencode.v25.annotation.gtf.gz.gene.pc"),sep='\t',header=None)
-        #self.positives = pd.read_csv(os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),sep='\t',header=None)
-        #self.holdout = ['chr8','chr9']
-
-        #initializations
-        #self.geneanno['traininds']=pd.match(self.geneanno.iloc[:,0], ['chr8','chr9']) == -1
-        #self.positives['traininds']=pd.match(self.positives.iloc[:,0], ['chr8','chr9']) == -1
-        #self.geneanno['start_shifted']=self.geneanno.iloc[:,3]+self.radius
-        #self.geneanno['end_shifted']=self.geneanno.iloc[:,4]-self.radius
-
-        #self.geneanno['p'] = (
-        #    (self.geneanno['end_shifted'] - self.geneanno['start_shifted'] + 1) / (
-        #        np.sum(self.geneanno['end_shifted'] - self.geneanno['start_shifted']) + self.geneanno.shape[0]))
-        #self.geneanno['p'] = (
-        #    np.asarray(self.geneanno['p'] * (self.geneanno['p']>=0))/np.sum(self.geneanno['p'] * (self.geneanno['p']>=0)))
-
-
-        #if mode == "all":
-        #    self.all_mode()
-        #elif mode == 'train':
-        #    self.train_mode(mode='train')
-        #elif mode == 'test':
-        #    self.train_mode(mode='test')
-        #else:
-        #    raise ValueError('Mode has to be one of "all", "train", and "test".')
-
-   def set_mode(self, mode):
         if mode == "train":
-            indices = np.asarray(self.training_indices)
+            indices = np.asarray(self._training_indices)
         elif mode == "test":
-            indices = ~np.asarray(self.training_indices)
-        self._features_dataframe = self._features_dataframe[indices]
+            indices = ~np.asarray(self._training_indices)
+
+        self._features_dataframe = self._feats_df[indices]
 
     def _retrieve(self, chrom, position, strand, radius,
                   sequence_only=False, verbose=False, padding=(0, 0)):
@@ -303,6 +317,7 @@ class SplicingDataset:
             print("{0}, {1}, {2}".format(chrom, position, strand))
         start = position - radius - padding[0]
         end = position + radius + padding[1] + 1
+
         retrieved_sequence = sequence_encoding(
             self.genome.get_sequence(chrom, start, end, strand))
         if sequence_only:
@@ -310,7 +325,7 @@ class SplicingDataset:
         else:
             # TODO: need padding here?
             retrieved_data = self.genome_features.get_feature_data(
-                chrom, pos - radius, pos + radius + 1, strand, verbose=verbose)
+                chrom, position - radius, position + radius + 1, strand, verbose=verbose)
             return (retrieved_sequence, retrieved_data)
 
     def sample_background(self, sequence_only=False, verbose=False, padding=(0, 0)):
@@ -321,13 +336,13 @@ class SplicingDataset:
                 np.random.choice(
                     self.genome.chrs, p=self.genome.chrs_distribution, size=2000))
         randchr = self._randcache.pop()
-        randpos = np.random.choice(len(self.genome[randchr])
+        randpos = np.random.choice(len(self.genome.get(randchr)))
         # randpos = np.random.uniform() * len(self.genome.chrs[randchr])
         # strand = "."
-        strand_choices = ["+", "-"]
+        strand_choices = ['+', '-']
         randstrand = np.random.choice(strand_choices)
 
-        return self._retrieve(chrom, position, randstrand, self.radius,
+        return self._retrieve(randchr, randpos, randstrand, self.radius,
                               sequence_only=sequence_only,
                               verbose=verbose,
                               padding=padding)
@@ -336,7 +351,9 @@ class SplicingDataset:
 
         randind = np.random.randint(0, self._features_dataframe.shape[0])
         row = self._features_dataframe.iloc[randind]
+
         gene_length = row["end"] - row["start"]  # + 1?
+        print(gene_length)
         chrom = row["chr"]
 
         rand_in_gene = np.random.uniform() * gene_length
@@ -347,8 +364,8 @@ class SplicingDataset:
             row["start"] + rand_in_gene + rand_in_radius)
 
         strand = row["strand"]
-        if strand == ".":
-            strand_choices = ["+", "-"]
+        if strand == '.':
+            strand_choices = ['+', '-']
             strand = np.random.choice(strand_choices)
 
         if verbose:
@@ -364,12 +381,14 @@ class SplicingDataset:
         if np.random.uniform() < positive_proportion:
             return self.sample_positive(sequence_only=sequence_only, verbose=verbose, padding=padding)
         else:
+            print("sample positive")
             return self.sample_background(sequence_only=sequence_only, verbose=verbose, padding=padding)
 
-hiddenSizes = [100,2]
+hiddenSizes = [100, 381]
 n_lstm_layers = 2
 rnn = nn.LSTM(input_size=4, hidden_size=hiddenSizes[0], num_layers=n_lstm_layers, batch_first=True, bidirectional=True)
 
+# why is this hiddenSizes[0] * 2?
 conv = nn.modules.container.Sequential(
     nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[0]*2, 1),
     nn.ReLU(),
@@ -380,21 +399,24 @@ useCuda = True
 if useCuda:
     for module in model:
         module.cuda()
-
+n_features = 381
 padding = (0, 0)
 criterion = nn.MSELoss()
-optimizer = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
+optimizers = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
 
 def runBatch(batchSize=16, update=True, plot=False):
     window = sdata.radius * 2 + 1 + sum(padding)
     inputs = np.zeros((batchSize, window, len(BASES)))
     # should there be padding here?
-    # also the '2' looks like it should be replaced with n_features
-    targets = np.zeros((batchSize, sdata.radius * 2 + 1, 2))
+    targets = np.zeros((batchSize, sdata.radius * 2 + 1, n_features))
     for i in range(batchSize):
         sequence, target = sdata.sample_mixture(0.5, padding=padding)
+        if sequence.shape[0] != target.shape[0]:
+            continue
         inputs[i, :, :] = sequence
         #targets[i,:,:] = np.log10(target+1e-6)+6
+        #print(targets.shape)
+        #print(target.shape)
         targets[i, :, :] = target  # score of just 1 ok?
 
     if useCuda:
@@ -426,28 +448,28 @@ def runBatch(batchSize=16, update=True, plot=False):
         plt.show()
     return loss.data[0]
 
-
 sdata = SplicingDataset(
-    os.path.join(DIR, "hg38.fa"),
-    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    ["5p", "3p"],
+    os.path.join(DIR, "mm10_no_alt_analysis_set_ENCODE.fasta"),
+    os.path.join(DIR, "reduced_agg_beds_1.bed.gz"),
+    os.path.join(DIR, "reduced_agg_beds_1.bed"),
+    #os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
+    #os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
+    #["5p", "3p"],
     ["chr8", "chr9"],
     radius=100,
     mode="train")
 
-
-for _ in range(10000):
-    sdata.train_mode()
+n_epochs = 3
+for _ in range(n_epochs):
+    sdata.set_mode("train")
     cumlossTrain = 0
-    for _ in range(1000):
+    for _ in range(50):
         cumlossTrain = cumlossTrain + runBatch()
 
-    sdata.train_mode('test')
+    sdata.set_mode("test")
     cumlossTest = 0
-    for _ in range(100):
+    for _ in range(5):
         cumlossTest = cumlossTest + runBatch(update=False)
     print("Train loss: %.5f, Test loss: %.5f." % (cumlossTrain, cumlossTest) )
 
-
-torch.save(model,os.path.join(DIR, "models/101bp.h100.cpu.model"))
+torch.save(model,os.path.join(DIR, "models/test.mm10.cpu.model"))
