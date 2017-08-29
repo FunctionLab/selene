@@ -249,7 +249,9 @@ class Sampler:
     STRAND_SIDES = ('+', '-')
 
     def __init__(self, genome, genome_features, query_features,
-                 holdout_chrs, radius=100, window_size=1001, mode="all"):
+                 holdout_chrs, radius=100, window_size=1001,
+                 random_seed=436, mode="all"):
+
         """The class used to sample positive and negative examples from the
         genomic sequence. These examples are used during training/testing
         of the model.
@@ -272,11 +274,16 @@ class Sampler:
             Specify chromosomes to hold out (used as the test dataset).
         radius : int, optional
             Default is 100. The bin is composed of
-            <sequence length radius> + position + <sequence length radius>,
+                ([sequence (len radius)] +
+                 position (len 1) + [sequence (len radius)])
             i.e. 201 bp bin
         window_size : int, optional
             Default is 1001. The input sequence length.
+            This should be an odd number to accomodate the fact that
+            the bin sequence length will be an odd number.
             i.e. defaults result in 400 bp on either side of a 201 bp bin
+        random_seed : int, optional
+            Default is 436. Sets the numpy random seed.
         mode : {"all", "train", "test"}, optional
             Default is "all".
 
@@ -293,12 +300,28 @@ class Sampler:
         Raises
         ------
         ValueError
-            If the input str to `mode` is not one of the specified choices.
+            - If the input str to `mode` is not one of the specified choices.
+            - If the input `window_size` is less than the computed bin size.
+            - If the input `window_size` is an even number.
         """
         print(MODES)
         print(self.MODES)
         if mode not in self.MODES:
-            raise ValueError("Mode must be one of {0}. Input was '{1}'.".format(MODES, mode))
+            raise ValueError(
+                "Mode must be one of {0}. Input was '{1}'.".format(
+                    self.MODES, mode))
+
+        if window_size < (1 + 2 * radius):
+            raise ValueError(
+                "Window size of {0} is not greater than bin "
+                "size of 1 + 2 x radius {1} = {2}".format(
+                    window_size, radius, 1 + 2 * radius))
+
+
+        if window_size % 2 == 0:
+            raise ValueError(
+                "Window size must be an odd number. Input was {0}".format(
+                    window_size))
 
         self.genome = Genome(genome)
 
@@ -324,18 +347,34 @@ class Sampler:
         # we use the padding to incorporate sequence context around the
         # bin for which we have feature information.
         self.padding = 0
-        # TODO: no error checking here yet.
+
         remaining_space = window_size - self.radius * 2 + 1
         if remaining_space > 0:
             self.padding = remaining_space / 2
 
         self.set_mode(mode)
 
+        np.random.seed(random_seed)
+
+        # used during the background sampling step - get a random chromosome
+        # in the Genome FASTA file and randomly select a position in the
+        # sequence from there.
         self._randcache = []
-        self._strand_choices = ['+', '-']
 
     def set_mode(self, mode):
+        """Determines what positive examples are available to sample depending
+        on the mode.
+
+        Parameters
+        ----------
+        mode : {"all", "train", "test}
+            - all: Use all examples in the genomic features dataset
+            - train: Use all examples except those in the holdout chromosome
+                     set
+            - test: Use only the examples in the holdout chromosome set
+        """
         if mode == "all":
+            self._features_df = self._dup_features_df.copy()
             return
 
         if mode == "train":
@@ -350,7 +389,8 @@ class Sampler:
         """
         Parameters
         ----------
-        chrom : char|str|int
+        chrom : str
+            e.g. "chr1"
         position : int
         strand : {'+', '-'}
         sequence_only : bool, optional
@@ -381,17 +421,28 @@ class Sampler:
             return (retrieved_sequence, retrieved_data)
 
     def sample_background(self, sequence_only=False, verbose=False):
-        # TODO: documentation
-        # TODO: random seed
-        # should this be sample_negative now?
+        """Sample a background (i.e. negative) example from the genome.
+
+        Parameters
+        ----------
+        sequence_only : bool, optional
+            Default is False.
+        verbose : bool, optional
+            Default is False.
+
+        Returns
+        -------
+        np.ndarray | tuple(np.ndarray, np.ndarray)
+            If `sequence_only`, returns the sequence encoding and nothing else.
+            Otherwise, returns both the sequence encoding and the feature labels
+            for the specified range.
+        """
         if len(self._randcache) == 0:
             self._randcache = list(
                 np.random.choice(self.genome.chrs, size=2000))
-                #np.random.choice(
-                #    self.genome.chrs, p=self.genome.chrs_distribution, size=2000))
         randchr = self._randcache.pop()
         randpos = np.random.choice(range(
-            self.radius, len(self.genome.get(randchr) - self.radius)))
+            self.radius, self.genome.get_chr_len(randchr) - self.radius))
         randstrand = np.random.choice(self.strand_choices)
         # should query to make sure this is a true negative?
         is_positive = self.query_targets.is_positive(
