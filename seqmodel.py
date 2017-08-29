@@ -19,7 +19,7 @@ DIR = "./data"  # TODO: REMOVE
 
 
 def sequence_encoding(sequence):
-    """Converts an input sequence to its binary encoding.
+    """Converts an input sequence to its one hot encoding.
 
     Parameters
     ----------
@@ -59,19 +59,6 @@ class Genome:
         # For simplicity right now, I'm ignoring that and hence the
         # other 2 params in this constructor
         self.chrs = sorted(self.genome.keys())
-        # get the probability distribution for the chromosomes based
-        # on their lengths.
-        self.chrs_distribution = self._get_chrs_distribution()
-
-    def _get_chrs_distribution(self):
-        """This is based on code written for the genome annotations file in
-        the original script.
-        """
-        len_each_chr = np.array([len(self.genome[chrom]) for chrom in self.genome.keys()])
-        total_bases = float(np.sum(len_each_chr))
-        proba_chrs = len_each_chr / total_bases
-        squared_proba_chrs = np.square(proba_chrs) / np.sum(np.square(proba_chrs))
-        return squared_proba_chrs
 
     def get(self, chrom):
         return self.genome[chrom]
