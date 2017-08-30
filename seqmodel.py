@@ -40,7 +40,7 @@ def sequence_encoding(sequence):
 class Genome:
 
     def __init__(self, fa_file):
-        """Wrapper class around the pyfaix.Fasta class
+        """Wrapper class around the pyfaix.Fasta class.
 
         Parameters
         ----------
@@ -56,35 +56,20 @@ class Genome:
         self.genome = Fasta(fa_file)
         self.chrs = sorted(self.genome.keys())
 
-    def get_chr_sequence(self, chrom, strand='+'):
-        """Get the genomic sequence given the chromosome
-        and strand side.
+    def get_chr_len(self, chrom):
+        """Get the length of the input chromosome.
 
         Parameters
         ----------
         chr : str
-            e.g. "chr1"
-        strand : {'+', '-'}, optional
-            Default is '+'.
+            e.g. "chr1".
 
         Returns
         -------
-        str
-            The genomic sequence.
-
-        Raises
-        ------
-        ValueError
-            If the input char to `strand` is not one of the specified choices.
+        int
+            The length of the chromosome's genomic sequence.
         """
-        if strand == '+':
-            return self.genome[chrom][:].seq
-        elif strand == '-':
-            return self.genome[chrom][:].reverse.complement.seq
-        else:
-            raise ValueError(
-                "Strand must be one of '+' or '-'. Input was {0}".format(
-                    strand))
+        return len(self.genome[chrom])
 
     def get_sequence(self, chrom, start, end, strand='+'):
         """Get the genomic sequence given the chromosome, sequence start,
@@ -109,9 +94,9 @@ class Genome:
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        if start >= len(self.genome[chrom]):
+        if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) or start < 0:
+            print("* ~ * ~ * [EMPTY {0}, {1}, {2}] ~ * ~ *".format(chrom, start, end))
             return ""
-        end = min(end, len(self.genome[chrom]))
 
         if strand == '+':
             return self.genome[chrom][start:end].seq
@@ -147,6 +132,7 @@ class GenomicFeatures:
         """
         self.data = tabix.open(dataset)
         self.n_features = len(features)
+
         self.features_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
 
@@ -159,7 +145,7 @@ class GenomicFeatures:
         Parameters
         ----------
         chrom : str
-            e.g. "chr1"
+            e.g. "chr1".
         start : int
         end : int
         threshold : [0.0, 1.0], float, optional
@@ -172,22 +158,50 @@ class GenomicFeatures:
         -------
         bool
             True if this meets the criterion for a positive example,
-            False otherwise
+            False otherwise.
         """
         try:
             rows = self.data.query(chrom, start, end)
             for row in rows:
-                feat_start = int(row[1])
-                feat_end = int(row[2])
-                section_start = max(feat_start, start)
-                section_end = min(feat_end, end)
-                if section_end - section_start > (end - start - 1) * threshold:
+                is_positive = self._is_positive_single(
+                    start, end,
+                    int(row[1]), int(row[2]), threshold)
+                if is_positive:
                     return True
             return False
         except tabix.TabixError:
             return False
 
-    def get_feature_data(self, chrom, start, end, strand='+'):
+    def _is_positive_single(self, query_start, query_end,
+            feat_start, feat_end, threshold):
+        """Helper function to determine whether a single row from a successful
+        query is considered a positive example.
+
+        Parameters
+        ----------
+        query_start : int
+        query_end : int
+        feat_start : int
+        feat_end : int
+        threshold : [0.0, 1.0], float
+            The threshold specifies the proportion of
+            the [`start`, `end`) window that needs to be covered by
+            at least one feature for the example to be considered
+            positive.
+        Returns
+        -------
+        bool
+            True if this row meets the criterion for a positive example,
+            False otherwise.
+        """
+        overlap_start = max(feat_start, query_start)
+        overlap_end = min(feat_end, query_end)
+        min_overlap_needed = (query_end - query_start) * threshold
+        if overlap_end - overlap_start > min_overlap_needed:
+            return True
+        return False
+
+    def get_feature_data(self, chrom, start, end, strand='+', threshold=0.50):
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will
@@ -202,6 +216,11 @@ class GenomicFeatures:
         end : int
         strand : {'+', '-'}, optional
             Default is '+'.
+        threshold : [0.0, 1.0], float, optional
+            Default is 0.50. The threshold specifies the proportion of
+            the [`start`, `end`) window that needs to be covered by
+            at least one feature for the example to be considered
+            positive.
 
         Returns
         -------
@@ -218,17 +237,26 @@ class GenomicFeatures:
             rows = self.data.query(chrom, start, end)
             if strand == '+':
                 for row in rows:
-                    # TODO: this could be a helper
-                    feat_start = int(row[1]) - start
-                    feat_end = int(row[2]) - start
-                    feat_index = self.features_map[row[4]]
-                    encoding[feat_start:feat_end, feat_index] = 1
+                    feat_start = int(row[1])
+                    feat_end = int(row[2])
+                    is_positive = self._is_positive_single(
+                        start, end, feat_start, feat_end, threshold)
+                    if is_positive:
+                        index_start = feat_start - start
+                        index_end = feat_end - start
+                        index_feat = self.features_map[row[4]]
+                        encoding[index_start:index_end, index_feat] = 1
             elif strand == '-':
                 for row in rows:
-                    feat_start = end - int(row[2])
-                    feat_end = end - int(row[1])
-                    feat_index = self.features_map[row[4]]
-                    encoding[feat_start:feat_end, feat_index] = 1
+                    feat_start = int(row[1])
+                    feat_end = int(row[2])
+                    is_positive = self._is_positive_single(
+                        start, end, feat_start, feat_end, threshold)
+                    if is_positive:
+                        index_start = end - feat_end
+                        index_end = end - feat_start
+                        index_feat = self.features_map[row[4]]
+                        encoding[index_start:index_end, index_feat] = 1
             else:
                 raise ValueError(
                     "Strand must be one of '+' or '-'. Input was {0}".format(
@@ -243,12 +271,12 @@ class Sampler:
 
     MODES = ("all", "train", "test")
     EXPECTED_BED_COLS = (
-        "chr", "start", "end", "strand", "feature", "metadata_index")
+        "chr", "start", "end", "strand", "feature") # "metadata_index")
     USE_BED_COLS = (
-        "chr", "start", "end", "strand")
+        "chr", "start", "end", "strand", "feature")
     STRAND_SIDES = ('+', '-')
 
-    def __init__(self, genome, genome_features, query_features,
+    def __init__(self, genome, genomic_features, query_features,
                  holdout_chrs, radius=100, window_size=1001,
                  random_seed=436, mode="all"):
 
@@ -261,7 +289,7 @@ class Sampler:
         genome : str
             Path to the indexed FASTA file of a target organism's complete
             genome sequence.
-        genome_features : str
+        genomic_features : str
             Path to the .bed file that contains information about
             genomic features.
             File must have the following columns, in order:
@@ -269,19 +297,20 @@ class Sampler:
         query_features : str
             Used for fast querying. Path to tabix-indexed .bed file that
             contains information about genomic features.
-            (`genome_targets` is the uncompressed original)
+            (`genome_features` is the uncompressed original)
         holdout_chrs : list[str]
             Specify chromosomes to hold out (used as the test dataset).
         radius : int, optional
             Default is 100. The bin is composed of
                 ([sequence (len radius)] +
                  position (len 1) + [sequence (len radius)])
-            i.e. 201 bp bin
+            i.e. 201 bp bin.
         window_size : int, optional
             Default is 1001. The input sequence length.
-            This should be an odd number to accomodate the fact that
+            This should be an odd number to accommodate the fact that
             the bin sequence length will be an odd number.
-            i.e. defaults result in 400 bp on either side of a 201 bp bin
+            i.e. defaults result in 400 bp padding on either side of a
+            201 bp bin.
         random_seed : int, optional
             Default is 436. Sets the numpy random seed.
         mode : {"all", "train", "test"}, optional
@@ -296,7 +325,6 @@ class Sampler:
             Should be identical on both sides
         mode : {"all", "train", "test"}
 
-
         Raises
         ------
         ValueError
@@ -304,8 +332,6 @@ class Sampler:
             - If the input `window_size` is less than the computed bin size.
             - If the input `window_size` is an even number.
         """
-        print(MODES)
-        print(self.MODES)
         if mode not in self.MODES:
             raise ValueError(
                 "Mode must be one of {0}. Input was '{1}'.".format(
@@ -328,16 +354,16 @@ class Sampler:
         # used during the positive sampling step - get a random index from the
         # .bed file and the corresponding (chr, start, end, strand).
         self._features_df = pd.read_table(
-            genome_data, header=None, names=self.EXPECTED_BED_COLS,
+            genomic_features, header=None, names=self.EXPECTED_BED_COLS,
             usecols=self.USE_BED_COLS)
         # stores a copy of the .bed file that can be used to reset
         # `self._features_df` depending on what mode is specified.
         self._dup_features_df = pd.read_table(
-            genome_data, header=None, names=self.EXPECTED_BED_COLS,
+            genomic_features, header=None, names=self.EXPECTED_BED_COLS,
             usecols=self.USE_BED_COLS)
-        self._training_indices = ~self._features_dataframe["chr"].isin(holdout_chrs)
+        self._training_indices = ~self._features_df["chr"].isin(holdout_chrs)
 
-        features = self._features_dataframe["feature"].unique()
+        features = self._features_df["feature"].unique()
         print(len(features))
         self.query_features = GenomicFeatures(query_features, features)
 
@@ -348,7 +374,7 @@ class Sampler:
         # bin for which we have feature information.
         self.padding = 0
 
-        remaining_space = window_size - self.radius * 2 + 1
+        remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
             self.padding = remaining_space / 2
 
@@ -357,7 +383,7 @@ class Sampler:
         np.random.seed(random_seed)
 
         # used during the background sampling step - get a random chromosome
-        # in the Genome FASTA file and randomly select a position in the
+        # in the genome FASTA file and randomly select a position in the
         # sequence from there.
         self._randcache = []
 
@@ -368,10 +394,10 @@ class Sampler:
         Parameters
         ----------
         mode : {"all", "train", "test}
-            - all: Use all examples in the genomic features dataset
-            - train: Use all examples except those in the holdout chromosome
-                     set
-            - test: Use only the examples in the holdout chromosome set
+            - all:   Use all examples in the genomic features dataset.
+            - train: Use all examples except those in the holdout
+                     chromosome set.
+            - test:  Use only the examples in the holdout chromosome set.
         """
         if mode == "all":
             self._features_df = self._dup_features_df.copy()
@@ -385,23 +411,25 @@ class Sampler:
         self._features_df = self._dup_features_df[indices]
 
     def _retrieve(self, chrom, position, strand,
-                  sequence_only=False, verbose=False):
+                  is_positive=False,
+                  verbose=False):
         """
         Parameters
         ----------
         chrom : str
-            e.g. "chr1"
+            e.g. "chr1".
         position : int
         strand : {'+', '-'}
-        sequence_only : bool, optional
-            Default is False.
+        is_positive : bool, optional
+            Default is True.
         verbose : bool, optional
             Default is False.
 
         Returns
         -------
-        np.ndarray | tuple(np.ndarray, np.ndarray)
-            If `sequence_only`, returns the sequence encoding and nothing else.
+        tuple(np.ndarray, np.ndarray)
+            If not `is_positive`, returns the sequence encoding and a numpy
+            array of zeros (no feature labels present).
             Otherwise, returns both the sequence encoding and the feature labels
             for the specified range.
         """
@@ -412,51 +440,64 @@ class Sampler:
         retrieved_sequence = sequence_encoding(
             self.genome.get_sequence(
                 chrom, sequence_start, sequence_end, strand))
-        if sequence_only:
-            return retrieved_sequence
+        bin_start = position - self.radius
+        bin_end = position + self.radius + 1
+        if not is_positive:
+            return (
+                retrieved_sequence,
+                np.zeros((bin_end - bin_start,
+                         self.query_features.n_features)))
         else:
-            retrieved_data = self.genome_features.get_feature_data(
-                chrom, position - self.radius, position + self.radius + 1,
-                strand, verbose=verbose)
+            retrieved_data = self.query_features.get_feature_data(
+                chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
 
-    def sample_background(self, sequence_only=False, verbose=False):
+    def sample_background(self, verbose=False):
         """Sample a background (i.e. negative) example from the genome.
 
         Parameters
         ----------
-        sequence_only : bool, optional
-            Default is False.
         verbose : bool, optional
             Default is False.
 
         Returns
         -------
-        np.ndarray | tuple(np.ndarray, np.ndarray)
-            If `sequence_only`, returns the sequence encoding and nothing else.
-            Otherwise, returns both the sequence encoding and the feature labels
-            for the specified range.
+        tuple(np.ndarray, np.ndarray)
+            Returns the sequence encoding and a numpy array of zeros (no
+            feature labels present).
         """
         if len(self._randcache) == 0:
             self._randcache = list(
                 np.random.choice(self.genome.chrs, size=2000))
         randchr = self._randcache.pop()
         randpos = np.random.choice(range(
-            self.radius, self.genome.get_chr_len(randchr) - self.radius))
-        randstrand = np.random.choice(self.strand_choices)
-        # should query to make sure this is a true negative?
-        is_positive = self.query_targets.is_positive(
-            randchr, randpos - self.radius, randpos + self.radius + 1,
-            self.radius, verbose=verbose)
+            self.radius + self.padding,
+            self.genome.get_chr_len(randchr) - self.radius - self.padding - 1))
+        randstrand = np.random.choice(self.STRAND_SIDES)
+        is_positive = self.query_features.is_positive(
+            randchr, randpos - self.radius, randpos + self.radius + 1)
         if is_positive:
             print("sampled background overlapped with positive examples")
-            return self.sample_background(sequence_only, verbose)
+            return self.sample_background(verbose)
         else:
+            print("BG: {0}, {1}, {2}".format(randchr, randpos, randstrand))
             return self._retrieve(randchr, randpos, randstrand,
-                sequence_only=sequence_only, verbose=verbose)
+                is_positive=False, verbose=verbose)
 
-    def sample_positive(self, sequence_only=False, verbose=False):
+    def sample_positive(self, verbose=False):
+        """Sample a positive example from the genome.
 
+        Parameters
+        ----------
+        verbose : bool, optional
+            Default is False.
+
+        Returns
+        -------
+        tuple(np.ndarray, np.ndarray)
+            Returns both the sequence encoding and the feature labels
+            for the specified range.
+        """
         randind = np.random.randint(0, self._features_df.shape[0])
         row = self._features_df.iloc[randind]
 
@@ -469,54 +510,77 @@ class Sampler:
 
         strand = row["strand"]
         if strand == '.':
-            strand = np.random.choice(self.strand_choices)
+            strand = np.random.choice(self.STRAND_SIDES)
 
         if verbose:
-            print chrom, position, strand
-        return self._retrieve(chrom, position, strand,
-                              sequence_only=sequence_only,
-                              verbose=verbose)
+            print(chrom, position, strand)
+        print("PT: {0}, {1}, {2}".format(chrom, position, strand))
+        seq, feats = self._retrieve(chrom, position, strand,
+            is_positive=True, verbose=verbose)
+        n, k = seq.shape
+        if n == 0:
+            print("no sequence...{0}".format(seq.shape))
+            return self.sample_positive(verbose=verbose)
+        else:
+            return (seq, feats)
 
-    def sample_mixture(self, positive_proportion=0.5, sequence_only=False, verbose=False, padding=(0, 0)):
+    def sample_mixture(self, positive_proportion=0.50, verbose=False):
         """Gets a mixture of positive and background samples
+
+        Parameters
+        ----------
+        positive_proportion : [0.0, 1.0], float, optional
+            Default is 0.50. Specify the proportion of positive examples to sample.
+        verbose : bool, optional
+            Default is False.
+
+        Returns
+        -------
+        tuple(np.ndarray, np.ndarray)
+            Returns both the sequence encoding and the feature labels
+            for the specified range.
         """
         if np.random.uniform() < positive_proportion:
-            return self.sample_positive(sequence_only=sequence_only, verbose=verbose, padding=padding)
+            return self.sample_positive(verbose=verbose)
         else:
-            return self.sample_background(sequence_only=sequence_only, verbose=verbose, padding=padding)
+            return self.sample_background(verbose=verbose)
 
-hiddenSizes = [100, 381]
+n_features = 381
+hiddenSizes = [100, n_features]
 n_lstm_layers = 2
 rnn = nn.LSTM(input_size=4, hidden_size=hiddenSizes[0], num_layers=n_lstm_layers, batch_first=True, bidirectional=True)
 
-# why is this hiddenSizes[0] * 2?
 conv = nn.modules.container.Sequential(
     nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[0]*2, 1),
     nn.ReLU(),
-    nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[1], 1))
+    nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[1], 1),
+
+    nn.Sigmoid())
 
 model = [rnn, conv]
 useCuda = True
 if useCuda:
     for module in model:
         module.cuda()
-n_features = 381
-padding = (0, 0)
+padding = 400
 criterion = nn.BCELoss()
 optimizers = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
 
+sdata = Sampler(
+    os.path.join(DIR, "mm10_no_alt_analysis_set_ENCODE.fasta"),
+    os.path.join(DIR, "reduced_agg_beds_1.bed"),
+    os.path.join(DIR, "reduced_agg_beds_1.bed.gz"),
+    ["chr8", "chr9"],
+    mode="train")
+
 def runBatch(batchSize=16, update=True, plot=False):
-    window = sdata.radius * 2 + 1 + sum(padding)
+    window = sdata.radius * 2 + padding * 2 + 1
     inputs = np.zeros((batchSize, window, len(BASES)))
-    # should there be padding here?
     targets = np.zeros((batchSize, sdata.radius * 2 + 1, n_features))
     for i in range(batchSize):
-        sequence, target = sdata.sample_mixture(0.5, padding=padding)
-        if sequence.shape[0] != target.shape[0]:
-            continue
+        sequence, target = sdata.sample_mixture()
         inputs[i, :, :] = sequence
-        targets[i, :, :] = target  # score of just 1 ok?
-
+        targets[i, :, :] = target
     if useCuda:
         inputs = Variable(torch.Tensor(inputs).cuda(), requires_grad=True)
         targets = Variable(torch.Tensor(targets).cuda())
@@ -530,7 +594,10 @@ def runBatch(batchSize=16, update=True, plot=False):
 
     outputs, hn = rnn(inputs, (h0, c0))
     outputs = conv(outputs.transpose(1,2)).transpose(1,2)
-
+    outputs = outputs[:, 400:601, :]
+    #print(outputs)
+    #print(outputs.size())
+    #print(targets.size())
     loss = criterion(outputs,targets)
 
     if update:
@@ -546,16 +613,6 @@ def runBatch(batchSize=16, update=True, plot=False):
         plt.show()
     return loss.data[0]
 
-sdata = SplicingDataset(
-    os.path.join(DIR, "mm10_no_alt_analysis_set_ENCODE.fasta"),
-    os.path.join(DIR, "reduced_agg_beds_1.bed.gz"),
-    os.path.join(DIR, "reduced_agg_beds_1.bed"),
-    #os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    #os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    #["5p", "3p"],
-    ["chr8", "chr9"],
-    radius=100,
-    mode="train")
 
 n_epochs = 3
 for _ in range(n_epochs):
