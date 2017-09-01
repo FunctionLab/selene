@@ -1,4 +1,3 @@
-
 # DeepSEA
 Here we describe the steps necessary to run [seq_model.py](seqmodel.py) as of 1 Sept 2017.
 
@@ -22,7 +21,7 @@ As a result, we end up with two files:
 1. mm10_no_alt_analysis_set_ENCODE.fasta
 2. mm10_no_alt_analysis_set_ENCODE.fasta.fai
 
-Where the indexed FASTA file (1)---**not** the .fai file---is an input to our script.
+where the indexed FASTA file (1)---**not** the .fai file---is an input to our script.
 
 ### The genomic features .bed file
 [This query](https://www.encodeproject.org/search/?type=Experiment&assay_slims%21=Genotyping&assay_title=ChIP-seq&assay_title=DNase-seq&assay_title=ATAC-seq&replicates.library.biosample.donor.organism.scientific_name=Mus+musculus&files.file_type=bigBed+narrowPeak&files.file_type=bed+narrowPeak&files.file_type=bed+broadPeak&files.file_type=bigBed+broadPeak&files.file_type=bigBed+bed3%2B&files.file_type=bed+bed9&files.file_type=bigBed+bed9&status%21=archived) was used to retrieve ENCODE mouse ChIP-seq, DNase-seq, and ATAC-seq datasets.
@@ -62,7 +61,24 @@ The feature is based on the metadata available for that file.
 The information listed for each assay is space-separated and used as the feature.
 
 #### Tabix-indexed file
+The aggregate .bed file was compressed and tabix-indexed after downloading [htslib-1.5](http://www.htslib.org/download/). 
 
+The steps taken (on the command line):
+- `sort -k1V -k2n -k3n unsorted_aggregate.bed > sorted_aggregate.bed`
+    - This sorts the .bed file using the chr, start, end columns.
+    - You can check this using `head -n20 sorted_aggregate.bed | column -t`
+- `bgzip -c sorted_aggregate.bed sorted_aggregate.bed.gz`
+    - Compresses the file
+- `tabix -p bed sorted_aggregate.bed.gz`
+
+_Steps adapted from [slowkow/pytabix](https://github.com/slowkow/pytabix#how-to-prepare-a-file-for-tabix)._
+
+As a result, we end up with three files:
+1. sorted_aggregate.bed
+2. sorted_aggregate.bed.gz
+3. sorted_aggregate.bed.gz.tbi
+
+where the files (1) and (2) are inputs to our script.
 
 ## Training and testing the model
 
@@ -71,7 +87,7 @@ We are using Python 3.6 via [anaconda3](https://www.anaconda.com/download/).
 This README also assumes that you have access to CUDA.
 Specifically, we use the `cudnn/cuda-8.0/6.0` module on Princeton's **tigergpu** cluster.
 
-The [env-spec.txt](env-spec.txt) file provided in this repository can be used to build an identical conda environment on Linux x86-64 by running the following command:
+The [env-spec.txt](env-spec.txt) file provided in this repository can be used to build an identical conda environment on Linux x86-64 by running the following:
 ```bash
 conda create --name myenv --file ./env-spec.txt
 ```
@@ -90,13 +106,13 @@ If you'd like to install these packages manually, these are the appropriate comm
 source activate myenv
 pip install pyfaidx
 ```
-The `pyfaidx` package provided on a conda channel has not been updated and will not install properly. 
+The `pyfaidx` package provided on a conda channel has not been updated and will not install properly.
+
+**Please do this regardless of whether or not you have used the spec file to build your environment.**
 
 ### Locally (e.g. on a GPU node)
 
 
 ### Slurm
-
-
 
 
