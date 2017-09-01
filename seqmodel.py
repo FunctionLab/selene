@@ -15,7 +15,7 @@ torch.set_num_threads(32)
 
 
 BASES = np.array(['A', 'G', 'C', 'T'])
-DIR = "./data"  # TODO: REMOVE
+DIR = "/tigress/kc31/data_small"  # TODO: REMOVE
 
 
 def sequence_encoding(sequence):
@@ -376,7 +376,7 @@ class Sampler:
 
         remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
-            self.padding = remaining_space / 2
+            self.padding = int(remaining_space / 2)
 
         self.set_mode(mode)
 
@@ -614,7 +614,7 @@ def runBatch(batchSize=16, update=True, plot=False):
     return loss.data[0]
 
 
-n_epochs = 3
+n_epochs = 1
 for _ in range(n_epochs):
     sdata.set_mode("train")
     cumlossTrain = 0
