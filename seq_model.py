@@ -6,11 +6,11 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    seq_model.py <genome-fa> <features-tabix> <features-file>
-        <distinct-features> <holdout> <output-file>
-        [--radius=<radius>]
-        [--mode=<mode>]
-        [-v | --verbose]
+    seq_model.py <genome-fa> <features-file> <features-gz> <output-file>
+        [--holdout-chrs=<chrs>]
+        [--radius=<radius>] [--window=<window-size>]
+        [--random-seed=<rseed>]
+        [--mode=<mode>] [-v | --verbose] [--use-cuda]
     seq_model.py -h | --help
 
 Options:
@@ -18,35 +18,45 @@ Options:
 
     <genome-fa>             The target organism's full genome sequence
                             FASTA file.
-    <features-tabix>        The tabix-indexed sequence features .bed file.
     <features-file>         The non-tabix-indexed sequence features .bed file.
-    <distinct-features>     The list of distinct features in the file.
-    <holdout-chrs>          Specify which chromosomes should be in our holdout
-                            set.
+    <features-gz>           The tabix-indexed sequence features .bed.gz file.
     <output-file>           The trained model will be saved to this file.
 
+    --holdout-chrs=<chrs>   Specify which chromosomes should be in our holdout
+                            set.
+                            [default: chr8;chr9]
     --radius=<radius>       Specify the radius surrounding a target base.
-                            (e.g. how big of a window/context is needed?)
+                            A bin of length radius + 1 target base + radius
+                            is annotated with a genomic features vector
+                            based on the features file.
                             [default: 100]
+    --window=<window-size>  Specify the input sequence window size.
+                            The window is larger than the bin to provide
+                            context for the bin sequence.
+                            [default: 1001]
+    --random-seed=<rseed>   Set the random seed.
+                            [default: 123]
     --mode=<mode>           One of {"all", "train", "test"}
                             # TODO: should this be all vs. train/test?
                             # also, if you use this to call test you should
-                            # expect an input of the trained model...
-                            [default: "all"]
+                            # expect instead to have a trained model as input
+                            [default: all]
     -v --verbose            Logging information to stdout.
                             [default: False]
+    --use-cuda              Whether CUDA is available to use or not.
+                            [default: False]
 """
-import os
 from time import time
 
 from docopt import docopt
 import numpy as np
-import pandas as pd
 import torch
 from torch import nn
 from torch import optim
 from torch.autograd import Variable
 
+from seqmodel import BASES
+from seqmodel import Sampler
 
 torch.set_num_threads(32)  # TODO: should this be a parameter?
 
@@ -55,108 +65,77 @@ torch.set_num_threads(32)  # TODO: should this be a parameter?
 N_FEATURES = 4
 HEIGHT = 1
 # WIDTH = # number of inputs or the window size...? TBD
-WIDTH = 1000
+WIDTH = 1001
 N_KERNELS = [320, 480, 960]
-N_CHANNELS = np.floor(  # account for window size and pooling layers
-    (np.floor((WIDTH - 7.) / 4.) - 7.) / 4.) - 7
-N_OUTPUTS = 919  # this is the number of chromatin features
+#N_CHANNELS = int(np.floor(  # account for window size and pooling layers
+#    (np.floor((WIDTH - 7.) / 4.) - 7.) / 4.) - 7)
+N_OUTPUTS = 381  # this is the number of chromatin features
+N_CHANNELS = int(np.floor(  # account for window size and pooling layers
+    np.floor(WIDTH / 4.) / 4.))
 
 class View(nn.Module):
     def __init__(self, *shape):
-        super(nn.View, self).__init__()
+        super(View, self).__init__()
         self.shape = shape
 
-    def forward(self, input):
-        return input.view(*shape)
+    def forward(self, x):
+        print(self.shape)
+        print(x.size())
+        print(x.view(*self.shape).size())
+        return x.view(*self.shape)
 
 
 deepsea = nn.modules.container.Sequential(
 
-    nn.Conv2d(N_FEATURES, N_KERNELS[0], (8, 1), (1, 1), padding=0),
+    #nn.Conv2d(N_FEATURES, N_KERNELS[0], (8, 1), (1, 1), padding=0),
+    nn.Conv1d(N_FEATURES, N_KERNELS[0], 1),
     nn.ReLU(inplace=True),  # should I use this flag?
-    nn.MaxPool2d((4, 1), (4, 1)),
+    # nn.MaxPool2d((4, 1), (4, 1)),
+    nn.MaxPool1d(4),
     nn.Dropout(p=0.2),  # why not have this be inplace?
 
-    nn.Conv2d(N_KERNELS[0], N_KERNELS[1], (8, 1), (1, 1), padding=0),
+    #nn.Conv2d(N_KERNELS[0], N_KERNELS[1], (8, 1), (1, 1), padding=0),
+    nn.Conv1d(N_KERNELS[0], N_KERNELS[1], 1),
     nn.ReLU(inplace=True),
-    nn.MaxPool2d((4, 1), (4, 1)),
+    #nn.MaxPool2d((4, 1), (4, 1)),
+    nn.MaxPool1d(4),
     nn.Dropout(p=0.2),
 
-    nn.Conv2d(N_KERNELS[1], N_KERNELS[2], (8, 1), (1, 1), padding=0),
+    #nn.Conv2d(N_KERNELS[1], N_KERNELS[2], (8, 1), (1, 1), padding=0),
+    nn.Conv1d(N_KERNELS[1], N_KERNELS[2], 1),
     nn.ReLU(inplace=True),
     nn.Dropout(p=0.5),
 
-    View(N_KERNELS[3] * N_CHANNELS, 1),
-    nn.Linear(N_KERNELS[3] * N_CHANNELS, N_OUTPUTS),
+    # TODO: the 16 is the batch size. Need to *not* hard code that...
+    View((16, N_KERNELS[2] * N_CHANNELS)),
+    nn.Linear(N_KERNELS[2] * N_CHANNELS, N_OUTPUTS),
     nn.ReLU(inplace=True),
     nn.Linear(N_OUTPUTS, N_OUTPUTS),
 
     nn.Sigmoid())
 
 
-if __name__ == "__main__":
-    arguments = doctopt(
-        __doc__,
-        version="1.0")
-    genome_fa_file = arguments["<genome-fa>"]
-    features_tabix_file = arguments["<features-tabix>"]
-    features_file = arguments["<features-file>"]
-    # TODO: this should be in a file... especially when you get to hundreds of features
-    features_list = list(arguments["<distinct-features>"])
-    holdout = list(arguments["<holdout-chrs>"])
-    output_file = arguments["<output-file>"]
-
-    radius = int(arguments["--radius"])
-    mode = arguments["--mode"]
-    verbose = arguments["--verbose"]
-
-
-hiddenSizes = [100,2]
-n_lstm_layers = 2
-rnn = nn.LSTM(input_size=4, hidden_size=hiddenSizes[0], num_layers=n_lstm_layers, batch_first=True, bidirectional=True)
-
-conv = nn.modules.container.Sequential(
-    nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[0]*2, 1),
-    nn.ReLU(),
-    nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[1], 1))
-
-model = [rnn, conv]
-useCuda = True
-if useCuda:
-    for module in model:
-        module.cuda()
-
-padding = (0, 0)
-criterion = nn.MSELoss()
-optimizer = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
-
-def runBatch(batchSize=16, update=True, plot=False):
-    window = sdata.radius * 2 + 1 + sum(padding)
-    inputs = np.zeros((batchSize, window, len(BASES)))
-    # should there be padding here?
-    # also the '2' looks like it should be replaced with n_features
-    targets = np.zeros((batchSize, sdata.radius * 2 + 1, 2))
-    for i in range(batchSize):
-        sequence, target = sdata.sample_mixture(0.5, padding=padding)
+def runBatch(sampler, optimizers, window_size, use_cuda, batch_size=16, update=True, plot=False):
+    inputs = np.zeros((batch_size, window_size, len(BASES)))
+    targets = np.zeros((batch_size, sampler.n_features))
+    #targets = np.zeros((batch_size, sampler.radius * 2 + 1, sampler.n_features))
+    for i in range(batch_size):
+        sequence, target = sampler.sample_mixture()
         inputs[i, :, :] = sequence
-        #targets[i,:,:] = np.log10(target+1e-6)+6
-        targets[i, :, :] = target  # score of just 1 ok?
+        targets[i, :] = np.any(target == 1, axis=0)
 
-    if useCuda:
+    if use_cuda:
         inputs = Variable(torch.Tensor(inputs).cuda(), requires_grad=True)
         targets = Variable(torch.Tensor(targets).cuda())
-        h0 = Variable(torch.zeros(n_lstm_layers*2, batchSize, hiddenSizes[0]).cuda())
-        c0 = Variable(torch.zeros(n_lstm_layers*2, batchSize, hiddenSizes[0]).cuda())
     else:
         inputs = Variable(torch.Tensor(inputs), requires_grad=True)
         targets = Variable(torch.Tensor(targets))
-        h0 = Variable(torch.zeros(n_lstm_layers * 2, batchSize, hiddenSizes[0]))
-        c0 = Variable(torch.zeros(n_lstm_layers * 2, batchSize, hiddenSizes[0]))
-
-    outputs, hn = rnn(inputs, (h0, c0))
-    outputs = conv(outputs.transpose(1,2)).transpose(1,2)
-
-    loss = criterion(outputs,targets)
+    print(inputs.size())
+    print(inputs.transpose(1,2).size())
+    outputs = deepsea(inputs.transpose(1,2))
+    print(outputs.size())
+    print(targets.size())
+    loss = criterion(outputs, targets)
 
     if update:
         for module in model:
@@ -164,35 +143,71 @@ def runBatch(batchSize=16, update=True, plot=False):
         loss.backward()
         for optimizer in optimizers:
             optimizer.step()
-
-    if plot:
-        plt.figure()
-        plt.plot(outputs.data.numpy().flatten(),targets.data.numpy().flatten(),'.',alpha=0.2)
-        plt.show()
     return loss.data[0]
 
 
-sdata = SplicingDataset(
-    os.path.join(DIR, "hg38.fa"),
-    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    os.path.join(DIR, "splicejunc.database.bed.sorted.gz"),
-    ["5p", "3p"],
-    ["chr8", "chr9"],
-    radius=100,
-    mode="train")
+if __name__ == "__main__":
+    arguments = docopt(
+        __doc__,
+        version="1.0")
+    print(arguments)
+    genome_fa_file = arguments["<genome-fa>"]
+    features_file = arguments["<features-file>"]
+    features_gz_file = arguments["<features-gz>"]
+    output_file = arguments["<output-file>"]
+
+    holdout = arguments["--holdout-chrs"].split(";")
+    radius = int(arguments["--radius"])
+    window_size = int(arguments["--window"])
+    random_seed = int(arguments["--random-seed"])
+    mode = arguments["--mode"]
+
+    verbose = arguments["--verbose"]
+    use_cuda = arguments["--use-cuda"]
+
+    model = [deepsea]
+    if use_cuda:
+        for module in model:
+            module.cuda()
+
+    criterion = nn.BCELoss()
+    optimizers = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
+
+    ti = time()
+    sampler = Sampler(
+        genome_fa_file,
+        features_file,
+        features_gz_file,
+        holdout,
+        radius=radius,
+        window_size=window_size,
+        random_seed=random_seed,
+        mode=mode)
+
+    #n_epochs = 10000
+    #n_train = 1000
+    #n_test = 100
+
+    n_epochs = 10
+    n_train = 10
+    n_test = 5
+    for _ in range(n_epochs):
+        sampler.set_mode("train")
+        cum_loss_train = 0
+        for _ in range(n_train):
+            cum_loss_train = cum_loss_train + runBatch(
+                sampler, optimizers, window_size, use_cuda)
+
+        sampler.set_mode("test")
+        cum_loss_test = 0
+        for _ in range(n_test):
+            cum_loss_test = cum_loss_test + runBatch(
+                sampler, optimizers, window_size, use_cuda,
+                update=False)
+        print("Train loss: {0}, Test loss: {1}.".format(
+            cum_loss_train / n_train, cum_loss_test / n_test))
 
 
-for _ in range(10000):
-    sdata.train_mode()
-    cumlossTrain = 0
-    for _ in range(1000):
-        cumlossTrain = cumlossTrain + runBatch()
-
-    sdata.train_mode('test')
-    cumlossTest = 0
-    for _ in range(100):
-        cumlossTest = cumlossTest + runBatch(update=False)
-    print("Train loss: %.5f, Test loss: %.5f." % (cumlossTrain, cumlossTest) )
-
-
-torch.save(model,os.path.join(DIR, "models/101bp.h100.cpu.model"))
+    torch.save(model, output_file)
+    tf = time()
+    print("Took {0} to train and test this model.".format(ti - tf))

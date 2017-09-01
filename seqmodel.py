@@ -11,6 +11,10 @@ from torch import optim
 from torch.autograd import Variable
 
 
+from guppy import hpy
+
+h = hpy()
+
 torch.set_num_threads(32)
 
 
@@ -361,10 +365,14 @@ class Sampler:
         self._dup_features_df = pd.read_table(
             genomic_features, header=None, names=self.EXPECTED_BED_COLS,
             usecols=self.USE_BED_COLS)
+
+        print(holdout_chrs)
+        print(self._features_df["chr"].unique())
         self._training_indices = ~self._features_df["chr"].isin(holdout_chrs)
 
         features = self._features_df["feature"].unique()
         print(len(features))
+        self.n_features = len(features)
         self.query_features = GenomicFeatures(query_features, features)
 
         # bin size = self.radius + 1 + self.radius
@@ -408,7 +416,7 @@ class Sampler:
         elif mode == "test":
             indices = ~np.asarray(self._training_indices)
 
-        self._features_df = self._dup_features_df[indices]
+        self._features_df = self._dup_features_df[indices].copy()
 
     def _retrieve(self, chrom, position, strand,
                   is_positive=False,
@@ -498,6 +506,7 @@ class Sampler:
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
+        print(self._features_df.shape[0])
         randind = np.random.randint(0, self._features_df.shape[0])
         row = self._features_df.iloc[randind]
 
@@ -545,86 +554,89 @@ class Sampler:
         else:
             return self.sample_background(verbose=verbose)
 
-n_features = 381
-hiddenSizes = [100, n_features]
-n_lstm_layers = 2
-rnn = nn.LSTM(input_size=4, hidden_size=hiddenSizes[0], num_layers=n_lstm_layers, batch_first=True, bidirectional=True)
+if __name__ == "__main__":
+    n_features = 381
+    hiddenSizes = [100, n_features]
+    n_lstm_layers = 2
+    rnn = nn.LSTM(input_size=4, hidden_size=hiddenSizes[0], num_layers=n_lstm_layers, batch_first=True, bidirectional=True)
 
-conv = nn.modules.container.Sequential(
-    nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[0]*2, 1),
-    nn.ReLU(),
-    nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[1], 1),
+    conv = nn.modules.container.Sequential(
+        nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[0]*2, 1),
+        nn.ReLU(),
+        nn.Conv1d(hiddenSizes[0]*2, hiddenSizes[1], 1),
 
-    nn.Sigmoid())
+        nn.Sigmoid())
 
-model = [rnn, conv]
-useCuda = True
-if useCuda:
-    for module in model:
-        module.cuda()
-padding = 400
-criterion = nn.BCELoss()
-optimizers = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
-
-sdata = Sampler(
-    os.path.join(DIR, "mm10_no_alt_analysis_set_ENCODE.fasta"),
-    os.path.join(DIR, "reduced_agg_beds_1.bed"),
-    os.path.join(DIR, "reduced_agg_beds_1.bed.gz"),
-    ["chr8", "chr9"],
-    mode="train")
-
-def runBatch(batchSize=16, update=True, plot=False):
-    window = sdata.radius * 2 + padding * 2 + 1
-    inputs = np.zeros((batchSize, window, len(BASES)))
-    targets = np.zeros((batchSize, sdata.radius * 2 + 1, n_features))
-    for i in range(batchSize):
-        sequence, target = sdata.sample_mixture()
-        inputs[i, :, :] = sequence
-        targets[i, :, :] = target
+    model = [rnn, conv]
+    useCuda = True
     if useCuda:
-        inputs = Variable(torch.Tensor(inputs).cuda(), requires_grad=True)
-        targets = Variable(torch.Tensor(targets).cuda())
-        h0 = Variable(torch.zeros(n_lstm_layers*2, batchSize, hiddenSizes[0]).cuda())
-        c0 = Variable(torch.zeros(n_lstm_layers*2, batchSize, hiddenSizes[0]).cuda())
-    else:
-        inputs = Variable(torch.Tensor(inputs), requires_grad=True)
-        targets = Variable(torch.Tensor(targets))
-        h0 = Variable(torch.zeros(n_lstm_layers * 2, batchSize, hiddenSizes[0]))
-        c0 = Variable(torch.zeros(n_lstm_layers * 2, batchSize, hiddenSizes[0]))
-
-    outputs, hn = rnn(inputs, (h0, c0))
-    outputs = conv(outputs.transpose(1,2)).transpose(1,2)
-    outputs = outputs[:, 400:601, :]
-    #print(outputs)
-    #print(outputs.size())
-    #print(targets.size())
-    loss = criterion(outputs,targets)
-
-    if update:
         for module in model:
-            module.zero_grad()
-        loss.backward()
-        for optimizer in optimizers:
-            optimizer.step()
+            module.cuda()
+    padding = 400
+    criterion = nn.BCELoss()
+    optimizers = [optim.SGD(module.parameters(), lr=0.05, momentum=0.95) for module in model]
 
-    if plot:
-        plt.figure()
-        plt.plot(outputs.data.numpy().flatten(),targets.data.numpy().flatten(),'.',alpha=0.2)
-        plt.show()
-    return loss.data[0]
+    sdata = Sampler(
+        os.path.join(DIR, "mm10_no_alt_analysis_set_ENCODE.fasta"),
+        os.path.join(DIR, "reduced_agg_beds_1.bed"),
+        os.path.join(DIR, "reduced_agg_beds_1.bed.gz"),
+        ["chr8", "chr9"],
+        mode="train")
+
+    def runBatch(batchSize=16, update=True, plot=False):
+        window = sdata.radius * 2 + padding * 2 + 1
+        inputs = np.zeros((batchSize, window, len(BASES)))
+        targets = np.zeros((batchSize, sdata.radius * 2 + 1, n_features))
+        for i in range(batchSize):
+            sequence, target = sdata.sample_mixture()
+            inputs[i, :, :] = sequence
+            targets[i, :, :] = target
+        if useCuda:
+            inputs = Variable(torch.Tensor(inputs).cuda(), requires_grad=True)
+            targets = Variable(torch.Tensor(targets).cuda())
+            h0 = Variable(torch.zeros(n_lstm_layers*2, batchSize, hiddenSizes[0]).cuda())
+            c0 = Variable(torch.zeros(n_lstm_layers*2, batchSize, hiddenSizes[0]).cuda())
+        else:
+            inputs = Variable(torch.Tensor(inputs), requires_grad=True)
+            targets = Variable(torch.Tensor(targets))
+            h0 = Variable(torch.zeros(n_lstm_layers * 2, batchSize, hiddenSizes[0]))
+            c0 = Variable(torch.zeros(n_lstm_layers * 2, batchSize, hiddenSizes[0]))
+
+        outputs, hn = rnn(inputs, (h0, c0))
+        outputs = conv(outputs.transpose(1,2)).transpose(1,2)
+        outputs = outputs[:, 400:601, :]
+        #print(outputs)
+        #print(outputs.size())
+        #print(targets.size())
+        loss = criterion(outputs,targets)
+
+        if update:
+            for module in model:
+                module.zero_grad()
+            loss.backward()
+            for optimizer in optimizers:
+                optimizer.step()
+
+        if plot:
+            plt.figure()
+            plt.plot(outputs.data.numpy().flatten(),targets.data.numpy().flatten(),'.',alpha=0.2)
+            plt.show()
+        return loss.data[0]
 
 
-n_epochs = 3
-for _ in range(n_epochs):
-    sdata.set_mode("train")
-    cumlossTrain = 0
-    for _ in range(50):
-        cumlossTrain = cumlossTrain + runBatch()
+    n_epochs = 1
+    for _ in range(n_epochs):
+        sdata.set_mode("train")
+        cumlossTrain = 0
+        for _ in range(50):
+            cumlossTrain = cumlossTrain + runBatch()
 
-    sdata.set_mode("test")
-    cumlossTest = 0
-    for _ in range(5):
-        cumlossTest = cumlossTest + runBatch(update=False)
-    print("Train loss: %.5f, Test loss: %.5f." % (cumlossTrain, cumlossTest) )
+        sdata.set_mode("test")
+        cumlossTest = 0
+        for _ in range(5):
+            cumlossTest = cumlossTest + runBatch(update=False)
+        print("Train loss: %.5f, Test loss: %.5f." % (cumlossTrain, cumlossTest) )
 
-torch.save(model,os.path.join(DIR, "models/test.mm10.cpu.model"))
+    torch.save(model,os.path.join(DIR, "models/test.mm10.cpu.model"))
+
+    print(h.heap())
