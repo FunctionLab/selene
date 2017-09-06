@@ -14,7 +14,7 @@ class Sampler(object):
 
     MODES = ("all", "train", "validate", "test")
     EXPECTED_BED_COLS = (
-        "chr", "start", "end", "strand", "feature") # "metadata_index")
+        "chr", "start", "end", "strand", "feature", "metadata_index")
     USE_BED_COLS = (
         "chr", "start", "end", "strand")
     STRAND_SIDES = ('+', '-')

@@ -6,7 +6,7 @@ import numpy as np
 from pyfaidx import Fasta
 
 
-class Genome:
+class Genome(object):
 
     BASES = np.array(['A', 'C', 'G', 'T'])
 

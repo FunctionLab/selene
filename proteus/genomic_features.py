@@ -19,7 +19,7 @@ row of genome coordinates for a feature).
 import numpy as np
 import tabix
 
-class GenomicFeatures:
+class GenomicFeatures(object):
 
     def __init__(self, dataset, features):
         """Stores the dataset specifying sequence regions and features.
