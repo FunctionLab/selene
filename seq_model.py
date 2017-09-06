@@ -24,7 +24,7 @@ Options:
 
     --holdout-chrs=<chrs>   Specify which chromosomes should be in our holdout
                             set.
-                            [default: chr8;chr9]
+                            [default: chr8,chr9]
     --radius=<radius>       Specify the radius surrounding a target base.
                             A bin of length radius + 1 target base + radius
                             is annotated with a genomic features vector
@@ -118,7 +118,6 @@ deepsea = nn.modules.container.Sequential(
 def runBatch(sampler, optimizers, window_size, use_cuda, batch_size=16, update=True, plot=False):
     inputs = np.zeros((batch_size, window_size, len(BASES)))
     targets = np.zeros((batch_size, sampler.n_features))
-    #targets = np.zeros((batch_size, sampler.radius * 2 + 1, sampler.n_features))
     for i in range(batch_size):
         sequence, target = sampler.sample_mixture()
         inputs[i, :, :] = sequence
@@ -130,11 +129,7 @@ def runBatch(sampler, optimizers, window_size, use_cuda, batch_size=16, update=T
     else:
         inputs = Variable(torch.Tensor(inputs), requires_grad=True)
         targets = Variable(torch.Tensor(targets))
-    print(inputs.size())
-    print(inputs.transpose(1,2).size())
     outputs = deepsea(inputs.transpose(1,2))
-    print(outputs.size())
-    print(targets.size())
     loss = criterion(outputs, targets)
 
     if update:
@@ -150,13 +145,12 @@ if __name__ == "__main__":
     arguments = docopt(
         __doc__,
         version="1.0")
-    print(arguments)
     genome_fa_file = arguments["<genome-fa>"]
     features_file = arguments["<features-file>"]
     features_gz_file = arguments["<features-gz>"]
     output_file = arguments["<output-file>"]
 
-    holdout = arguments["--holdout-chrs"].split(";")
+    holdout = arguments["--holdout-chrs"].split(",")
     radius = int(arguments["--radius"])
     window_size = int(arguments["--window"])
     random_seed = int(arguments["--random-seed"])
@@ -184,14 +178,11 @@ if __name__ == "__main__":
         random_seed=random_seed,
         mode=mode)
 
-    #n_epochs = 10000
-    #n_train = 1000
-    #n_test = 100
-
     n_epochs = 10
     n_train = 10
     n_test = 5
     for _ in range(n_epochs):
+        ti_epoch = time()
         sampler.set_mode("train")
         cum_loss_train = 0
         for _ in range(n_train):
@@ -204,10 +195,12 @@ if __name__ == "__main__":
             cum_loss_test = cum_loss_test + runBatch(
                 sampler, optimizers, window_size, use_cuda,
                 update=False)
-        print("Train loss: {0}, Test loss: {1}.".format(
-            cum_loss_train / n_train, cum_loss_test / n_test))
+        tf_epoch = time()
+        print("Train loss: {0}, Test loss: {1}. Time: {2} s.".format(
+            cum_loss_train / n_train, cum_loss_test / n_test,
+            tf_epoch - ti_epoch))
 
 
     torch.save(model, output_file)
     tf = time()
-    print("Took {0} to train and test this model.".format(ti - tf))
+    print("Took {0} to train and test this model.".format(tf - ti))

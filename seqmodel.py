@@ -11,10 +11,6 @@ from torch import optim
 from torch.autograd import Variable
 
 
-from guppy import hpy
-
-h = hpy()
-
 torch.set_num_threads(32)
 
 
@@ -639,4 +635,3 @@ if __name__ == "__main__":
 
     torch.save(model,os.path.join(DIR, "models/test.mm10.cpu.model"))
 
-    print(h.heap())
