@@ -120,15 +120,20 @@ class GenomicFeatures:
         Parameters
         ----------
         dataset : str
-            Path to the tabix-indexed dataset.
+            Path to the tabix-indexed dataset. Note that for the file to
+            be tabix-indexed, we must have compressed it using bgzip.
+            The `dataset` file should be *.bed.gz and have an accompanying
+            *.bed.gz.tbi file in the same directory.
         features : list[str]
-            The list of features (labels) we are interested in predicting.
+            The list of genomic features (labels) we are interested in
+            predicting.
 
         Attributes
         ----------
         data : tabix.open
         n_features : int
         features_map : dict
+            feature (key) -> position index (value) in `features`
         """
         self.data = tabix.open(dataset)
         self.n_features = len(features)
@@ -159,6 +164,9 @@ class GenomicFeatures:
         bool
             True if this meets the criterion for a positive example,
             False otherwise.
+            Note that if we catch a tabix.TabixError exception, we assume
+            the error was the result of no genomic features being present
+            in the queried region and return False.
         """
         try:
             rows = self.data.query(chrom, start, end)
@@ -225,7 +233,10 @@ class GenomicFeatures:
         Returns
         -------
         numpy.ndarray
-            shape = [L, n_features]
+            shape = [L, n_features].
+            Note that if we catch a tabix.TabixError exception, we assume
+            the error was the result of no genomic features being present
+            in the queried region and return a numpy.ndarray of all 0s.
 
         Raises
         ------
@@ -263,8 +274,6 @@ class GenomicFeatures:
                         strand))
             return encoding
         except tabix.TabixError as e:
-            print(">>>>> TABIX ERROR <<<<<")
-            print(e)
             return encoding
 
 class Sampler:
