@@ -5,31 +5,10 @@ into their one hot encodings.
 import numpy as np
 from pyfaidx import Fasta
 
-BASES = np.array(['A', 'G', 'C', 'T'])
-
-
-def sequence_encoding(sequence):
-    """Converts an input sequence to its one hot encoding.
-
-    Parameters
-    ----------
-    sequence : str
-        The input sequence of length N.
-
-    Returns
-    -------
-    numpy.ndarray, dtype=bool
-        The N-by-4 encoding of the sequence.
-    """
-    encoding = np.zeros((len(sequence), 4), np.bool_)
-    for base, index in zip(sequence, range(len(sequence))):
-        encoding[index, :] = BASES == base
-    return encoding
-
 
 class Genome:
 
-    BASES = np.array(['A', 'G', 'C', 'T'])
+    BASES = np.array(['A', 'C', 'G', 'T'])
 
     def __init__(self, fa_file):
         """Wrapper class around the pyfaix.Fasta class.
@@ -37,7 +16,8 @@ class Genome:
         Parameters
         ----------
         fa_file : str
-            Path to an indexed FASTA file.
+            Path to an indexed FASTA file, that is, a *.fasta file with a
+            corresponding *.fai file in the same directory.
             File should contain the target organism's genome sequence.
 
         Attributes
@@ -87,7 +67,6 @@ class Genome:
             If the input char to `strand` is not one of the specified choices.
         """
         if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) or start < 0:
-            print("* ~ * ~ * [EMPTY {0}, {1}, {2}] ~ * ~ *".format(chrom, start, end))
             return ""
 
         if strand == '+':
@@ -121,7 +100,7 @@ class Genome:
         ------
         ValueError
             If the input char to `strand` is not one of the specified choices.
-            (Due to the call to `self.get_sequence`)
+            (Raised in the call to `self.get_sequence_from_coords`)
         """
         sequence = self.get_sequence_from_coords(chrom, start, end, strand)
         return self.sequence_encoding(sequence)

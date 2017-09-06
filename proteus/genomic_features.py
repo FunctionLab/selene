@@ -2,8 +2,8 @@
 where each row of [start, end) coordinates corresponds to a genomic feature
 in the sequence.
 
-It accepts the path to a tabix-indexed .bed.gz file of this feature information
-which can be created from a tab-delimited features file (.tsv/.bed) using
+It accepts the path to a tabix-indexed .bed.gz file of genomic coordinates.
+Such a file can be created from a tab-delimited features file (.tsv/.bed) using
 the following shell script:
     ../index_coordinates_file.sh
 Please consult the description provided in the shell script in order to
@@ -14,7 +14,7 @@ This .tsv/.bed file must contain the following columns, in order:
     chrom, start (0-based), end, strand, feature
 Additionally, the column names should be omitted from the file itself
 (i.e. there is no header and the first line in the file is the first
-row or genome coordinates for a feature).
+row of genome coordinates for a feature).
 """
 import numpy as np
 import tabix
@@ -26,15 +26,15 @@ class GenomicFeatures:
         Accepts a tabix-indexed .bed file with the following columns,
         in order:
             [chrom, start (0-based), end, strand, feature]
-        Additional columns following these 5 are acceptable.
+        Additional columns that follow these 5 are acceptable.
 
         Parameters
         ----------
         dataset : str
             Path to the tabix-indexed dataset. Note that for the file to
             be tabix-indexed, we must have compressed it using bgzip.
-            The `dataset` file should be *.bed.gz and have an accompanying
-            *.bed.gz.tbi file in the same directory.
+            `dataset` should be a *.gz file that has a corresponding
+            *.tbi file in the same directory.
         features : list[str]
             The list of genomic features (labels) we are interested in
             predicting.
@@ -92,7 +92,7 @@ class GenomicFeatures:
             return False
 
     def _is_positive_single(self, query_start, query_end,
-            feat_start, feat_end, threshold):
+                            feat_start, feat_end, threshold):
         """Helper function to determine whether a single row from a successful
         query is considered a positive example.
 
@@ -124,8 +124,8 @@ class GenomicFeatures:
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will
-            have a binary vector specifying whether each feature is
-            present
+            have a binary vector specifying whether the genomic feature's
+            coordinates overlap with that position.
 
         Parameters
         ----------
