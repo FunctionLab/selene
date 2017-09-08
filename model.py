@@ -7,10 +7,32 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
-from torch import Variable
+from torch.autograd import Variable
 
 
 N_BASES = 4
+
+
+torch.set_num_threads(32)
+
+
+class AverageMeter(object):
+    """Computes and stores the average and current value.
+    """
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
 
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
@@ -47,7 +69,7 @@ def run_batch(sampler, model, criterion,
     output = model(inputs.transpose(1, 2))
     loss = criterion(output, targets)
 
-    losses.update(loss.data[0], input.size(0))
+    losses.update(loss.data[0], inputs.size(0))
 
     if mode == "train" and optimizer is not None:
         optimizer.zero_grad()
@@ -64,23 +86,6 @@ def run_batch(sampler, model, criterion,
             "loss_avg": losses.avg}
 
 
-def AverageMeter(object):
-    """Computes and stores the average and current value.
-    """
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
 
 
 class SeqModel(object):

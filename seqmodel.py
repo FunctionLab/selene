@@ -358,6 +358,7 @@ class Sampler:
                 "Window size must be an odd number. Input was {0}".format(
                     window_size))
 
+        self.window_size = window_size
         self.genome = Genome(genome)
 
         # used during the positive sampling step - get a random index from the
@@ -418,7 +419,7 @@ class Sampler:
 
         if mode == "train":
             indices = np.asarray(self._training_indices)
-        elif mode == "test":
+        elif mode == "validate":
             indices = ~np.asarray(self._training_indices)
 
         self._features_df = self._dup_features_df[indices].copy()
