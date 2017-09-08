@@ -9,8 +9,9 @@ import time
 import numpy as np
 import pandas as pd
 
-import Genome
-import GenomicFeatures
+from genome import Genome
+from genomic_features import GenomicFeatures
+
 
 class Sampler(object):
 
@@ -157,7 +158,8 @@ class Sampler(object):
         Parameters
         ----------
         positive_proportion : [0.0, 1.0], float, optional
-            Default is 0.50. Specify the proportion of positive examples to sample.
+            Default is 0.50. Specify the proportion of positive examples
+            that will be sampled (the rest are negative examples).
 
         Returns
         -------
@@ -169,6 +171,7 @@ class Sampler(object):
             return self.sample_positive()
         else:
             return self.sample_negative()
+
 
 class ChromatinFeaturesSampler(Sampler):
 
@@ -249,8 +252,8 @@ class ChromatinFeaturesSampler(Sampler):
         tuple(np.ndarray, np.ndarray)
             If not `is_positive`, returns the sequence encoding and a numpy
             array of zeros (no feature labels present).
-            Otherwise, returns both the sequence encoding and the feature labels
-            for the specified range.
+            Otherwise, returns both the sequence encoding and the feature
+            labels for the specified range.
         """
         sequence_start = position - self.radius - self.padding
         sequence_end = position + self.radius + self.padding + 1
@@ -296,7 +299,7 @@ class ChromatinFeaturesSampler(Sampler):
         else:
             print("BG: {0}, {1}, {2}".format(randchr, randpos, randstrand))
             return self._retrieve(randchr, randpos, randstrand,
-                is_positive=False)
+                                  is_positive=False)
 
     def sample_positive(self):
         """Sample a positive example from the genome.
@@ -327,11 +330,10 @@ class ChromatinFeaturesSampler(Sampler):
 
         print("PT: {0}, {1}, {2}".format(chrom, position, strand))
         seq, feats = self._retrieve(chrom, position, strand,
-            is_positive=True)
+                                    is_positive=True)
         n, k = seq.shape
         if n == 0:
             print("no sequence...{0}".format(seq.shape))
             return self.sample_positive()
         else:
             return (seq, feats)
-

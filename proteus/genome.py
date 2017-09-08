@@ -66,7 +66,8 @@ class Genome(object):
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) or start < 0:
+        if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) \
+                or start < 0:
             return ""
 
         if strand == '+':
@@ -105,8 +106,7 @@ class Genome(object):
         sequence = self.get_sequence_from_coords(chrom, start, end, strand)
         return self.sequence_encoding(sequence)
 
-    @staticmethod
-    def sequence_encoding(sequence):
+    def sequence_encoding(self, sequence):
         """Converts an input sequence to its one hot encoding.
 
         Parameters
@@ -121,6 +121,5 @@ class Genome(object):
         """
         encoding = np.zeros((len(sequence), 4), np.bool_)
         for base, index in zip(sequence, range(len(sequence))):
-            encoding[index, :] = BASES == base
+            encoding[index, :] = self.BASES == base
         return encoding
-

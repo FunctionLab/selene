@@ -19,6 +19,7 @@ row of genome coordinates for a feature).
 import numpy as np
 import tabix
 
+
 class GenomicFeatures(object):
 
     def __init__(self, dataset, features):
@@ -186,4 +187,3 @@ class GenomicFeatures(object):
             return encoding
         except tabix.TabixError as e:
             return encoding
-
