@@ -9,20 +9,25 @@ import torch
 import torch.nn as nn
 from torch import Variable
 
-from seqmodel import BASES
+
+N_BASES = 4
+
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, "model_best.pth.tar")
 
-def run_batch(sampler, model, criterion, optimizer=None, mode="train", batch_size=16, use_cuda=False):
+
+def run_batch(sampler, model, criterion,
+              optimizer=None, mode="train",
+              batch_size=16, use_cuda=False):
     batch_times = AverageMeter()
     losses = AverageMeter()
 
     sampler.set_mode(mode)
 
-    inputs = np.zeros((batch_size, sampler.window_size, len(BASES)))
+    inputs = np.zeros((batch_size, sampler.window_size, 4))
     targets = np.zeros((batch_size, sampler.n_features))
 
     t_i = time.time()
@@ -39,7 +44,7 @@ def run_batch(sampler, model, criterion, optimizer=None, mode="train", batch_siz
     inputs = Variable(inputs, requires_grad=True)
     targets = Variable(targets)
 
-    output = model(inputs.transpose(1,2))
+    output = model(inputs.transpose(1, 2))
     loss = criterion(output, targets)
 
     losses.update(loss.data[0], input.size(0))
@@ -57,6 +62,7 @@ def run_batch(sampler, model, criterion, optimizer=None, mode="train", batch_siz
             "batch_time_avg": batch_times.avg,
             "loss": losses.val,
             "loss_avg": losses.avg}
+
 
 def AverageMeter(object):
     """Computes and stores the average and current value.
@@ -79,8 +85,8 @@ def AverageMeter(object):
 
 class SeqModel(object):
     def __init__(self, model, sampler,
-            loss_criterion, optimizer_args,
-            use_cuda=False, data_parallel=False):
+                 loss_criterion, optimizer_args,
+                 use_cuda=False, data_parallel=False):
         self.model = model
         self.sampler = sampler
         self.criterion = loss_criterion
@@ -99,16 +105,19 @@ class SeqModel(object):
                                momentum=momentum,
                                **kwargs)
 
-    def train_validate(self, batch_size=16, n_epochs=10000, n_train=600, n_validate=200):
+    def train_validate(self, batch_size=16, n_epochs=10000, n_train=600,
+                       n_validate=200):
         min_loss = float("inf")
         for epoch in range(n_epochs):
             cum_loss_train = 0.
             for _ in range(n_train):
                 info = run_batch(self.sampler,
-                    self.model, self.criterion, self.optimizer,
-                    mode="train",
-                    batch_size=batch_size,
-                    use_cuda=self.use_cuda)
+                                 self.model,
+                                 self.criterion,
+                                 self.optimizer,
+                                 mode="train",
+                                 batch_size=batch_size,
+                                 use_cuda=self.use_cuda)
                 cum_loss_train += info["loss"]
                 # LOGGING MESSAGE
             cum_loss_train /= n_train
@@ -116,10 +125,12 @@ class SeqModel(object):
             cum_loss_validate = 0.
             for _ in range(n_validate):
                 info = run_batch(self.sampler,
-                    self.model, self.criterion, self.optimizer,
-                    mode="validate",
-                    batch_size=batch_size,
-                    use_cuda=self.use_cuda)
+                                 self.model,
+                                 self.criterion,
+                                 self.optimizer,
+                                 mode="validate",
+                                 batch_size=batch_size,
+                                 use_cuda=self.use_cuda)
                 cum_loss_validate += info["loss"]
                 # LOGGING MESSAGE
             cum_loss_train /= n_validate
@@ -134,6 +145,7 @@ class SeqModel(object):
                 "state_dict": self.model.state_dict(),
                 "min_loss": min_loss,
                 "optimizer": self.optimizer.state_dict()}, is_best)
+
 
 class DeepSEA(nn.Module):
     def __init__(self, window_size, n_classes):
@@ -171,6 +183,7 @@ class DeepSEA(nn.Module):
         x = x.view(x.size(0), 960 * self.n_channels)
         x = self.classifier(x)
         return x
+
 
 def deepsea(filepath=None, **kwargs):
     model = DeepSEA(**kwargs)
