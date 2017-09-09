@@ -6,7 +6,8 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    seq_model.py <genome-fa> <features-file> <features-gz> <output-file>
+    seq_model.py <genome-fa> <features-file> <features-gz>
+        <uniq-features-file> <chrs-file> <output-file>
         [--holdout-chrs=<chrs>]
         [--radius=<radius>] [--window=<window-size>]
         [--random-seed=<rseed>]
@@ -20,6 +21,8 @@ Options:
                             FASTA file.
     <features-file>         The non-tabix-indexed sequence features .bed file.
     <features-gz>           The tabix-indexed sequence features .bed.gz file.
+    <uniq-features-file>    INS DESCRIPTION
+    <chrs-file>             INS DESCRIPTION
     <output-file>           The trained model will be saved to this file.
 
     --holdout-chrs=<chrs>   Specify which chromosomes should be in our holdout
@@ -69,7 +72,8 @@ WIDTH = 1001
 N_KERNELS = [320, 480, 960]
 #N_CHANNELS = int(np.floor(  # account for window size and pooling layers
 #    (np.floor((WIDTH - 7.) / 4.) - 7.) / 4.) - 7)
-N_OUTPUTS = 381  # this is the number of chromatin features
+#N_OUTPUTS = 381  # this is the number of chromatin features
+N_OUTPUTS = 460
 N_CHANNELS = int(np.floor(  # account for window size and pooling layers
     np.floor(WIDTH / 4.) / 4.))
 
@@ -148,6 +152,8 @@ if __name__ == "__main__":
     genome_fa_file = arguments["<genome-fa>"]
     features_file = arguments["<features-file>"]
     features_gz_file = arguments["<features-gz>"]
+    distinct_features = arguments["<uniq-features-file>"]
+    chrs_list_txt = arguments["<chrs-file>"]
     output_file = arguments["<output-file>"]
 
     holdout = arguments["--holdout-chrs"].split(",")
@@ -158,6 +164,7 @@ if __name__ == "__main__":
 
     verbose = arguments["--verbose"]
     use_cuda = arguments["--use-cuda"]
+
 
     model = [deepsea]
     if use_cuda:
@@ -170,18 +177,20 @@ if __name__ == "__main__":
     ti = time()
     sampler = Sampler(
         genome_fa_file,
-        features_file,
         features_gz_file,
+        features_file,
+        distinct_features,
+        chrs_list_txt,
         holdout,
         radius=radius,
         window_size=window_size,
         random_seed=random_seed,
         mode=mode)
 
-    n_epochs = 10
-    n_train = 10
-    n_test = 5
-    for _ in range(n_epochs):
+    n_epochs = 10000
+    n_train = 800
+    n_test = 200
+    for i in range(n_epochs):
         ti_epoch = time()
         sampler.set_mode("train")
         cum_loss_train = 0
@@ -199,6 +208,7 @@ if __name__ == "__main__":
         print("Train loss: {0}, Test loss: {1}. Time: {2} s.".format(
             cum_loss_train / n_train, cum_loss_test / n_test,
             tf_epoch - ti_epoch))
+        print("EPOCH NUMBER {0}".format(i))
 
 
     torch.save(model, output_file)

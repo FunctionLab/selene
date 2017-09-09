@@ -55,21 +55,13 @@ class Genome:
         """
         self.genome = Fasta(fa_file)
         self.chrs = sorted(self.genome.keys())
+        self.len_chrs = self._get_len_chrs()
 
-    def get_chr_len(self, chrom):
-        """Get the length of the input chromosome.
-
-        Parameters
-        ----------
-        chr : str
-            e.g. "chr1".
-
-        Returns
-        -------
-        int
-            The length of the chromosome's genomic sequence.
-        """
-        return len(self.genome[chrom])
+    def _get_len_chrs(self):
+        len_chrs = {}
+        for chrom in self.chrs:
+            len_chrs[chrom] = len(self.genome[chrom])
+        return len_chrs
 
     def get_sequence(self, chrom, start, end, strand='+'):
         """Get the genomic sequence given the chromosome, sequence start,
@@ -271,12 +263,15 @@ class Sampler:
 
     MODES = ("all", "train", "test")
     EXPECTED_BED_COLS = (
-        "chr", "start", "end", "strand", "feature") # "metadata_index")
+        "chr", "start", "end", "strand", "feature", "metadata_index")
     USE_BED_COLS = (
-        "chr", "start", "end", "strand", "feature")
+        "chr", "start", "end")
     STRAND_SIDES = ('+', '-')
 
-    def __init__(self, genome, genomic_features, query_features,
+    def __init__(self, genome, query_feature_data,
+                 feature_data, n_feature_data_rows,
+                 distinct_features_list_txt,
+                 chrs_list_txt,
                  holdout_chrs, radius=100, window_size=1001,
                  random_seed=436, mode="all"):
 
@@ -351,25 +346,19 @@ class Sampler:
 
         self.genome = Genome(genome)
 
-        # used during the positive sampling step - get a random index from the
-        # .bed file and the corresponding (chr, start, end, strand).
-        self._features_df = pd.read_table(
-            genomic_features, header=None, names=self.EXPECTED_BED_COLS,
-            usecols=self.USE_BED_COLS)
-        # stores a copy of the .bed file that can be used to reset
-        # `self._features_df` depending on what mode is specified.
-        self._dup_features_df = pd.read_table(
-            genomic_features, header=None, names=self.EXPECTED_BED_COLS,
-            usecols=self.USE_BED_COLS)
+        self._features_df = pd.read_table(feature_data, header=None, names=self.EXPECTED_BED_COLS, usecols=self.USE_BED_COLS)
+        self._features_nrows = n_feature_data_rows
+        self.features = pd.read_csv(distinct_features_list_txt, names=["feature"])
+        self.features = self.features["feature"].values.tolist()
 
-        print(holdout_chrs)
-        print(self._features_df["chr"].unique())
-        self._training_indices = ~self._features_df["chr"].isin(holdout_chrs)
+        features_chr_data = pd.read_csv(chrs_list_txt, names=["chr"])
+        #self._features_chr_data = self._features_chr_data["chr"].values.tolist()
+        self._all_indices = features_chr_data.index
+        self._training_indices = np.where(np.asarray(~features_chr_data["chr"].isin(holdout_chrs)))[0]
+        self._test_indices = np.where(np.asarray(features_chr_data["chr"].isin(holdout_chrs)))[0]
 
-        features = self._features_df["feature"].unique()
-        print(len(features))
-        self.n_features = len(features)
-        self.query_features = GenomicFeatures(query_features, features)
+        self.n_features = len(self.features)
+        self.query_features = GenomicFeatures(query_feature_data, self.features)
 
         # bin size = self.radius + 1 + self.radius
         self.radius = radius
@@ -389,7 +378,9 @@ class Sampler:
         # used during the background sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
         # sequence from there.
-        self._randcache = []
+        self._randcache = {}
+
+        self._randcache_positives = {}
 
     def set_mode(self, mode):
         """Determines what positive examples are available to sample depending
@@ -403,16 +394,15 @@ class Sampler:
                      chromosome set.
             - test:  Use only the examples in the holdout chromosome set.
         """
+        print("setting mode...")
         if mode == "all":
-            self._features_df = self._dup_features_df.copy()
-            return
-
-        if mode == "train":
-            indices = np.asarray(self._training_indices)
+            indices = self._all_indices
+        elif mode == "train":
+            indices = self._training_indices
         elif mode == "test":
-            indices = ~np.asarray(self._training_indices)
+            indices = self._test_indices
 
-        self._features_df = self._dup_features_df[indices].copy()
+        self._use_indices = list(indices)
 
     def _retrieve(self, chrom, position, strand,
                   is_positive=False,
@@ -456,6 +446,23 @@ class Sampler:
                 chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
 
+    def _build_randcache(self, size=5000):
+        rand_chrs = list(np.random.choice(self.genome.chrs, size=size))
+        rand_chr_positions = {}
+        for chrom, chrom_len in self.genome.len_chrs.items():
+            rand_chr_positions[chrom] = \
+                self._rand_chr_positions(chrom_len, size / 2)
+        rand_strands = list(np.random.choice(self.STRAND_SIDES, size=size))
+        return {"chr": rand_chrs,
+                "pos": rand_chr_positions,
+                "strand": rand_strands}
+
+    def _rand_chr_positions(self, chr_len, size):
+        return list(np.random.choice(range(
+            self.radius + self.padding,
+            chr_len - self.radius - self.padding - 1),
+            size=int(size)))
+
     def sample_background(self, verbose=False):
         """Sample a background (i.e. negative) example from the genome.
 
@@ -470,14 +477,16 @@ class Sampler:
             Returns the sequence encoding and a numpy array of zeros (no
             feature labels present).
         """
-        if len(self._randcache) == 0:
-            self._randcache = list(
-                np.random.choice(self.genome.chrs, size=2000))
-        randchr = self._randcache.pop()
-        randpos = np.random.choice(range(
-            self.radius + self.padding,
-            self.genome.get_chr_len(randchr) - self.radius - self.padding - 1))
-        randstrand = np.random.choice(self.STRAND_SIDES)
+        if len(self._randcache) == 0 or len(self._randcache["chr"]) == 0:
+            self._randcache = self._build_randcache()
+        randchr = self._randcache["chr"].pop()
+
+        if len(self._randcache["pos"][randchr]) == 0:
+            self._randcache["pos"][randchr] = self._rand_chr_positions(
+                self.genome.len_chrs[randchr], 500)
+        randpos = self._randcache["pos"][randchr].pop()
+        randstrand = self._randcache["strand"].pop()
+
         is_positive = self.query_features.is_positive(
             randchr, randpos - self.radius, randpos + self.radius + 1)
         if is_positive:
@@ -487,6 +496,11 @@ class Sampler:
             print("BG: {0}, {1}, {2}".format(randchr, randpos, randstrand))
             return self._retrieve(randchr, randpos, randstrand,
                 is_positive=False, verbose=verbose)
+
+    def _build_randcache_positives(self, size=2000):
+        randpos = list(np.random.choice(self._use_indices, size=size))
+        randstrand = list(np.random.choice(self.STRAND_SIDES, size=size))
+        self._randcache_positives = {"ind": randpos, "strand": randstrand}
 
     def sample_positive(self, verbose=False):
         """Sample a positive example from the genome.
@@ -502,8 +516,9 @@ class Sampler:
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
-        print(self._features_df.shape[0])
-        randind = np.random.randint(0, self._features_df.shape[0])
+        if len(self._randcache_positives) == 0 or len(self._randcache_positives["ind"]) == 0:
+            self._build_randcache_positives()
+        randind = self._randcache_positives["ind"].pop()
         row = self._features_df.iloc[randind]
 
         gene_length = row["end"] - row["start"]
@@ -513,9 +528,10 @@ class Sampler:
         position = int(
             row["start"] + rand_in_gene)
 
-        strand = row["strand"]
+        #strand = row["strand"]
+        strand = '.'
         if strand == '.':
-            strand = np.random.choice(self.STRAND_SIDES)
+            strand = self._randcache_positives["strand"].pop()
 
         if verbose:
             print(chrom, position, strand)
@@ -529,7 +545,7 @@ class Sampler:
         else:
             return (seq, feats)
 
-    def sample_mixture(self, positive_proportion=0.50, verbose=False):
+    def sample_mixture(self, positive_proportion=0.50, batch=200, verbose=False):
         """Gets a mixture of positive and background samples
 
         Parameters
