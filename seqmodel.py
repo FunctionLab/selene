@@ -269,7 +269,7 @@ class Sampler:
     STRAND_SIDES = ('+', '-')
 
     def __init__(self, genome, query_feature_data,
-                 feature_data, n_feature_data_rows,
+                 feature_data,
                  distinct_features_list_txt,
                  chrs_list_txt,
                  holdout_chrs, radius=100, window_size=1001,
@@ -347,7 +347,6 @@ class Sampler:
         self.genome = Genome(genome)
 
         self._features_df = pd.read_table(feature_data, header=None, names=self.EXPECTED_BED_COLS, usecols=self.USE_BED_COLS)
-        self._features_nrows = n_feature_data_rows
         self.features = pd.read_csv(distinct_features_list_txt, names=["feature"])
         self.features = self.features["feature"].values.tolist()
 
