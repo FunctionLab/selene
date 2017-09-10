@@ -87,15 +87,15 @@ class Sampler(object):
         t_f = time.time()
         print("{0} s to load file {1}".format(t_f - t_i, genomic_features))
 
-        self._test_indices = self._features_df["chr"].isin(chrs_test)
-        self._training_indices = ~self._features_df["chr"].isin(chrs_test)
+        self._test_indices = np.where(np.asarray(self._features_df["chr"].isin(chrs_test)))[0]
+        self._training_indices = np.where(np.asarray(~self._features_df["chr"].isin(chrs_test)))[0]
         self._validation_indices = np.random.choice(
             self._training_indices,
             size=int(len(self._training_indices) * validation_prop),
             replace=False)
         validation_set = set(self._validation_indices)
-        self._training_indices = [ix for ix in self._training_indices
-                                  if ix not in validation_set]
+        self._training_indices = np.asarray([ix for ix in self._training_indices
+                                  if ix not in validation_set])
 
         features = self._features_df["feature"].unique()
         self.n_features = len(features)
@@ -135,13 +135,13 @@ class Sampler(object):
             return
 
         if mode == "train":
-            indices = np.asarray(self._training_indices)
+            indices = self._training_indices
         elif mode == "test":
-            indices = np.asarray(self._test_indices)
+            indices = self._test_indices
         elif mode == "validate":
-            indices = np.asarray(self._validation_indices)
+            indices = self._validation_indices
 
-        self._features_df = self._dup_features_df[indices].copy()
+        self._features_df = self._dup_features_df.iloc[indices].copy()
 
     def _retrieve(self):
         pass
