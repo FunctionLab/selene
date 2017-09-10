@@ -146,7 +146,7 @@ class SeqModel(object):
             min_loss = min(cum_loss_train, min_loss)
             save_checkpoint({
                 "epoch": epoch,
-                "arch": self.model.__name__,
+                "arch": "DeepSEA",
                 "state_dict": self.model.state_dict(),
                 "min_loss": min_loss,
                 "optimizer": self.optimizer.state_dict()}, is_best)

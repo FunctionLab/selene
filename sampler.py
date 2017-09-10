@@ -9,8 +9,8 @@ import time
 import numpy as np
 import pandas as pd
 
-from genome import Genome
-from genomic_features import GenomicFeatures
+from proteus import Genome
+from proteus import GenomicFeatures
 
 
 class Sampler(object):
@@ -18,9 +18,9 @@ class Sampler(object):
     MODES = ("all", "train", "validate", "test")
     STRAND_SIDES = ('+', '-')
     EXPECTED_BED_COLS = (
-        "chr", "start", "end", "strand", "feature", "metadata_index")
+        "chr", "start", "end", "strand", "feature") #, "metadata_index")
     USE_BED_COLS = (
-        "chr", "start", "end", "strand")
+        "chr", "start", "end", "strand", "feature")
 
     def __init__(self, genome, genomic_features, query_features,
                  chrs_test, validation_prop=0.2,
@@ -91,7 +91,7 @@ class Sampler(object):
         self._training_indices = ~self._features_df["chr"].isin(chrs_test)
         self._validation_indices = np.random.choice(
             self._training_indices,
-            size=len(self._training_indices) * validation_prop,
+            size=int(len(self._training_indices) * validation_prop),
             replace=False)
         validation_set = set(self._validation_indices)
         self._training_indices = [ix for ix in self._training_indices
@@ -103,7 +103,7 @@ class Sampler(object):
 
         self.set_mode(mode)
 
-        np.random.seed(random_seed)
+        np.random.seed(int(random_seed))
 
         # used during the negative sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
@@ -209,10 +209,10 @@ class ChromatinFeaturesSampler(Sampler):
             - If the input `window_size` is less than the computed bin size.
             - If the input `window_size` is an even number.
         """
-        super(genome, genomic_features,
+        super(ChromatinFeaturesSampler, self).__init__(genome, genomic_features,
               query_features,
               chrs_test, validation_prop,
-              random_seed, mode).__init__()
+              random_seed, mode)
 
         if window_size < (1 + 2 * radius):
             raise ValueError(
@@ -224,6 +224,8 @@ class ChromatinFeaturesSampler(Sampler):
             raise ValueError(
                 "Window size must be an odd number. Input was {0}".format(
                     window_size))
+
+        self.window_size = window_size
         # bin size = self.radius + 1 + self.radius
         self.radius = radius
         # the amount of padding is based on the window size and bin size.
@@ -284,10 +286,10 @@ class ChromatinFeaturesSampler(Sampler):
             Returns the sequence encoding and a numpy array of zeros (no
             feature labels present).
         """
-        if len(self._randcache) == 0:
-            self._randcache = list(
+        if len(self._randcache_negative) == 0:
+            self._randcache_negative = list(
                 np.random.choice(self.genome.chrs, size=2000))
-        randchr = self._randcache.pop()
+        randchr = self._randcache_negative.pop()
         randpos = np.random.choice(range(
             self.radius + self.padding,
             self.genome.get_chr_len(randchr) - self.radius - self.padding - 1))

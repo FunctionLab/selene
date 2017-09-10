@@ -55,7 +55,7 @@ from torch import nn
 from torch import optim
 from torch.autograd import Variable
 
-from seqmodel import Sampler
+from sampler import ChromatinFeaturesSampler as Sampler
 from model import DeepSEA, SeqModel
 
 if __name__ == "__main__":
