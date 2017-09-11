@@ -1,5 +1,7 @@
 import math
+import random
 import os
+from time import time
 
 import numpy as np
 import pandas as pd
@@ -259,6 +261,12 @@ class GenomicFeatures:
             print(e)
             return encoding
 
+def log_timing(t_i, t_f, info=None):
+    if info is not None:
+        print("{0}: {1} seconds to executee".format(info, t_f - t_i))
+    else:
+        print("INFO: {0} seconds to execute code block".format(t_f - t_i))
+
 class Sampler:
 
     MODES = ("all", "train", "test")
@@ -343,21 +351,44 @@ class Sampler:
             raise ValueError(
                 "Window size must be an odd number. Input was {0}".format(
                     window_size))
-
+        t_i = time()
         self.genome = Genome(genome)
+        t_f = time()
+        log_timing(t_i, t_f, "Load genome FASTA")
 
-        self._features_df = pd.read_table(feature_data, header=None, names=self.EXPECTED_BED_COLS, usecols=self.USE_BED_COLS)
+        #self._features_df = pd.read_table(feature_data, header=None, names=self.EXPECTED_BED_COLS, usecols=self.USE_BED_COLS)
+        t_i = time()
+        self._features_df = pd.read_table(feature_data, header=None, names=self.USE_BED_COLS)
+        t_f = time()
+        log_timing(t_i, t_f, "Load genome coordinates for features")
+
+        t_i = time()
         self.features = pd.read_csv(distinct_features_list_txt, names=["feature"])
         self.features = self.features["feature"].values.tolist()
+        t_f = time()
+        log_timing(t_i, t_f, "Load unique features list")
 
-        features_chr_data = pd.read_csv(chrs_list_txt, names=["chr"])
+        t_i = time()
+        #features_chr_data = pd.read_csv(chrs_list_txt, names=["chr"])
+        features_chr_data = self._features_df["chr"]
+        t_f = time()
+        log_timing(t_i, t_f, "Load chromosomes for coordinates list")
+
         #self._features_chr_data = self._features_chr_data["chr"].values.tolist()
+        t_i = time()
         self._all_indices = features_chr_data.index
-        self._training_indices = np.where(np.asarray(~features_chr_data["chr"].isin(holdout_chrs)))[0]
-        self._test_indices = np.where(np.asarray(features_chr_data["chr"].isin(holdout_chrs)))[0]
+        holdout_chrs_data = features_chr_data.isin(holdout_chrs)
+        self._training_indices = np.where(np.asarray(~holdout_chrs_data))[0]
+        self._test_indices = np.where(np.asarray(holdout_chrs_data))[0]
+        t_f = time()
+        log_timing(t_i, t_f, "Specify indices for train, test")
 
         self.n_features = len(self.features)
+
+        t_i = time()
         self.query_features = GenomicFeatures(query_feature_data, self.features)
+        t_f = time()
+        log_timing(t_i, t_f, "Load tabix-indexed features file")
 
         # bin size = self.radius + 1 + self.radius
         self.radius = radius
@@ -393,7 +424,6 @@ class Sampler:
                      chromosome set.
             - test:  Use only the examples in the holdout chromosome set.
         """
-        print("setting mode...")
         if mode == "all":
             indices = self._all_indices
         elif mode == "train":
@@ -445,13 +475,16 @@ class Sampler:
                 chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
 
-    def _build_randcache(self, size=5000):
+    def _build_randcache(self, size=10000):
+        t_i = time()
         rand_chrs = list(np.random.choice(self.genome.chrs, size=size))
         rand_chr_positions = {}
         for chrom, chrom_len in self.genome.len_chrs.items():
             rand_chr_positions[chrom] = \
                 self._rand_chr_positions(chrom_len, size / 2)
         rand_strands = list(np.random.choice(self.STRAND_SIDES, size=size))
+        t_f = time()
+        log_timing(t_i, t_f, "Build whole rand cache")
         return {"chr": rand_chrs,
                 "pos": rand_chr_positions,
                 "strand": rand_strands}
@@ -481,8 +514,12 @@ class Sampler:
         randchr = self._randcache["chr"].pop()
 
         if len(self._randcache["pos"][randchr]) == 0:
+            t_i = time()
             self._randcache["pos"][randchr] = self._rand_chr_positions(
                 self.genome.len_chrs[randchr], 500)
+            t_f = time()
+            log_timing(t_i, t_f, "Build rand cache positions only")
+
         randpos = self._randcache["pos"][randchr].pop()
         randstrand = self._randcache["strand"].pop()
 
@@ -496,10 +533,13 @@ class Sampler:
             return self._retrieve(randchr, randpos, randstrand,
                 is_positive=False, verbose=verbose)
 
-    def _build_randcache_positives(self, size=2000):
+    def _build_randcache_positives(self, size=10000):
+        t_i = time()
         randpos = list(np.random.choice(self._use_indices, size=size))
         randstrand = list(np.random.choice(self.STRAND_SIDES, size=size))
         self._randcache_positives = {"ind": randpos, "strand": randstrand}
+        t_f = time()
+        log_timing(t_i, t_f, "Build rand cache of positives")
 
     def sample_positive(self, verbose=False):
         """Sample a positive example from the genome.
@@ -523,7 +563,7 @@ class Sampler:
         gene_length = row["end"] - row["start"]
         chrom = row["chr"]
 
-        rand_in_gene = np.random.uniform() * gene_length
+        rand_in_gene = random.uniform(0, 1) * gene_length
         position = int(
             row["start"] + rand_in_gene)
 
@@ -560,10 +600,19 @@ class Sampler:
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
+        t_i = time()
         if np.random.uniform() < positive_proportion:
-            return self.sample_positive(verbose=verbose)
+            positive = self.sample_positive(verbose=verbose)
+            t_f = time()
+            log_timing(t_i, t_f, "Positive query")
+            return positive
+            #return self.sample_positive(verbose=verbose)
         else:
-            return self.sample_background(verbose=verbose)
+            negative = self.sample_background(verbose=verbose)
+            t_f = time()
+            log_timing(t_i, t_f, "Negative query")
+            return negative
+            #return self.sample_background(verbose=verbose)
 
 if __name__ == "__main__":
     n_features = 381

@@ -89,6 +89,7 @@ class View(nn.Module):
         return x.view(*self.shape)
 
 
+BATCH_SIZE = 96
 deepsea = nn.modules.container.Sequential(
 
     #nn.Conv2d(N_FEATURES, N_KERNELS[0], (8, 1), (1, 1), padding=0),
@@ -111,7 +112,7 @@ deepsea = nn.modules.container.Sequential(
     nn.Dropout(p=0.5),
 
     # TODO: the 16 is the batch size. Need to *not* hard code that...
-    View((16, N_KERNELS[2] * N_CHANNELS)),
+    View((BATCH_SIZE, N_KERNELS[2] * N_CHANNELS)),
     nn.Linear(N_KERNELS[2] * N_CHANNELS, N_OUTPUTS),
     nn.ReLU(inplace=True),
     nn.Linear(N_OUTPUTS, N_OUTPUTS),
@@ -187,23 +188,26 @@ if __name__ == "__main__":
         random_seed=random_seed,
         mode=mode)
 
-    n_epochs = 10000
-    n_train = 800
-    n_test = 200
+    n_epochs = 100
+    #n_epochs = 2
+    n_train = 8
+    n_test = 2
     for i in range(n_epochs):
         ti_epoch = time()
         sampler.set_mode("train")
         cum_loss_train = 0
         for _ in range(n_train):
             cum_loss_train = cum_loss_train + runBatch(
-                sampler, optimizers, window_size, use_cuda)
+                sampler, optimizers, window_size, use_cuda,
+                batch_size=BATCH_SIZE)
 
         sampler.set_mode("test")
         cum_loss_test = 0
         for _ in range(n_test):
             cum_loss_test = cum_loss_test + runBatch(
                 sampler, optimizers, window_size, use_cuda,
-                update=False)
+                update=False,
+                batch_size=BATCH_SIZE)
         tf_epoch = time()
         print("Train loss: {0}, Test loss: {1}. Time: {2} s.".format(
             cum_loss_train / n_train, cum_loss_test / n_test,
