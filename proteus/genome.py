@@ -24,27 +24,25 @@ class Genome(object):
         ----------
         genome : Fasta
         chrs : list[str]
+        len_chrs : dict
+            The length of each chromosome sequence in the file.
         """
         self.genome = Fasta(fa_file)
         self.chrs = sorted(self.genome.keys())
+        self.len_chrs = self._get_len_chrs()
 
-    def get_chr_len(self, chrom):
-        """Get the length of the input chromosome.
-
-        Parameters
-        ----------
-        chr : str
-            e.g. "chr1".
-
-        Returns
-        -------
-        int
-            The length of the chromosome's genomic sequence.
+    def _get_len_chrs(self):
+        """Gets the length of each chromosome sequence in the file.
+        `self.len_chrs` is used for quick lookup of this information
+        during sampling.
         """
-        return len(self.genome[chrom])
+        len_chrs = {}
+        for chrom in self.chrs:
+            len_chrs[chrom] = len(self.genome[chrom])
+        return len_chrs
 
     def get_sequence_from_coords(self, chrom, start, end, strand='+'):
-        """Get the genomic sequence given the chromosome, sequence start,
+        """Gets the genomic sequence given the chromosome, sequence start,
         sequence end, and strand side.
 
         Parameters
@@ -80,7 +78,7 @@ class Genome(object):
                     strand))
 
     def get_encoding_from_coords(self, chrom, start, end, strand='+'):
-        """Get the genomic sequence given the chromosome, sequence start,
+        """Gets the genomic sequence given the chromosome, sequence start,
         sequence end, and strand side; and return its one hot encoding.
 
         Parameters
