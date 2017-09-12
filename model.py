@@ -3,7 +3,7 @@ features are present in a genomic sequence.
 """
 import os
 import shutil
-import time
+from time import time
 
 import numpy as np
 import torch
@@ -104,6 +104,7 @@ class ModelController(object):
         avg_batch_times = AverageMeter()
         min_loss = float("inf")
         for epoch in range(n_epochs):
+            t_i = time()
             avg_losses = AverageMeter()
             cum_loss_train = 0.
             for _ in range(n_train):
@@ -111,6 +112,8 @@ class ModelController(object):
                     batch_size, mode="train")
                 cum_loss_train += info["loss"]
                 # LOGGING MESSAGE
+            print("train")
+            print(info)
             cum_loss_train /= n_train
 
             cum_loss_validate = 0.
@@ -119,9 +122,14 @@ class ModelController(object):
                     batch_size, avg_batch_times, avg_losses, mode="validate")
                 cum_loss_validate += info["loss"]
                 # LOGGING MESSAGE
-            cum_loss_train /= n_validate
 
+            print("validate")
+            print(info)
+            cum_loss_validate /= n_validate
+            t_f = time()
             # LOGGING MESSAGE
+            print("Train loss: {0}, validate loss: {1}".format(cum_loss_train, cum_loss_validate))
+            print("Epoch {0}, time {1} s".format(epoch, t_f - t_i))
 
             is_best = cum_loss_train < min_loss
             min_loss = min(cum_loss_train, min_loss)
@@ -166,7 +174,7 @@ class ModelController(object):
         inputs = np.zeros((batch_size, self.sampler.window_size, 4))
         targets = np.zeros((batch_size, self.sampler.n_features))
 
-        t_i = time.time()
+        t_i = time()
         for i in range(batch_size):
             sequence, target = self.sampler.sample_mixture()
             inputs[i, :, :] = sequence
@@ -190,8 +198,8 @@ class ModelController(object):
             loss.backward()
             self.optimizer.step()
 
-        avg_batch_times.update(time.time() - t_i)
-        t_i = time.time()
+        avg_batch_times.update(time() - t_i)
+        t_i = time()
 
         # returns logging information
         return {"batch_time": avg_batch_times.val,

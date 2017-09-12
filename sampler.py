@@ -4,7 +4,9 @@ It has both the Genome and GenomicFeatures objects as well as sampling
 functions that draw both positive and negative sequence examples from the
 genome.
 """
-import time
+import logging
+import random
+from time import time
 
 import numpy as np
 import pandas as pd
@@ -13,43 +15,53 @@ from proteus import Genome
 from proteus import GenomicFeatures
 
 
+LOG = logging.getLogger("deepsea")
+
+
 class Sampler(object):
 
     MODES = ("all", "train", "validate", "test")
     STRAND_SIDES = ('+', '-')
-    EXPECTED_BED_COLS = (
-        "chr", "start", "end", "strand", "feature") #, "metadata_index")
-    USE_BED_COLS = (
-        "chr", "start", "end", "strand", "feature")
+    EXPECTED_COLS = (
+        "chr", "start", "end")
 
-    def __init__(self, genome, genomic_features, query_features,
-                 chrs_test, validation_prop=0.2,
-                 random_seed=436, mode="train"):
+    def __init__(self, genome,
+                 query_feature_data,
+                 feature_coordinates,
+                 unique_features,
+                 chrs_test,
+                 train_prop=0.8,
+                 random_seed=436,
+                 mode="train"):
         """The class used to sample positive and negative examples from the
         genomic sequence.
+
+        TODO: UPDATE ALL DOCS IN THIS FILE.
 
         Parameters
         ----------
         genome : str
             Path to the indexed FASTA file of a target organism's complete
             genome sequence.
+        query_features : str
+            Used for fast querying. Path to tabix-indexed .bed file that
+            contains information about genomic features.
+            (`genome_features` is the uncompressed original)
         genomic_features : str
             Path to a directory of .bed files, uncompressed, that contain
             information about genomic features.
             Files must have the following columns, in order:
                 [chr, start (0-based), end, strand, feature, metadata_index]
             Used for sampling positive examples.
-        query_features : str
-            Used for fast querying. Path to tabix-indexed .bed file that
-            contains information about genomic features.
-            (`genome_features` is the uncompressed original)
         chrs_test : list[str]
             Specify chromosomes to hold out as the test dataset.
-        validation_prop : float, optional
-            Default is 0.2. The proportion of positive examples to hold out
-            from our training dataset as the validation dataset.
-            Selects `validation_prop` * 100% indices from `genomic_features`
-            to exclude from training.
+        train_prop : float, optional
+            Default is 0.8. The proportion of positive examples kept in the
+            training dataset. The remaining (1 - `train_prop`) * 100% is
+            designated as the validation dataset. We randomly select
+            indices from the whole dataset--excluding those in the test
+            holdout chromosomes list--based on this proportion to build the
+            validation set.
         random_seed : int, optional
             Default is 436. Sets the numpy random seed.
         mode : {"all", "train", "validate", "test"}, optional
@@ -73,48 +85,52 @@ class Sampler(object):
 
         self.genome = Genome(genome)
 
-        t_i = time.time()
+        t_i = time()
         # used during the positive sampling step - get a random index from the
-        # .bed file and the corresponding (chr, start, end, strand).
-        self._features_df = pd.read_table(
-            genomic_features, header=None, names=self.EXPECTED_BED_COLS,
-            usecols=self.USE_BED_COLS)
-        # stores a copy of the .bed file that can be used to reset
-        # `self._features_df` depending on what mode is specified.
-        self._dup_features_df = pd.read_table(
-            genomic_features, header=None, names=self.EXPECTED_BED_COLS,
-            usecols=self.USE_BED_COLS)
-        t_f = time.time()
-        print("{0} s to load file {1}".format(t_f - t_i, genomic_features))
+        # coords file and the corresponding (chr, start, end) info.
+        self._coords_df = pd.read_table(
+            feature_coordinates, header=None, names=self.EXPECTED_COLS)
+        t_f = time()
+        LOG.debug(
+            ("Loaded genome coordinates for each feature "
+             "in the dataset: file {0}, {1} s").format(
+                 feature_coordinates, t_f - t_i))
 
-        self._test_indices = np.where(np.asarray(self._features_df["chr"].isin(chrs_test)))[0]
-        self._training_indices = np.where(np.asarray(~self._features_df["chr"].isin(chrs_test)))[0]
+        t_i = time()
+        features_chr_data = self._coords_df["chr"]
+        holdout_chrs_data = features_chr_data.isin(chrs_test)
+
+        self._all_indices = features_chr_data.index
+        self._training_indices = np.where(
+            np.asarray(~holdout_chrs_data))[0]
+        self._test_indices = np.where(np.asarray(holdout_chrs_data))[0]
         self._validation_indices = np.random.choice(
             self._training_indices,
-            size=int(len(self._training_indices) * validation_prop),
+            size=int(len(self._training_indices) * 1 - train_prop),
             replace=False)
         validation_set = set(self._validation_indices)
-        self._training_indices = np.asarray([ix for ix in self._training_indices
-                                  if ix not in validation_set])
+        self._training_indices = np.asarray(
+            [ix for ix in self._training_indices
+             if ix not in validation_set])
+        t_f = time()
+        LOG.debug(
+            ("Partitioned the dataset into train/validate/test sets: "
+             "{0} s").format(t_f - t_i))
 
-        features = self._features_df["feature"].unique()
-        self.n_features = len(features)
-        self.query_features = GenomicFeatures(query_features, features)
+        self.features = pd.read_csv(unique_features, names=["feature"])
+        self.features = self.features["feature"].values.tolist()
+        self.n_features = len(self.features)
 
-        self.set_mode(mode)
+        self.query_feature_data = GenomicFeatures(
+            query_feature_data, self.features)
 
-        np.random.seed(int(random_seed))
+        self.mode = None
+        self.set_mode(mode)  # set the `mode` attribute here.
 
-        # used during the negative sampling step - get a random chromosome
-        # in the genome FASTA file and randomly select a position in the
-        # sequence from there.
-        self._randcache_negative = []
+        np.random.seed(random_seed)
+        random.seed(random_seed + 1)
 
-        # used during the positive sampling step - get random indices
-        # in the genome FASTA file and randomly select a position within
-        # the [start, end) of the genomic coordinates around which we'd
-        # define our bin and window.
-        self._randcache_positive = []
+        LOG.debug("Initialized the Sampler object")
 
     def set_mode(self, mode):
         """Determines what positive examples are available to sample depending
@@ -129,27 +145,44 @@ class Sampler(object):
             - test: Use only the examples in the test holdout chromosome set.
             - validation: Use only the examples in the validation holdout
                           chromosome set.
-        """
-        if mode == "all":
-            self._features_df = self._dup_features_df.copy()
-            return
 
-        if mode == "train":
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If the input str to `mode` is not one of the specified choices.
+        """
+        if mode not in self.MODES:
+            raise ValueError(
+                "Mode must be one of {0}. Input was '{1}'.".format(
+                    self.MODES, mode))
+
+        if mode == "all":
+            indices = self._all_indices
+        elif mode == "train":
             indices = self._training_indices
         elif mode == "test":
             indices = self._test_indices
-        elif mode == "validate":
-            indices = self._validation_indices
-
-        self._features_df = self._dup_features_df.iloc[indices].copy()
+        self._use_indices = list(indices)
+        self.mode = mode
+        LOG.debug("Setting mode to {0}".format(mode))
 
     def _retrieve(self):
+        """TODO: DOCUMENT
+        """
         pass
 
     def sample_positive(self):
+        """TODO: DOCUMENT
+        """
         pass
 
     def sample_negative(self):
+        """TODO: DOCUMENT
+        """
         pass
 
     def sample_mixture(self, positive_proportion=0.50):
@@ -167,7 +200,7 @@ class Sampler(object):
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
-        if np.random.uniform() < positive_proportion:
+        if random.uniform(0, 1) < positive_proportion:
             return self.sample_positive()
         else:
             return self.sample_negative()
@@ -175,10 +208,16 @@ class Sampler(object):
 
 class ChromatinFeaturesSampler(Sampler):
 
-    def __init__(self, genome, genomic_features, query_features,
-                 chrs_test, validation_prop=0.2,
-                 radius=100, window_size=1001,
-                 random_seed=436, mode="train"):
+    def __init__(self, genome,
+                 query_feature_data,
+                 feature_coordinates,
+                 unique_features,
+                 chrs_test,
+                 train_prop=0.8,
+                 radius=100,
+                 window_size=1001,
+                 random_seed=436,
+                 mode="train"):
         """The positive examples we focus on in ChromatinFeaturesSampler are
         those detected in ChIP-seq, DNase-seq, and ATAC-seq experiments; which
         assay DNA binding and accessibility.
@@ -200,8 +239,9 @@ class ChromatinFeaturesSampler(Sampler):
         Attributes
         ----------
         radius : int
+        window_size : int
         padding : int
-            Should be identical on both sides
+            The amount of padding is identical on both sides
 
         Raises
         ------
@@ -209,10 +249,15 @@ class ChromatinFeaturesSampler(Sampler):
             - If the input `window_size` is less than the computed bin size.
             - If the input `window_size` is an even number.
         """
-        super(ChromatinFeaturesSampler, self).__init__(genome, genomic_features,
-              query_features,
-              chrs_test, validation_prop,
-              random_seed, mode)
+        super(ChromatinFeaturesSampler, self).__init__(
+            genome,
+            query_feature_data,
+            feature_coordinates,
+            unique_features,
+            chrs_test,
+            train_prop=train_prop,
+            random_seed=random_seed,
+            mode=mode)
 
         if window_size < (1 + 2 * radius):
             raise ValueError(
@@ -225,9 +270,9 @@ class ChromatinFeaturesSampler(Sampler):
                 "Window size must be an odd number. Input was {0}".format(
                     window_size))
 
-        self.window_size = window_size
         # bin size = self.radius + 1 + self.radius
         self.radius = radius
+        self.window_size = window_size
         # the amount of padding is based on the window size and bin size.
         # we use the padding to incorporate sequence context around the
         # bin for which we have feature information.
@@ -236,6 +281,91 @@ class ChromatinFeaturesSampler(Sampler):
         remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
             self.padding = int(remaining_space / 2)
+
+        # used during the negative sampling step - get a random chromosome
+        # in the genome FASTA file and randomly select a position in the
+        # sequence from there.
+        self._randcache_negative = {}
+
+        # used during the positive sampling step - get random indices
+        # in the genome FASTA file and randomly select a position within
+        # the [start, end) of the genomic coordinates around which we'd
+        # define our bin and window.
+        self._randcache_positive = {}
+
+    def _build_randcache_negatives(self, size=10000):
+        t_i = time()
+        if "chr" not in self._randcache_negative \
+                or len(self._randcache_negative["chr"]) == 0:
+            rand_chrs = list(np.random.choice(self.genome.chrs, size=size))
+            self._randcache_negative["chr"] = rand_chrs
+
+        if "pos" not in self._randcache_negative:
+            self._randcache_negative["pos"] = dict(
+                [(x, []) for x in self.genome.chrs])
+        rand_chr_positions = self._randcache_negative["pos"]
+        for chrom, rand_positions in rand_chr_positions.items():
+            if len(rand_positions) == 0:
+                rand_chr_positions[chrom] = \
+                    self._rand_chr_sequence_positions(
+                        self.genome.len_chrs[chrom],
+                        size / 2)
+
+        if "strand" not in self._randcache_negative \
+                or len(self._randcache_negative["strand"]) == 0:
+            rand_strands = list(
+                np.random.choice(self.STRAND_SIDES, size=size))
+            self._randcache_negative["strand"] = rand_strands
+        t_f = time()
+        LOG.info(
+            ("Updated the cache for sampling "
+             "negative examples: {0} s").format(
+                 t_f - t_i))
+
+    def _rand_chr_sequence_positions(self, chr_len, size):
+        t_i = time()
+        rand_positions = np.random.choice(range(
+            self.radius + self.padding,
+            chr_len - self.radius - self.padding - 1),
+            size=int(size))
+        t_f = time()
+        LOG.debug(
+            ("Built a chromosome-specific cache of random positions: "
+             "{0} s").format(t_f - t_i))
+        return list(rand_positions)
+
+    def _build_randcache_positives(self, size=10000):
+        t_i = time()
+        if "all" not in self._randcache_positives \
+                or len(self._randcache_positives["all"]) == 0:
+            randpos_all = list(np.random.choice(self._all_indices, size=size))
+            self._randcache_positives["all"] = randpos_all
+        if "train" not in self._randcache_positives \
+                or len(self._randcache_positives["train"]) == 0:
+            randpos_train = list(np.random.choice(
+                self._training_indices, size=size))
+            self._randcache_positives["train"] = randpos_train
+        if "validate" not in self._randcache_positives \
+                or len(self._randcache_positives["validate"]) == 0:
+            randpos_validate = list(np.random.choice(
+                self._validation_indices, size=int(size / 2)))
+            self._randcache_positives["validate"] = randpos_validate
+        if "test" not in self._randcache_positives \
+                or len(self._randcache_positions["test"]) == 0:
+            randpos_test = list(np.random.choice(
+                self._test_indices, size=int(size / 2)))
+            self._randcache_positives["test"] = randpos_test
+
+        if "strand" not in self._randcache_positives \
+                or len(self._randcache_positives["strand"]) == 0:
+            rand_strands = list(np.random.choice(
+                self.STRAND_SIDES, size=size))
+            self._randcache_positives["strand"] = rand_strands
+        t_f = time()
+        LOG.info(
+            ("Updated the cache for sampling "
+             "positive examples: {0} s").format(
+                 t_f - t_i))
 
     def _retrieve(self, chrom, position, strand,
                   is_positive=False):
@@ -257,6 +387,8 @@ class ChromatinFeaturesSampler(Sampler):
             Otherwise, returns both the sequence encoding and the feature
             labels for the specified range.
         """
+        LOG.debug("Retrieving ({0}, {1}, {2})".format(
+            chrom, position, strand))
         sequence_start = position - self.radius - self.padding
         sequence_end = position + self.radius + self.padding + 1
         retrieved_sequence = \
@@ -286,20 +418,33 @@ class ChromatinFeaturesSampler(Sampler):
             Returns the sequence encoding and a numpy array of zeros (no
             feature labels present).
         """
-        if len(self._randcache_negative) == 0:
-            self._randcache_negative = list(
-                np.random.choice(self.genome.chrs, size=2000))
+        if len(self._randcache_negative) == 0 or \
+                len(self._randcache["chr"]) == 0:
+            self._build_randcache_negative()
         randchr = self._randcache_negative.pop()
-        randpos = np.random.choice(range(
-            self.radius + self.padding,
-            self.genome.get_chr_len(randchr) - self.radius - self.padding - 1))
-        randstrand = np.random.choice(self.STRAND_SIDES)
+
+        if len(self._randcache["pos"][randchr]) == 0:
+            t_i = time()
+            self._randcache["pos"][randchr] = self._rand_chr_positions(
+                self.genome.len_chrs[randchr], 500)
+            t_f = time()
+            LOG.debug(
+                ("Updated the cache for sampling negative examples, "
+                 "{0} positions only: {1} s").format(randchr, t_f - t_i))
+        randpos = self._randcache["pos"][randchr].pop()
+
+        if len(self._randcache["strand"]) == 0:
+            self._build_randcache_negative()
+        randstrand = self._randcache["strand"].pop()
+
         is_positive = self.query_features.is_positive(
             randchr, randpos - self.radius, randpos + self.radius + 1)
         if is_positive:
+            LOG.debug(
+                "Sample background overlapped with positive examples. "
+                "Trying `sample_negative` again.")
             return self.sample_negative()
         else:
-            print("BG: {0}, {1}, {2}".format(randchr, randpos, randstrand))
             return self._retrieve(randchr, randpos, randstrand,
                                   is_positive=False)
 
@@ -315,27 +460,30 @@ class ChromatinFeaturesSampler(Sampler):
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
-        print(self._features_df.shape[0])
-        randind = np.random.randint(0, self._features_df.shape[0])
-        row = self._features_df.iloc[randind]
+        if len(self._randcache_positives) == 0 or \
+                len(self._randcache_positives[self.mode]) == 0 or \
+                len(self._randcache_positives["strand"]) == 0:
+            self._build_randcache_positives()
+        randindex = self._randcache_positives[self.mode].pop()
+        row = self._coords_df.iloc[randindex]
 
         gene_length = row["end"] - row["start"]
         chrom = row["chr"]
 
-        rand_in_gene = np.random.uniform() * gene_length
+        rand_in_gene = random.uniform(0, 1) * gene_length
         position = int(
             row["start"] + rand_in_gene)
 
-        strand = row["strand"]
-        if strand == '.':
-            strand = np.random.choice(self.STRAND_SIDES)
+        # TODO: this is under the assumption that strand is '.'
+        strand = np.random.choice(self.STRAND_SIDES)
 
-        print("PT: {0}, {1}, {2}".format(chrom, position, strand))
         seq, feats = self._retrieve(chrom, position, strand,
                                     is_positive=True)
         n, k = seq.shape
         if n == 0:
-            print("no sequence...{0}".format(seq.shape))
+            LOG.debug(
+                "Sample positive window was out of bounds. "
+                "Trying `sample_positive` again.")
             return self.sample_positive()
         else:
             return (seq, feats)
