@@ -13,7 +13,7 @@ Usage:
         [--mode=<mode>] [--holdout-chrs=<chrs>]
         [--n-epochs=<epochs>] [--batch-size=<batch>] [--train-prop=<prop>]
         [--log=<file-handle>] [-s | --stdout] [-v | --verbose]
-        [--use-cuda]
+        [--use-cuda] [--data-parallel]
     seq_model.py -h | --help
 
 Options:
@@ -85,7 +85,7 @@ from time import time
 from docopt import docopt
 from torch import nn
 
-from sampler import ChromatinFeaturesSampler as Sampler
+from sampler import ChromatinFeaturesSampler
 from model import DeepSEA, ModelController
 
 if __name__ == "__main__":
@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
     mode = arguments["--mode"]
     holdout = arguments["--holdout-chrs"].split(",")
-    n_epochs = int(arguments["--epochs"])
+    n_epochs = int(arguments["--n-epochs"])
     batch_size = int(arguments["--batch-size"])
     train_prop = float(arguments["--train-prop"])
 
@@ -134,8 +134,7 @@ if __name__ == "__main__":
         log.addHandler(stream_handle)
 
     t_i = time()
-
-    sampler = Sampler(
+    sampler = ChromatinFeaturesSampler(
         genome_fa_file,
         features_data_gz,
         feature_coords_data,
@@ -146,11 +145,16 @@ if __name__ == "__main__":
         random_seed=random_seed,
         mode=mode)
 
+    t_i_model = time()
     model = DeepSEA(sampler.window_size, sampler.n_features)
     # TODO: would prefer to not have to import & specify this in the
     # train_model.py script, I think?
     criterion = nn.BCELoss()
     sgd_optimizer_args = {}
+    t_f_model = time()
+    log.debug("Finished initializing the {0} model: {1} s".format(
+        model.__class__.__name__, t_f_model - t_i_model))
+
     runner = ModelController(
         model, sampler, criterion, sgd_optimizer_args,
         use_cuda=use_cuda, data_parallel=data_parallel)

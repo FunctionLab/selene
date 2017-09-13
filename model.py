@@ -1,9 +1,10 @@
 """The sequence-level model that learns to make predictions about what
 features are present in a genomic sequence.
 """
+import logging
 import os
 import shutil
-from time import time
+from time import strftime, time
 
 import numpy as np
 import torch
@@ -13,6 +14,7 @@ from torch.autograd import Variable
 from utils import AverageMeter
 
 
+LOG = logging.getLogger("deepsea")
 torch.set_num_threads(32)
 
 
@@ -51,10 +53,12 @@ class ModelController(object):
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
+            LOG.debug("Wrapped model in DataParallel")
 
         if self.use_cuda:
             self.model.cuda()
             self.criterion.cuda()
+            LOG.debug("Set modules to use CUDA")
 
     def _optimizer(self, lr=0.5, momentum=0.95, **kwargs):
         """Specify the optimizer to use. Here, it is stochastic gradient
@@ -70,11 +74,11 @@ class ModelController(object):
 
     def train_validate(self,
                        n_epochs=1000,
-                       batch_size=128,
-                       n_train=6,
+                       batch_size=96,
+                       n_train=8,
                        n_validate=2):
         """The training and validation process.
-        Defaults will sample approximately 100,000 positive and negative
+        Defaults will sample approximately 1 million positive and negative
         examples (total) in a single call to `train_validate`.
 
         Parameters
@@ -109,7 +113,7 @@ class ModelController(object):
             cum_loss_train = 0.
             for _ in range(n_train):
                 info = self.run_batch(
-                    batch_size, mode="train")
+                    batch_size, avg_batch_times, avg_losses, mode="train")
                 cum_loss_train += info["loss"]
                 # LOGGING MESSAGE
             print("train")
@@ -127,9 +131,10 @@ class ModelController(object):
             print(info)
             cum_loss_validate /= n_validate
             t_f = time()
-            # LOGGING MESSAGE
-            print("Train loss: {0}, validate loss: {1}".format(cum_loss_train, cum_loss_validate))
-            print("Epoch {0}, time {1} s".format(epoch, t_f - t_i))
+            LOG.debug(
+                ("Epoch {0}: {1} s. "
+                 "Training loss: {2}, validation loss: {3}.").format(
+                     epoch, t_f - t_i, cum_loss_train, cum_loss_validate))
 
             is_best = cum_loss_train < min_loss
             min_loss = min(cum_loss_train, min_loss)
@@ -231,10 +236,13 @@ class ModelController(object):
         """
         if dir_path is None:
             dir_path = os.getcwd()
-        cp_filepath = os.path.join(dir_path, filename)
+        time_str = strftime("%Y%m%d_%H%M")
+        cp_filepath = os.path.join(
+            dir_path, "{0}_{1}".format(time_str, filename))
         torch.save(state, cp_filepath)
         if is_best:
-            best_filepath = os.path.join(dir_path, "model_best.pth.tar")
+            best_filepath = os.path.join(dir_path,
+                "{0}_model_best.pth.tar".format(time_str))
             shutil.copyfile(cp_filepath, best_filepath)
 
 
