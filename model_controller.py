@@ -74,8 +74,8 @@ class ModelController(object):
 
     def train_validate(self,
                        n_epochs=1000,
-                       batch_size=96,
-                       n_train=8,
+                       batch_size=128,
+                       n_train=6,
                        n_validate=2):
         """The training and validation process.
         Defaults will sample approximately 1 million positive and negative
@@ -131,7 +131,7 @@ class ModelController(object):
             print(info)
             cum_loss_validate /= n_validate
             t_f = time()
-            LOG.debug(
+            LOG.info(
                 ("Epoch {0}: {1} s. "
                  "Training loss: {2}, validation loss: {3}.").format(
                      epoch, t_f - t_i, cum_loss_train, cum_loss_validate))
@@ -139,8 +139,6 @@ class ModelController(object):
             is_best = cum_loss_train < min_loss
             min_loss = min(cum_loss_train, min_loss)
 
-            print(self.model.__class__)
-            print(self.model.__class__.__name__)
             self._save_checkpoint({
                 "epoch": epoch,
                 "arch": "DeepSEA",
