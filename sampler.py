@@ -43,7 +43,7 @@ class Sampler(object):
         genome : str
             Path to the indexed FASTA file of a target organism's complete
             genome sequence.
-        query_features : str
+        query_feature_data : str
             Used for fast querying. Path to tabix-indexed .bed file that
             contains information about genomic features.
             (`genome_features` is the uncompressed original)
@@ -70,7 +70,7 @@ class Sampler(object):
         Attributes
         ----------
         genome : Genome
-        query_features : GenomicFeatures
+        query_feature_data : GenomicFeatures
         mode : {"all", "train", "validate", "test"}
 
         Raises
@@ -96,14 +96,22 @@ class Sampler(object):
              "in the dataset: file {0}, {1} s").format(
                  feature_coordinates, t_f - t_i))
 
+        np.random.seed(random_seed)
+        random.seed(random_seed + 1)
         t_i = time()
         features_chr_data = self._coords_df["chr"]
-        holdout_chrs_data = features_chr_data.isin(chrs_test)
+        chrs_validate = ["chr7"]
+        holdout_chrs_data = features_chr_data.isin(chrs_test + chrs_validate)
 
         self._all_indices = features_chr_data.index
         self._training_indices = np.where(
             np.asarray(~holdout_chrs_data))[0]
-        self._test_indices = np.where(np.asarray(holdout_chrs_data))[0]
+        self._test_indices = np.where(np.asarray(
+            features_chr_data.isin(chrs_test)))[0]
+        self._validate_indices = np.where(np.asarray(
+            features_chr_data.isin(chrs_validate)))[0]
+
+        """
         self._validation_indices = np.random.choice(
             self._training_indices,
             size=int(len(self._training_indices) * 1 - train_prop),
@@ -112,6 +120,7 @@ class Sampler(object):
         self._training_indices = np.asarray(
             [ix for ix in self._training_indices
              if ix not in validation_set])
+        """
         t_f = time()
         LOG.debug(
             ("Partitioned the dataset into train/validate/test sets: "
@@ -126,9 +135,6 @@ class Sampler(object):
 
         self.mode = None
         self.set_mode(mode)  # set the `mode` attribute here.
-
-        np.random.seed(random_seed)
-        random.seed(random_seed + 1)
 
         LOG.debug("Initialized the Sampler object")
 
@@ -164,6 +170,8 @@ class Sampler(object):
             indices = self._all_indices
         elif mode == "train":
             indices = self._training_indices
+        elif mode == "validate":
+            indices = self._validate_indices
         elif mode == "test":
             indices = self._test_indices
         self._use_indices = list(indices)
@@ -200,10 +208,15 @@ class Sampler(object):
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
+        t_i = time()
+        sample = None
         if random.uniform(0, 1) < positive_proportion:
-            return self.sample_positive()
+            sample = self.sample_positive()
         else:
-            return self.sample_negative()
+            sample = self.sample_negative()
+        t_f = time()
+        LOG.debug("Sampling step completed: {0} s".format(t_f - t_i))
+        return sample
 
 
 class ChromatinFeaturesSampler(Sampler):
@@ -285,25 +298,27 @@ class ChromatinFeaturesSampler(Sampler):
         # used during the negative sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
         # sequence from there.
-        self._randcache_negative = {}
+        self._randcache_negatives = {}
 
         # used during the positive sampling step - get random indices
         # in the genome FASTA file and randomly select a position within
         # the [start, end) of the genomic coordinates around which we'd
         # define our bin and window.
-        self._randcache_positive = {}
+        self._randcache_positives = {}
+
+        LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
     def _build_randcache_negatives(self, size=10000):
         t_i = time()
-        if "chr" not in self._randcache_negative \
-                or len(self._randcache_negative["chr"]) == 0:
+        if "chr" not in self._randcache_negatives \
+                or len(self._randcache_negatives["chr"]) == 0:
             rand_chrs = list(np.random.choice(self.genome.chrs, size=size))
-            self._randcache_negative["chr"] = rand_chrs
+            self._randcache_negatives["chr"] = rand_chrs
 
-        if "pos" not in self._randcache_negative:
-            self._randcache_negative["pos"] = dict(
+        if "pos" not in self._randcache_negatives:
+            self._randcache_negatives["pos"] = dict(
                 [(x, []) for x in self.genome.chrs])
-        rand_chr_positions = self._randcache_negative["pos"]
+        rand_chr_positions = self._randcache_negatives["pos"]
         for chrom, rand_positions in rand_chr_positions.items():
             if len(rand_positions) == 0:
                 rand_chr_positions[chrom] = \
@@ -311,11 +326,11 @@ class ChromatinFeaturesSampler(Sampler):
                         self.genome.len_chrs[chrom],
                         size / 2)
 
-        if "strand" not in self._randcache_negative \
-                or len(self._randcache_negative["strand"]) == 0:
+        if "strand" not in self._randcache_negatives \
+                or len(self._randcache_negatives["strand"]) == 0:
             rand_strands = list(
                 np.random.choice(self.STRAND_SIDES, size=size))
-            self._randcache_negative["strand"] = rand_strands
+            self._randcache_negatives["strand"] = rand_strands
         t_f = time()
         LOG.info(
             ("Updated the cache for sampling "
@@ -348,10 +363,10 @@ class ChromatinFeaturesSampler(Sampler):
         if "validate" not in self._randcache_positives \
                 or len(self._randcache_positives["validate"]) == 0:
             randpos_validate = list(np.random.choice(
-                self._validation_indices, size=int(size / 2)))
+                self._validate_indices, size=int(size / 2)))
             self._randcache_positives["validate"] = randpos_validate
         if "test" not in self._randcache_positives \
-                or len(self._randcache_positions["test"]) == 0:
+                or len(self._randcache_positives["test"]) == 0:
             randpos_test = list(np.random.choice(
                 self._test_indices, size=int(size / 2)))
             self._randcache_positives["test"] = randpos_test
@@ -387,7 +402,7 @@ class ChromatinFeaturesSampler(Sampler):
             Otherwise, returns both the sequence encoding and the feature
             labels for the specified range.
         """
-        LOG.debug("Retrieving ({0}, {1}, {2})".format(
+        LOG.debug("Retrieved ({0}, {1}, {2})".format(
             chrom, position, strand))
         sequence_start = position - self.radius - self.padding
         sequence_end = position + self.radius + self.padding + 1
@@ -400,9 +415,9 @@ class ChromatinFeaturesSampler(Sampler):
             return (
                 retrieved_sequence,
                 np.zeros((bin_end - bin_start,
-                         self.query_features.n_features)))
+                         self.query_feature_data.n_features)))
         else:
-            retrieved_data = self.query_features.get_feature_data(
+            retrieved_data = self.query_feature_data.get_feature_data(
                 chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
 
@@ -418,26 +433,26 @@ class ChromatinFeaturesSampler(Sampler):
             Returns the sequence encoding and a numpy array of zeros (no
             feature labels present).
         """
-        if len(self._randcache_negative) == 0 or \
-                len(self._randcache["chr"]) == 0:
-            self._build_randcache_negative()
-        randchr = self._randcache_negative.pop()
+        if len(self._randcache_negatives) == 0 or \
+                len(self._randcache_negatives["chr"]) == 0:
+            self._build_randcache_negatives()
+        randchr = self._randcache_negatives["chr"].pop()
 
-        if len(self._randcache["pos"][randchr]) == 0:
+        if len(self._randcache_negatives["pos"][randchr]) == 0:
             t_i = time()
-            self._randcache["pos"][randchr] = self._rand_chr_positions(
+            self._randcache_negatives["pos"][randchr] = self._rand_chr_positions(
                 self.genome.len_chrs[randchr], 500)
             t_f = time()
             LOG.debug(
                 ("Updated the cache for sampling negative examples, "
                  "{0} positions only: {1} s").format(randchr, t_f - t_i))
-        randpos = self._randcache["pos"][randchr].pop()
+        randpos = self._randcache_negatives["pos"][randchr].pop()
 
-        if len(self._randcache["strand"]) == 0:
-            self._build_randcache_negative()
-        randstrand = self._randcache["strand"].pop()
+        if len(self._randcache_negatives["strand"]) == 0:
+            self._build_randcache_negatives()
+        randstrand = self._randcache_negatives["strand"].pop()
 
-        is_positive = self.query_features.is_positive(
+        is_positive = self.query_feature_data.is_positive(
             randchr, randpos - self.radius, randpos + self.radius + 1)
         if is_positive:
             LOG.debug(
@@ -475,7 +490,7 @@ class ChromatinFeaturesSampler(Sampler):
             row["start"] + rand_in_gene)
 
         # TODO: this is under the assumption that strand is '.'
-        strand = np.random.choice(self.STRAND_SIDES)
+        strand = self._randcache_positives["strand"].pop()
 
         seq, feats = self._retrieve(chrom, position, strand,
                                     is_positive=True)
