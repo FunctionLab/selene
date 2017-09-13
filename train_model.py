@@ -85,8 +85,9 @@ from time import time
 from docopt import docopt
 from torch import nn
 
+from deepsea import DeepSEA
+from model import ModelController
 from sampler import ChromatinFeaturesSampler
-from model import DeepSEA, ModelController
 
 if __name__ == "__main__":
     arguments = docopt(
