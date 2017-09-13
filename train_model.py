@@ -10,8 +10,8 @@ Usage:
         <uniq-features> <output-file>
         [--radius=<radius>] [--window=<window-size>]
         [--random-seed=<rseed>]
-        [--mode=<mode>] [--holdout-chrs=<chrs>]
-        [--n-epochs=<epochs>] [--batch-size=<batch>] [--train-prop=<prop>]
+        [--mode=<mode>] [--chrs-test=<chrs>] [--chrs-validate=<chrs>]
+        [--n-epochs=<epochs>] [--batch-size=<batch>]
         [--log=<file-handle>] [-s | --stdout] [-v | --verbose]
         [--use-cuda] [--data-parallel]
     seq_model.py -h | --help
@@ -51,9 +51,16 @@ Options:
                             For testing an already-trained model, please use
                             the script ./evaluate_model.py.
                             [default: train]
-    --holdout-chrs=<chrs>   The chromosomes that should be in our holdout
-                            test set. Comma-separated, no spaces.
+    --chrs-test=<chrs>      The chromosomes in our holdout test set.
+                            Comma-separated, no spaces.
+                            Manual check of the default tells us that we are
+                            holding out 10% of our dataset for test.
                             [default: chr8,chr9]
+    --chrs-validate=<chrs>  The chromosomes in our holdout validation set.
+                            Comma-separated, no spaces.
+                            Manual check of the default tells us that we are
+                            holding out 10% of our dataset for validation.
+                            [default: chr6,ch7]
     --n-epochs=<epochs>     The number of epochs
                             [default: 1000]
     --batch-size=<batch>    The number of training examples to propagation
@@ -86,7 +93,7 @@ from docopt import docopt
 from torch import nn
 
 from deepsea import DeepSEA
-from model import ModelController
+from model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
 
 if __name__ == "__main__":
@@ -105,10 +112,10 @@ if __name__ == "__main__":
     random_seed = int(arguments["--random-seed"])
 
     mode = arguments["--mode"]
-    holdout = arguments["--holdout-chrs"].split(",")
+    holdout_test = arguments["--chrs-test"].split(",")
+    holdout_validate = arguments["--chrs-validate"].split(",")
     n_epochs = int(arguments["--n-epochs"])
     batch_size = int(arguments["--batch-size"])
-    train_prop = float(arguments["--train-prop"])
 
     output_log = arguments["--log"]
     to_stdout = arguments["--stdout"]
@@ -140,7 +147,8 @@ if __name__ == "__main__":
         features_data_gz,
         feature_coords_data,
         unique_features,
-        holdout,
+        holdout_test,
+        holdout_validate,
         radius=radius,
         window_size=window_size,
         random_seed=random_seed,
