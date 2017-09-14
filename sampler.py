@@ -211,11 +211,11 @@ class Sampler(object):
             for the specified range.
         """
         t_i = time()
-        sample = None
-        if random.uniform(0, 1) < positive_proportion:
-            sample = self.sample_positive()
-        else:
-            sample = self.sample_negative()
+        sample = self.sample_positive()
+        #if random.uniform(0, 1) < positive_proportion:
+        #    sample = self.sample_positive()
+        #else:
+        #    sample = self.sample_negative()
         t_f = time()
         LOG.debug("Sampling step completed: {0} s".format(t_f - t_i))
         return sample
@@ -300,13 +300,15 @@ class ChromatinFeaturesSampler(Sampler):
         # used during the negative sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
         # sequence from there.
-        self._randcache_negatives = {}
+        # TODO: negative sampling disabled temporarily to improve training
+        # time
+        # self._randcache_negatives = self._build_randcache_negatives()
 
         # used during the positive sampling step - get random indices
         # in the genome FASTA file and randomly select a position within
         # the [start, end) of the genomic coordinates around which we'd
         # define our bin and window.
-        self._randcache_positives = {}
+        self._randcache_positives = self._build_randcache_positives()
 
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
@@ -421,8 +423,8 @@ class ChromatinFeaturesSampler(Sampler):
             Otherwise, returns both the sequence encoding and the feature
             labels for the specified range.
         """
-        LOG.debug("Retrieved ({0}, {1}, {2})".format(
-            chrom, position, strand))
+        #LOG.debug("Retrieved ({0}, {1}, {2})".format(
+        #    chrom, position, strand))
         sequence_start = position - self.radius - self.padding
         sequence_end = position + self.radius + self.padding + 1
         retrieved_sequence = \

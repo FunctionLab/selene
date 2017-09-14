@@ -21,7 +21,8 @@ torch.set_num_threads(32)
 class ModelController(object):
     def __init__(self, model, sampler,
                  loss_criterion, optimizer_args,
-                 use_cuda=False, data_parallel=False):
+                 use_cuda=False, data_parallel=False,
+                 prefix_outputs=None):
         """Methods to train, validate, and test a PyTorch model.
 
         Parameters
@@ -34,6 +35,10 @@ class ModelController(object):
             Default is False.
         data_parallel : bool, optional
             Default is False.
+        prefix_outputs : str, optional
+            Default is None. If None, prefix output files (e.g. the latest
+            checkpoint and the best performing state of the model)
+            with the current day.
 
         Attributes
         ----------
@@ -50,6 +55,7 @@ class ModelController(object):
         self.optimizer = self._optimizer(**optimizer_args)
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
+        self.prefix_outputs = prefix_outputs
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
@@ -59,6 +65,12 @@ class ModelController(object):
             self.model.cuda()
             self.criterion.cuda()
             LOG.debug("Set modules to use CUDA")
+
+        if self.prefix_outputs is None:
+            self.prefix_outputs = strftime("%Y%m%d")
+
+        self._training_loss = []
+        self._validation_loss = []
 
     def _optimizer(self, lr=0.5, momentum=0.95, **kwargs):
         """Specify the optimizer to use. Here, it is stochastic gradient
@@ -107,28 +119,33 @@ class ModelController(object):
         """
         avg_batch_times = AverageMeter()
         min_loss = float("inf")
+
         for epoch in range(n_epochs):
             t_i = time()
-            avg_losses = AverageMeter()
+            avg_losses_train = AverageMeter()
             cum_loss_train = 0.
             for _ in range(n_train):
                 info = self.run_batch(
-                    batch_size, avg_batch_times, avg_losses, mode="train")
+                    batch_size,
+                    avg_batch_times,
+                    avg_losses_train,
+                    mode="train")
                 cum_loss_train += info["loss"]
-                # LOGGING MESSAGE
-            print("train")
-            print(info)
+            LOG.debug("Ep {0} average training loss: {1}".format(
+                epoch, avg_losses_train.avg))
             cum_loss_train /= n_train
 
+            avg_losses_validate = AverageMeter()
             cum_loss_validate = 0.
             for _ in range(n_validate):
                 info = self.run_batch(
-                    batch_size, avg_batch_times, avg_losses, mode="validate")
+                    batch_size,
+                    avg_batch_times,
+                    avg_losses_train,
+                    mode="validate")
                 cum_loss_validate += info["loss"]
-                # LOGGING MESSAGE
-
-            print("validate")
-            print(info)
+            LOG.debug("Ep {0} average validation loss: {1}".format(
+                epoch, avg_losses_validate.avg))
             cum_loss_validate /= n_validate
             t_f = time()
             LOG.info(
@@ -136,15 +153,32 @@ class ModelController(object):
                  "Training loss: {2}, validation loss: {3}.").format(
                      epoch, t_f - t_i, cum_loss_train, cum_loss_validate))
 
-            is_best = cum_loss_train < min_loss
-            min_loss = min(cum_loss_train, min_loss)
+            self._training_loss.append(cum_loss_train)
+            self._validation_loss.append(cum_loss_validate)
+
+            is_best = cum_loss_validate < min_loss
+            min_loss = min(cum_loss_validate, min_loss)
 
             self._save_checkpoint({
                 "epoch": epoch,
-                "arch": "DeepSEA",
+                "arch": self.model.__class__.__name__,
                 "state_dict": self.model.state_dict(),
                 "min_loss": min_loss,
                 "optimizer": self.optimizer.state_dict()}, is_best)
+        LOG.info(
+            ("Average time to propagate a batch of size {0} through the "
+             "model: {1} s").format(
+                batch_size, avg_batch_times.avg))
+
+        with open("./validation_loss.txt", mode="wt", encoding="utf-8") as \
+                validation_loss_txt:
+            validation_loss_txt.write(
+                '\n'.join(str(loss) for loss in self._validation_loss))
+
+        with open("./train_loss.txt", mode="wt", encoding="utf-8") as \
+                train_loss_txt:
+            train_loss_txt.write(
+                '\n'.join(str(loss) for loss in self._train_loss))
 
     def run_batch(self, batch_size, avg_batch_times, avg_losses, mode="train"):
         """Process a batch of positive/negative examples. Will update a model
@@ -176,12 +210,33 @@ class ModelController(object):
 
         inputs = np.zeros((batch_size, self.sampler.window_size, 4))
         targets = np.zeros((batch_size, self.sampler.n_features))
+        n_features_in_inputs = []
 
-        t_i = time()
+        t_i_sampling = time()
         for i in range(batch_size):
             sequence, target = self.sampler.sample_mixture()
             inputs[i, :, :] = sequence
             targets[i, :] = np.any(target == 1, axis=0)
+            n_features_in_inputs.append(np.sum(targets[i, :]))
+        t_f_sampling = time()
+
+        n_features_in_inputs = np.array(n_features_in_inputs)
+        n_features_in_inputs /= float(self.sampler.n_features)
+
+        count_features = np.sum(targets, axis=0)
+        most_common_features = count_features.argsort()[-3:][::-1]
+        log_n_features = 10
+        common_feats = {}
+        for i in range(log_n_features):
+            feature = most_common_features[i]
+            common_feats[feature] = count_features[feature]
+
+        LOG.debug(
+            "Percent features present in each example of batch: {0}".format(
+                n_features_in_inputs))
+        LOG.debug(
+            "{0} most common features in examples: {1}".format(
+                log_n_features, common_feats))
 
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
@@ -190,7 +245,14 @@ class ModelController(object):
             targets = targets.cuda()
         inputs = Variable(inputs, requires_grad=True)
         targets = Variable(targets)
+        t_f_tensor_conv = time()
+        LOG.debug(
+            ("Time to sample {0} examples: {1} s. "
+             "Time to convert to tensor format: {2} s.").format(
+                 t_f_sampling - t_i_sampling,
+                 t_f_tensor_conv - t_f_sampling))
 
+        t_i = time()
         output = self.model(inputs.transpose(1, 2))
         loss = self.criterion(output, targets)
 
@@ -202,7 +264,6 @@ class ModelController(object):
             self.optimizer.step()
 
         avg_batch_times.update(time() - t_i)
-        t_i = time()
 
         # returns logging information
         return {"batch_time": avg_batch_times.val,
@@ -210,8 +271,7 @@ class ModelController(object):
                 "loss": avg_losses.val,
                 "loss_avg": avg_losses.avg}
 
-    @staticmethod
-    def _save_checkpoint(state, is_best,
+    def _save_checkpoint(self, state, is_best,
                          dir_path=None,
                          filename="checkpoint.pth.tar"):
         """Saves snapshot of the model state to file.
@@ -234,12 +294,11 @@ class ModelController(object):
         """
         if dir_path is None:
             dir_path = os.getcwd()
-        time_str = strftime("%Y%m%d_%H%M")
         cp_filepath = os.path.join(
-            dir_path, "{0}_{1}".format(time_str, filename))
+            dir_path, "{0}_{1}".format(self.prefix_outputs, filename))
         torch.save(state, cp_filepath)
         if is_best:
             best_filepath = os.path.join(
                 dir_path,
-                "{0}_model_best.pth.tar".format(time_str))
+                "{0}_model_best.pth.tar".format(self.prefix_outputs))
             shutil.copyfile(cp_filepath, best_filepath)
