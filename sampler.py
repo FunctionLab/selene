@@ -112,10 +112,10 @@ class Sampler(object):
         holdout_chrs_both = np.logical_or(
             holdout_chrs_test, holdout_chrs_validate)
 
-        self._all_indices = features_chr_data.index
-        self._training_indices = np.where(~holdout_chrs_both)[0]
-        self._test_indices = np.where(holdout_chrs_test)[0]
-        self._validate_indices = np.where(holdout_chrs_validate)[0]
+        self._all_indices = list(features_chr_data.index)
+        self._training_indices = list(np.where(~holdout_chrs_both)[0])
+        self._test_indices = list(np.where(holdout_chrs_test)[0])
+        self._validate_indices = list(np.where(holdout_chrs_validate)[0])
         t_f = time()
         LOG.debug(
             ("Partitioned the dataset into train/validate/test sets: "
@@ -132,6 +132,20 @@ class Sampler(object):
         self.set_mode(mode)  # set the `mode` attribute here.
 
         LOG.debug("Initialized the Sampler object")
+
+    def get_feature_from_index(self, feature_index):
+        """Returns the feature corresponding to an index in the feature
+        vector. Currently used in the logger.
+
+        Parameters
+        ----------
+        feature_index : int
+
+        Returns
+        -------
+        str
+        """
+        return self.query_feature_data.index_feature_map[feature_index]
 
     def set_mode(self, mode):
         """Determines what positive examples are available to sample depending
@@ -161,6 +175,10 @@ class Sampler(object):
                 "Mode must be one of {0}. Input was '{1}'.".format(
                     self.MODES, mode))
 
+        if self.mode == mode:
+            LOG.debug("MODE: {0}".format(mode))
+            return
+
         if mode == "all":
             indices = self._all_indices
         elif mode == "train":
@@ -169,7 +187,7 @@ class Sampler(object):
             indices = self._validate_indices
         elif mode == "test":
             indices = self._test_indices
-        self._use_indices = list(indices)
+        self._use_indices = indices
         self.mode = mode
         LOG.debug("Setting mode to {0}".format(mode))
 
@@ -302,13 +320,15 @@ class ChromatinFeaturesSampler(Sampler):
         # sequence from there.
         # TODO: negative sampling disabled temporarily to improve training
         # time
-        # self._randcache_negatives = self._build_randcache_negatives()
+        # self._randcache_negatives = {}
+        # self._build_randcache_negatives()
 
         # used during the positive sampling step - get random indices
         # in the genome FASTA file and randomly select a position within
         # the [start, end) of the genomic coordinates around which we'd
         # define our bin and window.
-        self._randcache_positives = self._build_randcache_positives()
+        self._randcache_positives = {}
+        self._build_randcache_positives()
 
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
