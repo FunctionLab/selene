@@ -11,7 +11,7 @@
 module load cudnn/cuda-8.0/6.0
 module load anaconda3/4.4.0
 
-export myscratch="/scratch/kc31/job"
+export myscratch="/scratch/kc31/rf-job"
 data_dir="/tigress/kc31/data_small"
 
 rm -rf $myscratch
@@ -19,10 +19,10 @@ mkdir -p $myscratch
 
 source activate mazu
 
-python -u seq_model.py $data_dir"/mm10_no_alt_analysis_set_ENCODE.fasta" \
+python -u train_model.py $data_dir"/mm10_no_alt_analysis_set_ENCODE.fasta" \
                     $data_dir"/reduced_agg_beds_1.bed" \
                     $data_dir"/reduced_agg_beds_1.bed.gz" \
-                    $myscratch"/output9317.model" \
+                    $myscratch"/output91017.model" \
                     --holdout-chrs=chr8,chr9 --radius=100 --window=1001 \
                     --random-seed=123 --mode=train --use-cuda
 
