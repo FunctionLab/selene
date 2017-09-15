@@ -22,7 +22,8 @@ class ModelController(object):
     def __init__(self, model, sampler,
                  loss_criterion, optimizer_args,
                  use_cuda=False, data_parallel=False,
-                 prefix_outputs=None):
+                 prefix_outputs=None,
+                 checkpoint_resume=None):
         """Methods to train, validate, and test a PyTorch model.
 
         Parameters
@@ -72,6 +73,16 @@ class ModelController(object):
         self._training_loss = []
         self._validation_loss = []
 
+        self.start_epoch = 0
+        self.min_loss = float("inf")
+        if checkpoint_resume is not None:
+            self.start_epoch = checkpoint_resume["epoch"]
+            self.min_loss = checkpoint_resume["min_loss"]
+            self.optimizer.load_state_dict(
+                checkpoint_resume["optimizer"])
+            LOG.info("Checkpoint data: epoch {0}, min loss {1}".format(
+                self.start_epoch, self.min_loss))
+
     def _optimizer(self, lr=0.5, momentum=0.95, **kwargs):
         """Specify the optimizer to use. Here, it is stochastic gradient
         descent.
@@ -87,8 +98,8 @@ class ModelController(object):
     def train_validate(self,
                        n_epochs=1000,
                        batch_size=128,
-                       n_train=6,
-                       n_validate=2):
+                       n_train=80,
+                       n_validate=10):
         """The training and validation process.
         Defaults will sample approximately 1 million positive and negative
         examples (total) in a single call to `train_validate`.
@@ -103,27 +114,28 @@ class ModelController(object):
             Default is 128. The number of samples to propagate through the
             network in one epoch.
         n_train : int, optional
-            Default is 6. The `n_train` and `n_validation` parameters are used
+            Default is 80. The `n_train` and `n_validation` parameters are used
             to maintain the proportion of train/validation examples we would
             like to sample in a single epoch. (Training, validation, and
             testing sets are completely separate from each other. By these
-            defaults, we maintain a 60-20-20 percent division in the
+            defaults, we maintain a 80-10-10 percent division in the
             proportion of the full dataset represented during
             training-validation-testing, respectively.
         n_validation : int, optional
-            Default is 2. See notes in `n_validation`.
+            Default is 10. See notes in `n_validation`.
 
         Returns
         -------
         None
         """
         avg_batch_times = AverageMeter()
-        min_loss = float("inf")
+        min_loss = self.min_loss
 
-        for epoch in range(n_epochs):
+        for epoch in range(self.start_epoch, n_epochs):
             t_i = time()
             avg_losses_train = AverageMeter()
             cum_loss_train = 0.
+            self.model.train()
             for _ in range(n_train):
                 info = self.run_batch(
                     batch_size,
@@ -137,11 +149,12 @@ class ModelController(object):
 
             avg_losses_validate = AverageMeter()
             cum_loss_validate = 0.
+            self.model.eval()
             for _ in range(n_validate):
                 info = self.run_batch(
                     batch_size,
                     avg_batch_times,
-                    avg_losses_train,
+                    avg_losses_validate,
                     mode="validate")
                 cum_loss_validate += info["loss"]
             LOG.debug("Ep {0} average validation loss: {1}".format(
@@ -153,22 +166,34 @@ class ModelController(object):
                  "Training loss: {2}, validation loss: {3}.").format(
                      epoch, t_f - t_i, cum_loss_train, cum_loss_validate))
 
+            if epoch % 5 == 0:
+                LOG.info(
+                    ("Average time to propagate a batch of size {0} "
+                     "through the model: {1} s").format(
+                        batch_size, avg_batch_times.avg))
             self._training_loss.append(cum_loss_train)
             self._validation_loss.append(cum_loss_validate)
 
             is_best = cum_loss_validate < min_loss
             min_loss = min(cum_loss_validate, min_loss)
 
+            LOG.info(
+                "Saving model state to file on epoch {0}.".format(epoch))
             self._save_checkpoint({
                 "epoch": epoch,
                 "arch": self.model.__class__.__name__,
                 "state_dict": self.model.state_dict(),
                 "min_loss": min_loss,
                 "optimizer": self.optimizer.state_dict()}, is_best)
-        LOG.info(
-            ("Average time to propagate a batch of size {0} through the "
-             "model: {1} s").format(
-                batch_size, avg_batch_times.avg))
+
+        # Include a last log message if the last `epoch` was not a multiple
+        # 5. e.g., we are interested in knowing the average time after the
+        # model was trained over all epochs.
+        if epoch % 5 != 0:
+            LOG.info(
+                ("Average time to propagate a batch of size {0} through the "
+                 "model: {1} s").format(
+                    batch_size, avg_batch_times.avg))
 
         with open("./validation_loss.txt", mode="wt", encoding="utf-8") as \
                 validation_loss_txt:
@@ -178,7 +203,7 @@ class ModelController(object):
         with open("./train_loss.txt", mode="wt", encoding="utf-8") as \
                 train_loss_txt:
             train_loss_txt.write(
-                '\n'.join(str(loss) for loss in self._train_loss))
+                '\n'.join(str(loss) for loss in self._training_loss))
 
     def run_batch(self, batch_size, avg_batch_times, avg_losses, mode="train"):
         """Process a batch of positive/negative examples. Will update a model
@@ -214,7 +239,7 @@ class ModelController(object):
 
         t_i_sampling = time()
         for i in range(batch_size):
-            sequence, target = self.sampler.sample_mixture()
+            sequence, target = self.sampler.sample()
             inputs[i, :, :] = sequence
             targets[i, :] = np.any(target == 1, axis=0)
             n_features_in_inputs.append(np.sum(targets[i, :]))
@@ -222,21 +247,25 @@ class ModelController(object):
 
         n_features_in_inputs = np.array(n_features_in_inputs)
         n_features_in_inputs /= float(self.sampler.n_features)
+        avg_percent_features = np.average(n_features_in_inputs)
+        std_percent_features = np.std(n_features_in_inputs)
 
         count_features = np.sum(targets, axis=0)
-        most_common_features = count_features.argsort()[-3:][::-1]
-        log_n_features = 10
+        most_common_features = list(count_features.argsort())
+        most_common_features.reverse()
+        report_n_features = 10
         common_feats = {}
-        for i in range(log_n_features):
-            feature = most_common_features[i]
-            common_feats[feature] = count_features[feature]
+        for feature_index in most_common_features[:report_n_features]:
+            feat = self.sampler.get_feature_from_index(feature_index)
+            common_feats[feat] = count_features[feature_index]
 
         LOG.debug(
-            "Percent features present in each example of batch: {0}".format(
-                n_features_in_inputs))
+            ("Proportion of features present in each example of batch: "
+             "avg {0}, std {1}").format(avg_percent_features,
+                                        std_percent_features))
         LOG.debug(
-            "{0} most common features in examples: {1}".format(
-                log_n_features, common_feats))
+            "{0} most common features present in this batch: {1}".format(
+                report_n_features, common_feats))
 
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
@@ -249,6 +278,7 @@ class ModelController(object):
         LOG.debug(
             ("Time to sample {0} examples: {1} s. "
              "Time to convert to tensor format: {2} s.").format(
+                 batch_size,
                  t_f_sampling - t_i_sampling,
                  t_f_tensor_conv - t_f_sampling))
 
