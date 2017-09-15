@@ -55,23 +55,27 @@ class DeepSEA(nn.Module):
         return x
 
 
-def deepsea(filepath=None, **kwargs):
+def deepsea(window_size, n_genomic_features, filepath=None):
     """Initializes a new (untrained) DeepSEA model or loads
     a trained model from a filepath.
 
     Parameters
     ----------
+    window_size : int
+        The window size is the input sequence length for a single
+        training example.
+    n_genomic_features : int
+        The number of genomic features (classes) to predict.
     filepath : str, optional
         Default is None.
-    **kwargs : dict
-        Parameters should match those of the DeepSEA constructor
-        (window_size, n_genomic_features)
+
+    [TODO] Note this function has not been tested.
 
     Returns
     -------
     DeepSEA
     """
-    model = DeepSEA(**kwargs)
+    model = DeepSEA(window_size, n_genomic_features)
     if filepath is not None:
         model.load_state_dict(torch.load(filepath))
         model.eval()
