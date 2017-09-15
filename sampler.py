@@ -20,10 +20,11 @@ LOG = logging.getLogger("deepsea")
 
 class Sampler(object):
 
-    MODES = ("all", "train", "validate", "test")
-    STRAND_SIDES = ('+', '-')
-    EXPECTED_COLS = (
+    COORDS_EXPECTED_COLS = (
         "chr", "start", "end")
+    MODES = ("all", "train", "validate", "test")
+    SAMPLING_OPTIONS = ("random", "positive", "proportion")
+    STRAND_SIDES = ('+', '-')
 
     def __init__(self, genome,
                  query_feature_data,
@@ -32,7 +33,9 @@ class Sampler(object):
                  chrs_test,
                  chrs_validate,
                  random_seed=436,
-                 mode="train"):
+                 mode="train",
+                 sample_from="random",
+                 sample_positive_prop=0.50):
         """The class used to sample positive and negative examples from the
         genomic sequence.
 
@@ -69,6 +72,21 @@ class Sampler(object):
             Default is 436. Sets the numpy random seed.
         mode : {"all", "train", "validate", "test"}, optional
             Default is "train".
+        sample_from : {"random", "positive", "proportion"}, optional
+            Default is "random". Specify where to draw our samples.
+            * "random": Select a random chromosome, sequence position in the
+                  chr, and strand side. Do not check for whether it is a known
+                  positive example (i.e. has at least 1 genomic feature
+                  within the surrounding bin).
+            * "positive": Select from the `feature_coordinates` dataframe.
+                  The samples we draw will have at least 1 genomic feature
+                  as a result.
+            * "proportion": Select from the `feature_coordinates` positive
+                  examples X% of the time and select a negative example
+                  (0 genomic features in this bin) (100 - X)% of the time.
+        sample_positive_prop : [0.0, 1.0], optional
+            Default is 0.50. This is only used if `sample_from` is
+            "proportion".
 
         Attributes
         ----------
@@ -82,11 +100,19 @@ class Sampler(object):
         ------
         ValueError
             - If the input str to `mode` is not one of the specified choices.
+            - If the input str to `sample_from` is not one of the specified
+              choices.
         """
         if mode not in self.MODES:
             raise ValueError(
                 "Mode must be one of {0}. Input was '{1}'.".format(
                     self.MODES, mode))
+
+        if sample_from not in self.SAMPLING_OPTIONS:
+            raise ValueError(
+                ("Sampling option `sample_from` must be one of {0}. "
+                 "Input was '{1}'.").format(
+                     self.SAMPLING_OPTIONS, sample_from))
 
         self.genome = Genome(genome)
 
@@ -94,7 +120,7 @@ class Sampler(object):
         # used during the positive sampling step - get a random index from the
         # coords file and the corresponding (chr, start, end) info.
         self._coords_df = pd.read_table(
-            feature_coordinates, header=None, names=self.EXPECTED_COLS)
+            feature_coordinates, header=None, names=self.COORDS_EXPECTED_COLS)
         t_f = time()
         LOG.debug(
             ("Loaded genome coordinates for each feature "
@@ -130,6 +156,9 @@ class Sampler(object):
 
         self.mode = None
         self.set_mode(mode)  # set the `mode` attribute here.
+
+        self.sample_from = sample_from
+        self.sample_positive_prop = sample_positive_prop
 
         LOG.debug("Initialized the Sampler object")
 
@@ -191,8 +220,30 @@ class Sampler(object):
         self.mode = mode
         LOG.debug("Setting mode to {0}".format(mode))
 
-    def sample_positive(self):
-        """Sample a positive example from the genome.
+
+    def sample(self):
+        """Sample based on `self.sample_from` specified in the sampler's
+        initialization.
+
+        Returns
+        -------
+        tuple(np.ndarray, np.ndarray)
+            Returns the sequence encoding and its corresponding feature labels.
+        """
+        t_i = time()
+        if self.sample_from == "random":
+            self.sample_random()
+        elif self.sample_from == "positive":
+            self.sample_positive()
+        elif self.sample_from == "proportion":
+            self.sample_mixture()
+        t_f = time()
+        LOG.debug("Sampling step: {0} s".format(t_f - t_i))
+
+    def sample_random(self):
+        """Sample an example from the genome. This should be implemented
+        such that there is no need to check whether the drawn example is
+        positive or negative.
 
         Returns
         -------
@@ -213,14 +264,20 @@ class Sampler(object):
         """
         pass
 
-    def sample_mixture(self, positive_proportion=0.50):
-        """Gets a mixture of positive and negative samples
+    def sample_positive(self):
+        """Sample a positive example from the genome.
 
-        Parameters
-        ----------
-        positive_proportion : [0.0, 1.0], float, optional
-            Default is 0.50. Specify the proportion of positive examples
-            that will be sampled (the rest are negative examples).
+        Returns
+        -------
+        tuple(np.ndarray, np.ndarray)
+            Returns the sequence encoding and its corresponding feature labels.
+        """
+        pass
+
+    def sample_mixture(self):
+        """Gets a mixture of positive and negative samples, where the
+        frequency of each being drawn is determined by the
+        `self.sample_positive_prop` parameter.
 
         Returns
         -------
@@ -228,14 +285,11 @@ class Sampler(object):
             Returns both the sequence encoding and the feature labels
             for the specified range.
         """
-        t_i = time()
         sample = self.sample_positive()
-        #if random.uniform(0, 1) < positive_proportion:
-        #    sample = self.sample_positive()
-        #else:
-        #    sample = self.sample_negative()
-        t_f = time()
-        LOG.debug("Sampling step completed: {0} s".format(t_f - t_i))
+        if random.uniform(0, 1) < self.sample_positive_prop:
+            sample = self.sample_positive()
+        else:
+            sample = self.sample_negative()
         return sample
 
 
@@ -250,7 +304,9 @@ class ChromatinFeaturesSampler(Sampler):
                  radius=100,
                  window_size=1001,
                  random_seed=436,
-                 mode="train"):
+                 mode="train",
+                 sample_from="random",
+                 sample_positive_prop=0.5):
         """The positive examples we focus on in ChromatinFeaturesSampler are
         those detected in ChIP-seq, DNase-seq, and ATAC-seq experiments; which
         assay DNA binding and accessibility.
@@ -290,7 +346,9 @@ class ChromatinFeaturesSampler(Sampler):
             chrs_test,
             chrs_validate,
             random_seed=random_seed,
-            mode=mode)
+            mode=mode,
+            sample_from=sample_from,
+            sample_positive_prop=sample_positive_prop)
 
         if window_size < (1 + 2 * radius):
             raise ValueError(
@@ -318,10 +376,9 @@ class ChromatinFeaturesSampler(Sampler):
         # used during the negative sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
         # sequence from there.
-        # TODO: negative sampling disabled temporarily to improve training
-        # time
-        # self._randcache_negatives = {}
-        # self._build_randcache_negatives()
+        if self.sample_from == "random" or self.sample_from == "proportion":
+            self._randcache_background = {}
+            self._build_randcache_background()
 
         # used during the positive sampling step - get random indices
         # in the genome FASTA file and randomly select a position within
@@ -332,19 +389,19 @@ class ChromatinFeaturesSampler(Sampler):
 
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
-    def _build_randcache_negatives(self, size=10000):
+    def _build_randcache_background(self, size=10000):
         t_i = time()
         # select chromosomes
-        if "chr" not in self._randcache_negatives \
-                or len(self._randcache_negatives["chr"]) == 0:
+        if "chr" not in self._randcache_background \
+                or len(self._randcache_background["chr"]) == 0:
             rand_chrs = list(np.random.choice(self.genome.chrs, size=size))
-            self._randcache_negatives["chr"] = rand_chrs
+            self._randcache_background["chr"] = rand_chrs
 
         # select sequence positions for each chromosome
-        if "pos" not in self._randcache_negatives:
-            self._randcache_negatives["pos"] = dict(
+        if "pos" not in self._randcache_background:
+            self._randcache_background["pos"] = dict(
                 [(x, []) for x in self.genome.chrs])
-        rand_chr_positions = self._randcache_negatives["pos"]
+        rand_chr_positions = self._randcache_background["pos"]
         for chrom, rand_positions in rand_chr_positions.items():
             if len(rand_positions) == 0:
                 rand_chr_positions[chrom] = \
@@ -353,11 +410,11 @@ class ChromatinFeaturesSampler(Sampler):
                         size / 2)
 
         # select strand side
-        if "strand" not in self._randcache_negatives \
-                or len(self._randcache_negatives["strand"]) == 0:
+        if "strand" not in self._randcache_background \
+                or len(self._randcache_background["strand"]) == 0:
             rand_strands = list(
                 np.random.choice(self.STRAND_SIDES, size=size))
-            self._randcache_negatives["strand"] = rand_strands
+            self._randcache_background["strand"] = rand_strands
         t_f = time()
         LOG.info(
             ("Updated the cache for sampling "
@@ -443,8 +500,6 @@ class ChromatinFeaturesSampler(Sampler):
             Otherwise, returns both the sequence encoding and the feature
             labels for the specified range.
         """
-        #LOG.debug("Retrieved ({0}, {1}, {2})".format(
-        #    chrom, position, strand))
         sequence_start = position - self.radius - self.padding
         sequence_end = position + self.radius + self.padding + 1
         retrieved_sequence = \
@@ -462,6 +517,42 @@ class ChromatinFeaturesSampler(Sampler):
                 chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
 
+    def _get_rand_background(self):
+        if len(self._randcache_background) == 0 or \
+                len(self._randcache_background["chr"]) == 0 or \
+                len(self._randcache_background["strand"]) == 0:
+            self._build_randcache_background()
+
+        randchr = self._randcache_background["chr"].pop()
+
+        if len(self._randcache_background["pos"][randchr]) == 0:
+            t_i = time()
+            self._randcache_background["pos"][randchr] = \
+                self._rand_chr_positions(
+                    self.genome.len_chrs[randchr], 500)
+            t_f = time()
+            LOG.debug(
+                ("Updated the cache for sampling negative examples, "
+                 "{0} positions only: {1} s").format(randchr, t_f - t_i))
+
+        randpos = self._randcache_background["pos"][randchr].pop()
+        randstrand = self._randcache_background["strand"].pop()
+        return (randchr, randpos, randstrand)
+
+    def sample_random(self):
+        """Sample an example from the genome. This should be implemented
+        such that there is no need to check whether the drawn example is
+        positive or negative.
+
+        Returns
+        -------
+        tuple(np.ndarray, np.ndarray)
+            Returns the sequence encoding and its corresponding feature labels.
+        """
+        randchr, randpos, randstrand = self._get_rand_background()
+        return self._retrieve(randchr, randpos, randstrand,
+                              is_positive=False)
+
     def sample_negative(self):
         """Sample a negative example from the genome.
 
@@ -471,26 +562,7 @@ class ChromatinFeaturesSampler(Sampler):
             Returns the sequence encoding for the window and an array
             of all 0s (no features) for the middle bin.
         """
-        if len(self._randcache_negatives) == 0 or \
-                len(self._randcache_negatives["chr"]) == 0:
-            self._build_randcache_negatives()
-        randchr = self._randcache_negatives["chr"].pop()
-
-        if len(self._randcache_negatives["pos"][randchr]) == 0:
-            t_i = time()
-            self._randcache_negatives["pos"][randchr] = \
-                self._rand_chr_positions(
-                    self.genome.len_chrs[randchr], 500)
-            t_f = time()
-            LOG.debug(
-                ("Updated the cache for sampling negative examples, "
-                 "{0} positions only: {1} s").format(randchr, t_f - t_i))
-        randpos = self._randcache_negatives["pos"][randchr].pop()
-
-        if len(self._randcache_negatives["strand"]) == 0:
-            self._build_randcache_negatives()
-        randstrand = self._randcache_negatives["strand"].pop()
-
+        randchr, randpos, randstrand = self._get_rand_background()
         is_positive = self.query_feature_data.is_positive(
             randchr, randpos - self.radius, randpos + self.radius + 1)
         if is_positive:
