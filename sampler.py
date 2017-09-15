@@ -231,14 +231,17 @@ class Sampler(object):
             Returns the sequence encoding and its corresponding feature labels.
         """
         t_i = time()
+        sample = None
         if self.sample_from == "random":
-            self.sample_random()
+            sample = self.sample_random()
         elif self.sample_from == "positive":
-            self.sample_positive()
+            sample = self.sample_positive()
         elif self.sample_from == "proportion":
-            self.sample_mixture()
+            sample = self.sample_mixture()
         t_f = time()
-        LOG.debug("Sampling step: {0} s".format(t_f - t_i))
+        LOG.debug("Sampling step ({0}): {1} s".format(
+            self.sample_from, t_f - t_i))
+        return sample
 
     def sample_random(self):
         """Sample an example from the genome. This should be implemented
