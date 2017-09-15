@@ -6,6 +6,7 @@ import os
 import shutil
 from time import strftime, time
 
+from joblib import Parallel, delayed
 import numpy as np
 import torch
 import torch.nn as nn
@@ -21,7 +22,7 @@ torch.set_num_threads(32)
 class ModelController(object):
     def __init__(self, model, sampler,
                  loss_criterion, optimizer_args,
-                 use_cuda=False, data_parallel=False,
+                 n_cores=1, use_cuda=False, data_parallel=False,
                  prefix_outputs=None,
                  checkpoint_resume=None):
         """Methods to train, validate, and test a PyTorch model.
@@ -32,10 +33,15 @@ class ModelController(object):
         sampler : Sampler
         loss_criterion : torch.nn._Loss
         optimizer_args : dict
+        n_cores : int, optional
+            Default is 1. Multiple cores can be used to parallelize the
+            sampling step used to create batches.
         use_cuda : bool, optional
-            Default is False.
+            Default is False. Specify whether CUDA is available for torch
+            to use during training.
         data_parallel : bool, optional
-            Default is False.
+            Default is False. Specify whether multiple GPUs are available
+            for torch to use during training.
         prefix_outputs : str, optional
             Default is None. If None, prefix output files (e.g. the latest
             checkpoint and the best performing state of the model)
@@ -47,15 +53,20 @@ class ModelController(object):
         sampler : Sampler
         criterion : torch.nn._Loss
         optimizer : torch.optim
+        n_cores : int
         use_cuda : bool
         data_parallel : bool
+        prefix_outputs : str
         """
         self.model = model
         self.sampler = sampler
         self.criterion = loss_criterion
         self.optimizer = self._optimizer(**optimizer_args)
+
+        self.n_cores = n_cores
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
+
         self.prefix_outputs = prefix_outputs
 
         if self.data_parallel:
@@ -238,11 +249,21 @@ class ModelController(object):
         n_features_in_inputs = []
 
         t_i_sampling = time()
+        """
         for i in range(batch_size):
             sequence, target = self.sampler.sample()
             inputs[i, :, :] = sequence
             targets[i, :] = np.any(target == 1, axis=0)
             n_features_in_inputs.append(np.sum(targets[i, :]))
+        """
+        with Parallel(n_jobs=self.n_cores) as parallel:
+            results = parallel(
+                delayed(self.sampler.sample)()
+                for _ in range(batch_size))
+            for index, (sequence, target) in enumerate(results):
+                inputs[index, :, :] = sequence
+                targets[index, :] = np.any(target == 1, axis=0)
+                n_features_in_inputs.append(np.sum(targets[index, :]))
         t_f_sampling = time()
 
         n_features_in_inputs = np.array(n_features_in_inputs)
