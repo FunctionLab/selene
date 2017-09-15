@@ -44,14 +44,16 @@ class GenomicFeatures(object):
         ----------
         data : tabix.open
         n_features : int
-        features_map : dict
+        feature_index_map : dict
             feature (key) -> position index (value) in `features`
         """
         self.data = tabix.open(dataset)
         self.n_features = len(features)
 
-        self.features_map = dict(
+        self.feature_index_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
+        self.index_feature_map = dict(
+            list(enumerate(features)))
 
     def is_positive(self, chrom, start, end, threshold=0.50):
         """Determines whether the (chrom, start, end) queried
@@ -167,7 +169,7 @@ class GenomicFeatures(object):
                     if is_positive:
                         index_start = feat_start - start
                         index_end = feat_end - start
-                        index_feat = self.features_map[row[4]]
+                        index_feat = self.feature_index_map[row[4]]
                         encoding[index_start:index_end, index_feat] = 1
             elif strand == '-':
                 for row in rows:
@@ -178,7 +180,7 @@ class GenomicFeatures(object):
                     if is_positive:
                         index_start = end - feat_end
                         index_end = end - feat_start
-                        index_feat = self.features_map[row[4]]
+                        index_feat = self.feature_index_map[row[4]]
                         encoding[index_start:index_end, index_feat] = 1
             else:
                 raise ValueError(
