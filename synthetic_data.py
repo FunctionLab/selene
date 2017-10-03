@@ -81,8 +81,8 @@ if __name__ == "__main__":
         validation.append(
             generate_data_bases(batch_size))
 
-    learning_rate = 1e-5
-    print(lr)
+    learning_rate = 1e-4
+    print(learning_rate)
 
     model = DeepSEA(H, D_out)
     print(model)
@@ -98,9 +98,9 @@ if __name__ == "__main__":
     # dataset
 
     #optimizer = torch.optim.SGD(model.parameters(),
-    #    lr=lr, momentum=0.95, weight_decay=5e-7)
+    #    lr=learning_rate, momentum=0.95, weight_decay=5e-7)
     optimizer = torch.optim.Adam(model.parameters(),
-        lr=lr, weight_decay=5e-7)
+        lr=learning_rate, weight_decay=5e-7)
     print(optimizer)
 
     model.cuda()
