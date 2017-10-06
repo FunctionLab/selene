@@ -90,6 +90,7 @@ import sys
 from time import time
 
 from docopt import docopt
+import torch
 from torch import nn
 
 from deepsea import DeepSEA
@@ -152,10 +153,20 @@ if __name__ == "__main__":
         radius=radius,
         window_size=window_size,
         random_seed=random_seed,
-        mode=mode)
+        mode=mode,
+        sample_from="positive")
 
     t_i_model = time()
     model = DeepSEA(sampler.window_size, sampler.n_features)
+    checkpoint = None
+    resume = False
+    # resume = True
+    if resume:
+        log.info("Resuming training from checkpoint.")
+        checkpoint = torch.load("20170914_model_best.pth.tar")
+        model.load_state_dict(checkpoint["state_dict"])
+        model.eval()
+
     # TODO: would prefer to not have to import & specify this in the
     # train_model.py script, I think?
     criterion = nn.BCELoss()
@@ -166,7 +177,9 @@ if __name__ == "__main__":
 
     runner = ModelController(
         model, sampler, criterion, sgd_optimizer_args,
-        use_cuda=use_cuda, data_parallel=data_parallel)
+        prefix_outputs="deepsea_300eps",
+        n_cores=4, use_cuda=use_cuda, data_parallel=data_parallel,
+        checkpoint_resume=checkpoint)
     log.info("Training model: {0} epochs, {1} batch size.".format(
         n_epochs, batch_size))
     runner.train_validate(n_epochs=n_epochs, batch_size=batch_size)

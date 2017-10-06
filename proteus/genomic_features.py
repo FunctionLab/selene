@@ -44,14 +44,15 @@ class GenomicFeatures(object):
         ----------
         data : tabix.open
         n_features : int
-        features_map : dict
+        feature_index_map : dict
             feature (key) -> position index (value) in `features`
         """
         self.data = tabix.open(dataset)
         self.n_features = len(features)
 
-        self.features_map = dict(
+        self.feature_index_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
+        self.index_feature_map = dict(list(enumerate(features)))
 
     def is_positive(self, chrom, start, end, threshold=0.50):
         """Determines whether the (chrom, start, end) queried
@@ -114,6 +115,8 @@ class GenomicFeatures(object):
             True if this row meets the criterion for a positive example,
             False otherwise.
         """
+        #print("BIN: {0} {1}".format(query_start, query_end))
+        #print("FEAT: {0} {1}".format(feat_start, feat_end))
         overlap_start = max(feat_start, query_start)
         overlap_end = min(feat_end, query_end)
         min_overlap_needed = (query_end - query_start) * threshold
@@ -160,25 +163,31 @@ class GenomicFeatures(object):
             rows = self.data.query(chrom, start, end)
             if strand == '+':
                 for row in rows:
+                    if row[4] == "":
+                        print("ERR: no feature {0}".format(row))
+                        continue
                     feat_start = int(row[1])
                     feat_end = int(row[2])
                     is_positive = self._is_positive_single(
                         start, end, feat_start, feat_end, threshold)
                     if is_positive:
-                        index_start = feat_start - start
-                        index_end = feat_end - start
-                        index_feat = self.features_map[row[4]]
+                        index_start = max(0, feat_start - start)
+                        index_end = min(feat_end - start, end - start)
+                        index_feat = self.feature_index_map[row[4]]
                         encoding[index_start:index_end, index_feat] = 1
             elif strand == '-':
                 for row in rows:
+                    if row[4] == "":
+                        print("ERR: no feature {0}".format(row))
+                        continue
                     feat_start = int(row[1])
                     feat_end = int(row[2])
                     is_positive = self._is_positive_single(
                         start, end, feat_start, feat_end, threshold)
                     if is_positive:
-                        index_start = end - feat_end
-                        index_end = end - feat_start
-                        index_feat = self.features_map[row[4]]
+                        index_start = max(0, end - feat_end)
+                        index_end = min(end - feat_start, end - start)
+                        index_feat = self.feature_index_map[row[4]]
                         encoding[index_start:index_end, index_feat] = 1
             else:
                 raise ValueError(
@@ -186,4 +195,5 @@ class GenomicFeatures(object):
                         strand))
             return encoding
         except tabix.TabixError as e:
+            print("ERR: TRIED TO QUERY BUT NO FEATURES FOUND.")
             return encoding
