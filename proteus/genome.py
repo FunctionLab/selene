@@ -66,6 +66,7 @@ class Genome(object):
         """
         if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) \
                 or start < 0:
+            print("ERR: EMPTY STRING")
             return ""
 
         if strand == '+':
