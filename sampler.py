@@ -17,6 +17,10 @@ from proteus import GenomicFeatures
 
 LOG = logging.getLogger("deepsea")
 
+SLOG = logging.getLogger("samples")
+SLOG.setLevel(logging.INFO)
+file_handle = logging.FileHandler("samples.txt")
+SLOG.addHandler(file_handle)
 
 class Sampler(object):
 
@@ -515,7 +519,9 @@ class ChromatinFeaturesSampler(Sampler):
         retrieved_sequence = \
             self.genome.get_encoding_from_coords(
                 chrom, sequence_start, sequence_end, strand)
+        seq_str = self.genome.encoding_to_sequence(retrieved_sequence)
         if not is_positive or retrieved_sequence.shape[0] == 0:
+            SLOG.info(seq_str)
             return (
                 retrieved_sequence,
                 np.zeros((bin_end - bin_start,
@@ -525,6 +531,7 @@ class ChromatinFeaturesSampler(Sampler):
                 chrom, bin_start, bin_end, strand)
             #LOG.debug(retrieved_sequence)
             #LOG.debug(retrieved_data)
+            SLOG.info("{0}, {1}, P".format(seq_str, np.any(retrieved_sequence == 1, axis=0)))
             return (retrieved_sequence, retrieved_data)
 
     def _get_rand_background(self):

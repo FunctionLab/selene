@@ -94,8 +94,7 @@ import torch
 from torch import nn
 
 #from deepsea import DeepSEA
-#from model import DeepSEA
-from simple_model import DeepSEA
+from model import DeepSEA
 from model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
 
@@ -175,7 +174,7 @@ if __name__ == "__main__":
     # train_model.py script, I think?
     criterion = nn.BCEWithLogitsLoss()
     #optimizer_args = {"lr": 1e-3, "momentum": 0.9, "weight_decay": 5e-7}
-    optimizer_args = {"use_optim": "Adam", "lr": 1e-4, "eps": 1e-6, "weight_decay": 5e-7}
+    optimizer_args = {"use_optim": "Adam", "lr": 1e-2, "eps": 1e-6, "weight_decay": 5e-7}
 
     t_f_model = time()
     log.debug("Finished initializing the {0} model: {1} s".format(

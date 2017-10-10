@@ -1,4 +1,15 @@
+import sys
 
+import yaml
+
+def read_yaml_file(config_file):
+    with open(config_file, "r") as config_file:
+        try:
+            config_dict = yaml.load(config_file)
+        except yaml.YAMLError as expection:
+            sys.exit(exception)
+
+# TODO: consider removing later?
 class AverageMeter(object):
     """Computes and stores the average and current value.
     """

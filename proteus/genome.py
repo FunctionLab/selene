@@ -103,9 +103,9 @@ class Genome(object):
             (Raised in the call to `self.get_sequence_from_coords`)
         """
         sequence = self.get_sequence_from_coords(chrom, start, end, strand)
-        return self.sequence_encoding(sequence)
+        return self.sequence_to_encoding(sequence)
 
-    def sequence_encoding(self, sequence):
+    def sequence_to_encoding(self, sequence):
         """Converts an input sequence to its one hot encoding.
 
         Parameters
@@ -122,3 +122,11 @@ class Genome(object):
         for base, index in zip(sequence, range(len(sequence))):
             encoding[index, :] = self.BASES == base
         return encoding
+
+    def encoding_to_sequence(self, encoding):
+        cols, rows = np.where(encoding == 1)
+        assert len(cols) == len(self.BASES)
+        sequence = []
+        for row_index in rows:
+            sequence.append(self.BASES[row_index])
+        return sequence

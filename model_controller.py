@@ -20,6 +20,13 @@ torch.set_num_threads(32)
 
 
 class ModelController(object):
+
+    OPTIMIZERS = {
+        "Adam": torch.optim.Adam,
+        "SGD": torch.optim.SGD,
+        "RMSprop": torch.optim.RMSprop
+    }
+
     def __init__(self, model, sampler,
                  loss_criterion, optimizer_args,
                  batch_size,
@@ -116,17 +123,24 @@ class ModelController(object):
                  "epoch {0}, min loss {1}").format(
                     self.start_epoch, self.min_loss))
 
-    def _optimizer(self, lr=0.05, momentum=0.90, **kwargs):
+    def _optimizer(self, use_optim="Adam", **kwargs):
         """Specify the optimizer to use. Here, it is stochastic gradient
         descent.
 
         TODO: Discuss where the optimizer should be specified
         [software design]
         """
+        print(use_optim)
+        optim = self.OPTIMIZERS[use_optim]
+        return optim(self.model.parameters(), **kwargs)
+        """
+        print("SGD")
         return torch.optim.SGD(self.model.parameters(),
-                               lr=lr,
-                               momentum=momentum,
                                **kwargs)
+        """
+        #print("Adam")
+        #return torch.optim.Adam(self.model.parameters(),
+        #        **kwargs)
 
     def _run_batch(self):
         t_i_sampling = time()
