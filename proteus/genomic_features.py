@@ -156,41 +156,27 @@ class GenomicFeatures(object):
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        encoding = np.zeros((end - start, self.n_features))
+        if strand not in set({'+', '-'}):
+            raise ValueError(
+                "Strand must be one of '+' or '-'. Input was {0}".format(
+                    strand))
         try:
             pos = start + int((end - start) / 2)
             rows = self.data.query(chrom, pos, pos + 1)
+            encoding = np.zeros((end - start, self.n_features))
             #rows = self.data.query(chrom, start, end)
-            if strand == '+':
-                for row in rows:
-                    feat_start = int(row[1])
-                    feat_end = int(row[2])
-                    #is_positive = self._is_positive_single(
-                    #    start, end, feat_start, feat_end, threshold)
-                    #if is_positive:
+            for row in rows:
+                feat_start = int(row[1])
+                feat_end = int(row[2])
+                # this way is slower but more concise...
+                if strand == '+':
                     index_start = max(0, feat_start - start)
                     index_end = min(feat_end - start, end - start)
-                    index_feat = self.feature_index_map[row[4]]
-                    encoding[index_start:index_end, index_feat] = 1
-                    #else:
-                    #    print("WAS NOT POSITIVE: {0}, ({1}, {2})".format(pos, feat_start, feat_end))
-            elif strand == '-':
-                for row in rows:
-                    feat_start = int(row[1])
-                    feat_end = int(row[2])
-                    #is_positive = self._is_positive_single(
-                    #    start, end, feat_start, feat_end, threshold)
-                    #if is_positive:
+                else:
                     index_start = max(0, end - feat_end)
                     index_end = min(end - feat_start, end - start)
-                    index_feat = self.feature_index_map[row[4]]
-                    encoding[index_start:index_end, index_feat] = 1
-                    #else:
-                    #    print("WAS NOT POSITIVE: {0}, ({1}, {2})".format(pos, feat_start, feat_end))
-            else:
-                raise ValueError(
-                    "Strand must be one of '+' or '-'. Input was {0}".format(
-                        strand))
+                index_feat = self.feature_index_map[row[4]]
+                encoding[index_start:index_end, index_feat] = 1
             encoding = np.sum(encoding, axis=0) / (end - start)
             encoding = (encoding > threshold) * 1
             return encoding
