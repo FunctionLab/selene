@@ -19,7 +19,7 @@ LOG = logging.getLogger("deepsea")
 
 SLOG = logging.getLogger("samples")
 SLOG.setLevel(logging.INFO)
-file_handle = logging.FileHandler("samples.txt")
+file_handle = logging.FileHandler("_test6_lr1e-2_samples.txt")
 SLOG.addHandler(file_handle)
 
 class Sampler(object):
@@ -128,6 +128,10 @@ class Sampler(object):
         # coords file and the corresponding (chr, start, end) info.
         self._coords_df = pd.read_table(
             feature_coordinates, header=None, names=self.COORDS_EXPECTED_COLS)
+        diff = self._coords_df["end"].sub(self._coords_df["start"], axis=0)
+        bin_size = self.radius * 2 + 1
+        threshold = 0.50
+        self._coords_df = self._coords_df[diff >= bin_size * threshold]
         t_f = time()
         LOG.debug(
             ("Loaded genome coordinates for each feature "
@@ -350,17 +354,6 @@ class ChromatinFeaturesSampler(Sampler):
             - If the input `window_size` is less than the computed bin size.
             - If the input `window_size` is an even number.
         """
-        super(ChromatinFeaturesSampler, self).__init__(
-            genome,
-            query_feature_data,
-            feature_coordinates,
-            unique_features,
-            chrs_test,
-            chrs_validate,
-            random_seed=random_seed,
-            mode=mode,
-            sample_from=sample_from,
-            sample_positive_prop=sample_positive_prop)
 
         if window_size < (1 + 2 * radius):
             raise ValueError(
@@ -380,6 +373,19 @@ class ChromatinFeaturesSampler(Sampler):
         # we use the padding to incorporate sequence context around the
         # bin for which we have feature information.
         self.padding = 0
+
+        # TODO: NO GENERIC SAMPLER CLASS POSSIBLE...
+        super(ChromatinFeaturesSampler, self).__init__(
+            genome,
+            query_feature_data,
+            feature_coordinates,
+            unique_features,
+            chrs_test,
+            chrs_validate,
+            random_seed=random_seed,
+            mode=mode,
+            sample_from=sample_from,
+            sample_positive_prop=sample_positive_prop)
 
         remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
@@ -519,19 +525,20 @@ class ChromatinFeaturesSampler(Sampler):
         retrieved_sequence = \
             self.genome.get_encoding_from_coords(
                 chrom, sequence_start, sequence_end, strand)
-        seq_str = self.genome.encoding_to_sequence(retrieved_sequence)
+
+        #seq_str = self.genome.encoding_to_sequence(retrieved_sequence)
+        seq_sum = retrieved_sequence.sum(axis=0)
         if not is_positive or retrieved_sequence.shape[0] == 0:
-            SLOG.info(seq_str)
+            #SLOG.info(str(seq_sum))
             return (
                 retrieved_sequence,
-                np.zeros((bin_end - bin_start,
-                         self.query_feature_data.n_features)))
+                np.zeros((self.query_feature_data.n_features,)))
         else:
             retrieved_data = self.query_feature_data.get_feature_data(
                 chrom, bin_start, bin_end, strand)
             #LOG.debug(retrieved_sequence)
             #LOG.debug(retrieved_data)
-            SLOG.info("{0}, {1}, P".format(seq_str, np.any(retrieved_sequence == 1, axis=0)))
+            #SLOG.info("{0}, {1}, P".format(str(seq_sum), np.any(retrieved_data == 1, axis=0)))
             return (retrieved_sequence, retrieved_data)
 
     def _get_rand_background(self):
@@ -592,6 +599,33 @@ class ChromatinFeaturesSampler(Sampler):
             return self._retrieve(randchr, randpos, randstrand,
                                   is_positive=False)
 
+    def _sample_positive(self):
+        if len(self._randcache_positives) == 0 or \
+                len(self._randcache_positives[self.mode]) == 0 or \
+                len(self._randcache_positives["strand"]) == 0:
+            self._build_randcache_positives(size=20000)
+        randindex = self._randcache_positives[self.mode].pop()
+        row = self._coords_df.iloc[randindex]
+
+        peak_length = row["end"] - row["start"]
+        if peak_length < self.radius:
+            LOG.debug("Example is <50% of the bin size. Sampling again.")
+            # TODO: better to do this recursively or iteratively?
+            return self._sample_positive()
+
+        chrom = row["chr"]
+
+        rand_in_peak = random.uniform(0, 1) * peak_length
+        #position = int(row["start"] + rand_in_peak)
+        position = int(row["start"] + rand_in_peak) # + random.uniform(0, 1) * self.radius)
+
+        # we have verified that there is no strand information
+        # in any of our data
+        strand = self._randcache_positives["strand"].pop()
+        seq, feats = self._retrieve(chrom, position, strand,
+                                    is_positive=True)
+        return (seq, feats)
+
     def sample_positive(self):
         """Sample a positive example from the genome.
 
@@ -604,43 +638,16 @@ class ChromatinFeaturesSampler(Sampler):
             Returns both the sequence encoding for the window and
             the feature labels for the middle bin.
         """
-        if len(self._randcache_positives) == 0 or \
-                len(self._randcache_positives[self.mode]) == 0 or \
-                len(self._randcache_positives["strand"]) == 0:
-            self._build_randcache_positives(size=20000)
-        randindex = self._randcache_positives[self.mode].pop()
-        row = self._coords_df.iloc[randindex]
 
-        peak_length = row["end"] - row["start"]
-        if peak_length < self.radius:
-            LOG.debug("Example is <50% of the bin size. Sampling again.")
-            # TODO: better to do this recursively or iteratively?
-            return self.sample_positive()
-
-        chrom = row["chr"]
-
-        rand_in_peak = random.uniform(0, 1) * peak_length
-        position = int(row["start"] + rand_in_peak)
-
-        # we have verified that there is no strand information
-        # in any of our data
-        strand = self._randcache_positives["strand"].pop()
-
-        seq, feats = self._retrieve(chrom, position, strand,
-                                    is_positive=True)
-        n, k = seq.shape
-        if n == 0:
-            LOG.debug(
-                "Sample positive window was out of bounds. "
-                "Trying `sample_positive` again.")
-            return self.sample_positive()
-        else:
-            #print("feature vector")
-            #all_zeros = not np.any(feats)
-            #print("all zeros? {0}".format(all_zeros))
-            #n_nonzero = np.sum(feats)
-            #print("prop nonzero: {0}".format(n_nonzero / feats.shape[0]))
-            #if int(n_nonzero) == 0:
-            #    print("{0}, {1}, {2} {3}".format(
-            #        chrom, position, row["start"], row["end"]))
-            return (seq, feats)
+        seq, feats = self._sample_positive()
+        window_size, n_bases = seq.shape
+        while window_size == 0 or np.sum(seq) / float(window_size) < 0.65:
+            if window_size == 0:
+                LOG.debug(
+                    "Sample positive window was out of bounds. "
+                    "Trying `sample_positive` again.")
+            else:
+                LOG.debug("Lots of unknown bases in sequence {0}".format(np.sum(seq) / float(window_size)))
+            seq, feats = self._sample_positive()
+            window_size, n_bases = seq.shape
+        return (seq, feats)

@@ -2,8 +2,13 @@
 It supports retrieving parts of the sequence and converting these parts
 into their one hot encodings.
 """
+import logging
+
 import numpy as np
 from pyfaidx import Fasta
+
+
+SLOG = logging.getLogger("samples")
 
 
 class Genome(object):
@@ -66,7 +71,6 @@ class Genome(object):
         """
         if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) \
                 or start < 0:
-            print("ERR: EMPTY STRING")
             return ""
 
         if strand == '+':
@@ -103,7 +107,9 @@ class Genome(object):
             (Raised in the call to `self.get_sequence_from_coords`)
         """
         sequence = self.get_sequence_from_coords(chrom, start, end, strand)
-        return self.sequence_to_encoding(sequence)
+        encoding = self.sequence_to_encoding(sequence)
+        return encoding
+
 
     def sequence_to_encoding(self, sequence):
         """Converts an input sequence to its one hot encoding.
@@ -118,15 +124,19 @@ class Genome(object):
         numpy.ndarray, dtype=bool
             The N-by-4 encoding of the sequence.
         """
-        encoding = np.zeros((len(sequence), 4), np.bool_)
+        encoding = np.zeros((len(sequence), 4))
         for base, index in zip(sequence, range(len(sequence))):
-            encoding[index, :] = self.BASES == base
+            encoding[index, :] = (self.BASES == str.upper(base)).astype(float)
+            if np.sum(encoding[index, :]) != 1:
+                encoding[index, :] = 0.25
         return encoding
 
     def encoding_to_sequence(self, encoding):
-        cols, rows = np.where(encoding == 1)
-        assert len(cols) == len(self.BASES)
         sequence = []
-        for row_index in rows:
-            sequence.append(self.BASES[row_index])
-        return sequence
+        for row in encoding:
+            base_pos = np.where(row == 1)[0]
+            if len(base_pos) != 1:
+                sequence.append('N')
+            else:
+                sequence.append(self.BASES[base_pos[0]])
+        return "".join(sequence)

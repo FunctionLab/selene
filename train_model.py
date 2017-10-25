@@ -93,9 +93,9 @@ from docopt import docopt
 import torch
 from torch import nn
 
-#from deepsea import DeepSEA
+from deepsea import DeepSEA
 #from model import DeepSEA
-from simple_model import DeepSEA
+#from four_layer_model import DeepSEA
 from model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
 
@@ -158,13 +158,15 @@ if __name__ == "__main__":
         window_size=window_size,
         random_seed=random_seed,
         mode=mode,
-        sample_from="proportion")
+        sample_from="positive")
+    #    sample_from="proportion",
+    #    sample_positive_prop=0.75)
 
     t_i_model = time()
     model = DeepSEA(sampler.window_size, sampler.n_features)
+
     checkpoint = None
     resume = False
-    # resume = True
     if resume:
         log.info("Resuming training from checkpoint.")
         checkpoint = torch.load("20170914_model_best.pth.tar")
@@ -174,8 +176,8 @@ if __name__ == "__main__":
     # TODO: would prefer to not have to import & specify this in the
     # train_model.py script, I think?
     criterion = nn.BCEWithLogitsLoss()
-    #optimizer_args = {"lr": 1e-3, "momentum": 0.9, "weight_decay": 5e-7}
-    optimizer_args = {"use_optim": "Adam", "lr": 1e-4, "eps": 1e-6, "weight_decay": 5e-7}
+    optimizer_args = {"use_optim": "SGD", "lr": 0.08, "momentum": 0.9, "weight_decay": 5e-7}
+    #optimizer_args = {"use_optim": "Adam", "lr": 0.04, "eps": 1e-6, "weight_decay": 5e-7}
 
     t_f_model = time()
     log.debug("Finished initializing the {0} model: {1} s".format(
@@ -194,7 +196,7 @@ if __name__ == "__main__":
         checkpoint_resume=checkpoint)
     log.info("Training model: {0} epochs, {1} batch size.".format(
         n_epochs, batch_size))
-    runner.train_validate(n_epochs, 240)
+    runner.train_and_validate(n_epochs, 2000)
 
     t_f = time()
     log.info("./train_model.py completed in {0} s.".format(t_f - t_i))

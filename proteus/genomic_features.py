@@ -48,8 +48,8 @@ class GenomicFeatures(object):
             feature (key) -> position index (value) in `features`
         """
         self.data = tabix.open(dataset)
-        self.n_features = len(features)
 
+        self.n_features = len(features)
         self.feature_index_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
         self.index_feature_map = dict(list(enumerate(features)))
@@ -57,7 +57,7 @@ class GenomicFeatures(object):
     def is_positive(self, chrom, start, end, threshold=0.50):
         """Determines whether the (chrom, start, end) queried
         contains features that occupy over `threshold` * 100%
-        of the (start, end) region. If so, this is a positive
+        of the [start, end) region. If so, this is a positive
         example.
 
         Parameters
@@ -83,7 +83,7 @@ class GenomicFeatures(object):
         """
         try:
             rows = self.data.query(chrom, start, end)
-            for row in rows:
+            for row in rows:  # features within [start, end)
                 is_positive = self._is_positive_single(
                     start, end,
                     int(row[1]), int(row[2]), threshold)
@@ -115,8 +115,6 @@ class GenomicFeatures(object):
             True if this row meets the criterion for a positive example,
             False otherwise.
         """
-        #print("BIN: {0} {1}".format(query_start, query_end))
-        #print("FEAT: {0} {1}".format(feat_start, feat_end))
         overlap_start = max(feat_start, query_start)
         overlap_end = min(feat_end, query_end)
         min_overlap_needed = (query_end - query_start) * threshold
@@ -160,40 +158,41 @@ class GenomicFeatures(object):
         """
         encoding = np.zeros((end - start, self.n_features))
         try:
-            rows = self.data.query(chrom, start, end)
+            pos = start + int((end - start) / 2)
+            rows = self.data.query(chrom, pos, pos + 1)
+            #rows = self.data.query(chrom, start, end)
             if strand == '+':
                 for row in rows:
-                    if row[4] == "":
-                        print("ERR: no feature {0}".format(row))
-                        continue
                     feat_start = int(row[1])
                     feat_end = int(row[2])
-                    is_positive = self._is_positive_single(
-                        start, end, feat_start, feat_end, threshold)
-                    if is_positive:
-                        index_start = max(0, feat_start - start)
-                        index_end = min(feat_end - start, end - start)
-                        index_feat = self.feature_index_map[row[4]]
-                        encoding[index_start:index_end, index_feat] = 1
+                    #is_positive = self._is_positive_single(
+                    #    start, end, feat_start, feat_end, threshold)
+                    #if is_positive:
+                    index_start = max(0, feat_start - start)
+                    index_end = min(feat_end - start, end - start)
+                    index_feat = self.feature_index_map[row[4]]
+                    encoding[index_start:index_end, index_feat] = 1
+                    #else:
+                    #    print("WAS NOT POSITIVE: {0}, ({1}, {2})".format(pos, feat_start, feat_end))
             elif strand == '-':
                 for row in rows:
-                    if row[4] == "":
-                        print("ERR: no feature {0}".format(row))
-                        continue
                     feat_start = int(row[1])
                     feat_end = int(row[2])
-                    is_positive = self._is_positive_single(
-                        start, end, feat_start, feat_end, threshold)
-                    if is_positive:
-                        index_start = max(0, end - feat_end)
-                        index_end = min(end - feat_start, end - start)
-                        index_feat = self.feature_index_map[row[4]]
-                        encoding[index_start:index_end, index_feat] = 1
+                    #is_positive = self._is_positive_single(
+                    #    start, end, feat_start, feat_end, threshold)
+                    #if is_positive:
+                    index_start = max(0, end - feat_end)
+                    index_end = min(end - feat_start, end - start)
+                    index_feat = self.feature_index_map[row[4]]
+                    encoding[index_start:index_end, index_feat] = 1
+                    #else:
+                    #    print("WAS NOT POSITIVE: {0}, ({1}, {2})".format(pos, feat_start, feat_end))
             else:
                 raise ValueError(
                     "Strand must be one of '+' or '-'. Input was {0}".format(
                         strand))
+            encoding = np.sum(encoding, axis=0) / (end - start)
+            encoding = (encoding > threshold) * 1
             return encoding
         except tabix.TabixError as e:
-            print("ERR: TRIED TO QUERY BUT NO FEATURES FOUND.")
-            return encoding
+            return np.zeros((self.n_features,))

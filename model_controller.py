@@ -9,12 +9,13 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 import torch
 import torch.nn as nn
-from torch.optim.lr_scheduler import StepLR
 from torch.autograd import Variable
+from torch.optim.lr_scheduler import StepLR
 
 from utils import AverageMeter
 
 
+SLOG = logging.getLogger("samples")
 LOG = logging.getLogger("deepsea")
 torch.set_num_threads(32)
 
@@ -81,6 +82,9 @@ class ModelController(object):
 
         self.prefix_outputs = prefix_outputs
 
+        if self.prefix_outputs is None:
+            self.prefix_outputs = strftime("%Y%m%d")
+
         if self.data_parallel:
             self.model = nn.DataParallel(model)
             LOG.debug("Wrapped model in DataParallel")
@@ -90,24 +94,10 @@ class ModelController(object):
             self.criterion.cuda()
             LOG.debug("Set modules to use CUDA")
 
-        if self.prefix_outputs is None:
-            self.prefix_outputs = strftime("%Y%m%d")
+        self._create_validation_set()
 
-        # TODO: validation set -> helper function
-        n_validation_exs = 5000
-        self._validation_data = []
-        validation_targets = []
-        self.sampler.set_mode("validate")
-        n_validation_batches = int(n_validation_exs / self.batch_size)
-        for _ in range(n_validation_batches):
-            inputs, targets = self._run_batch()
-            self._validation_data.append((inputs, targets))
-            validation_targets.append(targets)
-        self._all_validation_targets = np.vstack(validation_targets)
-        LOG.info(
-            ("Loaded {0} validation examples to evaluate after "
-             "each training epoch.").format(n_validation_exs))
-
+        # TODO: training and validation loss file handles?
+        # a single file handle for both should be just fine.
         self._training_loss = []
         self._validation_loss = []
 
@@ -123,6 +113,21 @@ class ModelController(object):
                  "epoch {0}, min loss {1}").format(
                     self.start_epoch, self.min_loss))
 
+    def _create_validation_set(self, n_validation=5000):
+        self._validation_data = []
+        validation_targets = []
+        self.sampler.set_mode("validate")
+        n_validation_batches = int(n_validation / self.batch_size)
+
+        for _ in range(n_validation_batches):
+            inputs, targets = self._get_batch()
+            self._validation_data.append((inputs, targets))
+            validation_targets.append(targets)
+
+        self._all_validation_targets = np.vstack(validation_targets)
+        LOG.info(("Loaded {0} validation examples to evaluate after "
+                 "each training epoch.").format(n_validation))
+
     def _optimizer(self, use_optim="Adam", **kwargs):
         """Specify the optimizer to use. Here, it is stochastic gradient
         descent.
@@ -133,23 +138,19 @@ class ModelController(object):
         print(use_optim)
         optim = self.OPTIMIZERS[use_optim]
         return optim(self.model.parameters(), **kwargs)
-        """
-        print("SGD")
-        return torch.optim.SGD(self.model.parameters(),
-                               **kwargs)
-        """
-        #print("Adam")
-        #return torch.optim.Adam(self.model.parameters(),
-        #        **kwargs)
 
-    def _run_batch(self):
+    def _get_batch(self):
+        """Sample `self.batch_size` times. Return inputs and targets as a
+        batch.
+        """
         t_i_sampling = time()
         inputs = np.zeros((self.batch_size, self.sampler.window_size, 4))
         targets = np.zeros((self.batch_size, self.sampler.n_features))
         for i in range(self.batch_size):
             sequence, target = self.sampler.sample()
             inputs[i, :, :] = sequence
-            targets[i, :] = np.any(target == 1, axis=0)
+            targets[i, :] = target
+            #targets[i, :] = np.any(target == 1, axis=0)
         t_f_sampling = time()
         LOG.debug(
             ("[BATCH] Time to sample {0} examples: {1} s.").format(
@@ -157,11 +158,10 @@ class ModelController(object):
                  t_f_sampling - t_i_sampling))
         return (inputs, targets)
 
-    def train_validate(self, n_epochs, n_train):
+    def train_and_validate(self, n_epochs, n_train):
         """The training and validation process.
         Will sample (`n_epochs` * `n_train` * self.batch_size)
-        positive and negative examples (total) in a single call
-        to `train_validate`.
+        examples in total.
 
         Parameters
         ----------
@@ -186,9 +186,10 @@ class ModelController(object):
 
         # for learning rate decay
         # TODO: gamma might need to be a parameter somewhere.
-        scheduler = StepLR(self.optimizer, step_size=1, gamma=8e-7)
+        scheduler = StepLR(self.optimizer, step_size=15, gamma=8e-6)
 
         for epoch in range(self.start_epoch, n_epochs):
+            SLOG.info("Epoch {0}".format(epoch))
             t_i = time()
 
             avg_losses_train = AverageMeter()
@@ -211,7 +212,7 @@ class ModelController(object):
             self.model.eval()
             collect_predictions = []
             for inputs, targets in self._validation_data:
-                info = self._process(
+                info = self._pass_through_model(
                     inputs, targets,
                     avg_losses_validate,
                     avg_batch_times,
@@ -219,6 +220,7 @@ class ModelController(object):
                 collect_predictions.append(info["predictions"])
                 cum_loss_validate += info["loss"]
             all_predictions = np.vstack(collect_predictions)
+
             feature_aucs = []
             for index, feature_preds in enumerate(all_predictions.T):
                 feature_targets = self._all_validation_targets[:, index]
@@ -298,10 +300,12 @@ class ModelController(object):
               "loss_avg" : float }
         """
         self.sampler.set_mode("train")  # just to make it explicit
-        inputs, targets = self._run_batch()
+        inputs, targets = self._get_batch()
+        self._log_training_info(targets)
+        return self._pass_through_model(
+            inputs, targets, avg_losses, avg_batch_times, "train")
 
-        # logging information
-        # TODO: helper function?
+    def _log_training_info(self, targets):
         proportion_features_in_inputs = []
         for i in range(self.batch_size):
             proportion_features_in_inputs.append(np.sum(targets[i, :]))
@@ -327,10 +331,8 @@ class ModelController(object):
         LOG.debug(
             "[BATCH] {0} most common features present: {1}".format(
                 report_n_features, common_feats))
-        return self._process(
-            inputs, targets, avg_losses, avg_batch_times, "train")
 
-    def _process(self, inputs, targets,
+    def _pass_through_model(self, inputs, targets,
                  avg_losses, avg_batch_times, mode):
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
@@ -364,6 +366,7 @@ class ModelController(object):
                     "loss_avg": avg_losses.avg}
         if mode == "validate":
             log_info["predictions"] = output.data.cpu().numpy()
+
         return log_info
 
     def _save_checkpoint(self, state, is_best,
