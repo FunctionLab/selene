@@ -30,12 +30,10 @@ class Sampler(object):
     SAMPLING_OPTIONS = ("random", "positive", "proportion")
     STRAND_SIDES = ('+', '-')
 
-    def __init__(self, genome,
+    def __init__(self,
+                 genome,
                  query_feature_data,
-                 feature_coordinates,
                  unique_features,
-                 chrs_test,
-                 chrs_validate,
                  random_seed=436,
                  mode="train",
                  sample_from="random",
@@ -85,11 +83,11 @@ class Sampler(object):
                   chr, and strand side. Do not check for whether it is a known
                   positive example (i.e. has at least 1 genomic feature
                   within the surrounding bin).
-            * "positive": Select from the `feature_coordinates` dataframe.
+            * "positive":
                   The samples we draw will have at least 1 genomic feature
                   as a result.
-            * "proportion": Select from the `feature_coordinates` positive
-                  examples x% of the time and select a negative example
+            * "proportion": Select from the positive examples x%
+                  of the time and select a negative example
                   (0 genomic features in this bin) (100 - x)% of the time.
         sample_positive_prop : [0.0, 1.0], optional
             Default is 0.50. This is only used if `sample_from` is
@@ -123,42 +121,9 @@ class Sampler(object):
 
         self.genome = Genome(genome)
 
-        t_i = time()
-        # used during the positive sampling step - get a random index from the
-        # coords file and the corresponding (chr, start, end) info.
-        self._coords_df = pd.read_table(
-            feature_coordinates, header=None, names=self.COORDS_EXPECTED_COLS)
-        diff = self._coords_df["end"].sub(self._coords_df["start"], axis=0)
-        bin_size = self.radius * 2 + 1
-        threshold = 0.50
-        self._coords_df = self._coords_df[diff >= bin_size * threshold]
-        t_f = time()
-        LOG.debug(
-            ("Loaded genome coordinates for each feature "
-             "in the dataset: file {0}, {1} s").format(
-                 feature_coordinates, t_f - t_i))
-
         # set the necessary random seeds.
         np.random.seed(random_seed)
         random.seed(random_seed + 1)
-
-        # training, validation, and test indices
-        t_i = time()
-        features_chr_data = self._coords_df["chr"]
-        holdout_chrs_test = np.asarray(features_chr_data.isin(chrs_test))
-        holdout_chrs_validate = np.asarray(
-            features_chr_data.isin(chrs_validate))
-        holdout_chrs_both = np.logical_or(
-            holdout_chrs_test, holdout_chrs_validate)
-
-        self._all_indices = list(features_chr_data.index)
-        self._training_indices = list(np.where(~holdout_chrs_both)[0])
-        self._validate_indices = list(np.where(holdout_chrs_validate)[0])
-        self._test_indices = list(np.where(holdout_chrs_test)[0])
-        t_f = time()
-        LOG.debug(
-            ("Partitioned the dataset into train/validate/test sets: "
-             "{0} s").format(t_f - t_i))
 
         self._features = pd.read_csv(unique_features, names=["feature"])
         self._features = self._features["feature"].values.tolist()
@@ -243,7 +208,6 @@ class Sampler(object):
         tuple(np.ndarray, np.ndarray)
             Returns the sequence encoding and its corresponding feature labels.
         """
-        #t_i = time()
         sample = None
         if self.sample_from == "random":
             sample = self.sample_random()
@@ -251,9 +215,6 @@ class Sampler(object):
             sample = self.sample_positive()
         elif self.sample_from == "proportion":
             sample = self.sample_mixture()
-        #t_f = time()
-        #LOG.debug("Sampling step ({0}): {1} s".format(
-        #    self.sample_from, t_f - t_i))
         return sample
 
     def sample_random(self):
@@ -317,8 +278,9 @@ class ChromatinFeaturesSampler(Sampler):
                  unique_features,
                  chrs_test,
                  chrs_validate,
-                 radius=100,
+                 bin_radius=100,
                  window_size=1001,
+                 bin_feature_threshold=0.5,
                  random_seed=436,
                  mode="train",
                  sample_from="random",
@@ -329,7 +291,28 @@ class ChromatinFeaturesSampler(Sampler):
 
         Parameters
         ----------
-        radius : int, optional
+        feature_coordinates : str
+            Path to a .bed file that contains the genomic
+            coordinates for the features in our dataset. File has the
+            columns [chr, start (0-based), end] in order.
+            Used for sampling positive examples - note that we then query
+            `query_feature_data` to get the necessary feature information.
+        chrs_test : list[str]
+            Specify chromosome(s) to hold out as the test dataset.
+            It is expected that the user decides beforehand that the
+            proportion of positive examples in the held-out chromosomes
+            is appropriate relative to the training and validation datasets.
+            e.g. 60-20-20 train-validate-test, 80-10-10, etc.
+        chrs_validate : list[str]
+            Specify chromosome(s) to hold out as the validation dataset.
+            It is expected that the user decides beforehand that the
+            proportion of positive examples in the held-out chromosomes
+            is appropriate relative to the training and testing datasets.
+            e.g. 60-20-20 train-validate-test, 80-10-10, etc.
+            # TODO: we pull 5000 examples from the chromosomes here to use
+            # as the validation set right now. Q: should we assign the
+            # remainder to the training set?
+        bin_radius : int, optional
             Default is 100. The bin is composed of
                 ([sequence (len radius)] +
                  position (len 1) + [sequence (len radius)])
@@ -344,9 +327,9 @@ class ChromatinFeaturesSampler(Sampler):
         Attributes
         ----------
         radius : int
-        window_size : int
         padding : int
             The amount of padding is identical on both sides
+        window_size : int
 
         Raises
         ------
@@ -354,6 +337,16 @@ class ChromatinFeaturesSampler(Sampler):
             - If the input `window_size` is less than the computed bin size.
             - If the input `window_size` is an even number.
         """
+        super(ChromatinFeaturesSampler, self).__init__(
+            genome,
+            query_feature_data,
+            unique_features,
+            chrs_test,
+            chrs_validate,
+            random_seed=random_seed,
+            mode=mode,
+            sample_from=sample_from,
+            sample_positive_prop=sample_positive_prop)
 
         if window_size < (1 + 2 * radius):
             raise ValueError(
@@ -367,29 +360,21 @@ class ChromatinFeaturesSampler(Sampler):
                     window_size))
 
         # bin size = self.radius + 1 + self.radius
-        self.radius = radius
+        self.radius = bin_radius
         self.window_size = window_size
         # the amount of padding is based on the window size and bin size.
         # we use the padding to incorporate sequence context around the
         # bin for which we have feature information.
         self.padding = 0
 
-        # TODO: NO GENERIC SAMPLER CLASS POSSIBLE...
-        super(ChromatinFeaturesSampler, self).__init__(
-            genome,
-            query_feature_data,
-            feature_coordinates,
-            unique_features,
-            chrs_test,
-            chrs_validate,
-            random_seed=random_seed,
-            mode=mode,
-            sample_from=sample_from,
-            sample_positive_prop=sample_positive_prop)
-
         remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
             self.padding = int(remaining_space / 2)
+
+        self.bin_feature_threshold = bin_feature_threshold
+
+        self._load_feature_coordinates(feature_coordinates)
+        self._partition_dataset(chrs_validate, chrs_test)
 
         # used during the negative sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
@@ -406,6 +391,43 @@ class ChromatinFeaturesSampler(Sampler):
         self._build_randcache_positives(size=5000)
 
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
+
+    def _load_feature_coordinates(self, feature_coordinates_file):
+        t_i = time()
+        # used during the positive sampling step - get a random index from the
+        # coords file and the corresponding (chr, start, end) info.
+        self._coords_df = pd.read_table(
+            feature_coordinates_file,
+            header=None,
+            names=self.COORDS_EXPECTED_COLS)
+        diff = self._coords_df["end"].sub(self._coords_df["start"], axis=0)
+        bin_size = self.radius * 2 + 1
+        min_feature_size = bin_size * self.bin_feature_threshold
+        self._coords_df = self._coords_df[diff >= min_feature_size]
+        t_f = time()
+        LOG.debug(
+            ("Loaded genome coordinates for each feature "
+             "in the dataset: file {0}, {1} s").format(
+                 feature_coordinates_file, t_f - t_i))
+
+    def _partition_dataset(self):
+        # training, validation, and test indices
+        t_i = time()
+        features_chr_data = self._coords_df["chr"]
+        holdout_chrs_test = np.asarray(features_chr_data.isin(chrs_test))
+        holdout_chrs_validate = np.asarray(
+            features_chr_data.isin(chrs_validate))
+        holdout_chrs_both = np.logical_or(
+            holdout_chrs_test, holdout_chrs_validate)
+
+        self._all_indices = list(features_chr_data.index)
+        self._training_indices = list(np.where(~holdout_chrs_both)[0])
+        self._validate_indices = list(np.where(holdout_chrs_validate)[0])
+        self._test_indices = list(np.where(holdout_chrs_test)[0])
+        t_f = time()
+        LOG.debug(
+            ("Partitioned the dataset into train/validate/test sets: "
+             "{0} s").format(t_f - t_i))
 
     def _build_randcache_background(self, size=10000):
         t_i = time()
@@ -526,7 +548,6 @@ class ChromatinFeaturesSampler(Sampler):
             self.genome.get_encoding_from_coords(
                 chrom, sequence_start, sequence_end, strand)
 
-        #seq_str = self.genome.encoding_to_sequence(retrieved_sequence)
         seq_sum = retrieved_sequence.sum(axis=0)
         if not is_positive or retrieved_sequence.shape[0] == 0:
             #SLOG.info(str(seq_sum))
