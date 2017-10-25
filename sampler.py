@@ -133,7 +133,7 @@ class Sampler(object):
             query_feature_data, self._features)
 
         self.mode = None
-        self.set_mode(mode)  # set the `mode` attribute here.
+        #self.set_mode(mode)  # set the `mode` attribute here.
 
         self.sample_from = sample_from
         self.sample_positive_prop = sample_positive_prop
@@ -341,18 +341,16 @@ class ChromatinFeaturesSampler(Sampler):
             genome,
             query_feature_data,
             unique_features,
-            chrs_test,
-            chrs_validate,
             random_seed=random_seed,
             mode=mode,
             sample_from=sample_from,
             sample_positive_prop=sample_positive_prop)
 
-        if window_size < (1 + 2 * radius):
+        if window_size < (1 + 2 * bin_radius):
             raise ValueError(
                 "Window size of {0} is less than the bin "
                 "size of 1 + 2 x radius {1} = {2}".format(
-                    window_size, radius, 1 + 2 * radius))
+                    window_size, bin_radius, 1 + 2 * bin_radius))
 
         if window_size % 2 == 0:
             raise ValueError(
@@ -389,6 +387,7 @@ class ChromatinFeaturesSampler(Sampler):
         # define our bin and window.
         self._randcache_positives = {}
         self._build_randcache_positives(size=5000)
+        self.set_mode("train")  # TODO !!!
 
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
@@ -410,7 +409,7 @@ class ChromatinFeaturesSampler(Sampler):
              "in the dataset: file {0}, {1} s").format(
                  feature_coordinates_file, t_f - t_i))
 
-    def _partition_dataset(self):
+    def _partition_dataset(self, chrs_validate, chrs_test):
         # training, validation, and test indices
         t_i = time()
         features_chr_data = self._coords_df["chr"]

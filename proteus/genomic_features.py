@@ -162,21 +162,28 @@ class GenomicFeatures(object):
                     strand))
         try:
             pos = start + int((end - start) / 2)
+            # POTENTIALLY THE BEST THING TO DO *ONLY* WHEN THE RATIO
+            # IS 50% or MORE. Can have an if-statement that catches this.
             rows = self.data.query(chrom, pos, pos + 1)
-            encoding = np.zeros((end - start, self.n_features))
             #rows = self.data.query(chrom, start, end)
-            for row in rows:
-                feat_start = int(row[1])
-                feat_end = int(row[2])
-                # this way is slower but more concise...
-                if strand == '+':
+            encoding = np.zeros((end - start, self.n_features))
+
+            if strand == '+':
+                for row in rows:
+                    feat_start = int(row[1])
+                    feat_end = int(row[2])
                     index_start = max(0, feat_start - start)
                     index_end = min(feat_end - start, end - start)
-                else:
+                    index_feat = self.feature_index_map[row[4]]
+                    encoding[index_start:index_end, index_feat] = 1
+            else:
+                for row in rows:
+                    feat_start = int(row[1])
+                    feat_end = int(row[2])
                     index_start = max(0, end - feat_end)
                     index_end = min(end - feat_start, end - start)
-                index_feat = self.feature_index_map[row[4]]
-                encoding[index_start:index_end, index_feat] = 1
+                    index_feat = self.feature_index_map[row[4]]
+                    encoding[index_start:index_end, index_feat] = 1
             encoding = np.sum(encoding, axis=0) / (end - start)
             encoding = (encoding > threshold) * 1
             return encoding

@@ -154,7 +154,7 @@ if __name__ == "__main__":
         unique_features,
         holdout_test,
         holdout_validate,
-        radius=radius,
+        bin_radius=radius,
         window_size=window_size,
         random_seed=random_seed,
         mode=mode,
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     # TODO: would prefer to not have to import & specify this in the
     # train_model.py script, I think?
     criterion = nn.BCEWithLogitsLoss()
-    optimizer_args = {"use_optim": "SGD", "lr": 0.08, "momentum": 0.9, "weight_decay": 5e-7}
+    optimizer_args = {"use_optim": "SGD", "lr": 0.005, "momentum": 0.9, "weight_decay": 5e-7}
     #optimizer_args = {"use_optim": "Adam", "lr": 0.04, "eps": 1e-6, "weight_decay": 5e-7}
 
     t_f_model = time()
