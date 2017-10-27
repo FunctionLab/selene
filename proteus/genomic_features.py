@@ -122,7 +122,7 @@ class GenomicFeatures(object):
             return True
         return False
 
-    def get_feature_data(self, chrom, start, end, strand='+', threshold=0.50):
+    def get_feature_data(self, chrom, position, start, end, strand='+', threshold=0.50):
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will
@@ -161,11 +161,11 @@ class GenomicFeatures(object):
                 "Strand must be one of '+' or '-'. Input was {0}".format(
                     strand))
         try:
-            pos = start + int((end - start) / 2)
+            # pos = start + int((end - start) / 2)
             # POTENTIALLY THE BEST THING TO DO *ONLY* WHEN THE RATIO
             # IS 50% or MORE. Can have an if-statement that catches this.
-            rows = self.data.query(chrom, pos, pos + 1)
-            #rows = self.data.query(chrom, start, end)
+            rows = self.data.query(chrom, position, position + 1)
+            # rows = self.data.query(chrom, start, end)
             encoding = np.zeros((end - start, self.n_features))
 
             if strand == '+':

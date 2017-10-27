@@ -176,7 +176,7 @@ if __name__ == "__main__":
     # TODO: would prefer to not have to import & specify this in the
     # train_model.py script, I think?
     criterion = nn.BCEWithLogitsLoss()
-    optimizer_args = {"use_optim": "SGD", "lr": 0.045, "momentum": 0.9, "weight_decay": 5e-7}
+    optimizer_args = {"use_optim": "SGD", "lr": 0.07, "momentum": 0.9, "weight_decay": 5e-7}
     #optimizer_args = {"use_optim": "Adam", "lr": 0.04, "eps": 1e-6, "weight_decay": 5e-7}
 
     t_f_model = time()

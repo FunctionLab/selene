@@ -15,7 +15,6 @@ from torch.optim.lr_scheduler import StepLR
 from utils import AverageMeter
 
 
-SLOG = logging.getLogger("samples")
 LOG = logging.getLogger("deepsea")
 torch.set_num_threads(32)
 
@@ -85,7 +84,7 @@ class ModelController(object):
         if self.prefix_outputs is None:
             self.prefix_outputs = strftime("%Y%m%d")
 
-        if self.data_parallel:
+        if self.data_parallel:  # TODO: need to look into this
             self.model = nn.DataParallel(model)
             LOG.debug("Wrapped model in DataParallel")
 
@@ -144,9 +143,6 @@ class ModelController(object):
         batch.
         """
         t_i_sampling = time()
-        #inputs = np.zeros((self.batch_size, self.sampler.window_size, 4))
-        #targets = np.zeros((self.batch_size, self.sampler.n_features))
-
         batch_sequences, batch_targets = self.sampler.sample(sample_batch=self.batch_size)
         """
         for i in range(self.batch_size):
@@ -193,7 +189,6 @@ class ModelController(object):
         scheduler = StepLR(self.optimizer, step_size=15, gamma=8e-6)
 
         for epoch in range(self.start_epoch, n_epochs):
-            SLOG.info("Epoch {0}".format(epoch))
             t_i = time()
 
             avg_losses_train = AverageMeter()
@@ -305,7 +300,7 @@ class ModelController(object):
         """
         self.sampler.set_mode("train")  # just to make it explicit
         inputs, targets = self._get_batch()
-        self._log_training_info(targets)
+        #self._log_training_info(targets)
         return self._pass_through_model(
             inputs, targets, avg_losses, avg_batch_times, "train")
 
