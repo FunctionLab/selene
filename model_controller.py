@@ -144,19 +144,23 @@ class ModelController(object):
         batch.
         """
         t_i_sampling = time()
-        inputs = np.zeros((self.batch_size, self.sampler.window_size, 4))
-        targets = np.zeros((self.batch_size, self.sampler.n_features))
+        #inputs = np.zeros((self.batch_size, self.sampler.window_size, 4))
+        #targets = np.zeros((self.batch_size, self.sampler.n_features))
+
+        batch_sequences, batch_targets = self.sampler.sample(sample_batch=self.batch_size)
+        """
         for i in range(self.batch_size):
             sequence, target = self.sampler.sample()
             inputs[i, :, :] = sequence
             targets[i, :] = target
             #targets[i, :] = np.any(target == 1, axis=0)
+        """
         t_f_sampling = time()
         LOG.debug(
             ("[BATCH] Time to sample {0} examples: {1} s.").format(
                  self.batch_size,
                  t_f_sampling - t_i_sampling))
-        return (inputs, targets)
+        return (batch_sequences, batch_targets)
 
     def train_and_validate(self, n_epochs, n_train):
         """The training and validation process.
