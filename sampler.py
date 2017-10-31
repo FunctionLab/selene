@@ -17,10 +17,6 @@ from proteus import GenomicFeatures
 
 LOG = logging.getLogger("deepsea")
 
-#SLOG = logging.getLogger("samples")
-#SLOG.setLevel(logging.INFO)
-#file_handle = logging.FileHandler("_test_lr1e-2_samples.txt")
-#SLOG.addHandler(file_handle)
 
 class Sampler(object):
 
@@ -452,7 +448,6 @@ class ChromatinFeaturesSampler(Sampler):
         retrieved_sequence = \
             self.genome.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)
-
         if not is_positive or retrieved_sequence.shape[0] == 0:
             return (
                 retrieved_sequence,
@@ -464,8 +459,7 @@ class ChromatinFeaturesSampler(Sampler):
 
     def _get_rand_background(self):
         if len(self._randcache_background) == 0 or \
-                len(self._randcache_background["chr"]) == 0 or \
-                len(self._randcache_background["strand"]) == 0:
+                len(self._randcache_background["chr"]) == 0:
             self._build_randcache_background()
 
         randchr = self._randcache_background["chr"].pop()
@@ -482,7 +476,7 @@ class ChromatinFeaturesSampler(Sampler):
                     randchr, t_f - t_i))
 
         randpos = self._randcache_background["pos"][randchr].pop()
-        randstrand = self._randcache_background["strand"].pop()
+        randstrand = self.STRAND_SIDES[random.randint(0, 1)]
         return (randchr, randpos, randstrand)
 
     def sample_random(self, sample_batch):
@@ -524,21 +518,17 @@ class ChromatinFeaturesSampler(Sampler):
 
     def _sample_positive(self):
         if len(self._randcache_positives) == 0 or \
-                len(self._randcache_positives[self.mode]) == 0 or \
-                len(self._randcache_positives["strand"]) == 0 or \
-                len(self._randcache_positives["uniform"]) == 0:
+                len(self._randcache_positives[self.mode]) == 0:
             self._build_randcache_positives(size=20000)
         randindex = self._randcache_positives[self.mode].pop()
         row = self._coords_df.iloc[randindex]
         peak_length = row["peak_length"]
         chrom = row["chr"]
         rand_in_peak = random.uniform(0, 1) * peak_length
-        #rand_in_peak = self._randcache_positives["uniform"].pop() * peak_length
         position = int(row["start"] + rand_in_peak)
         # we have verified that there is no strand information
         # in any of our data
         strand = self.STRAND_SIDES[random.randint(0, 1)]
-        #strand = self._randcache_positives["strand"].pop()
         seq, feats = self._retrieve(chrom, position, strand,
                                     is_positive=True)
         return (seq, feats)
@@ -556,13 +546,12 @@ class ChromatinFeaturesSampler(Sampler):
             the feature labels for the middle bin.
         """
         if len(self._randcache_positives) == 0 or \
-                len(self._randcache_positives[self.mode]) == 0 or \
-                len(self._randcache_positives["strand"]) == 0 or \
-                len(self._randcache_positives["uniform"]) == 0:
+                len(self._randcache_positives[self.mode]) == 0:
             self._build_randcache_positives(size=20000)
 
         sequences = np.zeros((sample_batch, self.window_size, 4))
         targets = np.zeros((sample_batch, self.n_features))
+
         for i in range(sample_batch):
             seq, feats = self._sample_positive()
             while seq.shape[0] == 0 or \
@@ -599,13 +588,6 @@ class ChromatinFeaturesSampler(Sampler):
                     self._rand_chr_sequence_positions(
                         self.genome.len_chrs[chrom],
                         int(size / 3))
-
-        # select strand side
-        if "strand" not in self._randcache_background \
-                or len(self._randcache_background["strand"]) == 0:
-            rand_strands = list(
-                np.random.choice(self.STRAND_SIDES, size=size))
-            self._randcache_background["strand"] = rand_strands
         t_f = time()
         LOG.info(
             ("Updated the cache for sampling "
@@ -652,20 +634,6 @@ class ChromatinFeaturesSampler(Sampler):
             randpos_test = list(np.random.choice(
                 self._test_indices, size=int(size / 2)))
             self._randcache_positives["test"] = randpos_test
-
-        # select strand side
-        if "strand" not in self._randcache_positives \
-                or len(self._randcache_positives["strand"]) == 0:
-            rand_strands = list(np.random.choice(
-                self.STRAND_SIDES, size=size))
-            self._randcache_positives["strand"] = rand_strands
-
-        # select random.uniform values
-        if "uniform" not in self._randcache_positives \
-                or len(self._randcache_positives["uniform"]) == 0:
-            rand_unif = list(np.random.uniform(size=size))
-            self._randcache_positives["uniform"] = rand_unif
-
         t_f = time()
         LOG.info(
             ("Updated the cache for sampling "

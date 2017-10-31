@@ -224,6 +224,8 @@ class ModelController(object):
             for index, feature_preds in enumerate(all_predictions.T):
                 feature_targets = self._all_validation_targets[:, index]
                 if len(np.unique(feature_targets)) > 1:
+                    #print(feature_targets)
+                    #print(feature_preds)
                     auc = roc_auc_score(feature_targets, feature_preds)
                     feature_aucs.append(auc)
 

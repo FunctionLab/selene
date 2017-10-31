@@ -1,11 +1,10 @@
 ---
-genome: /tigress/kc31/hg19/male.hg19.fasta
+genome: /scratch/data_hg/male.hg19.fasta
 features:
-    dir_path: /tigress/kc31/hg19_1ChIP
+    dir_path: /scratch/data_hg/
     filenames:
-        genomic_features: CTCF_hg19_ChIP.bed.gz
+        genomic_features: sorted_aggregate.bed.gz
         coords_only: coords_only.txt
-        distinct_features: distinct_features.txt 
-output_logs: /tigress/kc31/logs
-output_models: /tigress/kc31/models
+        distinct_features: distinct_features.txt
+output_dir: /tigress/kc31/outputs
 ...

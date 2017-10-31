@@ -3,17 +3,21 @@ It supports retrieving parts of the sequence and converting these parts
 into their one hot encodings.
 """
 import logging
+from time import time
 
 import numpy as np
 from pyfaidx import Fasta
 
 
 SLOG = logging.getLogger("samples")
+LOG = logging.getLogger("deepsea")
 
 
 class Genome(object):
 
-    BASES = np.array(['A', 'C', 'G', 'T'])
+    BASES_ARR = np.array(['A', 'C', 'G', 'T'])
+    BASES_DICT = dict(
+        [(base, index) for index, base in enumerate(BASES_ARR)])
 
     def __init__(self, fa_file):
         """Wrapper class around the pyfaix.Fasta class.
@@ -69,7 +73,7 @@ class Genome(object):
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        if start >= len(self.genome[chrom]) or end >= len(self.genome[chrom]) \
+        if start > len(self.genome[chrom]) or end > len(self.genome[chrom]) \
                 or start < 0:
             return ""
 
@@ -125,9 +129,11 @@ class Genome(object):
             The N-by-4 encoding of the sequence.
         """
         encoding = np.zeros((len(sequence), 4))
-        for base, index in zip(sequence, range(len(sequence))):
-            encoding[index, :] = (self.BASES == str.upper(base)).astype(float)
-            if np.sum(encoding[index, :]) != 1:
+        sequence = str.upper(sequence)
+        for index, base in enumerate(sequence):
+            if base in self.BASES_DICT:
+                encoding[index, self.BASES_DICT[base]] = 1
+            else:
                 encoding[index, :] = 0.25
         return encoding
 
@@ -138,5 +144,5 @@ class Genome(object):
             if len(base_pos) != 1:
                 sequence.append('N')
             else:
-                sequence.append(self.BASES[base_pos[0]])
+                sequence.append(self.BASES_ARR[base_pos[0]])
         return "".join(sequence)
