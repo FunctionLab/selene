@@ -10,8 +10,9 @@ sampler:
         - chr6
         - chr7
     optional_args:
-        radius: 100
+        bin_radius: 100
         window_size: 1001
+        bin_feature_threshold: 0.5
         random_seed: 436
         mode: train
         sample_from: positive

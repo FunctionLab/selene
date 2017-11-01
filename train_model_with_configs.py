@@ -43,7 +43,7 @@ from docopt import docopt
 import torch
 from torch import nn
 
-from model_controller import ModelController
+from model_controller_rf import ModelController
 from sampler import ChromatinFeaturesSampler
 from utils import read_yaml_file
 
@@ -53,8 +53,10 @@ if __name__ == "__main__":
         version="1.0")
 
     import_model_from = arguments["<import-model>"]
+    model = importlib.import_module(import_model_from)
+
     optimizer = arguments["<optimizer>"]
-    lr = arguments["<lr>"]
+    lr = float(arguments["<lr>"])
 
     paths = read_yaml_file(
         arguments["<paths-yml>"])
@@ -86,14 +88,14 @@ if __name__ == "__main__":
     ##################################################
     # TRAIN MODEL PARAMETERS
     ##################################################
-    optimizer_info = train_model["optimizer"]
+    #optimizer_info = train_model["optimizer"]
     sampler_info = train_model["sampler"]
     model_controller_info = train_model["model_controller"]
 
     ##################################################
     # OTHER ARGS
     ##################################################
-    n_runs = int(arguments["--runs"]
+    n_runs = int(arguments["--runs"])
     to_stdout = arguments["--stdout"]
     verbose = arguments["--verbose"]
 
@@ -120,6 +122,7 @@ if __name__ == "__main__":
         log.addHandler(stream_handle)
 
     t_i = time()
+    print(sampler_info["optional_args"])
     sampler = ChromatinFeaturesSampler(
         genome_fa_file,
         genomic_features,
@@ -127,12 +130,12 @@ if __name__ == "__main__":
         distinct_features,
         sampler_info["holdout_test"],
         sampler_info["holdout_validate"],
-        current_run_output_dir,
+        #current_run_output_dir,
         **sampler_info["optional_args"])
 
     t_i_model = time()
 
-    model = DeepSEA(sampler.window_size, sampler.n_features)
+    model = model.DeepSEA(sampler.window_size, sampler.n_features)
 
     checkpoint_info = model_controller_info["checkpoint"]
     checkpoint_resume = checkpoint_info["resume"]
@@ -149,7 +152,7 @@ if __name__ == "__main__":
     # on the output of your model
     # though it may be argued that most sequence-level deep learning models
     # (at least those that use this tool) will follow this format...
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = nn.BCELoss()
     optimizer_args = {
         "use_optim": optimizer,
         "lr": lr
@@ -171,21 +174,23 @@ if __name__ == "__main__":
 
     batch_size = model_controller_info["batch_size"]
     n_epochs = model_controller_info["n_epochs"]
+    n_total_validate = model_controller_info["n_total_validate"]
     n_train_batch_per_epoch = model_controller_info["n_train_batch_per_epoch"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_args,
-        batch_size, model_controller_info["n_total_validate"],
+        batch_size, n_total_validate,
+        n_train_batch_per_epoch,
         current_run_output_dir,
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
 
-    stdout_logger_fields = []
-    runner.register_plugin(Logger(stdout_logger_fields,
-                                  interval=[(20, "iteration"), (1, "epoch")]))
+    #stdout_logger_fields = []
+    #runner.register_plugin(Logger(stdout_logger_fields,
+    #                              interval=[(20, "iteration"), (1, "epoch")]))
     log.info("Training model: {0} epochs, {1} batch size.".format(
         n_epochs, batch_size))
-    runner.train_and_validate(n_epochs, n_train_batch_per_epoch)
+    runner.train_and_validate(n_epochs)
 
     t_f = time()
     log.info("./train_model.py completed in {0} s.".format(t_f - t_i))
