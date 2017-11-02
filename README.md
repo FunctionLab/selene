@@ -1,11 +1,12 @@
 # DeepSEA
-Here we describe the steps necessary to run [seq_model.py](seqmodel.py) as of 1 Sept 2017.
+Here we describe the steps necessary to run [train_model.py](train_model.py) as of Nov 2017.
 
 ## Current to-dos
-- Script + dataset for validation/parameter-tuning? (When should this happen? i.e. How do I prioritize this to-do list?)
-- Follow PyTorch model construction best practices (refactoring needed)
-- Discuss what metrics should be used to compare different models
-- Anything else?
+- Incorporate plugins for logging information and monitoring.
+- Re-evaluate whether or not the "test" mode would be useful in this framework.
+- Try out a ResNet model within this framework.
+- Data preparation is still not automated.
+- Testing!!
 
 ## Data preparation
 
@@ -51,7 +52,7 @@ Note that labels are not provided in the .bed file:
 
 #### Assigning features
 `metadata.tsv` is the first file downloaded from `files.txt`.
-The metadata file specifies information about each file listed in `files.txt`. 
+The metadata file specifies information about each file listed in `files.txt`.
 Every row in one such file will be assigned the same feature in the resulting aggregate .bed file.
 The feature is based on the metadata available for that file.
 - ChIP-seq: "ChIP-seq", metadata columns "Experiment target" and "Biosample term name" for that row.
@@ -61,13 +62,13 @@ The feature is based on the metadata available for that file.
 The information listed for each assay is space-separated and used as the feature.
 
 #### Tabix-indexed file
-The aggregate .bed file was compressed and tabix-indexed after downloading [htslib-1.5](http://www.htslib.org/download/). 
+The aggregate .bed file was compressed and tabix-indexed after downloading [htslib-1.5](http://www.htslib.org/download/).
 
 The steps taken (on the command line):
 - `sort -k1V -k2n -k3n unsorted_aggregate.bed > sorted_aggregate.bed`
     - This sorts the .bed file using the chr, start, end columns.
     - You can check this using `head -n20 sorted_aggregate.bed | column -t`
-- `bgzip -c sorted_aggregate.bed sorted_aggregate.bed.gz`
+- `bgzip -c sorted_aggregate.bed > sorted_aggregate.bed.gz`
     - Compresses the file
 - `tabix -p bed sorted_aggregate.bed.gz`
 
@@ -79,6 +80,22 @@ As a result, we end up with three files:
 3. sorted_aggregate.bed.gz.tbi
 
 where the files (1) and (2) are inputs to our script.
+
+### Coordinates file
+We also generate a file that only contains the genomic coordinates of each
+entry in the tabix-indexed file. This reduces the size of the uncompressed
+dataset from which we sample before querying the tabix-indexed file.
+
+```bash
+cut -f 1-3 sorted_aggregate.bed > coords_only.txt
+```
+
+### Distinct features file
+A file of the distinct features found in the dataset is created by running
+
+```bash
+cut -f 5 sorted_aggregate.bed | sort -u > distinct_features.txt
+```
 
 ## Training and testing the model
 
@@ -109,10 +126,3 @@ pip install pyfaidx
 The `pyfaidx` package provided on a conda channel has not been updated and will not install properly.
 
 **Please do this regardless of whether or not you have used the spec file to build your environment.**
-
-### Locally (e.g. on a GPU node)
-
-
-### Slurm
-
-
