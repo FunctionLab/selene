@@ -6,11 +6,11 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    train_model_with_configs.py <import-model> <optimizer> <lr>
+    train_model.py <import-model> <optimizer> <lr>
         <paths-yml> <train-model-yml>
         [--runs=<n-runs>]
         [-s | --stdout] [-v | --verbose]
-    train_model_with_configs.py -h | --help
+    train_model.py -h | --help
 
 Options:
     -h --help               Show this screen.
@@ -88,7 +88,6 @@ if __name__ == "__main__":
     ##################################################
     # TRAIN MODEL PARAMETERS
     ##################################################
-    #optimizer_info = train_model["optimizer"]
     sampler_info = train_model["sampler"]
     model_controller_info = train_model["model_controller"]
 
@@ -130,7 +129,6 @@ if __name__ == "__main__":
         distinct_features,
         sampler_info["holdout_test"],
         sampler_info["holdout_validate"],
-        #current_run_output_dir,
         **sampler_info["optional_args"])
 
     t_i_model = time()
@@ -158,10 +156,6 @@ if __name__ == "__main__":
         "lr": lr
     }
 
-    #optimizer_args = {
-    #    "use_optim": optimizer_info["name"],
-    #    "lr": float(optimizer_info["learning_rate"])
-    #}
     t_f_model = time()
     log.debug(
         "Finished initializing the {0} model from module {1}: {2} s".format(
@@ -185,9 +179,6 @@ if __name__ == "__main__":
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
 
-    #stdout_logger_fields = []
-    #runner.register_plugin(Logger(stdout_logger_fields,
-    #                              interval=[(20, "iteration"), (1, "epoch")]))
     log.info("Training model: {0} epochs, {1} batch size.".format(
         n_epochs, batch_size))
     runner.train_and_validate(n_epochs)
