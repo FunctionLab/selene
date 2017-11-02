@@ -1,6 +1,7 @@
 """
 Usage:
-    python mm10_aggregate_data_file.py <input-dir> <bigBed-dir> <output-file>
+    mm10_aggregate_data_file.py <input-dir> <bigBed-dir> <output-file>
+    mm10_aggregate_data_file.py -h | --help
 
 Options:
     -h --help        Show this screen.
@@ -10,7 +11,7 @@ Options:
                      the directory.
     <bigBed-dir>     Directory to the uncompressed bigBed files that were
                      part of our ENCODE download. (Used bigBedToBed binary.)
-    <output-file>    The output file. Concatenante all ENCODE data files,
+    <output-file>    The output file. Concatenate all ENCODE data files,
                      where each file has been modified to include the genomic
                      feature detected in the assay as a new column, along with
                      the metadata index (the row number allows us to map the
