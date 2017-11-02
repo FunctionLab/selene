@@ -43,7 +43,7 @@ from docopt import docopt
 import torch
 from torch import nn
 
-from model_controller_rf import ModelController
+from model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
 from utils import read_yaml_file
 
