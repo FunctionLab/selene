@@ -1,4 +1,4 @@
-"""DeepSEA architecture (Zhou & Troyanskaya, 2015)
+"""DeepSEA architecture (Zhou & Troyanskaya, 2015).
 """
 import math
 
@@ -28,19 +28,17 @@ class DeepSEA(nn.Module):
 
         self.conv_net = nn.Sequential(
             nn.Conv1d(4, 320, kernel_size=conv_kernel_size),
-            nn.LeakyReLU(inplace=True),
-            #nn.Threshold(0, 1e-6, inplace=True),
+            nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=pool_kernel_size, stride=pool_kernel_size),
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.2),
 
             nn.Conv1d(320, 480, kernel_size=conv_kernel_size),
-            nn.LeakyReLU(inplace=True),
-            #nn.Threshold(0, 1e-6, inplace=True),
+            nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=pool_kernel_size, stride=pool_kernel_size),
-            nn.Dropout(p=0.5),
+            nn.Dropout(p=0.2),
 
             nn.Conv1d(480, 960, kernel_size=conv_kernel_size),
-            nn.LeakyReLU(inplace=True),
+            nn.ReLU(inplace=True),
             nn.Dropout(p=0.5))
 
         reduce_by = conv_kernel_size - 1
@@ -53,34 +51,20 @@ class DeepSEA(nn.Module):
             - reduce_by)
         self.classifier = nn.Sequential(
             nn.Linear(960 * self.n_channels, n_genomic_features),
-            nn.LeakyReLU(inplace=True),
-            #nn.Threshold(0, 1e-6, inplace=True),
-            nn.Linear(n_genomic_features, n_genomic_features))
-            # nn.Sigmoid())  NOTE: the only reason this is commented out is because I use BCEWithLogitsLoss
+            nn.ReLU(inplace=True),
+            nn.Linear(n_genomic_features, n_genomic_features),
+            nn.Sigmoid())
 
         self._weight_initialization()
 
     def _weight_initialization(self):
         for m in self.modules():
-            if isinstance(m, nn.Conv1d):
-                # found this online
-                nn.init.xavier_uniform(m.weight, gain=math.sqrt(2.))
-                nn.init.constant(m.bias, 0.1)
-
-                # another initialization approach? also from online
-                #n = m.kernel_size[0] * m.out_channels
-                #m.weight.data.normal_(0, math.sqrt(2. / n))
-
-                # NOTE: have tried with and without calling _weight_initialization.
-                # no significant differences thus far.
+            if isinstance(m, nn.Conv1d) or isinstance(m, nn.Linear):
+                m.weight.data.normal_(0, 0.05)
 
     def forward(self, x):
         """Forward propagation of a batch.
         """
-        # adding in the renorm stuff recently just
-        # to see if I could stop overfitting to the training
-        # data. observed slight improvement in training/validation
-        # on the synthetic data.
         for layer in self.conv_net.children():
             if isinstance(layer, nn.Conv1d):
                 layer.weight.data.renorm_(2, 1, 0.9)
