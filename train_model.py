@@ -6,126 +6,98 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    seq_model.py <genome-fa> <features-data-gz> <feature-coords-data>
-        <uniq-features> <output-file>
-        [--radius=<radius>] [--window=<window-size>]
-        [--random-seed=<rseed>]
-        [--mode=<mode>] [--chrs-test=<chrs>] [--chrs-validate=<chrs>]
-        [--n-epochs=<epochs>] [--batch-size=<batch>]
-        [--log=<file-handle>] [-s | --stdout] [-v | --verbose]
-        [--use-cuda] [--data-parallel]
-    seq_model.py -h | --help
+    train_model_with_configs.py <import-model> <optimizer> <lr>
+        <paths-yml> <train-model-yml>
+        [--runs=<n-runs>]
+        [-s | --stdout] [-v | --verbose]
+    train_model_with_configs.py -h | --help
 
 Options:
     -h --help               Show this screen.
 
-    <genome-fa>             The target organism's full genome sequence
-                            FASTA file.
-    <features-data-gz>      Tabix-indexed features dataset. *.bed.gz file.
-    <feature-coords-data>   A tab-separated (usually *.bed) file with the
-                            genome coordinates of each feature.
-                            Because of space/time concerns, this file omits
-                            the feature (label) for each row and only contains
-                            the columns [chr, start, end] in order. This is
-                            sufficient for querying the actual feature in the
-                            tabix-indexed file.
-    <uniq-features>         *.txt file of the unique features in our dataset.
-                            Each feature is on its own line.
-    <output-file>           The trained model is saved to this file.
+    <import-model>          Choose a model module to import. Must be able
+                            to access a model with the class name
+                            "SeqModel" from this module.
+    <optimizer>             Choose an optimizer (SGD, Adam, RMSprop)
+    <lr>                    Choose the optimizer's learning rate
+    <paths-yml>             Input data and output filepaths
+    <train-model-yml>       DeepSEA model-specific parameters
 
-    --radius=<radius>       Specify the radius surrounding a target base.
-                            A bin of length radius + 1 target base + radius
-                            is annotated with a genomic features vector
-                            based on the features file.
-                            [default: 100]
-    --window=<window-size>  Specify the input sequence window size.
-                            The window is larger than the bin to provide
-                            context for the bin sequence.
-                            [default: 1001]
-    --random-seed=<rseed>   Set the random seed.
-                            [default: 123]
-
-    --mode=<mode>           One of {"all", "train"}. "all" assumes that there
-                            is no need to partition the input dataset into
-                            train/validate/test sections.
-                            For testing an already-trained model, please use
-                            the script ./evaluate_model.py.
-                            [default: train]
-    --chrs-test=<chrs>      The chromosomes in our holdout test set.
-                            Comma-separated, no spaces.
-                            Manual check of the default tells us that we are
-                            holding out 10% of our dataset for test.
-                            [default: chr8,chr9]
-    --chrs-validate=<chrs>  The chromosomes in our holdout validation set.
-                            Comma-separated, no spaces.
-                            Manual check of the default tells us that we are
-                            holding out 10% of our dataset for validation.
-                            [default: chr6,ch7]
-    --n-epochs=<epochs>     The number of epochs
-                            [default: 1000]
-    --batch-size=<batch>    The number of training examples to propagation
-                            through the model in one training iteration.
-    --train-prop=<prop>     Specify the percentage of data not in the holdout
-                            chromosomes that should be available for training.
-                            (1 - <prop>) will be set aside for validation.
-                            [default: 0.8]
-
-    --log=<file-handle>     Output logging information to a file. Either
-                            specify a filename of your own or use the default
-                            filename.
-                            [default: log_train.out]
-    -s --stdout             Will also output logging information to stdout.
+    --runs=<n-runs>         Specify number of times to do a full run of the
+                            model training. (Will initialize the model using
+                            a different random seed, from 0 to <n-runs>, each
+                            time
+                            [default: 1]
+    -s --stdout             Will also output logging information to stdout
                             [default: False]
-    -v --verbose            Include debug messages in logging information.
-                            [default: False]
-
-    --use-cuda              Whether CUDA is available to use or not.
-                            [default: False]
-    --data-parallel         Whether batch processing can be parallelized
-                            over multiple GPUs
+    -v --verbose            Include debug messages in logging information
                             [default: False]
 """
+import importlib
 import logging
+import os
 import sys
-from time import time
+from time import strftime, time
 
 from docopt import docopt
 import torch
 from torch import nn
 
-from deepsea import DeepSEA
-#from model import DeepSEA
-#from four_layer_model import DeepSEA
 from model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
+from utils import read_yaml_file
 
 if __name__ == "__main__":
     arguments = docopt(
         __doc__,
         version="1.0")
 
-    genome_fa_file = arguments["<genome-fa>"]
-    features_data_gz = arguments["<features-data-gz>"]
-    feature_coords_data = arguments["<feature-coords-data>"]
-    unique_features = arguments["<uniq-features>"]
-    output_model = arguments["<output-file>"]
+    import_model_from = arguments["<import-model>"]
+    model = importlib.import_module(import_model_from)
 
-    radius = int(arguments["--radius"])
-    window_size = int(arguments["--window"])
-    random_seed = int(arguments["--random-seed"])
+    optimizer = arguments["<optimizer>"]
+    lr = float(arguments["<lr>"])
 
-    mode = arguments["--mode"]
-    holdout_test = arguments["--chrs-test"].split(",")
-    holdout_validate = arguments["--chrs-validate"].split(",")
-    n_epochs = int(arguments["--n-epochs"])
-    batch_size = int(arguments["--batch-size"])
+    paths = read_yaml_file(
+        arguments["<paths-yml>"])
+    train_model = read_yaml_file(
+        arguments["<train-model-yml>"])
 
-    output_log = arguments["--log"]
+    ##################################################
+    # PATHS
+    ##################################################
+    genome_fa_file = paths["genome"]
+
+    features_paths = paths["features"]
+    features_dir = features_paths["dir_path"]
+    features_files = features_paths["filenames"]
+    genomic_features = os.path.join(
+        features_dir, features_files["genomic_features"])
+    coords_only = os.path.join(
+        features_dir, features_files["coords_only"])
+    distinct_features = os.path.join(
+        features_dir, features_files["distinct_features"])
+
+    output_dir = paths["output_dir"]
+    os.makedirs(output_dir, exist_ok=True)
+
+    current_run_output_dir = os.path.join(
+        output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+    os.makedirs(current_run_output_dir)
+
+    ##################################################
+    # TRAIN MODEL PARAMETERS
+    ##################################################
+    #optimizer_info = train_model["optimizer"]
+    sampler_info = train_model["sampler"]
+    model_controller_info = train_model["model_controller"]
+
+    ##################################################
+    # OTHER ARGS
+    ##################################################
+    n_runs = int(arguments["--runs"])
     to_stdout = arguments["--stdout"]
     verbose = arguments["--verbose"]
-
-    use_cuda = arguments["--use-cuda"]
-    data_parallel = arguments["--data-parallel"]
 
     log = logging.getLogger("deepsea")
     if verbose:
@@ -135,9 +107,12 @@ if __name__ == "__main__":
 
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
-    output_log = "{0}_{1}".format(
-        str(time())[:10], output_log)
-    file_handle = logging.FileHandler(output_log)
+    # TODO: LOOP FOR ALL THE RUNS.
+    # ALSO this wouldn't need to happen linearly.
+    # Should start diff jobs on diff GPU nodes for each of the runs.
+
+    log_output = os.path.join(current_run_output_dir, "train_model_log.out")
+    file_handle = logging.FileHandler(log_output)
     file_handle.setFormatter(formatter)
     log.addHandler(file_handle)
 
@@ -147,56 +122,75 @@ if __name__ == "__main__":
         log.addHandler(stream_handle)
 
     t_i = time()
+    print(sampler_info["optional_args"])
     sampler = ChromatinFeaturesSampler(
         genome_fa_file,
-        features_data_gz,
-        feature_coords_data,
-        unique_features,
-        holdout_test,
-        holdout_validate,
-        bin_radius=radius,
-        window_size=window_size,
-        random_seed=random_seed,
-        mode=mode,
-        sample_from="positive")
-    #    sample_from="proportion",
-    #    sample_positive_prop=0.75)
+        genomic_features,
+        coords_only,
+        distinct_features,
+        sampler_info["holdout_test"],
+        sampler_info["holdout_validate"],
+        #current_run_output_dir,
+        **sampler_info["optional_args"])
 
     t_i_model = time()
-    model = DeepSEA(sampler.window_size, sampler.n_features)
 
+    model = model.DeepSEA(sampler.window_size, sampler.n_features)
+
+    checkpoint_info = model_controller_info["checkpoint"]
+    checkpoint_resume = checkpoint_info["resume"]
     checkpoint = None
-    resume = False
-    if resume:
-        log.info("Resuming training from checkpoint.")
-        checkpoint = torch.load("20170914_model_best.pth.tar")
+    if checkpoint_resume:
+        checkpoint_file = checkpoint_info["model_file"]
+        log.info("Resuming training from checkpoint {0}.".format(
+            checkpoint_file))
+        checkpoint = torch.load(checkpoint_file)
         model.load_state_dict(checkpoint["state_dict"])
         model.eval()
 
-    # TODO: would prefer to not have to import & specify this in the
-    # train_model.py script, I think?
-    criterion = nn.BCEWithLogitsLoss()
-    optimizer_args = {"use_optim": "SGD", "lr": 0.07, "momentum": 0.9, "weight_decay": 5e-7}
-    #optimizer_args = {"use_optim": "Adam", "lr": 0.04, "eps": 1e-6, "weight_decay": 5e-7}
+    # TODO: should this be specified elsewhere? criterion is dependent
+    # on the output of your model
+    # though it may be argued that most sequence-level deep learning models
+    # (at least those that use this tool) will follow this format...
+    criterion = nn.BCELoss()
+    optimizer_args = {
+        "use_optim": optimizer,
+        "lr": lr
+    }
 
+    #optimizer_args = {
+    #    "use_optim": optimizer_info["name"],
+    #    "lr": float(optimizer_info["learning_rate"])
+    #}
     t_f_model = time()
-    log.debug("Finished initializing the {0} model: {1} s".format(
-        model.__class__.__name__, t_f_model - t_i_model))
+    log.debug(
+        "Finished initializing the {0} model from module {1}: {2} s".format(
+            model.__class__.__name__,
+            import_model_from,
+            t_f_model - t_i_model))
 
-    print(model)
-    print(optimizer_args)
+    log.info(model)
+    log.info(optimizer_args)
+
+    batch_size = model_controller_info["batch_size"]
+    n_epochs = model_controller_info["n_epochs"]
+    n_total_validate = model_controller_info["n_total_validate"]
+    n_train_batch_per_epoch = model_controller_info["n_train_batch_per_epoch"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_args,
-        batch_size,
-        prefix_outputs="{0}_LR{1}_BS{2}_EPS{3}".format(
-            optimizer_args["use_optim"], optimizer_args["lr"],
-            batch_size, n_epochs),
-        use_cuda=use_cuda, data_parallel=data_parallel,
-        checkpoint_resume=checkpoint)
+        batch_size, n_total_validate,
+        n_train_batch_per_epoch,
+        current_run_output_dir,
+        checkpoint_resume=checkpoint,
+        **model_controller_info["optional_args"])
+
+    #stdout_logger_fields = []
+    #runner.register_plugin(Logger(stdout_logger_fields,
+    #                              interval=[(20, "iteration"), (1, "epoch")]))
     log.info("Training model: {0} epochs, {1} batch size.".format(
         n_epochs, batch_size))
-    runner.train_and_validate(n_epochs, 2000)
+    runner.train_and_validate(n_epochs)
 
     t_f = time()
     log.info("./train_model.py completed in {0} s.".format(t_f - t_i))
