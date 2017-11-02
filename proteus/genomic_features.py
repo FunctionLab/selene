@@ -122,7 +122,8 @@ class GenomicFeatures(object):
             return True
         return False
 
-    def get_feature_data(self, chrom, position, start, end, strand='+', threshold=0.50):
+    def get_feature_data(self, chrom, position, start, end,
+                         strand='+', threshold=0.50):
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will

@@ -3,13 +3,11 @@ It supports retrieving parts of the sequence and converting these parts
 into their one hot encodings.
 """
 import logging
-from time import time
 
 import numpy as np
 from pyfaidx import Fasta
 
 
-SLOG = logging.getLogger("samples")
 LOG = logging.getLogger("deepsea")
 
 
@@ -113,7 +111,6 @@ class Genome(object):
         sequence = self.get_sequence_from_coords(chrom, start, end, strand)
         encoding = self.sequence_to_encoding(sequence)
         return encoding
-
 
     def sequence_to_encoding(self, sequence):
         """Converts an input sequence to its one hot encoding.
