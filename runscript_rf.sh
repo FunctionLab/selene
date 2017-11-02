@@ -22,8 +22,8 @@ mkdir -p $data_dir
 cp -r $data_dir_original $data_dir
 cp -r $hg19 $data_dir
 
-python -u train_model_with_configs.py deepsea SGD 0.005 \
-                                      configs/paths.yml \
-                                      configs/train_model.yml \
-                                      --runs=1 --verbose
+python -u train_model.py deepsea SGD 0.005 \
+                         configs/paths.yml \
+                         configs/train_model.yml \
+                         --runs=1 --verbose
 rm -rf $data_dir
