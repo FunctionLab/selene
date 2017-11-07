@@ -146,11 +146,10 @@ if __name__ == "__main__":
         model.load_state_dict(checkpoint["state_dict"])
         model.eval()
 
-    # TODO: should this be specified elsewhere? criterion is dependent
-    # on the output of your model
-    # though it may be argued that most sequence-level deep learning models
-    # (at least those that use this tool) will follow this format...
-    criterion = nn.BCELoss()
+    criterion = model.criterion()
+
+    # TODO: might ask that the optimizer be specified in a file?
+    # or at least allow for that option so that the user can specify more parameters.
     optimizer_args = {
         "use_optim": optimizer,
         "lr": lr
