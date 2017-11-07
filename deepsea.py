@@ -76,6 +76,8 @@ class DeepSEA(nn.Module):
         predict = self.classifier(reshape_out)
         return predict
 
+def criterion():
+    return nn.BCELoss()
 
 def deepsea(window_size, n_genomic_features, filepath=None):
     """Initializes a new (untrained) DeepSEA model or loads
