@@ -196,7 +196,7 @@ class ChromatinFeaturesSampler(Sampler):
                  feature_coordinates,
                  unique_features,
                  chrs_test,
-                 chrs_validate,
+                 n_validate_from_train,
                  bin_radius=100,
                  window_size=1001,
                  bin_feature_threshold=0.5,
@@ -221,16 +221,11 @@ class ChromatinFeaturesSampler(Sampler):
             It is expected that the user decides beforehand that the
             proportion of positive examples in the held-out chromosomes
             is appropriate relative to the training and validation datasets.
-            e.g. 60-20-20 train-validate-test, 80-10-10, etc.
-        chrs_validate : list[str]
-            Specify chromosome(s) to hold out as the validation dataset.
-            It is expected that the user decides beforehand that the
-            proportion of positive examples in the held-out chromosomes
-            is appropriate relative to the training and testing datasets.
-            e.g. 60-20-20 train-validate-test, 80-10-10, etc.
-            # TODO: we pull 5000 examples from the chromosomes here to use
-            # as the validation set right now. Q: should we assign the
-            # remainder to the training set?
+            e.g. 15-85 or 20-80 for test-train split.
+        n_validate_from_train : int
+            The number of examples to hold out from the training set. These
+            examples are our validation dataset and are used to evaluate
+            the model after each training epoch.
         bin_radius : int, optional
             Default is 100. The bin is composed of
                 ([sequence (len radius)] +
@@ -304,7 +299,10 @@ class ChromatinFeaturesSampler(Sampler):
         self.bin_feature_threshold = bin_feature_threshold
 
         self._load_feature_coordinates(feature_coordinates)
-        self._partition_dataset(chrs_validate, chrs_test)
+
+        self.chrs_test = chrs_test
+        self.n_validation = n_validate_from_train
+        self._partition_dataset()
 
         # used during the negative sampling step - get a random chromosome
         # in the genome FASTA file and randomly select a position in the
@@ -347,26 +345,45 @@ class ChromatinFeaturesSampler(Sampler):
              "in the dataset: file {0}, {1} s").format(
                  feature_coordinates_file, t_f - t_i))
 
-    def _partition_dataset(self, chrs_validate, chrs_test):
+    def _partition_dataset(self):
         """Specify the training, validation, and test indices available to
         sample in the genomic features coordinates dataframe.
         """
         t_i = time()
         features_chr_data = self._coords_df["chr"]
-        holdout_chrs_test = np.asarray(features_chr_data.isin(chrs_test))
-        holdout_chrs_validate = np.asarray(
-            features_chr_data.isin(chrs_validate))
-        holdout_chrs_both = np.logical_or(
-            holdout_chrs_test, holdout_chrs_validate)
-
+        holdout_chrs_test = np.asarray(
+            features_chr_data.isin(self.chrs_test))
         self._all_indices = list(features_chr_data.index)
-        self._training_indices = list(np.where(~holdout_chrs_both)[0])
-        self._validate_indices = list(np.where(holdout_chrs_validate)[0])
+
+        not_test_indices = list(np.where(~holdout_chrs_test)[0])
+        self._validation_indices = list(np.random.choice(
+            not_test_indices, size=self.n_validation, replace=False))
+        self._training_indices = list(
+            set(not_test_indices) - set(self._validation_indices))
         self._test_indices = list(np.where(holdout_chrs_test)[0])
         t_f = time()
         LOG.debug(
-            ("Partitioned the dataset into train/validate/test sets: "
+            ("Partitioned the dataset into train/validate & test sets: "
              "{0} s").format(t_f - t_i))
+
+    def _create_validation_set(self):
+        """Used in `__init__`.
+        """
+        self.sampler.set_mode("validate")
+        self._validation_data = []
+        validation_targets = []
+
+        n_validation_batches = int(n_validation / self.batch_size)
+
+        for _ in range(n_validation_batches):
+            inputs, targets = self._get_batch()
+            self._validation_data.append((inputs, targets))
+            validation_targets.append(targets)
+
+        self._all_validation_targets = np.vstack(validation_targets)
+        LOG.info(("Loaded {0} validation examples ({1} validation batches) "
+                  "to evaluate after each training epoch.").format(
+                      n_validation, len(self._validation_data)))
 
     def set_mode(self, mode):
         """Determines what positive examples are available to sample depending
@@ -396,24 +413,8 @@ class ChromatinFeaturesSampler(Sampler):
                 "Mode must be one of {0}. Input was '{1}'.".format(
                     self.MODES, mode))
 
-        if self.mode == mode:
-            LOG.debug("[MODE] {0}".format(mode))
-            return
-        # These if-statements are irrelevant now that we are building
-        # randcaches for each of these modes...
-        """
-        if mode == "all":
-            indices = self._all_indices
-        elif mode == "train":
-            indices = self._training_indices
-        elif mode == "validate":
-            indices = self._validate_indices
-        elif mode == "test":
-            indices = self._test_indices
-        self._use_indices = indices  # also not used.
-        """
         self.mode = mode
-        LOG.debug("[MODE] Setting mode to {0}".format(mode))
+        LOG.debug("[MODE] {0}".format(mode))
 
     def _retrieve(self, chrom, position, strand,
                   is_positive=False):
@@ -621,19 +622,19 @@ class ChromatinFeaturesSampler(Sampler):
                 self._training_indices, size=size))
             self._randcache_positives["train"] = randpos_train
 
-        # select examples from only the validation set
-        if "validate" not in self._randcache_positives \
-                or len(self._randcache_positives["validate"]) == 0:
-            randpos_validate = list(np.random.choice(
-                self._validate_indices, size=int(size / 2)))
-            self._randcache_positives["validate"] = randpos_validate
-
         # select examples from only the test set
         if "test" not in self._randcache_positives \
                 or len(self._randcache_positives["test"]) == 0:
             randpos_test = list(np.random.choice(
                 self._test_indices, size=int(size / 2)))
             self._randcache_positives["test"] = randpos_test
+
+        if "validate" not in self._randcache_positives \
+                or len(self._randcache_positives["validate"]) == 0:
+            validation_shuffled = random.sample(
+                self._validation_indices, len(self._validation_indices))
+            self._randcache_positives["validate"] = validation_shuffled
+
         t_f = time()
         LOG.info(
             ("Updated the cache for sampling "

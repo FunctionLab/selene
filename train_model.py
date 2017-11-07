@@ -53,7 +53,7 @@ if __name__ == "__main__":
         version="1.0")
 
     import_model_from = arguments["<import-model>"]
-    model = importlib.import_module(import_model_from)
+    use_model = importlib.import_module(import_model_from)
 
     optimizer = arguments["<optimizer>"]
     lr = float(arguments["<lr>"])
@@ -128,12 +128,12 @@ if __name__ == "__main__":
         coords_only,
         distinct_features,
         sampler_info["holdout_test"],
-        sampler_info["holdout_validate"],
+        sampler_info["n_total_validate"],
         **sampler_info["optional_args"])
 
     t_i_model = time()
 
-    model = model.DeepSEA(sampler.window_size, sampler.n_features)
+    model = use_model.DeepSEA(sampler.window_size, sampler.n_features)
 
     checkpoint_info = model_controller_info["checkpoint"]
     checkpoint_resume = checkpoint_info["resume"]
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         model.load_state_dict(checkpoint["state_dict"])
         model.eval()
 
-    criterion = model.criterion()
+    criterion = use_model.criterion()
 
     # TODO: might ask that the optimizer be specified in a file?
     # or at least allow for that option so that the user can specify more parameters.
@@ -167,13 +167,11 @@ if __name__ == "__main__":
 
     batch_size = model_controller_info["batch_size"]
     n_epochs = model_controller_info["n_epochs"]
-    n_total_validate = model_controller_info["n_total_validate"]
     n_train_batch_per_epoch = model_controller_info["n_train_batch_per_epoch"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_args,
-        batch_size, n_total_validate,
-        n_train_batch_per_epoch,
+        batch_size, n_train_batch_per_epoch,
         current_run_output_dir,
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])

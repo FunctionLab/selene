@@ -6,9 +6,7 @@ sampler:
     holdout_test:
         - chr8
         - chr9
-    holdout_validate:
-        - chr6
-        - chr7
+    n_total_validate: 5000
     optional_args:
         bin_radius: 100
         window_size: 1001
@@ -20,7 +18,6 @@ model_controller:
     batch_size: 128
     n_epochs: 500
     n_train_batch_per_epoch: 2000
-    n_total_validate: 5000
     optional_args:
         use_cuda: True
         data_parallel: False

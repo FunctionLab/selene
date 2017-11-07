@@ -30,7 +30,7 @@ class ModelController(object):
 
     def __init__(self, model, sampler,
                  loss_criterion, optimizer_args,
-                 batch_size, n_total_validate,
+                 batch_size,
                  n_train_batch_per_epoch,
                  output_dir,
                  checkpoint_resume=None,
@@ -93,7 +93,7 @@ class ModelController(object):
             self.criterion.cuda()
             LOG.debug("Set modules to use CUDA")
 
-        self._create_validation_set(n_total_validate)
+        self._create_validation_set()
 
         self.start_epoch = 0
         self.min_loss = float("inf")
@@ -120,13 +120,15 @@ class ModelController(object):
             "update": []
         }
 
-    def _create_validation_set(self, n_validation=5000):
+    def _create_validation_set(self):
         """Used in `__init__`.
         """
         self.sampler.set_mode("validate")
         self._validation_data = []
         validation_targets = []
-        n_validation_batches = int(n_validation / self.batch_size)
+
+        n_validation_batches = int(
+            self.sampler.n_validation / self.batch_size)
 
         for _ in range(n_validation_batches):
             inputs, targets = self._get_batch()
@@ -136,7 +138,7 @@ class ModelController(object):
         self._all_validation_targets = np.vstack(validation_targets)
         LOG.info(("Loaded {0} validation examples ({1} validation batches) "
                   "to evaluate after each training epoch.").format(
-                      n_validation, len(self._validation_data)))
+                      self.sampler.n_validation, len(self._validation_data)))
 
     def _optimizer(self, use_optim="SGD", **kwargs):
         """Used in `__init__`. Specify the optimizer.
