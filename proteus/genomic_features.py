@@ -162,11 +162,12 @@ class GenomicFeatures(object):
                 "Strand must be one of '+' or '-'. Input was {0}".format(
                     strand))
         try:
-            # pos = start + int((end - start) / 2)
-            # POTENTIALLY THE BEST THING TO DO *ONLY* WHEN THE RATIO
-            # IS 50% or MORE. Can have an if-statement that catches this.
-            rows = self.data.query(chrom, position, position + 1)
-            # rows = self.data.query(chrom, start, end)
+            rows = None
+            if threshold < 0.50:
+                rows = self.data.query(chrom, start, end)
+            else:
+                rows = self.data.query(chrom, position, position + 1)
+
             encoding = np.zeros((end - start, self.n_features))
 
             if strand == '+':
