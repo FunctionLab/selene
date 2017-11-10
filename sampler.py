@@ -366,25 +366,6 @@ class ChromatinFeaturesSampler(Sampler):
             ("Partitioned the dataset into train/validate & test sets: "
              "{0} s").format(t_f - t_i))
 
-    def _create_validation_set(self):
-        """Used in `__init__`.
-        """
-        self.sampler.set_mode("validate")
-        self._validation_data = []
-        validation_targets = []
-
-        n_validation_batches = int(n_validation / self.batch_size)
-
-        for _ in range(n_validation_batches):
-            inputs, targets = self._get_batch()
-            self._validation_data.append((inputs, targets))
-            validation_targets.append(targets)
-
-        self._all_validation_targets = np.vstack(validation_targets)
-        LOG.info(("Loaded {0} validation examples ({1} validation batches) "
-                  "to evaluate after each training epoch.").format(
-                      n_validation, len(self._validation_data)))
-
     def set_mode(self, mode):
         """Determines what positive examples are available to sample depending
         on the mode.
@@ -454,8 +435,9 @@ class ChromatinFeaturesSampler(Sampler):
                 retrieved_sequence,
                 np.zeros((self.query_feature_data.n_features,)))
         else:
+            assert position == bin_start + (bin_end - bin_start) / 2
             retrieved_data = self.query_feature_data.get_feature_data(
-                chrom, position, bin_start, bin_end, strand)
+                chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
 
     def _get_rand_background(self):

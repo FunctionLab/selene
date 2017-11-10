@@ -122,7 +122,7 @@ class GenomicFeatures(object):
             return True
         return False
 
-    def get_feature_data(self, chrom, position, start, end,
+    def get_feature_data(self, chrom, start, end,
                          strand='+', threshold=0.50):
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
@@ -166,6 +166,7 @@ class GenomicFeatures(object):
             if threshold < 0.50:
                 rows = self.data.query(chrom, start, end)
             else:
+                position = start + int((end - start) / 2)
                 rows = self.data.query(chrom, position, position + 1)
 
             encoding = np.zeros((end - start, self.n_features))
@@ -189,5 +190,5 @@ class GenomicFeatures(object):
             encoding = np.sum(encoding, axis=0) / (end - start)
             encoding = (encoding > threshold) * 1
             return encoding
-        except tabix.TabixError as e:
+        except tabix.TabixError:
             return np.zeros((self.n_features,))
