@@ -435,7 +435,6 @@ class ChromatinFeaturesSampler(Sampler):
                 retrieved_sequence,
                 np.zeros((self.query_feature_data.n_features,)))
         else:
-            assert position == bin_start + (bin_end - bin_start) / 2
             retrieved_data = self.query_feature_data.get_feature_data(
                 chrom, bin_start, bin_end, strand)
             return (retrieved_sequence, retrieved_data)
