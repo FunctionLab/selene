@@ -20,12 +20,12 @@ import numpy as np
 import tabix
 
 
-def _any_positive_rows(rows, start, end, threshold):
+def _any_positive_rows(rows, query_start, query_end, threshold):
     if rows is None:
         return False
     for row in rows:  # features within [start, end)
-        is_positive = self._is_positive_row(
-            start, end, int(row[1]), int(row[2]), threshold)
+        is_positive = _is_positive_row(
+            query_start, query_end, int(row[1]), int(row[2]), threshold)
         if is_positive:
             return True
     return False
@@ -60,32 +60,21 @@ def _is_positive_row(query_start, query_end,
     else:
         return False
 
-def _get_feature_data(rows, start, end, strand, threshold,
-                      feature_index_map):
+def _get_feature_data(rows, query_start, query_end,
+                      threshold, feature_index_map):
     n_features = len(feature_index_map)
     if rows is None:
         return np.zeros((n_features,))
-
-    encoding = np.zeros((end - start, n_features))
-    if strand == '+':
-        for row in rows:
-            feat_start = int(row[1])
-            feat_end = int(row[2])
-            index_start = max(0, feat_start - start)
-            index_end = min(feat_end - start, end - start)
-            index_feat = feature_index_map[row[4]]
-            encoding[index_start:index_end, index_feat] = 1
-    else:
-        # question: does pos/neg strand matter when we are
-        # flattening the array?
-        for row in rows:
-            feat_start = int(row[1])
-            feat_end = int(row[2])
-            index_start = max(0, end - feat_end)
-            index_end = min(end - feat_start, end - start)
-            index_feat = feature_index_map[row[4]]
-            encoding[index_start:index_end, index_feat] = 1
-    encoding = np.sum(encoding, axis=0) / (end - start)
+    query_length = query_end - query_start
+    encoding = np.zeros((query_length, n_features))
+    for row in rows:
+        feat_start = int(row[1])
+        feat_end = int(row[2])
+        index_start = max(0, feat_start - query_start)
+        index_end = min(feat_end - query_start, query_length)
+        index_feat = feature_index_map[row[4]]
+        encoding[index_start:index_end, index_feat] = 1
+    encoding = np.sum(encoding, axis=0) / query_length
     encoding = (encoding > threshold) * 1
     return encoding
 
@@ -160,8 +149,7 @@ class GenomicFeatures(object):
         rows = self.query_tabix(chrom, start, end)
         return _any_positive_rows(rows, start, end, threshold)
 
-    def get_feature_data(self, chrom, start, end,
-                         strand='+', threshold=0.50):
+    def get_feature_data(self, chrom, start, end, threshold=0.50):
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will
@@ -174,8 +162,6 @@ class GenomicFeatures(object):
             e.g. "chr1".
         start : int
         end : int
-        strand : {'+', '-'}, optional
-            Default is '+'.
         threshold : [0.0, 1.0], float, optional
             Default is 0.50. The threshold specifies the proportion of
             the [`start`, `end`) window that needs to be covered by
@@ -189,17 +175,7 @@ class GenomicFeatures(object):
             Note that if we catch a tabix.TabixError exception, we assume
             the error was the result of no genomic features being present
             in the queried region and return a numpy.ndarray of all 0s.
-
-        Raises
-        ------
-        ValueError
-            If the input char to `strand` is not one of the specified choices.
         """
-        if strand not in set({'+', '-'}):
-            raise ValueError(
-                "Strand must be one of '+' or '-'. Input was {0}".format(
-                    strand))
-
         rows = None
         if threshold < 0.50:
             rows = self.query_tabix(chrom, start, end)
@@ -208,5 +184,4 @@ class GenomicFeatures(object):
             rows = self.query_tabix(chrom, start, end)
 
         return _get_feature_data(
-            rows, start, end, strand, threshold,
-            self.feature_index_map)
+            rows, start, end, threshold, self.feature_index_map)
