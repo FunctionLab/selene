@@ -11,17 +11,6 @@ from proteus.genomic_features import _any_positive_rows, _is_positive_row, \
 class TestGenomicFeatures(unittest.TestCase):
 
     def setUp(self):
-        """
-        GENOMIC_FEATURES_DIR = "data/test_files/ChIP_CTCF_6feats"
-
-        features_file = os.path.join(
-            GENOMIC_FEATURES_DIR,
-            "distinct_features.txt")
-        features_list = None
-        with open(features_file, 'r') as features_fh:
-            features_list = [f.strip() for f in features_fh.readlines()]
-        features_fh.close()
-        """
         self.features = [
             "CTCF", "eGFP-FOS", "GABP", "Pbx3", "Pol2", "TBP"
         ]
@@ -29,11 +18,6 @@ class TestGenomicFeatures(unittest.TestCase):
             "CTCF": 0, "eGFP-FOS": 1, "GABP": 2, "Pbx3": 3, "Pol2": 4, "TBP": 5
         }
 
-        """
-        self.query_features = GenomicFeatures(
-            os.path.join(GENOMIC_FEATURES_DIR, "sorted_aggregate.bed.gz"),
-            features_list)
-        """
         # CTCF only, between 16110 and 16239
         self.rows_example1 =  \
             [("chr1", "16110", "16190", ".", "CTCF", "662"),  # len 70
@@ -42,21 +26,37 @@ class TestGenomicFeatures(unittest.TestCase):
 
         # CTCF only, between 91128 and 91358
         self.rows_example2 =  \
-            [("chr1", "91128", "91358", ".", "CTCF", "631"),  # len 200
-             ("chr1", "91130", "91239", ".", "CTCF", "628"),  # len 109
-             ("chr1", "91156", "91310", ".", "CTCF", "662")]  # len 154
+            [("chr2", "91128", "91358", ".", "CTCF", "631"),  # len 200
+             ("chr2", "91130", "91239", ".", "CTCF", "628"),  # len 109
+             ("chr2", "91156", "91310", ".", "CTCF", "662")]  # len 154
 
         # multiple features, between 8533 and 9049
         self.rows_example3 = \
-            [("chr10", "8533", "8817", ".", "eGFP-FOS", "590"),  # len 284
-             ("chr10", "8541", "8651", ".", "GABP", "220"),      # len 110
-             ("chr10", "8574", "8629", ".", "Pol2", "229"),      # len 145
-             ("chr10", "8619", "9049", ".", "CTCF", "44"),       # len 430
-             ("chr10", "8620", "8680", ".", "TBP", "545"),       # len 60
-             ("chr10", "8645", "8720", ".", "TBP", "546")]       # len 75
+            [("chr3", "8533", "8817", ".", "eGFP-FOS", "590"),  # len 284
+             ("chr3", "8541", "8651", ".", "GABP", "220"),      # len 110
+             ("chr3", "8574", "8629", ".", "Pol2", "229"),      # len 145
+             ("chr3", "8619", "9049", ".", "CTCF", "44"),       # len 430
+             ("chr3", "8620", "8680", ".", "TBP", "545"),       # len 60
+             ("chr3", "8645", "8720", ".", "TBP", "546")]       # len 75
+
+    def get_feature_rows(self, chrom, start, end):
+        """This function disregards (`start`, `end`) input
+        """
+        if chrom is None:
+            return None
+
+        if chrom == "chr1":
+            return self.rows_example1
+        elif chrom == "chr2":
+            return self.rows_example2
+        elif chrom == "chr3":
+            return self.rows_example3
+        else:
+            return []
+
 
     ############################################
-    # Tests for `_is_positive_row`
+    # Correctness tests for `_is_positive_row`
     ############################################
 
     def test__is_positive_row_false(self):
@@ -84,7 +84,7 @@ class TestGenomicFeatures(unittest.TestCase):
                 query_start, query_end, query_start, query_end, threshold))
 
     ############################################
-    # Tests for `_any_positive_rows`
+    # Correctness tests for `_any_positive_rows`
     ############################################
 
     def test__any_positive_rows_none_rows(self):
@@ -116,75 +116,105 @@ class TestGenomicFeatures(unittest.TestCase):
             _any_positive_rows(rows, query_start, query_end, threshold))
 
     ############################################
-    # Tests for `_get_feature_data`
+    # Correctness tests for `_get_feature_data`
     ############################################
 
     def test__get_feature_data_none_rows(self):
-        rows = None
-        query_start, query_end = (10, 211)
+        query_chrom, query_start, query_end = (None, 10, 211)
         threshold = 0.50
 
         expected_encoding = [0, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
-            rows, query_start, query_end, threshold, self.feature_index_map)
+            query_chrom, query_start, query_end, threshold,
+            self.feature_index_map, self.get_feature_rows)
 
         self.assertSequenceEqual(
             observed_encoding.tolist(), expected_encoding)
 
     def test__get_feature_data_empty_rows(self):
-        rows = []
-        query_start, query_end = (10, 211)
+        query_chrom, query_start, query_end = ("chr7", 10, 211)
         threshold = 0.50
 
         expected_encoding = [0, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
-            rows, query_start, query_end, threshold, self.feature_index_map)
+            query_chrom, query_start, query_end, threshold,
+            self.feature_index_map, self.get_feature_rows)
 
         self.assertSequenceEqual(
             observed_encoding.tolist(), expected_encoding)
 
     def test__get_feature_data_single_feat_positive(self):
-        rows = self.rows_example1
-        query_start, query_end = (16100, 16350)
+        query_chrom, query_start, query_end = ("chr1", 16100, 16350)
         threshold = 0.50
 
         expected_encoding = [1, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
-            rows, query_start, query_end, threshold, self.feature_index_map)
+            query_chrom, query_start, query_end, threshold,
+            self.feature_index_map, self.get_feature_rows)
 
         self.assertSequenceEqual(
             observed_encoding.tolist(), expected_encoding)
 
     def test__get_feature_data_no_feat_positive(self):
-        rows = self.rows_example2
-        query_start, query_end = (91027, 91228)
+        query_chrom, query_start, query_end = ("chr2", 91027, 91228)
         threshold = 0.50
 
         expected_encoding = [0, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
-            rows, query_start, query_end, threshold, self.feature_index_map)
+            query_chrom, query_start, query_end, threshold,
+            self.feature_index_map, self.get_feature_rows)
 
         self.assertSequenceEqual(
             observed_encoding.tolist(), expected_encoding)
 
     def test__get_feature_data_multiple_feats_positive(self):
-        rows = self.rows_example3
-        query_start, query_end = (8619, 8719)
+        query_chrom, query_start, query_end = ("chr3", 8619, 8719)
         threshold = 0.50
 
         expected_encoding = [1, 1, 0, 0, 0, 1]
         observed_encoding = _get_feature_data(
-            rows, query_start, query_end, threshold, self.feature_index_map)
+            query_chrom, query_start, query_end, threshold,
+            self.feature_index_map, self.get_feature_rows)
 
         self.assertSequenceEqual(
             observed_encoding.tolist(), expected_encoding)
 
     ############################################
-    # Tests for `GenomicFeatures` class methods
+    # Integration tests for `GenomicFeatures` class methods
     ############################################
 
-    # TODO.
+    def test_GenomicFeatures_query_is_positive(self):
+        # path assumes tests are run from the top-level Github dir.
+        query_features = GenomicFeatures(
+            os.path.join(".", "data",
+                         "test_files", "ChIP_CTCF_6feats",
+                         "sorted_aggregate.bed.gz"),
+            self.features)
 
+        query_chrom, query_start, query_end = ("chr1", 29200, 29570)
+        threshold = 0.50
+
+        observed_is_positive = query_features.is_positive(
+            query_chrom, query_start, query_end, threshold)
+
+        self.assertTrue(observed_is_positive)
+
+    def test_GenomicFeatures_query_get_feature_data(self):
+        # path assumes tests are run from the top-level Github dir.
+        query_features = GenomicFeatures(
+            os.path.join(".", "data",
+                         "test_files", "ChIP_CTCF_6feats",
+                         "sorted_aggregate.bed.gz"),
+            self.features)
+
+        query_chrom, query_start, query_end = ("chr10", 63348553, 63349171)
+        threshold = 0.50
+        expected_get_feature_data = [0, 0, 1, 0, 0, 0]
+        observed_get_feature_data = query_features.get_feature_data(
+            query_chrom, query_start, query_end, threshold)
+
+        self.assertSequenceEqual(
+            observed_get_feature_data.tolist(), expected_get_feature_data)
 
 if __name__ == "__main__":
     unittest.main()

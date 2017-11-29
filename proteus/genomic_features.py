@@ -60,8 +60,15 @@ def _is_positive_row(query_start, query_end,
     else:
         return False
 
-def _get_feature_data(rows, query_start, query_end,
-                      threshold, feature_index_map):
+def _get_feature_data(query_chrom, query_start, query_end,
+                      threshold, feature_index_map, get_feature_rows):
+    rows = None
+    if threshold < 0.50:
+        rows = get_feature_rows(query_chrom, query_start, query_end)
+    else:
+        position = query_start + int((query_end - query_start) / 2)
+        rows = get_feature_rows(query_chrom, query_start, query_end)
+
     n_features = len(feature_index_map)
     if rows is None:
         return np.zeros((n_features,))
@@ -113,7 +120,7 @@ class GenomicFeatures(object):
             [(feat, index) for index, feat in enumerate(features)])
         self.index_feature_map = dict(list(enumerate(features)))
 
-    def query_tabix(self, chrom, start, end):
+    def _query_tabix(self, chrom, start, end):
         try:
             return self.data.query(chrom, start, end)
         except tabix.TabixError:
@@ -146,7 +153,7 @@ class GenomicFeatures(object):
             the error was the result of no genomic features being present
             in the queried region and return False.
         """
-        rows = self.query_tabix(chrom, start, end)
+        rows = self._query_tabix(chrom, start, end)
         return _any_positive_rows(rows, start, end, threshold)
 
     def get_feature_data(self, chrom, start, end, threshold=0.50):
@@ -176,12 +183,6 @@ class GenomicFeatures(object):
             the error was the result of no genomic features being present
             in the queried region and return a numpy.ndarray of all 0s.
         """
-        rows = None
-        if threshold < 0.50:
-            rows = self.query_tabix(chrom, start, end)
-        else:
-            position = start + int((end - start) / 2)
-            rows = self.query_tabix(chrom, start, end)
-
         return _get_feature_data(
-            rows, start, end, threshold, self.feature_index_map)
+            chrom, start, end, threshold,
+            self.feature_index_map, self._query_tabix)
