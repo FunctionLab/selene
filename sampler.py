@@ -87,8 +87,10 @@ class Sampler(object):
         np.random.seed(random_seed)
         random.seed(random_seed + 1)
 
-        self._features = pd.read_csv(unique_features, names=["feature"])
-        self._features = self._features["feature"].values.tolist()
+        self._features = []
+        with open(unique_features, "r") as file_handle:
+            for line in file_handle:
+                self._features.append(line.strip())
         self.n_features = len(self._features)
 
         self.query_feature_data = GenomicFeatures(
@@ -112,6 +114,9 @@ class Sampler(object):
         str
         """
         return self.query_feature_data.index_feature_map[feature_index]
+
+    def get_sequence_from_encoding(self, encoding):
+        return self.genome.encoding_to_sequence(encoding)
 
     def sample(self, sample_batch=1):
         """Sample based on the `self.sample_from` value specified during
@@ -196,7 +201,7 @@ class ChromatinFeaturesSampler(Sampler):
                  feature_coordinates,
                  unique_features,
                  chrs_test,
-                 n_validate_from_train,
+                 n_validate_from_train=5000,
                  bin_radius=100,
                  window_size=1001,
                  bin_feature_threshold=0.5,
@@ -436,7 +441,7 @@ class ChromatinFeaturesSampler(Sampler):
                 np.zeros((self.query_feature_data.n_features,)))
         else:
             retrieved_data = self.query_feature_data.get_feature_data(
-                chrom, bin_start, bin_end, strand)
+                chrom, bin_start, bin_end)
             return (retrieved_sequence, retrieved_data)
 
     def _get_rand_background(self):
@@ -530,10 +535,8 @@ class ChromatinFeaturesSampler(Sampler):
         if len(self._randcache_positives) == 0 or \
                 len(self._randcache_positives[self.mode]) == 0:
             self._build_randcache_positives(size=20000)
-
         sequences = np.zeros((sample_batch, self.window_size, 4))
         targets = np.zeros((sample_batch, self.n_features))
-
         for i in range(sample_batch):
             seq, feats = self._sample_positive()
             while seq.shape[0] == 0 or \

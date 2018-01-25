@@ -129,7 +129,6 @@ class ModelController(object):
 
         n_validation_batches = int(
             self.sampler.n_validation / self.batch_size)
-
         for _ in range(n_validation_batches):
             inputs, targets = self._get_batch()
             self._validation_data.append((inputs, targets))
@@ -148,7 +147,6 @@ class ModelController(object):
         With config files this shouldn't be an issue, except for the
         fact that we need to specify TYPES.
         """
-        print(use_optim)
         optim = self.OPTIMIZERS[use_optim]
         return optim(self.model.parameters(), **kwargs)
 
@@ -193,8 +191,8 @@ class ModelController(object):
 
         # TODO: gamma might need to be a parameter somewhere.
         # learning rate decay.
-        scheduler = StepLR(self.optimizer, step_size=15, gamma=8e-6)
-
+        scheduler = StepLR(self.optimizer, step_size=18, gamma=0.05)
+        #print(self.optimizer.param_groups)
         for q in self.plugin_queues.values():
             heapq.heapify(q)
 
@@ -203,16 +201,20 @@ class ModelController(object):
         report_stats_handle.write("Epoch\tTraining\tValidation\tAUC\n")
         for epoch in range(self.start_epoch, n_epochs):
             t_i = time()
+            scheduler.step()
             train_loss_avg = self.train(epoch)
             validate_loss_avg = self.validate(epoch)
-
+            #for param_group in self.optimizer.param_groups:
+            #    print(param_group["lr"])
+            #    print(param_group)
+            #    lr = param_group["initial_lr"]
+            #    param_group["lr"] = lr / (1 + epoch * 5e-2)
             self.stats["training_loss"].append(train_loss_avg)
             self.stats["validation_loss"].append(validate_loss_avg)
             auc_avg = self.stats["AUC"][-1]
             report_stats_handle.write("{0}\t{1}\t{2}\t{3}\n".format(
                 epoch, train_loss_avg, validate_loss_avg, auc_avg))
 
-            scheduler.step()
             self.call_plugins("epoch", epoch)
             t_f = time()
 
@@ -263,11 +265,13 @@ class ModelController(object):
         feature_aucs = []
         for index, feature_preds in enumerate(all_predictions.T):
             feature_targets = self._all_validation_targets[:, index]
+            #print(feature_targets)
             if len(np.unique(feature_targets)) > 1:
                 auc = roc_auc_score(feature_targets, feature_preds)
                 feature_aucs.append(auc)
         LOG.debug("[AUC] Average: {0}".format(np.average(feature_aucs)))
         print("[AUC] average: {0}".format(np.average(feature_aucs)))
+        #print(feature_aucs)
 
         self.stats["AUC"].append(np.average(feature_aucs))
         return avg_losses_validate.avg
@@ -295,7 +299,7 @@ class ModelController(object):
         self.sampler.set_mode("train")
         inputs, targets = self._get_batch()
         self.call_plugins("batch", batch_number, inputs, targets)
-        self._log_training_info(targets)
+        #self._log_training_info(targets)
         return self._pass_through_model_train(
             inputs, targets, batch_number, avg_losses)
 
@@ -355,6 +359,7 @@ class ModelController(object):
         self.call_plugins("update", batch_number, self.model)
 
         batch_time = time() - t_i
+        #print("_pass_through_model_train: {0}".format(batch_time))
 
         log_info = {"batch_time": batch_time,
                     "loss": avg_losses.val,

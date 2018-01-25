@@ -57,6 +57,7 @@ if __name__ == "__main__":
 
     optimizer = arguments["<optimizer>"]
     lr = float(arguments["<lr>"])
+    print("Learning rate: {0}".format(lr))
 
     paths = read_yaml_file(
         arguments["<paths-yml>"])
@@ -132,8 +133,11 @@ if __name__ == "__main__":
         **sampler_info["optional_args"])
 
     t_i_model = time()
+    #torch.manual_seed(42)
+    #torch.cuda.manual_seed_all(42)
 
     model = use_model.DeepSEA(sampler.window_size, sampler.n_features)
+    print(model)
 
     checkpoint_info = model_controller_info["checkpoint"]
     checkpoint_resume = checkpoint_info["resume"]
@@ -152,8 +156,11 @@ if __name__ == "__main__":
     # or at least allow for that option so that the user can specify more parameters.
     optimizer_args = {
         "use_optim": optimizer,
-        "lr": lr
+        "lr": lr,
+        "weight_decay": 1e-6,
+        "momentum": 0.9
     }
+    print(optimizer_args)
 
     t_f_model = time()
     log.debug(

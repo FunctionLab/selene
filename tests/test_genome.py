@@ -1,3 +1,4 @@
+import os
 import unittest
 
 import numpy as np
@@ -8,27 +9,65 @@ from proteus import Genome
 class TestGenome(unittest.TestCase):
 
     def setUp(self):
-        self.genome = Genome("data/test_files/fasta/small.fasta")
+        self.genome = Genome(
+            # path assumes tests are run from the top-level Github dir.
+            os.path.join(
+                ".", "data", "test_files", "fasta", "small.fasta"))
 
-    def test_chrs_attribute(self):
-        """Test that the chromosomes specified in a FASTA file are all stored
-        in `chrs`.
-        """
-        observed = self.genome.chrs
-        expected = ["chr1", "chr2", "chr3", "chr4"]
-        msg = "Genome `chrs` expected to be {0} but was {1}".format(
-            expected, observed)
-        self.assertEqual(observed, expected, msg)
+    ############################################
+    # Integration tests for `Genome` class methods
+    ############################################
 
-    def test_len_chrs_attribute(self):
-        """Test that the chromosome sequence lengths are correct.
+    def test_Genome_get_sequence_from_coords(self):
+        
+        query_chrom, query_start, query_end = ("chr1", 29200, 29570)
+        threshold = 0.50
+
+        observed_is_positive = query_features.is_positive(
+            query_chrom, query_start, query_end, threshold)
+
+        self.assertTrue(observed_is_positive)
+
+    def test_Genome_get_encoding_from_coords(self):
+        query_chrom, query_start, query_end = ("chr10", 63348553, 63349171)
+        threshold = 0.50
+        expected_get_feature_data = [0, 0, 1, 0, 0, 0]
+        observed_get_feature_data = query_features.get_feature_data(
+            query_chrom, query_start, query_end, threshold)
+
+        self.assertSequenceEqual(
+            observed_get_feature_data.tolist(), expected_get_feature_data)
+
+    def test_Genome_sequence_to_encoding(self):
+        query_chrom, query_start, query_end = ("chr10", 63348553, 63349171)
+        threshold = 0.50
+        expected_get_feature_data = [0, 0, 1, 0, 0, 0]
+        observed_get_feature_data = query_features.get_feature_data(
+            query_chrom, query_start, query_end, threshold)
+
+        self.assertSequenceEqual(
+            observed_get_feature_data.tolist(), expected_get_feature_data)
+
+    def test_Genome_encoding_to_sequence(self):
+        query_chrom, query_start, query_end = ("chr10", 63348553, 63349171)
+        threshold = 0.50
+        expected_get_feature_data = [0, 0, 1, 0, 0, 0]
+        observed_get_feature_data = query_features.get_feature_data(
+            query_chrom, query_start, query_end, threshold)
+
+        self.assertSequenceEqual(
+            observed_get_feature_data.tolist(), expected_get_feature_data)
+
+
+    def test_invalid_strand_input_ValueError(self):
+        """Test that an input of an invalid strand side throws a ValueError.
         """
-        observed = self.genome.len_chrs
-        expected = {"chr1": 100, "chr2": 100, "chr3": 10, "chr4": 50}
-        for chrom, length in observed.items():
-            msg = "{0} len expected to be {1} but was {2}".format(
-                chrom, expected[chrom], length)
-            self.assertEqual(length, expected[chrom], msg)
+        chrom = "chr2"
+        start, end = (27, 35)
+
+        with self.assertRaises(ValueError):
+            self.genome.get_sequence_from_coords(
+                chrom, start, end, '=')
 
     def test_get_sequence_unknown_base(self):
         """Test that unknown bases in genomic coordinates are returned
@@ -93,16 +132,6 @@ class TestGenome(unittest.TestCase):
 
         self.assertEqual(observed_fwd, expected_fwd, msg_fwd)
         self.assertEqual(observed_rev, expected_rev, msg_rev)
-
-    def test_invalid_strand_side(self):
-        """Test that an input of an invalid strand side throws a ValueError.
-        """
-        chrom = "chr2"
-        start, end = (27, 35)
-
-        with self.assertRaises(ValueError):
-            self.genome.get_sequence_from_coords(
-                chrom, start, end, '=')
 
     def test_sequence_to_encoding(self):
         """Test that we return the correct one-hot encoding for a standard
