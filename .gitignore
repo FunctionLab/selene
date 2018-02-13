@@ -3,6 +3,7 @@ data/
 output/
 *.out
 *.err
+*.sh
 *.tar
 
 # Mac
