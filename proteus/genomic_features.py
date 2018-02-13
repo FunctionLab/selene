@@ -66,11 +66,7 @@ def _get_feature_data(query_chrom, query_start, query_end,
                       threshold, feature_index_map, get_feature_rows):
     t_i = time()
     rows = None
-    if threshold < 0.50:
-        rows = get_feature_rows(query_chrom, query_start, query_end)
-    else:
-        #position = query_start + int((query_end - query_start) / 2)
-        rows = get_feature_rows(query_chrom, query_start, query_end)
+    rows = get_feature_rows(query_chrom, query_start, query_end)
 
     n_features = len(feature_index_map)
     if rows is None:
@@ -86,7 +82,6 @@ def _get_feature_data(query_chrom, query_start, query_end,
         encoding[index_start:index_end, index_feat] = 1
     encoding = np.sum(encoding, axis=0) / query_length
     encoding = (encoding > threshold) * 1
-    #print("_get_feature_data: {0}".format(time() - t_i))
     return encoding
 
 

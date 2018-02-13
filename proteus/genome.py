@@ -33,7 +33,6 @@ def _sequence_to_encoding(sequence, bases_encoding):
             encoding[index, bases_encoding[base]] = 1
         else:
             encoding[index, :] = 0.25
-    #print("_sequence_to_encoding: {0}".format(time() - t_i))
     return encoding
 
 def _encoding_to_sequence(encoding, bases_arr):
@@ -45,7 +44,6 @@ def _encoding_to_sequence(encoding, bases_arr):
             sequence.append('N')
         else:
             sequence.append(bases_arr[base_pos[0]])
-    #print("_enc_to_seq: {0}".format(time() - t_i))
     return "".join(sequence)
 
 def _get_sequence_from_coords(len_chrs, genome_sequence,
