@@ -76,6 +76,8 @@ if __name__ == "__main__":
         features_dir, features_files["genomic_features"])
     coords_only = os.path.join(
         features_dir, features_files["coords_only"])
+    print(coords_only)
+
     distinct_features = os.path.join(
         features_dir, features_files["distinct_features"])
 
