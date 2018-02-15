@@ -3,8 +3,8 @@ import unittest
 
 import numpy as np
 
-from proteus import Genome
-from proteus.genome import _sequence_to_encoding, _encoding_to_sequence, \
+from data_utils import Genome
+from data_utils.genome import _sequence_to_encoding, _encoding_to_sequence, \
     _get_sequence_from_coords
 
 

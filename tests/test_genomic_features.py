@@ -1,9 +1,9 @@
 import os
 import unittest
 
-from proteus import GenomicFeatures
-from proteus.genomic_features import _any_positive_rows, _is_positive_row, \
-    _get_feature_data
+from data_utils import GenomicFeatures
+from data_utils.genomic_features import _any_positive_rows, \
+    _is_positive_row, _get_feature_data
 
 
 class TestGenomicFeatures(unittest.TestCase):
