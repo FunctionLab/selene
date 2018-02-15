@@ -135,8 +135,8 @@ if __name__ == "__main__":
         **sampler_info["optional_args"])
 
     t_i_model = time()
-    #torch.manual_seed(42)
-    #torch.cuda.manual_seed_all(42)
+    torch.manual_seed(1337)
+    torch.cuda.manual_seed_all(1337)
 
     model = use_model.DeepSEA(sampler.window_size, sampler.n_features)
     print(model)
