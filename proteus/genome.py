@@ -3,12 +3,85 @@ It supports retrieving parts of the sequence and converting these parts
 into their one hot encodings.
 """
 import logging
+from time import time
 
 import numpy as np
 from pyfaidx import Fasta
 
 
 LOG = logging.getLogger("deepsea")
+
+
+def _sequence_to_encoding(sequence, bases_encoding):
+    """Converts an input sequence to its one hot encoding.
+
+    Parameters
+    ----------
+    sequence : str
+        The input sequence of length N.
+
+    Returns
+    -------
+    numpy.ndarray, dtype=bool
+        The N-by-4 encoding of the sequence.
+    """
+    t_i = time()
+    encoding = np.zeros((len(sequence), 4))
+    sequence = str.upper(sequence)
+    for index, base in enumerate(sequence):
+        if base in bases_encoding:
+            encoding[index, bases_encoding[base]] = 1
+        else:
+            encoding[index, :] = 0.25
+    return encoding
+
+def _encoding_to_sequence(encoding, bases_arr):
+    t_i = time()
+    sequence = []
+    for row in encoding:
+        base_pos = np.where(row == 1)[0]
+        if len(base_pos) != 1:
+            sequence.append('N')
+        else:
+            sequence.append(bases_arr[base_pos[0]])
+    return "".join(sequence)
+
+def _get_sequence_from_coords(len_chrs, genome_sequence,
+                             chrom, start, end, strand='+'):
+    """Gets the genomic sequence given the chromosome, sequence start,
+    sequence end, and strand side.
+
+    Parameters
+    ----------
+    chrom : str
+        e.g. "chr1".
+    start : int
+    end : int
+    strand : {'+', '-'}, optional
+        Default is '+'.
+
+    Returns
+    -------
+    str
+        The genomic sequence.
+
+    Raises
+    ------
+    ValueError
+        If the input char to `strand` is not one of the specified choices.
+    """
+    if start > len_chrs[chrom] or end > len_chrs[chrom] \
+            or start < 0:
+        return ""
+
+    if strand == '+':
+        return genome_sequence(chrom, start, end, strand)
+    elif strand == '-':
+        return genome_sequence(chrom, start, end, strand)
+    else:
+        raise ValueError(
+            "Strand must be one of '+' or '-'. Input was {0}".format(
+                strand))
 
 
 class Genome(object):
@@ -48,6 +121,12 @@ class Genome(object):
             len_chrs[chrom] = len(self.genome[chrom])
         return len_chrs
 
+    def _genome_sequence(self, chrom, start, end, strand='+'):
+        if strand == '+':
+            return self.genome[chrom][start:end].seq
+        else:
+            return self.genome[chrom][start:end].reverse.complement.seq
+
     def get_sequence_from_coords(self, chrom, start, end, strand='+'):
         """Gets the genomic sequence given the chromosome, sequence start,
         sequence end, and strand side.
@@ -71,18 +150,8 @@ class Genome(object):
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        if start > len(self.genome[chrom]) or end > len(self.genome[chrom]) \
-                or start < 0:
-            return ""
-
-        if strand == '+':
-            return self.genome[chrom][start:end].seq
-        elif strand == '-':
-            return self.genome[chrom][start:end].reverse.complement.seq
-        else:
-            raise ValueError(
-                "Strand must be one of '+' or '-'. Input was {0}".format(
-                    strand))
+        return _get_sequence_from_coords(
+            self.len_chrs, self._genome_sequence, chrom, start, end, strand)
 
     def get_encoding_from_coords(self, chrom, start, end, strand='+'):
         """Gets the genomic sequence given the chromosome, sequence start,
@@ -125,21 +194,7 @@ class Genome(object):
         numpy.ndarray, dtype=bool
             The N-by-4 encoding of the sequence.
         """
-        encoding = np.zeros((len(sequence), 4))
-        sequence = str.upper(sequence)
-        for index, base in enumerate(sequence):
-            if base in self.BASES_DICT:
-                encoding[index, self.BASES_DICT[base]] = 1
-            else:
-                encoding[index, :] = 0.25
-        return encoding
+        return _sequence_to_encoding(sequence, self.BASES_DICT)
 
     def encoding_to_sequence(self, encoding):
-        sequence = []
-        for row in encoding:
-            base_pos = np.where(row == 1)[0]
-            if len(base_pos) != 1:
-                sequence.append('N')
-            else:
-                sequence.append(self.BASES_ARR[base_pos[0]])
-        return "".join(sequence)
+        return _encoding_to_sequence(encoding, self.BASES_ARR)

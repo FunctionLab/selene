@@ -16,8 +16,73 @@ Additionally, the column names should be omitted from the file itself
 (i.e. there is no header and the first line in the file is the first
 row of genome coordinates for a feature).
 """
+from time import time
+
 import numpy as np
 import tabix
+
+
+def _any_positive_rows(rows, query_start, query_end, threshold):
+    if rows is None:
+        return False
+    for row in rows:  # features within [start, end)
+        is_positive = _is_positive_row(
+            query_start, query_end, int(row[1]), int(row[2]), threshold)
+        if is_positive:
+            return True
+    return False
+
+def _is_positive_row(query_start, query_end,
+                     feat_start, feat_end, threshold):
+    """Helper function to determine whether a single row from a successful
+    query is considered a positive example.
+
+    Parameters
+    ----------
+    query_start : int
+    query_end : int
+    feat_start : int
+    feat_end : int
+    threshold : [0.0, 1.0], float
+        The threshold specifies the proportion of
+        the [`start`, `end`) window that needs to be covered by
+        at least one feature for the example to be considered
+        positive.
+    Returns
+    -------
+    bool
+        True if this row meets the criterion for a positive example,
+        False otherwise.
+    """
+    overlap_start = max(feat_start, query_start)
+    overlap_end = min(feat_end, query_end)
+    min_overlap_needed = (query_end - query_start) * threshold
+    if overlap_end - overlap_start > min_overlap_needed:
+        return True
+    else:
+        return False
+
+def _get_feature_data(query_chrom, query_start, query_end,
+                      threshold, feature_index_map, get_feature_rows):
+    t_i = time()
+    rows = None
+    rows = get_feature_rows(query_chrom, query_start, query_end)
+
+    n_features = len(feature_index_map)
+    if rows is None:
+        return np.zeros((n_features,))
+    query_length = query_end - query_start
+    encoding = np.zeros((query_length, n_features))
+    for row in rows:
+        feat_start = int(row[1])
+        feat_end = int(row[2])
+        index_start = max(0, feat_start - query_start)
+        index_end = min(feat_end - query_start, query_length)
+        index_feat = feature_index_map[row[4]]
+        encoding[index_start:index_end, index_feat] = 1
+    encoding = np.sum(encoding, axis=0) / query_length
+    encoding = (encoding > threshold) * 1
+    return encoding
 
 
 class GenomicFeatures(object):
@@ -50,9 +115,26 @@ class GenomicFeatures(object):
         self.data = tabix.open(dataset)
 
         self.n_features = len(features)
+        print("GenomicFeatures: {0}".format(self.n_features))
+
+        feature_set = set()
+        for feat in features:
+            if feat not in feature_set:
+                feature_set.add(feat)
+            else:
+                print(feat)
+        print(len(feature_set))
+
+
         self.feature_index_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
         self.index_feature_map = dict(list(enumerate(features)))
+
+    def _query_tabix(self, chrom, start, end):
+        try:
+            return self.data.query(chrom, start, end)
+        except tabix.TabixError:
+            return None
 
     def is_positive(self, chrom, start, end, threshold=0.50):
         """Determines whether the (chrom, start, end) queried
@@ -81,49 +163,10 @@ class GenomicFeatures(object):
             the error was the result of no genomic features being present
             in the queried region and return False.
         """
-        try:
-            rows = self.data.query(chrom, start, end)
-            for row in rows:  # features within [start, end)
-                is_positive = self._is_positive_single(
-                    start, end,
-                    int(row[1]), int(row[2]), threshold)
-                if is_positive:
-                    return True
-            return False
-        except tabix.TabixError:
-            return False
+        rows = self._query_tabix(chrom, start, end)
+        return _any_positive_rows(rows, start, end, threshold)
 
-    def _is_positive_single(self, query_start, query_end,
-                            feat_start, feat_end, threshold):
-        """Helper function to determine whether a single row from a successful
-        query is considered a positive example.
-
-        Parameters
-        ----------
-        query_start : int
-        query_end : int
-        feat_start : int
-        feat_end : int
-        threshold : [0.0, 1.0], float
-            The threshold specifies the proportion of
-            the [`start`, `end`) window that needs to be covered by
-            at least one feature for the example to be considered
-            positive.
-        Returns
-        -------
-        bool
-            True if this row meets the criterion for a positive example,
-            False otherwise.
-        """
-        overlap_start = max(feat_start, query_start)
-        overlap_end = min(feat_end, query_end)
-        min_overlap_needed = (query_end - query_start) * threshold
-        if overlap_end - overlap_start > min_overlap_needed:
-            return True
-        return False
-
-    def get_feature_data(self, chrom, position, start, end,
-                         strand='+', threshold=0.50):
+    def get_feature_data(self, chrom, start, end, threshold=0.50):
         """For a sequence of length L = `end` - `start`, return the features'
         one hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will
@@ -136,8 +179,6 @@ class GenomicFeatures(object):
             e.g. "chr1".
         start : int
         end : int
-        strand : {'+', '-'}, optional
-            Default is '+'.
         threshold : [0.0, 1.0], float, optional
             Default is 0.50. The threshold specifies the proportion of
             the [`start`, `end`) window that needs to be covered by
@@ -151,43 +192,7 @@ class GenomicFeatures(object):
             Note that if we catch a tabix.TabixError exception, we assume
             the error was the result of no genomic features being present
             in the queried region and return a numpy.ndarray of all 0s.
-
-        Raises
-        ------
-        ValueError
-            If the input char to `strand` is not one of the specified choices.
         """
-        if strand not in set({'+', '-'}):
-            raise ValueError(
-                "Strand must be one of '+' or '-'. Input was {0}".format(
-                    strand))
-        try:
-            rows = None
-            if threshold < 0.50:
-                rows = self.data.query(chrom, start, end)
-            else:
-                rows = self.data.query(chrom, position, position + 1)
-
-            encoding = np.zeros((end - start, self.n_features))
-
-            if strand == '+':
-                for row in rows:
-                    feat_start = int(row[1])
-                    feat_end = int(row[2])
-                    index_start = max(0, feat_start - start)
-                    index_end = min(feat_end - start, end - start)
-                    index_feat = self.feature_index_map[row[4]]
-                    encoding[index_start:index_end, index_feat] = 1
-            else:
-                for row in rows:
-                    feat_start = int(row[1])
-                    feat_end = int(row[2])
-                    index_start = max(0, end - feat_end)
-                    index_end = min(end - feat_start, end - start)
-                    index_feat = self.feature_index_map[row[4]]
-                    encoding[index_start:index_end, index_feat] = 1
-            encoding = np.sum(encoding, axis=0) / (end - start)
-            encoding = (encoding > threshold) * 1
-            return encoding
-        except tabix.TabixError as e:
-            return np.zeros((self.n_features,))
+        return _get_feature_data(
+            chrom, start, end, threshold,
+            self.feature_index_map, self._query_tabix)

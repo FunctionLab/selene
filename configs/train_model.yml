@@ -6,18 +6,18 @@ sampler:
     holdout_test:
         - chr8
         - chr9
-    n_total_validate: 5000
+    n_total_validate: 8000
     optional_args:
         bin_radius: 100
         window_size: 1001
         bin_feature_threshold: 0.5
-        random_seed: 436
+        random_seed: 42 #127
         mode: train
         sample_from: positive
 model_controller:
-    batch_size: 128
-    n_epochs: 500
-    n_train_batch_per_epoch: 2000
+    batch_size: 16
+    n_epochs: 1000
+    n_train_batch_per_epoch: 8000
     optional_args:
         use_cuda: True
         data_parallel: False

@@ -10,6 +10,7 @@ from time import time
 
 import numpy as np
 import pandas as pd
+from pybedtools import BedTool
 
 from proteus import Genome
 from proteus import GenomicFeatures
@@ -68,6 +69,8 @@ class Sampler(object):
         n_features : int
             Number of unique features in the dataset.
         query_feature_data : GenomicFeatures
+        sample_from : {"random", "positive", "proportion"}
+        sample_positive_prop : [0.0, 1.0]
 
         Raises
         ------
@@ -87,8 +90,10 @@ class Sampler(object):
         np.random.seed(random_seed)
         random.seed(random_seed + 1)
 
-        self._features = pd.read_csv(unique_features, names=["feature"])
-        self._features = self._features["feature"].values.tolist()
+        self._features = []
+        with open(unique_features, "r") as file_handle:
+            for line in file_handle:
+                self._features.append(line.strip())
         self.n_features = len(self._features)
 
         self.query_feature_data = GenomicFeatures(
@@ -113,13 +118,16 @@ class Sampler(object):
         """
         return self.query_feature_data.index_feature_map[feature_index]
 
+    def get_sequence_from_encoding(self, encoding):
+        return self.genome.encoding_to_sequence(encoding)
+
     def sample(self, sample_batch=1):
         """Sample based on the `self.sample_from` value specified during
         initialization of the Sampler object.
 
         Returns
         -------
-        # TODO: change this if we keep the `sample_batch` concept.
+        @TODO: change this if we keep the `sample_batch` concept.
         tuple(np.ndarray, np.ndarray)
             Returns the sequence encoding and its corresponding feature labels.
         """
@@ -151,8 +159,8 @@ class Sampler(object):
         -------
         tuple(np.ndarray, np.ndarray)
             Returns the sequence encoding and an empty array of feature labels
-            (since we are sampling a negative example, there should be no
-            features present).
+            (since we are sampling a negative example, we expect no
+            features to be present).
         """
         pass
 
@@ -187,21 +195,20 @@ class Sampler(object):
 
 class ChromatinFeaturesSampler(Sampler):
 
-    COORDS_EXPECTED_COLS = (
-        "chr", "start", "end")
-    MODES = ("all", "train", "validate", "test")
+    MODES = ("train", "validate", "test")
 
-    def __init__(self, genome,
+    def __init__(self,
+                 genome,
                  query_feature_data,
                  feature_coordinates,
                  unique_features,
                  chrs_test,
-                 n_validate_from_train,
-                 bin_radius=100,
+                 n_validate_from_train=8000,
                  window_size=1001,
+                 bin_radius=100,
                  bin_feature_threshold=0.5,
-                 random_seed=436,
                  mode="train",
+                 random_seed=436,
                  sample_from="random",
                  sample_positive_prop=0.5):
         """The positive examples we focus on in ChromatinFeaturesSampler are
@@ -214,44 +221,44 @@ class ChromatinFeaturesSampler(Sampler):
             Path to a .bed file that contains the genomic
             coordinates for the features in our dataset. File has the
             columns [chr, start (0-based), end] in order.
-            Used for sampling positive examples - note that we then query
-            `query_feature_data` to get the necessary feature information.
+            Used for sampling positive examples.
         chrs_test : list[str]
             Specify chromosome(s) to hold out as the test dataset.
-            It is expected that the user decides beforehand that the
+            It is expected that the user determines beforehand that the
             proportion of positive examples in the held-out chromosomes
             is appropriate relative to the training and validation datasets.
-            e.g. 15-85 or 20-80 for test-train split.
         n_validate_from_train : int
-            The number of examples to hold out from the training set. These
-            examples are our validation dataset and are used to evaluate
-            the model after each training epoch.
+            Default is 8000. The number of examples to hold out from the
+            training set. These examples are our validation dataset and
+            are used to evaluate the model at the end of each training epoch.
+        window_size : int, optional
+            Default is 1001. The input sequence length.
+            This should be an odd number to accommodate the fact that
+            the bin sequence length will be an odd number.
+            i.e. default results in 400 bp padding on either side of a
+            201 bp bin.
         bin_radius : int, optional
             Default is 100. The bin is composed of
                 ([sequence (len radius)] +
                  position (len 1) + [sequence (len radius)])
             i.e. bin size of 201 bp.
-        window_size : int, optional
-            Default is 1001. The input sequence length.
-            This should be an odd number to accommodate the fact that
-            the bin sequence length will be an odd number.
-            i.e. defaults result in 400 bp padding on either side of a
-            201 bp bin.
         bin_feature_threshold : float, optional
             Default is 0.50. The minimum length of a chromatin feature peak
             detected within a bin must be greater than or equal to
             `bin_feature_threshold` * the bin size.
-        mode : {"all", "train", "validate", "test"}, optional
+        mode : {"train", "validate", "test"}, optional
             Default is "train".
 
         Attributes
         ----------
         radius : int
+        window_size : int
         padding : int
             The amount of padding is identical on both sides
-        window_size : int
         bin_feature_threshold : float
-        mode : {"all", "train", "validate", "test"}
+        chrs_test : list(str), e.g. ["chr8", "chr9"]
+        n_validation : int
+        mode : {"train", "validate", "test"}
 
         Raises
         ------
@@ -298,10 +305,10 @@ class ChromatinFeaturesSampler(Sampler):
 
         self.bin_feature_threshold = bin_feature_threshold
 
-        self._load_feature_coordinates(feature_coordinates)
-
         self.chrs_test = chrs_test
         self.n_validation = n_validate_from_train
+
+        self._load_feature_coordinates(feature_coordinates)
         self._partition_dataset()
 
         # used during the negative sampling step - get a random chromosome
@@ -329,16 +336,33 @@ class ChromatinFeaturesSampler(Sampler):
         information.
         """
         t_i = time()
-        self._coords_df = pd.read_table(
+        tmp_coords_df = pd.read_table(
             feature_coordinates_file,
             header=None,
-            names=self.COORDS_EXPECTED_COLS)
-        self._coords_df["peak_length"] = self._coords_df["end"].sub(
+            names=("chrom", "start", "end"))
+
+        holdout_chrs_test = np.asarray(
+            tmp_coords_df["chrom"].isin(self.chrs_test))
+        not_test_indices = list(np.where(~holdout_chrs_test)[0])
+
+        self._validation_indices = list(
+            np.random.choice(
+                not_test_indices, size=self.n_validation, replace=False))
+
+        validation_rows = tmp_coords_df.index.isin(self._validation_indices)
+        self._validation_df = tmp_coords_df[validation_rows]
+
+        tmp_coords_df = tmp_coords_df[~validation_rows]
+
+        coords_bedtool = BedTool().from_dataframe(tmp_coords_df)
+
+        merged_intervals = coords_bedtool.merge()
+
+        self._coords_df = merged_intervals.to_dataframe()
+
+        self._coords_df["interval_length"] = self._coords_df["end"].sub(
             self._coords_df["start"], axis=0)
-        bin_size = self.radius * 2 + 1
-        min_feature_size = bin_size * self.bin_feature_threshold
-        self._coords_df = self._coords_df[
-            self._coords_df["peak_length"] >= min_feature_size]
+
         t_f = time()
         LOG.debug(
             ("Loaded genome coordinates for each feature "
@@ -350,40 +374,16 @@ class ChromatinFeaturesSampler(Sampler):
         sample in the genomic features coordinates dataframe.
         """
         t_i = time()
-        features_chr_data = self._coords_df["chr"]
+        features_chr_data = self._coords_df["chrom"]
         holdout_chrs_test = np.asarray(
             features_chr_data.isin(self.chrs_test))
-        self._all_indices = list(features_chr_data.index)
 
-        not_test_indices = list(np.where(~holdout_chrs_test)[0])
-        self._validation_indices = list(np.random.choice(
-            not_test_indices, size=self.n_validation, replace=False))
-        self._training_indices = list(
-            set(not_test_indices) - set(self._validation_indices))
+        self._training_indices = list(np.where(~holdout_chrs_test)[0])
         self._test_indices = list(np.where(holdout_chrs_test)[0])
         t_f = time()
         LOG.debug(
             ("Partitioned the dataset into train/validate & test sets: "
              "{0} s").format(t_f - t_i))
-
-    def _create_validation_set(self):
-        """Used in `__init__`.
-        """
-        self.sampler.set_mode("validate")
-        self._validation_data = []
-        validation_targets = []
-
-        n_validation_batches = int(n_validation / self.batch_size)
-
-        for _ in range(n_validation_batches):
-            inputs, targets = self._get_batch()
-            self._validation_data.append((inputs, targets))
-            validation_targets.append(targets)
-
-        self._all_validation_targets = np.vstack(validation_targets)
-        LOG.info(("Loaded {0} validation examples ({1} validation batches) "
-                  "to evaluate after each training epoch.").format(
-                      n_validation, len(self._validation_data)))
 
     def set_mode(self, mode):
         """Determines what positive examples are available to sample depending
@@ -391,8 +391,7 @@ class ChromatinFeaturesSampler(Sampler):
 
         Parameters
         ----------
-        mode : {"all", "train", "validate", "test"}
-            - all: Use all examples in the genomic features dataset.
+        mode : {"train", "validate", "test"}
             - train: Use all examples except those in the test and validation
                      holdout sets.
             - test: Use only the examples in the test holdout chromosome set.
@@ -455,7 +454,7 @@ class ChromatinFeaturesSampler(Sampler):
                 np.zeros((self.query_feature_data.n_features,)))
         else:
             retrieved_data = self.query_feature_data.get_feature_data(
-                chrom, position, bin_start, bin_end, strand)
+                chrom, bin_start, bin_end)
             return (retrieved_sequence, retrieved_data)
 
     def _get_rand_background(self):
@@ -522,13 +521,16 @@ class ChromatinFeaturesSampler(Sampler):
                 len(self._randcache_positives[self.mode]) == 0:
             self._build_randcache_positives(size=20000)
         randindex = self._randcache_positives[self.mode].pop()
-        row = self._coords_df.iloc[randindex]
-        peak_length = row["peak_length"]
-        chrom = row["chr"]
-        rand_in_peak = random.uniform(0, 1) * peak_length
-        position = int(row["start"] + rand_in_peak)
-        # we have verified that there is no strand information
-        # in any of our data
+        row = None
+        if self.mode == "validate":
+            row = self._validation_df.ix[randindex]
+        else:
+            row = self._coords_df.iloc[randindex]
+
+        interval_length = row["end"] - row["start"]
+        chrom = row["chrom"]
+        rand_in_interval = random.uniform(0, 1) * interval_length
+        position = int(row["start"] + rand_in_interval)
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         seq, feats = self._retrieve(chrom, position, strand,
                                     is_positive=True)
@@ -549,17 +551,18 @@ class ChromatinFeaturesSampler(Sampler):
         if len(self._randcache_positives) == 0 or \
                 len(self._randcache_positives[self.mode]) == 0:
             self._build_randcache_positives(size=20000)
-
         sequences = np.zeros((sample_batch, self.window_size, 4))
         targets = np.zeros((sample_batch, self.n_features))
-
         for i in range(sample_batch):
             seq, feats = self._sample_positive()
             while seq.shape[0] == 0 or \
-                    np.sum(seq) / float(seq.shape[0]) < 0.65:
+                    np.sum(seq) / float(seq.shape[0]) < 0.70 or \
+                    np.sum(feats) == 0:
                 if seq.shape[0] == 0:
                     LOG.debug(
                         "Sample positive was out of bounds. Trying again.")
+                elif np.sum(feats) == 0:
+                    LOG.debug("Sampled a negative example. Trying again.")
                 else:
                     LOG.debug(
                         ("Too many unknowns in the retrieved sequence. "
@@ -609,26 +612,29 @@ class ChromatinFeaturesSampler(Sampler):
 
     def _build_randcache_positives(self, size=10000):
         t_i = time()
-        # select examples from all possible examples in the dataset
-        if "all" not in self._randcache_positives \
-                or len(self._randcache_positives["all"]) == 0:
-            randpos_all = list(np.random.choice(self._all_indices, size=size))
-            self._randcache_positives["all"] = randpos_all
-
         # select examples from only the training set
         if "train" not in self._randcache_positives \
                 or len(self._randcache_positives["train"]) == 0:
+            weights = \
+                self._coords_df.ix[self._training_indices]["interval_length"] \
+                    .tolist()
+            weights = np.array(weights) / np.sum(weights)
             randpos_train = list(np.random.choice(
-                self._training_indices, size=size))
+                self._training_indices, size=size, p=weights))
             self._randcache_positives["train"] = randpos_train
 
         # select examples from only the test set
         if "test" not in self._randcache_positives \
                 or len(self._randcache_positives["test"]) == 0:
+            weights = \
+                self._coords_df.ix[self._test_indices]["interval_length"] \
+                    .tolist()
+            weights = np.array(weights) / np.sum(weights)
             randpos_test = list(np.random.choice(
-                self._test_indices, size=int(size / 2)))
+                self._test_indices, size=int(size / 2), p=weights))
             self._randcache_positives["test"] = randpos_test
 
+        # select examples from only the validation set
         if "validate" not in self._randcache_positives \
                 or len(self._randcache_positives["validate"]) == 0:
             validation_shuffled = random.sample(
