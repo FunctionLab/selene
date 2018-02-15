@@ -1,9 +1,7 @@
-import os
 import unittest
 
 import numpy as np
 
-from data_utils import Genome
 from data_utils.genome import _sequence_to_encoding, _encoding_to_sequence, \
     _get_sequence_from_coords
 
@@ -20,11 +18,6 @@ class TestGenome(unittest.TestCase):
             "chr3": 64,
             "chr4": 8
         }
-
-        self.genome = Genome(
-            # path assumes tests are run from the top-level Github dir.
-            os.path.join(
-                ".", "data", "test_files", "fasta", "small.fasta"))
 
     def _genome_sequence(self, chrom, start, end, strand):
         base_sequence_pos = "AGCTTCCA"
