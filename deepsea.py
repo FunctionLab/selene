@@ -1,5 +1,7 @@
 """DeepSEA architecture (Zhou & Troyanskaya, 2015).
 """
+import math
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -29,16 +31,19 @@ class DeepSEA(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool1d(
                 kernel_size=pool_kernel_size, stride=pool_kernel_size),
+            nn.BatchNorm1d(320),
             nn.Dropout(p=0.2),
 
             nn.Conv1d(320, 480, kernel_size=conv_kernel_size),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(
                 kernel_size=pool_kernel_size, stride=pool_kernel_size),
+            nn.BatchNorm1d(480),
             nn.Dropout(p=0.2),
 
             nn.Conv1d(480, 960, kernel_size=conv_kernel_size),
             nn.ReLU(inplace=True),
+            nn.BatchNorm1d(960),
             nn.Dropout(p=0.5))
 
         reduce_by = conv_kernel_size - 1
@@ -52,25 +57,39 @@ class DeepSEA(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(960 * self.n_channels, n_genomic_features),
             nn.ReLU(inplace=True),
+            nn.BatchNorm1d(n_genomic_features),
             nn.Linear(n_genomic_features, n_genomic_features),
             nn.Sigmoid())
 
         self._weight_initialization()
 
     def _weight_initialization(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv1d) or isinstance(m, nn.Linear):
-                m.weight.data.normal_(0, 0.05)
+        self.convs = []
+        self.fcs = []
+        for m in self.conv_net.modules():
+            if isinstance(m, nn.Conv1d):
+                n = m.kernel_size[0] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+                self.convs.append(m.weight.data)
+            elif isinstance(m, nn.BatchNorm1d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+        for m in self.classifier.modules():
+            if isinstance(m, nn.Linear):
+                self.fcs.append(m.weight.data)
+                m.bias.data.zero_()
 
     def forward(self, x):
         """Forward propagation of a batch.
         """
+        """
         for layer in self.conv_net.children():
             if isinstance(layer, nn.Conv1d):
-                layer.weight.data.renorm_(2, 1, 0.9)
+                layer.weight.data.renorm_(2, 0, 0.9)
         for layer in self.classifier.children():
             if isinstance(layer, nn.Linear):
-                layer.weight.data.renorm_(2, 1, 0.9)
+                layer.weight.data.renorm_(2, 0, 0.9)
+        """
         out = self.conv_net(x)
         reshape_out = out.view(out.size(0), 960 * self.n_channels)
         predict = self.classifier(reshape_out)
@@ -78,6 +97,9 @@ class DeepSEA(nn.Module):
 
 def criterion():
     return nn.BCELoss()
+
+def optimizer():
+    return torch.optim.SGD, {"weight_decay": 1e-6, "momentum": 0.9}
 
 def deepsea(window_size, n_genomic_features, filepath=None):
     """Initializes a new (untrained) DeepSEA model or loads
