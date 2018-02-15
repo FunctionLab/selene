@@ -25,7 +25,6 @@ def _sequence_to_encoding(sequence, bases_encoding):
     numpy.ndarray, dtype=bool
         The N-by-4 encoding of the sequence.
     """
-    t_i = time()
     encoding = np.zeros((len(sequence), 4))
     sequence = str.upper(sequence)
     for index, base in enumerate(sequence):
@@ -35,19 +34,26 @@ def _sequence_to_encoding(sequence, bases_encoding):
             encoding[index, :] = 0.25
     return encoding
 
+def _get_base_index(encoding_row):
+    for index, val in enumerate(encoding_row):
+        if val == 0.25:
+            return -1
+        elif val == 1:
+            return index
+    return -1
+
 def _encoding_to_sequence(encoding, bases_arr):
-    t_i = time()
     sequence = []
     for row in encoding:
-        base_pos = np.where(row == 1)[0]
-        if len(base_pos) != 1:
+        base_pos = _get_base_index(row)
+        if base_pos == -1:
             sequence.append('N')
         else:
-            sequence.append(bases_arr[base_pos[0]])
+            sequence.append(bases_arr[base_pos])
     return "".join(sequence)
 
 def _get_sequence_from_coords(len_chrs, genome_sequence,
-                             chrom, start, end, strand='+'):
+                              chrom, start, end, strand='+'):
     """Gets the genomic sequence given the chromosome, sequence start,
     sequence end, and strand side.
 
@@ -191,10 +197,21 @@ class Genome(object):
 
         Returns
         -------
-        numpy.ndarray, dtype=bool
+        numpy.ndarray, dtype=float64
             The N-by-4 encoding of the sequence.
         """
         return _sequence_to_encoding(sequence, self.BASES_DICT)
 
     def encoding_to_sequence(self, encoding):
+        """Converts an input encoding to its DNA sequence.
+
+        Parameters
+        ----------
+        encoding : numpy.ndarray, dtype=float64
+            The N-by-4 encoding of the sequence
+
+        Returns
+        -------
+        str
+        """
         return _encoding_to_sequence(encoding, self.BASES_ARR)

@@ -1,8 +1,6 @@
 import os
 import unittest
 
-import numpy as np
-
 from proteus import GenomicFeatures
 from proteus.genomic_features import _any_positive_rows, _is_positive_row, \
     _get_feature_data
@@ -54,7 +52,6 @@ class TestGenomicFeatures(unittest.TestCase):
         else:
             return []
 
-
     ############################################
     # Correctness tests for `_is_positive_row`
     ############################################
@@ -81,7 +78,7 @@ class TestGenomicFeatures(unittest.TestCase):
         threshold = 0.80
         self.assertTrue(
             _is_positive_row(
-                query_start, query_end, query_start, query_end, threshold))
+                query_start, query_end, feat_start, feat_end, threshold))
 
     ############################################
     # Correctness tests for `_any_positive_rows`
@@ -215,6 +212,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
         self.assertSequenceEqual(
             observed_get_feature_data.tolist(), expected_get_feature_data)
+
 
 if __name__ == "__main__":
     unittest.main()
