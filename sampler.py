@@ -12,8 +12,8 @@ import numpy as np
 import pandas as pd
 from pybedtools import BedTool
 
-from proteus import Genome
-from proteus import GenomicFeatures
+from data_utils import Genome
+from data_utils import GenomicFeatures
 
 
 LOG = logging.getLogger("deepsea")
