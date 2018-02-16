@@ -183,8 +183,8 @@ class TestGenomicFeatures(unittest.TestCase):
     def test_GenomicFeatures_query_is_positive(self):
         # path assumes tests are run from the top-level Github dir.
         query_features = GenomicFeatures(
-            os.path.join(".", "data",
-                         "test_files", "ChIP_CTCF_6feats",
+            os.path.join(".", "tests",
+                         "files", "ChIP_CTCF_6feats",
                          "sorted_aggregate.bed.gz"),
             self.features)
 
@@ -199,8 +199,8 @@ class TestGenomicFeatures(unittest.TestCase):
     def test_GenomicFeatures_query_get_feature_data(self):
         # path assumes tests are run from the top-level Github dir.
         query_features = GenomicFeatures(
-            os.path.join(".", "data",
-                         "test_files", "ChIP_CTCF_6feats",
+            os.path.join(".", "tests",
+                         "files", "ChIP_CTCF_6feats",
                          "sorted_aggregate.bed.gz"),
             self.features)
 
