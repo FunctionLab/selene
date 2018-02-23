@@ -323,7 +323,7 @@ class ChromatinFeaturesSampler(Sampler):
         # the [start, end) of the genomic coordinates around which we'd
         # define our bin and window.
         self._randcache_positives = {}
-        self._build_randcache_positives(size=5000)
+        self._build_randcache_positives()
 
         self.mode = None
         self.set_mode(mode)  # set mode in this function
@@ -363,6 +363,10 @@ class ChromatinFeaturesSampler(Sampler):
         self._coords_df["interval_length"] = self._coords_df["end"].sub(
             self._coords_df["start"], axis=0)
 
+        min_feature_size = (self.radius * 2 + 1) * self.bin_feature_threshold
+        self._coords_df = self._coords_df[
+            self._coords_df["interval_length"] >= min_feature_size]
+
         t_f = time()
         LOG.debug(
             ("Loaded genome coordinates for each feature "
@@ -380,6 +384,31 @@ class ChromatinFeaturesSampler(Sampler):
 
         self._training_indices = list(np.where(~holdout_chrs_test)[0])
         self._test_indices = list(np.where(holdout_chrs_test)[0])
+
+        self._training_weights = \
+            self._coords_df.ix[self._training_indices]["interval_length"] \
+                .tolist()
+        remove_indices = np.argwhere(np.isnan(self._training_weights))
+        self._training_indices = [
+            ti for i, ti in enumerate(self._training_indices) if i not in remove_indices]
+
+        self._training_weights = [
+            tw for i, tw in enumerate(self._training_weights) if i not in remove_indices]
+        self._training_weights = \
+            np.array(self._training_weights) / float(np.sum(self._training_weights))
+
+        self._test_weights = \
+            self._coords_df.ix[self._test_indices]["interval_length"] \
+                .tolist()
+        remove_indices = np.argwhere(np.isnan(self._test_weights))
+        self._test_indices = [
+            ti for i, ti in enumerate(self._test_indices) if i not in remove_indices]
+
+        self._test_weights = [
+            tw for i, tw in enumerate(self._test_weights) if i not in remove_indices]
+        self._test_weights = \
+            np.array(self._test_weights) / float(np.sum(self._test_weights))
+
         t_f = time()
         LOG.debug(
             ("Partitioned the dataset into train/validate & test sets: "
@@ -443,19 +472,18 @@ class ChromatinFeaturesSampler(Sampler):
         """
         bin_start = position - self.radius
         bin_end = position + self.radius + 1
+        retrieved_targets = self.query_feature_data.get_feature_data(
+            chrom, bin_start, bin_end)
+
+        if is_positive and np.sum(retrieved_targets) == 0:
+            return (np.zeros((0, 4)), retrieved_targets)
+
         window_start = bin_start - self.padding
         window_end = bin_end + self.padding
         retrieved_sequence = \
             self.genome.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)
-        if not is_positive or retrieved_sequence.shape[0] == 0:
-            return (
-                retrieved_sequence,
-                np.zeros((self.query_feature_data.n_features,)))
-        else:
-            retrieved_data = self.query_feature_data.get_feature_data(
-                chrom, bin_start, bin_end)
-            return (retrieved_sequence, retrieved_data)
+        return (retrieved_sequence, retrieved_targets)
 
     def _get_rand_background(self):
         if len(self._randcache_background) == 0 or \
@@ -519,7 +547,7 @@ class ChromatinFeaturesSampler(Sampler):
     def _sample_positive(self):
         if len(self._randcache_positives) == 0 or \
                 len(self._randcache_positives[self.mode]) == 0:
-            self._build_randcache_positives(size=20000)
+            self._build_randcache_positives(size=64000)
         randindex = self._randcache_positives[self.mode].pop()
         row = None
         if self.mode == "validate":
@@ -529,8 +557,7 @@ class ChromatinFeaturesSampler(Sampler):
 
         interval_length = row["end"] - row["start"]
         chrom = row["chrom"]
-        rand_in_interval = random.uniform(0, 1) * interval_length
-        position = int(row["start"] + rand_in_interval)
+        position = int(row["start"] + random.uniform(0, 1) * interval_length)
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         seq, feats = self._retrieve(chrom, position, strand,
                                     is_positive=True)
@@ -550,19 +577,16 @@ class ChromatinFeaturesSampler(Sampler):
         """
         if len(self._randcache_positives) == 0 or \
                 len(self._randcache_positives[self.mode]) == 0:
-            self._build_randcache_positives(size=20000)
+            self._build_randcache_positives(size=64000)
         sequences = np.zeros((sample_batch, self.window_size, 4))
         targets = np.zeros((sample_batch, self.n_features))
         for i in range(sample_batch):
             seq, feats = self._sample_positive()
             while seq.shape[0] == 0 or \
-                    np.sum(seq) / float(seq.shape[0]) < 0.70 or \
-                    np.sum(feats) == 0:
+                    np.sum(seq) / float(seq.shape[0]) < 0.70:
                 if seq.shape[0] == 0:
                     LOG.debug(
                         "Sample positive was out of bounds. Trying again.")
-                elif np.sum(feats) == 0:
-                    LOG.debug("Sampled a negative example. Trying again.")
                 else:
                     LOG.debug(
                         ("Too many unknowns in the retrieved sequence. "
@@ -610,28 +634,26 @@ class ChromatinFeaturesSampler(Sampler):
              "{0} s").format(t_f - t_i))
         return list(rand_positions)
 
-    def _build_randcache_positives(self, size=10000):
+    def _build_randcache_positives(self, size=None):
         t_i = time()
         # select examples from only the training set
         if "train" not in self._randcache_positives \
                 or len(self._randcache_positives["train"]) == 0:
-            weights = \
-                self._coords_df.ix[self._training_indices]["interval_length"] \
-                    .tolist()
-            weights = np.array(weights) / np.sum(weights)
             randpos_train = list(np.random.choice(
-                self._training_indices, size=size, p=weights))
+                self._training_indices,
+                size=size if size else len(self._training_indices),
+                p=self._training_weights,
+                replace=False))
             self._randcache_positives["train"] = randpos_train
 
         # select examples from only the test set
         if "test" not in self._randcache_positives \
                 or len(self._randcache_positives["test"]) == 0:
-            weights = \
-                self._coords_df.ix[self._test_indices]["interval_length"] \
-                    .tolist()
-            weights = np.array(weights) / np.sum(weights)
             randpos_test = list(np.random.choice(
-                self._test_indices, size=int(size / 2), p=weights))
+                self._test_indices,
+                size=size if size else len(self._test_indices),
+                p=self._test_weights,
+                replace=False))
             self._randcache_positives["test"] = randpos_test
 
         # select examples from only the validation set
