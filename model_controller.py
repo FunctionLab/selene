@@ -2,6 +2,7 @@
 """
 import heapq
 import logging
+import math
 import os
 import shutil
 from time import time
@@ -11,7 +12,7 @@ from sklearn.metrics import roc_auc_score
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from utils import AverageMeter
 
@@ -189,9 +190,9 @@ class ModelController(object):
 
         min_loss = self.min_loss
 
-        # TODO: gamma might need to be a parameter somewhere.
-        # learning rate decay.
-        scheduler = StepLR(self.optimizer, step_size=18, gamma=0.05)
+        scheduler = ReduceLROnPlateau(
+            self.optimizer, 'max', patience=8, verbose=True,
+            factor=0.8)
         for q in self.plugin_queues.values():
             heapq.heapify(q)
 
@@ -200,7 +201,6 @@ class ModelController(object):
         report_stats_handle.write("Epoch\tTraining\tValidation\tAUC\n")
         for epoch in range(self.start_epoch, n_epochs):
             t_i = time()
-            scheduler.step()
             train_loss_avg = self.train(epoch)
             validate_loss_avg = self.validate(epoch)
             self.stats["training_loss"].append(train_loss_avg)
@@ -219,6 +219,8 @@ class ModelController(object):
 
             is_best = validate_loss_avg < min_loss
             min_loss = min(validate_loss_avg, min_loss)
+
+            scheduler.step(math.ceil(auc_avg * 1000.0) / 1000.0)
 
             LOG.info(
                 "[EPOCH] {0}: Saving model state to file.".format(epoch))

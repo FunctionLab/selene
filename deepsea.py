@@ -1,7 +1,5 @@
 """DeepSEA architecture (Zhou & Troyanskaya, 2015).
 """
-import math
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -60,24 +58,6 @@ class DeepSEA(nn.Module):
             nn.BatchNorm1d(n_genomic_features),
             nn.Linear(n_genomic_features, n_genomic_features),
             nn.Sigmoid())
-
-        self._weight_initialization()
-
-    def _weight_initialization(self):
-        self.convs = []
-        self.fcs = []
-        for m in self.conv_net.modules():
-            if isinstance(m, nn.Conv1d):
-                n = m.kernel_size[0] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
-                self.convs.append(m.weight.data)
-            elif isinstance(m, nn.BatchNorm1d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
-        for m in self.classifier.modules():
-            if isinstance(m, nn.Linear):
-                self.fcs.append(m.weight.data)
-                m.bias.data.zero_()
 
     def forward(self, x):
         """Forward propagation of a batch.

@@ -65,7 +65,6 @@ def _is_positive_row(query_start, query_end,
 def _get_feature_data(query_chrom, query_start, query_end,
                       threshold, feature_index_map, get_feature_rows):
     t_i = time()
-    rows = None
     rows = get_feature_rows(query_chrom, query_start, query_end)
 
     n_features = len(feature_index_map)
@@ -116,15 +115,6 @@ class GenomicFeatures(object):
 
         self.n_features = len(features)
         print("GenomicFeatures: {0}".format(self.n_features))
-
-        feature_set = set()
-        for feat in features:
-            if feat not in feature_set:
-                feature_set.add(feat)
-            else:
-                print(feat)
-        print(len(feature_set))
-
 
         self.feature_index_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
