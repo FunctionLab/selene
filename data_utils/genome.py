@@ -80,9 +80,7 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
             or start < 0:
         return ""
 
-    if strand == '+':
-        return genome_sequence(chrom, start, end, strand)
-    elif strand == '-':
+    if strand == '+' or strand == '-':
         return genome_sequence(chrom, start, end, strand)
     else:
         raise ValueError(
