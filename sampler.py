@@ -351,6 +351,7 @@ class ChromatinFeaturesSampler(Sampler):
 
         validation_rows = tmp_coords_df.index.isin(self._validation_indices)
         self._validation_df = tmp_coords_df[validation_rows]
+        self._validation_df = self._validation_df.reset_index()
 
         tmp_coords_df = tmp_coords_df[~validation_rows]
 
@@ -552,7 +553,7 @@ class ChromatinFeaturesSampler(Sampler):
         randindex = self._randcache_positives[self.mode].pop()
         row = None
         if self.mode == "validate":
-            row = self._validation_df.ix[randindex]
+            row = self._validation_df.iloc[randindex]
         else:
             row = self._coords_df.iloc[randindex]
 
