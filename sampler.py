@@ -366,6 +366,7 @@ class ChromatinFeaturesSampler(Sampler):
         min_feature_size = (self.radius * 2 + 1) * self.bin_feature_threshold
         self._coords_df = self._coords_df[
             self._coords_df["interval_length"] >= min_feature_size]
+        self._coords_df = self._coords_df.reset_index()
 
         t_f = time()
         LOG.debug(
@@ -386,7 +387,7 @@ class ChromatinFeaturesSampler(Sampler):
         self._test_indices = list(np.where(holdout_chrs_test)[0])
 
         self._training_weights = \
-            self._coords_df.ix[self._training_indices]["interval_length"] \
+            self._coords_df.iloc[self._training_indices]["interval_length"] \
                 .tolist()
         remove_indices = np.argwhere(np.isnan(self._training_weights))
         self._training_indices = [
@@ -398,7 +399,7 @@ class ChromatinFeaturesSampler(Sampler):
             np.array(self._training_weights) / float(np.sum(self._training_weights))
 
         self._test_weights = \
-            self._coords_df.ix[self._test_indices]["interval_length"] \
+            self._coords_df.iloc[self._test_indices]["interval_length"] \
                 .tolist()
         remove_indices = np.argwhere(np.isnan(self._test_weights))
         self._test_indices = [
