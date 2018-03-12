@@ -1,0 +1,23 @@
+---
+sampler:
+    holdout_test:
+        - 8
+        - 9
+    n_total_validate: 16000
+    optional_args:
+        bin_radius: 100
+        window_size: 1001
+        bin_feature_threshold: 0.5
+        random_seed: 127
+        mode: train
+        sample_from: positive
+model_controller:
+    batch_size: 64
+    n_epochs: 1000
+    n_train_batch_per_epoch: 6400
+    optional_args:
+        use_cuda: True
+        data_parallel: False
+    checkpoint:
+        resume: False
+...
