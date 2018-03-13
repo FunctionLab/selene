@@ -1,19 +1,13 @@
-# DeepSEA
-Here we describe the steps necessary to run [train_model.py](train_model.py) as of Nov 2017.
+# SELENE
 
 ## Current to-dos
 - Incorporate plugins for logging information and monitoring.
 - Re-evaluate whether or not the "test" mode would be useful in this framework.
-- Try out a ResNet model within this framework.
 - Data preparation is still not automated.
-- Testing!!
 
 ## Data preparation
 
 **TODO:** section about shell script and the files that need to be downloaded, dependencies, etc. before running the shell script -> automate as much of the data prep as you can.
-
-### The mouse genome FASTA file
-We are working with the [mm10_no_alt_analysis_set_ENCODE file](https://www.encodeproject.org/data-standards/reference-sequences/) provided by the ENCODE project.
 
 #### Indexed FASTA file
 The FASTA file was indexed by running `samtools faidx mm10_no_alt_analysis_set_ENCODE.fasta` on the command line after downloading [samtools-1.5](http://www.htslib.org/download/).
@@ -94,7 +88,7 @@ cut -f 1-3 sorted_aggregate.bed > coords_only.txt
 A file of the distinct features found in the dataset is created by running
 
 ```bash
-cut -f 5 sorted_aggregate.bed | sort -u > distinct_features.txt
+cut -f 4 sorted_aggregate.bed | sort -u > distinct_features.txt
 ```
 
 ## Training and testing the model
@@ -117,6 +111,7 @@ If you'd like to install these packages manually, these are the appropriate comm
 - `conda install -c bioconda pytabix`
 - `conda install -c anaconda docopt`
 - `conda install -c anaconda pandas`
+- TODO: this list is not fully updated.
 
 **Note**: The `pyfaidx` package must be installed **after** the environment has been created by running the following commands:
 ```bash
