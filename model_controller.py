@@ -1,6 +1,5 @@
 """Execute the necessary steps to train the model
 """
-import heapq
 import logging
 import math
 import os
@@ -23,16 +22,11 @@ torch.set_num_threads(32)
 
 class ModelController(object):
 
-    OPTIMIZERS = {
-        "Adam": torch.optim.Adam,
-        "SGD": torch.optim.SGD,
-        "RMSprop": torch.optim.RMSprop
-    }
-
     def __init__(self, model, sampler,
-                 loss_criterion, optimizer_args,
+                 loss_criterion,
+                 optimizer_class, optimizer_args,
                  batch_size,
-                 n_train_batch_per_epoch,
+                 n_steps_per_epoch,
                  output_dir,
                  checkpoint_resume=None,
                  use_cuda=False, data_parallel=False):
@@ -75,10 +69,11 @@ class ModelController(object):
         self.model = model
         self.sampler = sampler
         self.criterion = loss_criterion
-        self.optimizer = self._optimizer(**optimizer_args)
+        self.optimizer = optimizer_class(
+            self.model.parameters(), **optimizer_args)
 
         self.batch_size = batch_size
-        self.n_train_batch_per_epoch = n_train_batch_per_epoch
+        self.n_steps_per_epoch = n_steps_per_epoch
 
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
@@ -114,13 +109,6 @@ class ModelController(object):
             "AUC": []
         }
 
-        self.plugin_queues = {
-            "iteration": [],
-            "epoch": [],
-            "batch": [],
-            "update": []
-        }
-
     def _create_validation_set(self):
         """Used in `__init__`.
         """
@@ -139,17 +127,6 @@ class ModelController(object):
         LOG.info(("Loaded {0} validation examples ({1} validation batches) "
                   "to evaluate after each training epoch.").format(
                       self.sampler.n_validation, len(self._validation_data)))
-
-    def _optimizer(self, use_optim="SGD", **kwargs):
-        """Used in `__init__`. Specify the optimizer.
-        Default is stochastic gradient descent.
-
-        TODO: eventually, allow more parameters?
-        With config files this shouldn't be an issue, except for the
-        fact that we need to specify TYPES.
-        """
-        optim = self.OPTIMIZERS[use_optim]
-        return optim(self.model.parameters(), **kwargs)
 
     def _get_batch(self):
         """Sample `self.batch_size` times. Return inputs and targets as a
@@ -186,19 +163,13 @@ class ModelController(object):
         LOG.info(
             ("[TRAIN/VALIDATE] n_epochs: {0}, n_train: {1}, "
              "batch_size: {2}").format(
-                n_epochs, self.n_train_batch_per_epoch, self.batch_size))
+                n_epochs, self.n_steps_per_epoch, self.batch_size))
 
         min_loss = self.min_loss
 
         scheduler = ReduceLROnPlateau(
-            self.optimizer, 'max', patience=8, verbose=True,
+            self.optimizer, 'max', patience=16, verbose=True,
             factor=0.8)
-        for q in self.plugin_queues.values():
-            heapq.heapify(q)
-
-        report_stats_handle = open(
-            os.path.join(self.output_dir, "runner_stats.txt"), "w+")
-        report_stats_handle.write("Epoch\tTraining\tValidation\tAUC\n")
         for epoch in range(self.start_epoch, n_epochs):
             t_i = time()
             train_loss_avg = self.train(epoch)
@@ -206,10 +177,7 @@ class ModelController(object):
             self.stats["training_loss"].append(train_loss_avg)
             self.stats["validation_loss"].append(validate_loss_avg)
             auc_avg = self.stats["AUC"][-1]
-            report_stats_handle.write("{0}\t{1}\t{2}\t{3}\n".format(
-                epoch, train_loss_avg, validate_loss_avg, auc_avg))
 
-            self.call_plugins("epoch", epoch)
             t_f = time()
 
             LOG.info(
@@ -230,13 +198,12 @@ class ModelController(object):
                 "state_dict": self.model.state_dict(),
                 "min_loss": min_loss,
                 "optimizer": self.optimizer.state_dict()}, is_best)
-        report_stats_handle.close()
 
     def train(self, epoch):
         avg_losses_train = AverageMeter()
         self.model.train()
 
-        for batch_number in range(self.n_train_batch_per_epoch):
+        for batch_number in range(self.n_steps_per_epoch):
             self.run_batch_training(avg_losses_train, batch_number)
         LOG.debug("[TRAIN] Ep {0} average training loss: {1}".format(
             epoch, avg_losses_train.avg))
@@ -292,7 +259,6 @@ class ModelController(object):
         """
         self.sampler.set_mode("train")
         inputs, targets = self._get_batch()
-        self.call_plugins("batch", batch_number, inputs, targets)
         #self._log_training_info(targets)
         return self._pass_through_model_train(
             inputs, targets, batch_number, avg_losses)
@@ -332,25 +298,16 @@ class ModelController(object):
         inputs = Variable(inputs)
         targets = Variable(targets)
 
-        plugin_data = [None, None]
-
         def closure():
             batch_output = self.model(inputs.transpose(1, 2))
             loss = self.criterion(batch_output, targets)
             loss.backward()
             avg_losses.update(loss.data[0], inputs.size(0))
-            if plugin_data[0] is None:
-                plugin_data[0] = batch_output.data
-                plugin_data[1] = loss.data
             return loss
 
         LOG.debug("Updating the model after a training batch.")
         self.optimizer.zero_grad()
         self.optimizer.step(closure)
-
-        self.call_plugins(
-            "iteration", batch_number, inputs, targets, *plugin_data)
-        self.call_plugins("update", batch_number, self.model)
 
         batch_time = time() - t_i
 
@@ -415,30 +372,3 @@ class ModelController(object):
                 self.output_dir,
                 "best_model.pth.tar")
             shutil.copyfile(cp_filepath, best_filepath)
-
-    def register_plugin(self, plugin):
-        """TODO: documentation. This function is from Pytorch.
-        """
-        plugin.register(self)
-        intervals = plugin.trigger_interval
-        if not isinstance(intervals, list):
-            intervals = [intervals]
-        for duration, unit in intervals:
-            queue = self.plugin_queues[unit]
-            queue.append((duration, len(queue), plugin))
-
-    def call_plugins(self, queue_name, time, *args):
-        """TODO: documentation. This function is from Pytorch.
-        """
-        args = (time,) + args
-        queue = self.plugin_queues[queue_name]
-        if len(queue) == 0:
-            return
-        while queue[0][0] <= time:
-            plugin = queue[0][2]
-            getattr(plugin, queue_name)(*args)
-            for trigger in plugin.trigger_interval:
-                if trigger[1] == queue_name:
-                    interval = trigger[0]
-            new_item = (time + interval, queue[0][1], plugin)
-            heapq.heappushpop(queue, new_item)

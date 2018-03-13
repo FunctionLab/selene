@@ -6,7 +6,7 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    train_model.py <import-model> <optimizer> <lr>
+    train_model.py <import-module> <model-class-name> <lr>
         <paths-yml> <train-model-yml>
         [--runs=<n-runs>]
         [-s | --stdout] [-v | --verbose]
@@ -15,13 +15,11 @@ Usage:
 Options:
     -h --help               Show this screen.
 
-    <import-model>          Choose a model module to import. Must be able
-                            to access a model with the class name
-                            "SeqModel" from this module.
-    <optimizer>             Choose an optimizer (SGD, Adam, RMSprop)
+    <import-module>         Import the module containing the model
+    <model-class-name>      Must be a model class in the imported module
     <lr>                    Choose the optimizer's learning rate
     <paths-yml>             Input data and output filepaths
-    <train-model-yml>       DeepSEA model-specific parameters
+    <train-model-yml>       Model-specific parameters
 
     --runs=<n-runs>         Specify number of times to do a full run of the
                             model training. (Will initialize the model using
@@ -41,7 +39,6 @@ from time import strftime, time
 
 from docopt import docopt
 import torch
-from torch import nn
 
 from model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
@@ -52,12 +49,12 @@ if __name__ == "__main__":
         __doc__,
         version="1.0")
 
-    import_model_from = arguments["<import-model>"]
-    use_model = importlib.import_module(import_model_from)
+    import_model_from = arguments["<import-module>"]
+    model_class_name = arguments["<model-class-name>"]
+    use_module = importlib.import_module(import_model_from)
+    model_class = getattr(use_module, model_class_name)
 
-    optimizer = arguments["<optimizer>"]
     lr = float(arguments["<lr>"])
-    print("Learning rate: {0}".format(lr))
 
     paths = read_yaml_file(
         arguments["<paths-yml>"])
@@ -76,7 +73,6 @@ if __name__ == "__main__":
         features_dir, features_files["genomic_features"])
     coords_only = os.path.join(
         features_dir, features_files["coords_only"])
-    print(coords_only)
 
     distinct_features = os.path.join(
         features_dir, features_files["distinct_features"])
@@ -109,10 +105,6 @@ if __name__ == "__main__":
 
     formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 
-    # TODO: LOOP FOR ALL THE RUNS.
-    # ALSO this wouldn't need to happen linearly.
-    # Should start diff jobs on diff GPU nodes for each of the runs.
-
     log_output = os.path.join(current_run_output_dir, "train_model_log.out")
     file_handle = logging.FileHandler(log_output)
     file_handle.setFormatter(formatter)
@@ -124,7 +116,7 @@ if __name__ == "__main__":
         log.addHandler(stream_handle)
 
     t_i = time()
-    print(sampler_info["optional_args"])
+
     sampler = ChromatinFeaturesSampler(
         genome_fa_file,
         genomic_features,
@@ -138,7 +130,7 @@ if __name__ == "__main__":
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
-    model = use_model.DeepSEA(sampler.window_size, sampler.n_features)
+    model = model_class(sampler.window_size, sampler.n_features)
     print(model)
 
     checkpoint_info = model_controller_info["checkpoint"]
@@ -152,17 +144,8 @@ if __name__ == "__main__":
         model.load_state_dict(checkpoint["state_dict"])
         model.eval()
 
-    criterion = use_model.criterion()
-
-    # TODO: might ask that the optimizer be specified in a file?
-    # or at least allow for that option so that the user can specify more parameters.
-    optimizer_args = {
-        "use_optim": optimizer,
-        "lr": lr,
-        "weight_decay": 1e-6,
-        "momentum": 0.9
-    }
-    print(optimizer_args)
+    criterion = use_module.criterion()
+    optimizer_class, optimizer_args = use_module.get_optimizer(lr)
 
     t_f_model = time()
     log.debug(
@@ -179,7 +162,7 @@ if __name__ == "__main__":
     n_train_batch_per_epoch = model_controller_info["n_train_batch_per_epoch"]
 
     runner = ModelController(
-        model, sampler, criterion, optimizer_args,
+        model, sampler, criterion, optimizer_class, optimizer_args,
         batch_size, n_train_batch_per_epoch,
         current_run_output_dir,
         checkpoint_resume=checkpoint,
