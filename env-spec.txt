@@ -8,13 +8,23 @@ https://conda.anaconda.org/conda-forge/linux-64/bzip2-1.0.6-1.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/cffi-1.10.0-py36_0.tar.bz2
 https://conda.anaconda.org/soumith/linux-64/cuda80-1.0-0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/curl-7.54.1-0.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/cython-0.27.3-py36h1860423_0.tar.bz2
 https://conda.anaconda.org/anaconda/linux-64/docopt-0.6.2-py36_0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/freetype-2.5.5-2.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/h5py-2.7.1-py36h9b8c120_0.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/hdf5-1.8.18-h6792536_1.tar.bz2
+https://conda.anaconda.org/bioconda/linux-64/htslib-1.7-0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/jbig-2.1-0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/jpeg-9b-0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/krb5-1.13.2-0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/libffi-3.2.1-1.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/libgcc-5.2.0-0.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/libgcc-ng-7.2.0-hcbc56d2_1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libgfortran-3.0.0-1.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/libgfortran-ng-7.2.0-h9f7466a_2.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/libpng-1.6.30-1.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/libssh2-1.8.0-0.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/libstdcxx-ng-7.2.0-h7a57d05_2.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/libtiff-4.0.6-3.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/mkl-2017.0.3-0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/numpy-1.13.1-py36_0.tar.bz2
@@ -35,6 +45,7 @@ https://conda.anaconda.org/anaconda/linux-64/pyyaml-3.12-py36hafb9ca4_1.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/readline-6.2-2.tar.bz2
 https://conda.anaconda.org/bioconda/linux-64/samtools-1.5-1.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/scikit-learn-0.19.0-np113py36_0.tar.bz2
+https://repo.continuum.io/pkgs/free/linux-64/scipy-0.19.1-np113py36_0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/setuptools-27.2.0-py36_0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/six-1.10.0-py36_0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/sqlite-3.13.0-0.tar.bz2
@@ -42,4 +53,5 @@ https://repo.continuum.io/pkgs/free/linux-64/tk-8.5.18-0.tar.bz2
 https://conda.anaconda.org/soumith/linux-64/torchvision-0.1.9-py36h7584368_1.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/wheel-0.29.0-py36_0.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/xz-5.2.3-0.tar.bz2
+https://conda.anaconda.org/anaconda/linux-64/yaml-0.1.7-h96e3832_1.tar.bz2
 https://repo.continuum.io/pkgs/free/linux-64/zlib-1.2.11-0.tar.bz2
