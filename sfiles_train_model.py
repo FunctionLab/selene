@@ -6,7 +6,7 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    train_model.py <import-module> <model-class-name> <lr>
+    sfiles_train_model.py <import-module> <model-class-name> <lr>
         <paths-yml> <train-model-yml>
         [--runs=<n-runs>]
         [-s | --stdout] [-v | --verbose]
@@ -40,7 +40,7 @@ from time import strftime, time
 from docopt import docopt
 import torch
 
-from model_controller import ModelController
+from sfiles_model_controller import ModelController
 from sampler import ChromatinFeaturesSampler
 from utils import read_yaml_file
 
@@ -117,20 +117,11 @@ if __name__ == "__main__":
 
     t_i = time()
 
-    sampler = ChromatinFeaturesSampler(
-        genome_fa_file,
-        genomic_features,
-        coords_only,
-        distinct_features,
-        sampler_info["holdout_test"],
-        sampler_info["n_total_validate"],
-        **sampler_info["optional_args"])
-
     t_i_model = time()
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
-    model = model_class(sampler.window_size, sampler.n_features)
+    model = model_class(1001, 919)
     print(model)
 
     checkpoint_info = model_controller_info["checkpoint"]
@@ -162,7 +153,7 @@ if __name__ == "__main__":
     n_train_batch_per_epoch = model_controller_info["n_train_batch_per_epoch"]
 
     runner = ModelController(
-        model, sampler, criterion, optimizer_class, optimizer_args,
+        model, "/scratch/data_hg", criterion, optimizer_class, optimizer_args,
         batch_size, n_train_batch_per_epoch,
         current_run_output_dir,
         checkpoint_resume=checkpoint,

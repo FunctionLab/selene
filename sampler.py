@@ -9,7 +9,6 @@ import random
 from time import time
 
 import numpy as np
-import pandas as pd
 from pybedtools import BedTool
 
 from data_utils import Genome
@@ -298,14 +297,13 @@ class ChromatinFeaturesSampler(Sampler):
         # we use the padding to incorporate sequence context around the
         # bin for which we have feature information.
         self.padding = 0
-
         remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
             self.padding = int(remaining_space / 2)
 
-        self.bin_feature_threshold = bin_feature_threshold
+        self.threshold = bin_feature_threshold
 
-        self.chrs_test = chrs_test
+        self.chrs_test = [str(s) for s in chrs_test]
         self.n_validation = n_validate_from_train
 
         self._load_feature_coordinates(feature_coordinates)
@@ -330,42 +328,38 @@ class ChromatinFeaturesSampler(Sampler):
 
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
+    def _remove_rows_below_threshold(self, dataframe, threshold=None):
+        if not threshold:
+            threshold = self.threshold
+        if threshold == 0.0:
+            return dataframe
+        min_feature_size = np.floor((self.radius * 2 + 1) * threshold)
+        dataframe["interval_length"] = dataframe["end"].sub(dataframe["start"], axis=0)
+        dataframe = dataframe[dataframe["interval_length"] >= min_feature_size]
+        dataframe = dataframe.reset_index()
+        return dataframe
+
     def _load_feature_coordinates(self, feature_coordinates_file):
         """Used during the positive sampling step. Gets a random row index from
         the coordinates file and the corresponding (chr, start, end)
         information.
         """
         t_i = time()
-        tmp_coords_df = pd.read_table(
-            feature_coordinates_file,
-            header=None,
-            names=("chrom", "start", "end"))
-
-        holdout_chrs_test = np.asarray(
-            tmp_coords_df["chrom"].isin(self.chrs_test))
-        not_test_indices = list(np.where(~holdout_chrs_test)[0])
-
-        self._validation_indices = list(
-            np.random.choice(
-                not_test_indices, size=self.n_validation, replace=False))
-
-        validation_rows = tmp_coords_df.index.isin(self._validation_indices)
-        self._validation_df = tmp_coords_df[validation_rows]
-
-        tmp_coords_df = tmp_coords_df[~validation_rows]
-
-        coords_bedtool = BedTool().from_dataframe(tmp_coords_df)
-
+        coords_bedtool = BedTool(feature_coordinates_file)
         merged_intervals = coords_bedtool.merge()
 
         self._coords_df = merged_intervals.to_dataframe()
+        self._coords_df["chrom"] = self._coords_df["chrom"].astype(str)
 
-        self._coords_df["interval_length"] = self._coords_df["end"].sub(
-            self._coords_df["start"], axis=0)
+        if self.threshold == 0.:
+            threshold = 0.15
+        else:
+            threshold = self.threshold
 
-        min_feature_size = (self.radius * 2 + 1) * self.bin_feature_threshold
-        self._coords_df = self._coords_df[
-            self._coords_df["interval_length"] >= min_feature_size]
+        self._coords_df = self._remove_rows_below_threshold(self._coords_df, threshold)
+        self._sample_rows = []
+        for row in self._coords_df.itertuples():
+            self._sample_rows.append((row.chrom, row.start, row.end))
 
         t_f = time()
         LOG.debug(
@@ -373,42 +367,54 @@ class ChromatinFeaturesSampler(Sampler):
              "in the dataset: file {0}, {1} s").format(
                  feature_coordinates_file, t_f - t_i))
 
+    def _get_indices_and_probabilities(self, indices):
+        interval_lens = self._coords_df.iloc[indices]["interval_length"].tolist()
+        weights = np.array(interval_lens) / float(np.sum(interval_lens))
+        keep_indices = []
+        keep_weights = []
+        for index, weight in enumerate(weights):
+            if weight > 1e-10:
+                keep_indices.append(indices[index])
+                keep_weights.append(weight)
+            else:
+                print(weight)
+        return (keep_indices, keep_weights)
+
     def _partition_dataset(self):
         """Specify the training, validation, and test indices available to
         sample in the genomic features coordinates dataframe.
         """
         t_i = time()
-        features_chr_data = self._coords_df["chrom"]
         holdout_chrs_test = np.asarray(
-            features_chr_data.isin(self.chrs_test))
+            self._coords_df["chrom"].isin(self.chrs_test))
 
-        self._training_indices = list(np.where(~holdout_chrs_test)[0])
         self._test_indices = list(np.where(holdout_chrs_test)[0])
+        not_test_indices = list(np.where(~holdout_chrs_test)[0])
 
-        self._training_weights = \
-            self._coords_df.ix[self._training_indices]["interval_length"] \
-                .tolist()
-        remove_indices = np.argwhere(np.isnan(self._training_weights))
-        self._training_indices = [
-            ti for i, ti in enumerate(self._training_indices) if i not in remove_indices]
+        remove_nans = np.argwhere(np.isnan(self._coords_df["interval_length"].tolist()))
 
-        self._training_weights = [
-            tw for i, tw in enumerate(self._training_weights) if i not in remove_indices]
-        self._training_weights = \
-            np.array(self._training_weights) / float(np.sum(self._training_weights))
+        not_test_indices = [
+            i for i in not_test_indices if i not in remove_nans]
 
-        self._test_weights = \
-            self._coords_df.ix[self._test_indices]["interval_length"] \
-                .tolist()
-        remove_indices = np.argwhere(np.isnan(self._test_weights))
-        self._test_indices = [
-            ti for i, ti in enumerate(self._test_indices) if i not in remove_indices]
+        _validation_indices = list(
+            np.random.choice(
+                not_test_indices, size=self.n_validation, replace=False))
+        validation_rows = self._coords_df.index.isin(_validation_indices)
+        self._validation_rows = []
+        for row in self._coords_df[validation_rows].itertuples():
+            self._validation_rows.append((row.chrom, row.start, row.end))
+        _validation_indices = list(range(len(self._validation_rows)))
+        self._validation_indices, self._validation_weights = \
+            self._get_indices_and_probabilities(_validation_indices)
 
-        self._test_weights = [
-            tw for i, tw in enumerate(self._test_weights) if i not in remove_indices]
-        self._test_weights = \
-            np.array(self._test_weights) / float(np.sum(self._test_weights))
+        _training_indices = list(set(not_test_indices) - set(_validation_indices))
+        self._training_indices, self._training_weights = \
+            self._get_indices_and_probabilities(_training_indices)
 
+        _test_indices = [
+            i for i in self._test_indices if i not in remove_nans]
+        self._test_indices, self._test_weights = \
+            self._get_indices_and_probabilities(_test_indices)
         t_f = time()
         LOG.debug(
             ("Partitioned the dataset into train/validate & test sets: "
@@ -473,7 +479,7 @@ class ChromatinFeaturesSampler(Sampler):
         bin_start = position - self.radius
         bin_end = position + self.radius + 1
         retrieved_targets = self.query_feature_data.get_feature_data(
-            chrom, bin_start, bin_end)
+            chrom, bin_start, bin_end, threshold=self.threshold)
 
         if is_positive and np.sum(retrieved_targets) == 0:
             return (np.zeros((0, 4)), retrieved_targets)
@@ -482,7 +488,7 @@ class ChromatinFeaturesSampler(Sampler):
         window_end = bin_end + self.padding
         retrieved_sequence = \
             self.genome.get_encoding_from_coords(
-                chrom, window_start, window_end, strand)
+                "chr{0}".format(chrom), window_start, window_end, strand)
         return (retrieved_sequence, retrieved_targets)
 
     def _get_rand_background(self):
@@ -532,7 +538,8 @@ class ChromatinFeaturesSampler(Sampler):
         """
         randchr, randpos, randstrand = self._get_rand_background()
         is_positive = self.query_feature_data.is_positive(
-            randchr, randpos - self.radius, randpos + self.radius + 1)
+            randchr, randpos - self.radius, randpos + self.radius + 1,
+            threshold=self.threshold)
         while is_positive:
             LOG.debug(
                 "Sample background overlapped with positive examples. "
@@ -547,18 +554,20 @@ class ChromatinFeaturesSampler(Sampler):
     def _sample_positive(self):
         if len(self._randcache_positives) == 0 or \
                 len(self._randcache_positives[self.mode]) == 0:
-            self._build_randcache_positives(size=64000)
+            self._build_randcache_positives()
         randindex = self._randcache_positives[self.mode].pop()
         row = None
         if self.mode == "validate":
-            row = self._validation_df.ix[randindex]
+            row = self._validation_rows[randindex]
         else:
-            row = self._coords_df.iloc[randindex]
+            row = self._sample_rows[randindex]
 
-        interval_length = row["end"] - row["start"]
-        chrom = row["chrom"]
-        position = int(row["start"] + random.uniform(0, 1) * interval_length)
+        interval_length = row[2] - row[1]
+        chrom = row[0]
+        position = int(row[1] + random.uniform(0, 1) * interval_length)
+
         strand = self.STRAND_SIDES[random.randint(0, 1)]
+
         seq, feats = self._retrieve(chrom, position, strand,
                                     is_positive=True)
         return (seq, feats)
@@ -577,7 +586,7 @@ class ChromatinFeaturesSampler(Sampler):
         """
         if len(self._randcache_positives) == 0 or \
                 len(self._randcache_positives[self.mode]) == 0:
-            self._build_randcache_positives(size=64000)
+            self._build_randcache_positives()
         sequences = np.zeros((sample_batch, self.window_size, 4))
         targets = np.zeros((sample_batch, self.n_features))
         for i in range(sample_batch):
@@ -659,8 +668,11 @@ class ChromatinFeaturesSampler(Sampler):
         # select examples from only the validation set
         if "validate" not in self._randcache_positives \
                 or len(self._randcache_positives["validate"]) == 0:
-            validation_shuffled = random.sample(
-                self._validation_indices, len(self._validation_indices))
+            validation_shuffled = list(np.random.choice(
+                self._validation_indices,
+                size=len(self._validation_indices),
+                p=self._validation_weights,
+                replace=False))
             self._randcache_positives["validate"] = validation_shuffled
 
         t_f = time()

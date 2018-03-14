@@ -3,11 +3,11 @@ It supports retrieving parts of the sequence and converting these parts
 into their one hot encodings.
 """
 import logging
-from time import time
 
 import numpy as np
 from pyfaidx import Fasta
 
+from data_utils.fastloop import _fast_sequence_to_encoding
 
 LOG = logging.getLogger("deepsea")
 
@@ -25,14 +25,7 @@ def _sequence_to_encoding(sequence, bases_encoding):
     numpy.ndarray, dtype=bool
         The N-by-4 encoding of the sequence.
     """
-    encoding = np.zeros((len(sequence), 4))
-    sequence = str.upper(sequence)
-    for index, base in enumerate(sequence):
-        if base in bases_encoding:
-            encoding[index, bases_encoding[base]] = 1
-        else:
-            encoding[index, :] = 0.25
-    return encoding
+    return _fast_sequence_to_encoding(sequence, bases_encoding)
 
 def _get_base_index(encoding_row):
     for index, val in enumerate(encoding_row):
@@ -130,6 +123,12 @@ class Genome(object):
             return self.genome[chrom][start:end].seq
         else:
             return self.genome[chrom][start:end].reverse.complement.seq
+
+    def sequence_in_bounds(self, chrom, start, end):
+        if start > self.len_chrs[chrom] or end > self.len_chrs[chrom] \
+                or start < 0:
+            return False
+        return True
 
     def get_sequence_from_coords(self, chrom, start, end, strand='+'):
         """Gets the genomic sequence given the chromosome, sequence start,

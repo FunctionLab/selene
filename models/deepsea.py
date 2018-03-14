@@ -7,8 +7,7 @@ import torch.nn as nn
 
 class DeepSEA(nn.Module):
     def __init__(self, window_size, n_genomic_features):
-        """The DeepSEA architecture.
-
+        """
         Parameters
         ----------
         window_size : int
@@ -30,7 +29,6 @@ class DeepSEA(nn.Module):
             nn.MaxPool1d(
                 kernel_size=pool_kernel_size, stride=pool_kernel_size),
             nn.BatchNorm1d(320),
-            nn.Dropout(p=0.2),
 
             nn.Conv1d(320, 480, kernel_size=conv_kernel_size),
             nn.ReLU(inplace=True),
@@ -62,14 +60,12 @@ class DeepSEA(nn.Module):
     def forward(self, x):
         """Forward propagation of a batch.
         """
-        """
         for layer in self.conv_net.children():
             if isinstance(layer, nn.Conv1d):
                 layer.weight.data.renorm_(2, 0, 0.9)
         for layer in self.classifier.children():
             if isinstance(layer, nn.Linear):
                 layer.weight.data.renorm_(2, 0, 0.9)
-        """
         out = self.conv_net(x)
         reshape_out = out.view(out.size(0), 960 * self.n_channels)
         predict = self.classifier(reshape_out)
@@ -78,31 +74,6 @@ class DeepSEA(nn.Module):
 def criterion():
     return nn.BCELoss()
 
-def optimizer():
-    return torch.optim.SGD, {"weight_decay": 1e-6, "momentum": 0.9}
-
-def deepsea(window_size, n_genomic_features, filepath=None):
-    """Initializes a new (untrained) DeepSEA model or loads
-    a trained model from a filepath.
-
-    Parameters
-    ----------
-    window_size : int
-        The window size is the input sequence length for a single
-        training example.
-    n_genomic_features : int
-        The number of genomic features (classes) to predict.
-    filepath : str, optional
-        Default is None.
-
-    [TODO] Note this function has not been tested.
-
-    Returns
-    -------
-    DeepSEA
-    """
-    model = DeepSEA(window_size, n_genomic_features)
-    if filepath is not None:
-        model.load_state_dict(torch.load(filepath))
-        model.eval()
-    return model
+def get_optimizer(lr):
+    return (torch.optim.SGD,
+            {"lr": lr, "weight_decay": 1e-6, "momentum": 0.9})

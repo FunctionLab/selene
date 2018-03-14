@@ -1,4 +1,5 @@
 # Repo-specific
+configs/
 data/
 output/
 *.out
