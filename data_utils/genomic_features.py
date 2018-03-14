@@ -16,10 +16,9 @@ Additionally, the column names should be omitted from the file itself
 (i.e. there is no header and the first line in the file is the first
 row of genome coordinates for a feature).
 """
-from time import time
-
-import numpy as np
 import tabix
+
+from data_utils.fastloop import _fast_get_feature_data
 
 
 def _any_positive_rows(rows, query_start, query_end, threshold):
@@ -64,25 +63,9 @@ def _is_positive_row(query_start, query_end,
 
 def _get_feature_data(query_chrom, query_start, query_end,
                       threshold, feature_index_map, get_feature_rows):
-    t_i = time()
     rows = get_feature_rows(query_chrom, query_start, query_end)
-
-    n_features = len(feature_index_map)
-    if rows is None:
-        return np.zeros((n_features,))
-    query_length = query_end - query_start
-    encoding = np.zeros((query_length, n_features))
-    for row in rows:
-        feat_start = int(row[1])
-        feat_end = int(row[2])
-        index_start = max(0, feat_start - query_start)
-        index_end = min(feat_end - query_start, query_length)
-        index_feat = feature_index_map[row[4]]
-        encoding[index_start:index_end, index_feat] = 1
-    encoding = np.sum(encoding, axis=0) / query_length
-    encoding = (encoding > threshold) * 1
-    return encoding
-
+    return _fast_get_feature_data(
+        query_start, query_end, threshold, feature_index_map, rows)
 
 class GenomicFeatures(object):
 
@@ -114,10 +97,10 @@ class GenomicFeatures(object):
         self.data = tabix.open(dataset)
 
         self.n_features = len(features)
-        print("GenomicFeatures: {0}".format(self.n_features))
 
         self.feature_index_map = dict(
             [(feat, index) for index, feat in enumerate(features)])
+
         self.index_feature_map = dict(list(enumerate(features)))
 
     def _query_tabix(self, chrom, start, end):
