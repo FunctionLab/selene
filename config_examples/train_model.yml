@@ -14,7 +14,7 @@ sampler:
 model_controller:
     batch_size: 64
     n_epochs: 1000
-    n_train_batch_per_epoch: 6400
+    n_train_batch_per_epoch: 16000
     optional_args:
         use_cuda: True
         data_parallel: False
