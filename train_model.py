@@ -123,7 +123,7 @@ if __name__ == "__main__":
         coords_only,
         distinct_features,
         sampler_info["holdout_test"],
-        sampler_info["n_total_validate"],
+        sampler_info["validation_proportion"],
         **sampler_info["optional_args"])
 
     t_i_model = time()
@@ -159,11 +159,11 @@ if __name__ == "__main__":
 
     batch_size = model_controller_info["batch_size"]
     n_epochs = model_controller_info["n_epochs"]
-    n_train_batch_per_epoch = model_controller_info["n_train_batch_per_epoch"]
+    n_steps_per_epoch = model_controller_info["n_steps_per_epoch"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_class, optimizer_args,
-        batch_size, n_train_batch_per_epoch,
+        batch_size, n_steps_per_epoch,
         current_run_output_dir,
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
