@@ -9,6 +9,7 @@ import random
 from time import time
 
 import numpy as np
+import pandas as pd
 from pybedtools import BedTool
 
 from data_utils import Genome
@@ -88,6 +89,7 @@ class Sampler(object):
         # set the necessary random seeds.
         np.random.seed(random_seed)
         random.seed(random_seed + 1)
+        self.random_seed = random_seed
 
         self._features = []
         with open(unique_features, "r") as file_handle:
@@ -201,8 +203,8 @@ class ChromatinFeaturesSampler(Sampler):
                  query_feature_data,
                  feature_coordinates,
                  unique_features,
-                 chrs_test,
-                 n_validate_from_train=8000,
+                 test_holdout,
+                 validation_proportion=0.15,
                  window_size=1001,
                  bin_radius=100,
                  bin_feature_threshold=0.5,
@@ -221,13 +223,13 @@ class ChromatinFeaturesSampler(Sampler):
             coordinates for the features in our dataset. File has the
             columns [chr, start (0-based), end] in order.
             Used for sampling positive examples.
-        chrs_test : list[str]
+        test_holdout : list[str], float (0.0, 1.0), or None
             Specify chromosome(s) to hold out as the test dataset.
             It is expected that the user determines beforehand that the
             proportion of positive examples in the held-out chromosomes
             is appropriate relative to the training and validation datasets.
-        n_validate_from_train : int
-            Default is 8000. The number of examples to hold out from the
+        validation_proportion : float (0.0, 1.0)
+            Default is 0.15. The number of examples to hold out from the
             training set. These examples are our validation dataset and
             are used to evaluate the model at the end of each training epoch.
         window_size : int, optional
@@ -255,7 +257,7 @@ class ChromatinFeaturesSampler(Sampler):
         padding : int
             The amount of padding is identical on both sides
         bin_feature_threshold : float
-        chrs_test : list(str), e.g. ["chr8", "chr9"]
+        test_holdout : list(str), e.g. ["chr8", "chr9"]
         n_validation : int
         mode : {"train", "validate", "test"}
 
@@ -303,8 +305,15 @@ class ChromatinFeaturesSampler(Sampler):
 
         self.threshold = bin_feature_threshold
 
-        self.chrs_test = [str(s) for s in chrs_test]
-        self.n_validation = n_validate_from_train
+        if not (type(test_holdout) == type(list()) or
+                isinstance(test_holdout, float)):
+            raise ValueError(
+                "Test holdout must be specified as either a list of "
+                "chromosomes or a proportion of the dataset (0.0, 1.0) "
+                "but input {0} is of type {1}".format(
+                    test_holdout, type(test_holdout)))
+        self.test_holdout = test_holdout
+        self.validation_proportion = validation_proportion
 
         self._load_feature_coordinates(feature_coordinates)
         self._partition_dataset()
@@ -385,21 +394,30 @@ class ChromatinFeaturesSampler(Sampler):
         sample in the genomic features coordinates dataframe.
         """
         t_i = time()
-        holdout_chrs_test = np.asarray(
-            self._coords_df["chrom"].isin(self.chrs_test))
+        self._coords_df = self._coords_df[
+            pd.notnull(self._coords_df["interval_length"])]
 
-        self._test_indices = list(np.where(holdout_chrs_test)[0])
-        not_test_indices = list(np.where(~holdout_chrs_test)[0])
+        if isinstance(self.test_holdout, list):
+            self.test_holdout = [str(h) for h in self.test_holdout]
+            test_holdout_chrs = np.asarray(
+                self._coords_df["chrom"].isin(self.test_holdout))
+            self._test_indices = np.where(test_holdout_chrs)[0].tolist()
+        else:
+            self._test_indices = self._coords_df.sample(
+                frac=self.test_holdout, replace=False,
+                random_state=self.random_seed).index.values.tolist()
 
-        remove_nans = np.argwhere(np.isnan(self._coords_df["interval_length"].tolist()))
-
-        not_test_indices = [
-            i for i in not_test_indices if i not in remove_nans]
-
-        _validation_indices = list(
+        not_test_indices = \
+            self._coords_df.loc[
+                ~self._coords_df.index.isin(self._test_indices)] \
+            .index.values.tolist()
+        _validation_indices = \
             np.random.choice(
-                not_test_indices, size=self.n_validation, replace=False))
+                not_test_indices,
+                size=int(self.validation_proportion * self._coords_df.shape[0]),
+                replace=False).tolist()
         validation_rows = self._coords_df.index.isin(_validation_indices)
+
         self._validation_rows = []
         for row in self._coords_df[validation_rows].itertuples():
             self._validation_rows.append((row.chrom, row.start, row.end))
@@ -411,10 +429,8 @@ class ChromatinFeaturesSampler(Sampler):
         self._training_indices, self._training_weights = \
             self._get_indices_and_probabilities(_training_indices)
 
-        _test_indices = [
-            i for i in self._test_indices if i not in remove_nans]
         self._test_indices, self._test_weights = \
-            self._get_indices_and_probabilities(_test_indices)
+            self._get_indices_and_probabilities(self._test_indices)
         t_f = time()
         LOG.debug(
             ("Partitioned the dataset into train/validate & test sets: "
@@ -480,7 +496,6 @@ class ChromatinFeaturesSampler(Sampler):
         bin_end = position + self.radius + 1
         retrieved_targets = self.query_feature_data.get_feature_data(
             chrom, bin_start, bin_end, threshold=self.threshold)
-
         if is_positive and np.sum(retrieved_targets) == 0:
             return (np.zeros((0, 4)), retrieved_targets)
 
