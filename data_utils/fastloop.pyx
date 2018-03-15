@@ -50,6 +50,8 @@ def _fast_get_feature_data(int query_start, int query_end, double threshold,
         if index_start == index_end:
             index_end += 1
         encoding[index_start:index_end, index_feat] = 1
+    if threshold == 0.:
+        return (np.sum(encoding, axis=0) > 0).astype(int)
     targets = (
         np.around(np.sum(encoding, axis=0) / query_length, 2) >= threshold).astype(int)
     return targets

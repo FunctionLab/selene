@@ -116,8 +116,9 @@ class ModelController(object):
         self._validation_data = []
         validation_targets = []
 
+        n_validation = len(self.sampler._validation_indices)
         n_validation_batches = int(
-            self.sampler.n_validation / self.batch_size)
+            n_validation / self.batch_size)
         for _ in range(n_validation_batches):
             inputs, targets = self._get_batch()
             self._validation_data.append((inputs, targets))
@@ -126,7 +127,7 @@ class ModelController(object):
         self._all_validation_targets = np.vstack(validation_targets)
         LOG.info(("Loaded {0} validation examples ({1} validation batches) "
                   "to evaluate after each training epoch.").format(
-                      self.sampler.n_validation, len(self._validation_data)))
+                      n_validation, len(self._validation_data)))
 
     def _get_batch(self):
         """Sample `self.batch_size` times. Return inputs and targets as a
