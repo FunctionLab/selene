@@ -3,11 +3,11 @@ sampler:
     holdout_test:
         - 8
         - 9
-    validation_proportion: 0.15
+    validation_proportion: 0.125
     optional_args:
         bin_radius: 100
         window_size: 1001
-        bin_feature_threshold: 0.5
+        default_threshold: 0.5
         random_seed: 127
         mode: train
         sample_from: positive
