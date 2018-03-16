@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from data_utils.genomic_features import _any_positive_rows, \
     _is_positive_row, _get_feature_data
 
@@ -13,6 +15,8 @@ class TestGenomicFeatures(unittest.TestCase):
         self.feature_index_map = {
             "CTCF": 0, "eGFP-FOS": 1, "GABP": 2, "Pbx3": 3, "Pol2": 4, "TBP": 5
         }
+
+        self.n_features = len(self.features)
 
         # CTCF only, between 16110 and 16239
         self.rows_example1 =  \
@@ -85,28 +89,28 @@ class TestGenomicFeatures(unittest.TestCase):
     def test__any_positive_rows_none_rows(self):
         rows = None
         query_start, query_end = (10, 100)
-        threshold = 0.50
+        threshold = {k: 0.50 for k in self.features}
         self.assertFalse(
             _any_positive_rows(rows, query_start, query_end, threshold))
 
     def test__any_positive_rows_empty_rows(self):
         rows = []
         query_start, query_end = (10, 100)
-        threshold = 0.50
+        threshold = {k: 0.50 for k in self.features}
         self.assertFalse(
             _any_positive_rows(rows, query_start, query_end, threshold))
 
     def test__any_positive_rows_false(self):
         rows = self.rows_example1
         query_start, query_end = (16150, 16351)
-        threshold = 0.50
+        threshold = {k: 0.50 for k in self.features}
         self.assertFalse(
             _any_positive_rows(rows, query_start, query_end, threshold))
 
     def test__any_positive_rows_true(self):
         rows = self.rows_example1
         query_start, query_end = (16150, 16351)
-        threshold = 0.40
+        threshold = {k: 0.40 for k in self.features}
         self.assertTrue(
             _any_positive_rows(rows, query_start, query_end, threshold))
 
@@ -116,7 +120,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test__get_feature_data_none_rows(self):
         query_chrom, query_start, query_end = (None, 10, 211)
-        threshold = 0.50
+        threshold = np.array([0.50] * self.n_features).astype(np.float32)
 
         expected_encoding = [0, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
@@ -128,7 +132,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test__get_feature_data_empty_rows(self):
         query_chrom, query_start, query_end = ("chr7", 10, 211)
-        threshold = 0.50
+        threshold = np.array([0.50] * self.n_features).astype(np.float32)
 
         expected_encoding = [0, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
@@ -140,7 +144,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test__get_feature_data_single_feat_positive(self):
         query_chrom, query_start, query_end = ("chr1", 16100, 16350)
-        threshold = 0.50
+        threshold = np.array([0.50] * self.n_features).astype(np.float32)
 
         expected_encoding = [1, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
@@ -152,7 +156,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test__get_feature_data_no_feat_positive(self):
         query_chrom, query_start, query_end = ("chr2", 91027, 91228)
-        threshold = 0.51
+        threshold = np.array([0.51] * self.n_features).astype(np.float32)
 
         expected_encoding = [0, 0, 0, 0, 0, 0]
         observed_encoding = _get_feature_data(
@@ -164,7 +168,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test__get_feature_data_multiple_feats_positive(self):
         query_chrom, query_start, query_end = ("chr3", 8619, 8719)
-        threshold = 0.50
+        threshold = np.array([0.50] * self.n_features).astype(np.float32)
 
         expected_encoding = [1, 1, 0, 0, 0, 1]
         observed_encoding = _get_feature_data(

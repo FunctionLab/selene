@@ -29,13 +29,14 @@ def _any_positive_rows(rows, query_start, query_end, thresholds):
         return False
     for row in rows:  # features within [start, end)
         is_positive = _is_positive_row(
-            query_start, query_end, int(row[1]), int(row[2]), row[3], thresholds)
+            query_start, query_end, int(row[1]), int(row[2]), thresholds[row[3]])
         if is_positive:
             return True
     return False
 
-def _is_positive_row(query_start, query_end, feature,
-                     feat_start, feat_end, thresholds):
+def _is_positive_row(query_start, query_end,
+                     feat_start, feat_end,
+                     threshold):
     """Helper function to determine whether a single row from a successful
     query is considered a positive example.
 
@@ -59,7 +60,9 @@ def _is_positive_row(query_start, query_end, feature,
     overlap_start = max(feat_start, query_start)
     overlap_end = min(feat_end, query_end)
     min_overlap_needed = int(
-        (query_end - query_start) * thresholds[feature] - 1)
+        (query_end - query_start) * threshold - 1)
+    if min_overlap_needed < 0:
+        min_overlap_needed = 0
     if overlap_end - overlap_start > min_overlap_needed:
         return True
     else:
