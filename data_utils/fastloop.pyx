@@ -27,8 +27,10 @@ def _fast_sequence_to_encoding(str sequence, dict bases_encoding):
 
 @cython.boundscheck(False)
 @cython.wraparound(False) 
-def _fast_get_feature_data(int query_start, int query_end, double threshold,
-                      dict feature_index_map, rows):
+def _fast_get_feature_data(int query_start, int query_end,
+                           np.ndarray[FDTYPE_t, ndim=1] thresholds,
+                           dict feature_index_map, 
+                           rows):
     cdef int n_features = len(feature_index_map)
     cdef int query_length = query_end - query_start
     cdef int feat_start, feat_end, index_start, index_end, index_feat
@@ -50,9 +52,8 @@ def _fast_get_feature_data(int query_start, int query_end, double threshold,
         if index_start == index_end:
             index_end += 1
         encoding[index_start:index_end, index_feat] = 1
-    if threshold == 0.:
-        return (np.sum(encoding, axis=0) > 0).astype(int)
-    targets = (
-        np.around(np.sum(encoding, axis=0) / query_length, 2) >= threshold).astype(int)
+
+    thresholds = (thresholds * query_length - 1).clip(min=0)
+    targets = (np.sum(encoding, axis=0) > thresholds.astype(int)).astype(int)
     return targets
 

@@ -8,7 +8,6 @@ Output:
 Usage:
     train_model.py <import-module> <model-class-name> <lr>
         <paths-yml> <train-model-yml>
-        [--runs=<n-runs>]
         [-s | --stdout] [-v | --verbose]
     train_model.py -h | --help
 
@@ -20,12 +19,6 @@ Options:
     <lr>                    Choose the optimizer's learning rate
     <paths-yml>             Input data and output filepaths
     <train-model-yml>       Model-specific parameters
-
-    --runs=<n-runs>         Specify number of times to do a full run of the
-                            model training. (Will initialize the model using
-                            a different random seed, from 0 to <n-runs>, each
-                            time
-                            [default: 1]
     -s --stdout             Will also output logging information to stdout
                             [default: False]
     -v --verbose            Include debug messages in logging information
@@ -64,18 +57,16 @@ if __name__ == "__main__":
     ##################################################
     # PATHS
     ##################################################
-    genome_fa_file = paths["genome"]
-
-    features_paths = paths["features"]
-    features_dir = features_paths["dir_path"]
-    features_files = features_paths["filenames"]
+    dir_path = paths["dir_path"]
+    files = paths["files"]
+    genome_fasta = os.path.join(
+        dir_path, files["genome"])
     genomic_features = os.path.join(
-        features_dir, features_files["genomic_features"])
+        dir_path, files["genomic_features"])
     coords_only = os.path.join(
-        features_dir, features_files["coords_only"])
-
+        dir_path, files["sample_from_regions"])
     distinct_features = os.path.join(
-        features_dir, features_files["distinct_features"])
+        dir_path, files["distinct_features"])
 
     output_dir = paths["output_dir"]
     os.makedirs(output_dir, exist_ok=True)
@@ -93,7 +84,6 @@ if __name__ == "__main__":
     ##################################################
     # OTHER ARGS
     ##################################################
-    n_runs = int(arguments["--runs"])
     to_stdout = arguments["--stdout"]
     verbose = arguments["--verbose"]
 
@@ -116,9 +106,26 @@ if __name__ == "__main__":
         log.addHandler(stream_handle)
 
     t_i = time()
+    sampler_optional_args = sampler_info["optional_args"]
+    feature_thresholds = None
+    if "specific_feature_thresholds" in sampler_optional_args:
+        feature_thresholds = sampler_optional_args["specific_feature_thresholds"]
+        del sampler_optional_args["specific_feature_thresholds"]
+    else:
+        feature_thresholds = None
+    if "default_threshold" in sampler_optional_args:
+        if feature_thresholds:
+            feature_thresholds["default"] = \
+                sampler_optional_args["default_threshold"]
+        else:
+            feature_thresholds = sampler_optional_args["default_threshold"]
+        del sampler_optional_args["default_threshold"]
+
+    if feature_thresholds:
+        sampler_info["optional_args"]["feature_thresholds"] = feature_thresholds
 
     sampler = ChromatinFeaturesSampler(
-        genome_fa_file,
+        genome_fasta,
         genomic_features,
         coords_only,
         distinct_features,

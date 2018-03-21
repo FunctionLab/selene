@@ -7,6 +7,7 @@ genome.
 import logging
 import random
 from time import time
+import types
 
 import numpy as np
 import pandas as pd
@@ -28,6 +29,7 @@ class Sampler(object):
                  genome,
                  query_feature_data,
                  unique_features,
+                 feature_thresholds=0.50,
                  random_seed=436,
                  sample_from="random",
                  sample_positive_prop=0.50):
@@ -45,6 +47,7 @@ class Sampler(object):
         unique_features : str
             Path to a .txt file containing the set of unique features found in
             our dataset. Each feature is on its own line.
+        feature_thresholds : float [0.0, 1.0], dict, lambda
         random_seed : int, optional
             Default is 436. Sets the numpy random seed.
         sample_from : {"random", "positive", "proportion"}, optional
@@ -98,7 +101,8 @@ class Sampler(object):
         self.n_features = len(self._features)
 
         self.query_feature_data = GenomicFeatures(
-            query_feature_data, self._features)
+            query_feature_data, self._features,
+            feature_thresholds=feature_thresholds)
 
         self.sample_from = sample_from
         self.sample_positive_prop = sample_positive_prop
@@ -207,7 +211,7 @@ class ChromatinFeaturesSampler(Sampler):
                  validation_proportion=0.15,
                  window_size=1001,
                  bin_radius=100,
-                 bin_feature_threshold=0.5,
+                 feature_thresholds=0.5,
                  mode="train",
                  random_seed=436,
                  sample_from="random",
@@ -274,7 +278,8 @@ class ChromatinFeaturesSampler(Sampler):
             unique_features,
             random_seed=random_seed,
             sample_from=sample_from,
-            sample_positive_prop=sample_positive_prop)
+            sample_positive_prop=sample_positive_prop,
+            feature_thresholds=feature_thresholds)
 
         if mode not in self.MODES:
             raise ValueError(
@@ -302,8 +307,6 @@ class ChromatinFeaturesSampler(Sampler):
         remaining_space = window_size - self.radius * 2 - 1
         if remaining_space > 0:
             self.padding = int(remaining_space / 2)
-
-        self.threshold = bin_feature_threshold
 
         if not (type(test_holdout) == type(list()) or
                 isinstance(test_holdout, float)):
@@ -338,10 +341,10 @@ class ChromatinFeaturesSampler(Sampler):
         LOG.debug("Initialized the ChromatinFeaturesSampler object")
 
     def _remove_rows_below_threshold(self, dataframe, threshold=None):
-        if not threshold:
-            threshold = self.threshold
-        if threshold == 0.0:
-            return dataframe
+        #if not threshold:
+        #    threshold = self.threshold
+        #if threshold == 0.0:
+        #    return dataframe
         min_feature_size = np.floor((self.radius * 2 + 1) * threshold)
         dataframe["interval_length"] = dataframe["end"].sub(dataframe["start"], axis=0)
         dataframe = dataframe[dataframe["interval_length"] >= min_feature_size]
@@ -360,11 +363,11 @@ class ChromatinFeaturesSampler(Sampler):
         self._coords_df = merged_intervals.to_dataframe()
         self._coords_df["chrom"] = self._coords_df["chrom"].astype(str)
 
-        if self.threshold == 0.:
-            threshold = 0.15
-        else:
-            threshold = self.threshold
-
+        #if self.threshold == 0.:
+        #    threshold = 0.15
+        #else:
+        #    threshold = self.threshold
+        threshold = 0.15
         self._coords_df = self._remove_rows_below_threshold(self._coords_df, threshold)
         self._sample_rows = []
         for row in self._coords_df.itertuples():
@@ -495,7 +498,7 @@ class ChromatinFeaturesSampler(Sampler):
         bin_start = position - self.radius
         bin_end = position + self.radius + 1
         retrieved_targets = self.query_feature_data.get_feature_data(
-            chrom, bin_start, bin_end, threshold=self.threshold)
+            chrom, bin_start, bin_end)
         if is_positive and np.sum(retrieved_targets) == 0:
             return (np.zeros((0, 4)), retrieved_targets)
 
@@ -553,8 +556,7 @@ class ChromatinFeaturesSampler(Sampler):
         """
         randchr, randpos, randstrand = self._get_rand_background()
         is_positive = self.query_feature_data.is_positive(
-            randchr, randpos - self.radius, randpos + self.radius + 1,
-            threshold=self.threshold)
+            randchr, randpos - self.radius, randpos + self.radius + 1)
         while is_positive:
             LOG.debug(
                 "Sample background overlapped with positive examples. "
