@@ -35,8 +35,7 @@ def _any_positive_rows(rows, query_start, query_end, thresholds):
     return False
 
 def _is_positive_row(query_start, query_end,
-                     feat_start, feat_end,
-                     threshold):
+                     feat_start, feat_end, threshold):
     """Helper function to determine whether a single row from a successful
     query is considered a positive example.
 
