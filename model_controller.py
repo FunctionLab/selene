@@ -16,7 +16,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from utils import AverageMeter
 
 
-LOG = logging.getLogger("deepsea")
+logger = logging.getLogger("selene")
 torch.set_num_threads(32)
 
 
@@ -82,12 +82,12 @@ class ModelController(object):
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
-            LOG.debug("Wrapped model in DataParallel")
+            logger.debug("Wrapped model in DataParallel")
 
         if self.use_cuda:
             self.model.cuda()
             self.criterion.cuda()
-            LOG.debug("Set modules to use CUDA")
+            logger.debug("Set modules to use CUDA")
 
         self._create_validation_set()
 
@@ -98,7 +98,7 @@ class ModelController(object):
             self.min_loss = checkpoint_resume["min_loss"]
             self.optimizer.load_state_dict(
                 checkpoint_resume["optimizer"])
-            LOG.info(
+            logger.info(
                 ("Resuming from checkpoint: "
                  "epoch {0}, min loss {1}").format(
                     self.start_epoch, self.min_loss))
@@ -112,22 +112,15 @@ class ModelController(object):
     def _create_validation_set(self):
         """Used in `__init__`.
         """
-        self.sampler.set_mode("validate")
-        self._validation_data = []
-        validation_targets = []
-
-        n_validation = len(self.sampler._validation_indices)
-        n_validation_batches = int(
-            n_validation / self.batch_size)
-        for _ in range(n_validation_batches):
-            inputs, targets = self._get_batch()
-            self._validation_data.append((inputs, targets))
-            validation_targets.append(targets)
-
-        self._all_validation_targets = np.vstack(validation_targets)
-        LOG.info(("Loaded {0} validation examples ({1} validation batches) "
-                  "to evaluate after each training epoch.").format(
-                      n_validation, len(self._validation_data)))
+        t_i = time()
+        self._validation_data, self._all_validation_targets = \
+            self.sampler.get_validation_set(self.batch_size, n_samples=32000)
+        t_f = time()
+        logger.info(("{0} s to load {1} validation examples ({2} validation "
+                     "batches) to evaluate after each training epoch.").format(
+                      t_f - t_i,
+                      len(self._validation_data) * self.batch_size,
+                      len(self._validation_data)))
 
     def _get_batch(self):
         """Sample `self.batch_size` times. Return inputs and targets as a
@@ -135,9 +128,9 @@ class ModelController(object):
         """
         t_i_sampling = time()
         batch_sequences, batch_targets = self.sampler.sample(
-            sample_batch=self.batch_size)
+            batch_size=self.batch_size)
         t_f_sampling = time()
-        LOG.debug(
+        logger.debug(
             ("[BATCH] Time to sample {0} examples: {1} s.").format(
                  self.batch_size,
                  t_f_sampling - t_i_sampling))
@@ -161,7 +154,7 @@ class ModelController(object):
         -------
         None
         """
-        LOG.info(
+        logger.info(
             ("[TRAIN/VALIDATE] n_epochs: {0}, n_train: {1}, "
              "batch_size: {2}").format(
                 n_epochs, self.n_steps_per_epoch, self.batch_size))
@@ -181,7 +174,7 @@ class ModelController(object):
 
             t_f = time()
 
-            LOG.info(
+            logger.info(
                 ("[EPOCH] {0}: {1} s. "
                  "Training loss: {2}, validation loss: {3}.").format(
                      epoch, t_f - t_i, train_loss_avg, validate_loss_avg))
@@ -191,7 +184,7 @@ class ModelController(object):
 
             scheduler.step(math.ceil(auc_avg * 1000.0) / 1000.0)
 
-            LOG.info(
+            logger.info(
                 "[EPOCH] {0}: Saving model state to file.".format(epoch))
             self._save_checkpoint({
                 "epoch": epoch,
@@ -206,7 +199,7 @@ class ModelController(object):
 
         for batch_number in range(self.n_steps_per_epoch):
             self.run_batch_training(avg_losses_train, batch_number)
-        LOG.debug("[TRAIN] Ep {0} average training loss: {1}".format(
+        logger.debug("[TRAIN] Ep {0} average training loss: {1}".format(
             epoch, avg_losses_train.avg))
         return avg_losses_train.avg
 
@@ -222,7 +215,7 @@ class ModelController(object):
                 avg_losses_validate)
             collect_predictions.append(info["predictions"])
 
-        LOG.debug("[VALIDATE] Ep {0} average validation loss: {1}".format(
+        logger.debug("[VALIDATE] Ep {0} average validation loss: {1}".format(
             epoch, avg_losses_validate.avg))
 
         all_predictions = np.vstack(collect_predictions)
@@ -232,7 +225,7 @@ class ModelController(object):
             if len(np.unique(feature_targets)) > 1:
                 auc = roc_auc_score(feature_targets, feature_preds)
                 feature_aucs.append(auc)
-        LOG.debug("[AUC] Average: {0}".format(np.average(feature_aucs)))
+        logger.debug("[AUC] Average: {0}".format(np.average(feature_aucs)))
         print("[AUC] average: {0}".format(np.average(feature_aucs)))
 
         self.stats["AUC"].append(np.average(feature_aucs))
@@ -269,7 +262,7 @@ class ModelController(object):
         proportion_features_in_inputs /= float(self.sampler.n_features)
         avg_prop_features = np.average(proportion_features_in_inputs)
         std_prop_features = np.std(proportion_features_in_inputs)
-        LOG.debug(
+        logger.debug(
             ("[BATCH] proportion of features present in each example: "
              "avg {0}, std {1}").format(avg_prop_features,
                                         std_prop_features))
@@ -282,7 +275,7 @@ class ModelController(object):
         for feature_index in most_common_features[:report_n_features]:
             feat = self.sampler.get_feature_from_index(feature_index)
             common_feats[feat] = count_features[feature_index]
-        LOG.debug(
+        logger.debug(
             "[BATCH] {0} most common features present: {1}".format(
                 report_n_features, common_feats))
 
@@ -306,7 +299,7 @@ class ModelController(object):
             avg_losses.update(loss.data[0], inputs.size(0))
             return loss
 
-        LOG.debug("Updating the model after a training batch.")
+        logger.debug("Updating the model after a training batch.")
         self.optimizer.zero_grad()
         self.optimizer.step(closure)
 
