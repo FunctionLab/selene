@@ -1,16 +1,16 @@
 ---
 sampler:
-    holdout_test:
+    test_holdout:
         - 8
         - 9
-    validation_proportion: 0.125
-    optional_args:
-        bin_radius: 100
-        window_size: 1001
-        default_threshold: 0.5
-        random_seed: 127
-        mode: train
-        sample_from: positive
+    validation_holdout:
+        - 6
+        - 7
+    random_seed: 127
+    sequence_length: 1001
+    center_bin_to_predict: 201
+    default_threshold: 0.5
+    mode: train
 model_controller:
     batch_size: 64
     n_epochs: 1000

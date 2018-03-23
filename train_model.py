@@ -34,7 +34,8 @@ from docopt import docopt
 import torch
 
 from model_controller import ModelController
-from sampler import ChromatinFeaturesSampler
+from sampler import IntervalsSampler
+#from sampler import ChromatinFeaturesSampler
 from utils import read_yaml_file
 
 if __name__ == "__main__":
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     to_stdout = arguments["--stdout"]
     verbose = arguments["--verbose"]
 
-    log = logging.getLogger("deepsea")
+    log = logging.getLogger("selene")
     if verbose:
         log.setLevel(logging.DEBUG)
     else:
@@ -106,38 +107,35 @@ if __name__ == "__main__":
         log.addHandler(stream_handle)
 
     t_i = time()
-    sampler_optional_args = sampler_info["optional_args"]
     feature_thresholds = None
-    if "specific_feature_thresholds" in sampler_optional_args:
-        feature_thresholds = sampler_optional_args["specific_feature_thresholds"]
-        del sampler_optional_args["specific_feature_thresholds"]
+    if "specific_feature_thresholds" in sampler_info:
+        feature_thresholds = sampler_info["specific_feature_thresholds"]
+        del sampler_info["specific_feature_thresholds"]
     else:
         feature_thresholds = None
-    if "default_threshold" in sampler_optional_args:
+    if "default_threshold" in sampler_info:
         if feature_thresholds:
             feature_thresholds["default"] = \
-                sampler_optional_args["default_threshold"]
+                sampler_info["default_threshold"]
         else:
-            feature_thresholds = sampler_optional_args["default_threshold"]
-        del sampler_optional_args["default_threshold"]
+            feature_thresholds = sampler_info["default_threshold"]
+        del sampler_info["default_threshold"]
 
     if feature_thresholds:
-        sampler_info["optional_args"]["feature_thresholds"] = feature_thresholds
+        sampler_info["feature_thresholds"] = feature_thresholds
 
-    sampler = ChromatinFeaturesSampler(
+    sampler = IntervalsSampler(
         genome_fasta,
         genomic_features,
-        coords_only,
         distinct_features,
-        sampler_info["holdout_test"],
-        sampler_info["validation_proportion"],
-        **sampler_info["optional_args"])
+        coords_only,
+        **sampler_info)
 
     t_i_model = time()
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
-    model = model_class(sampler.window_size, sampler.n_features)
+    model = model_class(sampler.sequence_length, sampler.n_features)
     print(model)
 
     checkpoint_info = model_controller_info["checkpoint"]
