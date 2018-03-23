@@ -2,11 +2,12 @@ import random
 
 import numpy as np
 
+from .base_sampler import BaseSampler
 from data_utils import Genome
 from data_utils import GenomicFeatures
 
 
-class Sampler(object):
+class OnlineSampler(BaseSampler):
 
     STRAND_SIDES = ('+', '-')
 
@@ -21,8 +22,8 @@ class Sampler(object):
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train"):
-        # @TODO: do sequence len and center bin len need to both
-        # be odd numbers? Should I make this more flexible?
+        # @TODO: this could be more flexible. Sequence len and center bin
+        # len do not necessarily need to be odd numbers...
         if sequence_length % 2 == 0 or center_bin_to_predict % 2 == 0:
             raise ValueError(
                 "Both the sequence length and the center bin length "
@@ -39,10 +40,16 @@ class Sampler(object):
                     sequence_length, center_bin_to_predict))
 
         self.modes = ["train", "validate"]
+        # specifying a test holdout partition is optional
         if test_holdout:
             self.modes.append("test")
-            if type(validation_holdout) == type(list()) and \
-                    type(test_holdout) == type(list()):
+            # @TODO: make sure that isinstance works in this
+            # situation
+            if isinstance(validation_holdout, (list,)) and \
+                    isinstance(test_holdout, (list,)):
+            #if type(validation_holdout) == type(list()) and \
+            #        type(test_holdout) == type(list()):
+                print("both are type list")
                 self.validation_holdout = [
                     str(c) for c in validation_holdout]
                 self.test_holdout = [str(c) for c in test_holdout]
@@ -60,7 +67,9 @@ class Sampler(object):
                         type(validation_holdout), type(test_holdout)))
         else:
             self.test_holdout = None
-            if type(validation_holdout) == type(list()):
+            if isinstance(validation_holdout, (list)):
+            #if type(validation_holdout) == type(list()):
+                print("validation holdout is type list")
                 self.validation_holdout = [
                     str(c) for c in validation_holdout]
             else:
@@ -76,6 +85,7 @@ class Sampler(object):
             surrounding_sequence_length / 2)
         self.sequence_length = sequence_length
         self.bin_radius = int((center_bin_to_predict - 1) / 2)
+        print(self.surrounding_sequence_radius, self.sequence_length, self.bin_radius)
 
         np.random.seed(random_seed)
         random.seed(random_seed + 1)
@@ -88,6 +98,7 @@ class Sampler(object):
             for line in file_handle:
                 self._features.append(line.strip())
         self.n_features = len(self._features)
+        print(self.n_features)
 
         self.query_feature_data = GenomicFeatures(
             query_feature_data, self._features,
@@ -95,7 +106,7 @@ class Sampler(object):
 
     def get_feature_from_index(self, feature_index):
         """Returns the feature corresponding to an index in the feature
-        vector. Currently used by the 'deepsea' logger.
+        vector.
 
         Parameters
         ----------
@@ -107,5 +118,14 @@ class Sampler(object):
         """
         return self.query_feature_data.index_feature_map[feature_index]
 
+    def get_sequence_from_encoding(self, encoding):
+        return self.genome.encoding_to_sequence(encoding)
+
     def sample(self, batch_size):
+        raise NotImplementedError
+
+    def get_data_and_targets(self, mode, batch_size, n_samples):
+        raise NotImplementedError
+
+    def get_validation_set(self, batch_size, n_samples=None):
         raise NotImplementedError
