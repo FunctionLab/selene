@@ -225,11 +225,9 @@ class IntervalsSampler(OnlineSampler):
 
         n_batches = int(n_samples / batch_size)
         for _ in range(n_batches):
-            t_i = time()
             inputs, targets = self.sample(batch_size)
             sequences_and_targets.append((inputs, targets))
             targets_mat.append(targets)
-            print("validation batch: {0} s".format(time() - t_i))
         targets_mat = np.vstack(targets_mat)
         return sequences_and_targets, targets_mat
 
