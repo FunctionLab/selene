@@ -253,31 +253,8 @@ class ModelController(object):
         """
         self.sampler.set_mode("train")
         inputs, targets = self._get_batch()
-        #self._log_training_info(targets)
         return self._pass_through_model_train(
             inputs, targets, batch_number, avg_losses)
-
-    def _log_training_info(self, targets):
-        proportion_features_in_inputs = np.sum(targets, axis=1)
-        proportion_features_in_inputs /= float(self.sampler.n_features)
-        avg_prop_features = np.average(proportion_features_in_inputs)
-        std_prop_features = np.std(proportion_features_in_inputs)
-        logger.debug(
-            ("[BATCH] proportion of features present in each example: "
-             "avg {0}, std {1}").format(avg_prop_features,
-                                        std_prop_features))
-
-        count_features = np.sum(targets, axis=0)
-        most_common_features = list(count_features.argsort())
-        most_common_features.reverse()
-        report_n_features = 10
-        common_feats = {}
-        for feature_index in most_common_features[:report_n_features]:
-            feat = self.sampler.get_feature_from_index(feature_index)
-            common_feats[feat] = count_features[feature_index]
-        logger.debug(
-            "[BATCH] {0} most common features present: {1}".format(
-                report_n_features, common_feats))
 
     def _pass_through_model_train(self, inputs, targets, batch_number,
                                   avg_losses):

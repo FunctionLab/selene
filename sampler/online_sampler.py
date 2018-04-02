@@ -22,6 +22,9 @@ class OnlineSampler(BaseSampler):
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train"):
+        super(OnlineSampler, self).__init__(
+            random_seed=random_seed
+        )
         # @TODO: this could be more flexible. Sequence len and center bin
         # len do not necessarily need to be odd numbers...
         if sequence_length % 2 == 0 or center_bin_to_predict % 2 == 0:
@@ -39,7 +42,6 @@ class OnlineSampler(BaseSampler):
                 "length of {1}.".format(
                     sequence_length, center_bin_to_predict))
 
-        self.modes = ["train", "validate"]
         # specifying a test holdout partition is optional
         if test_holdout:
             self.modes.append("test")
@@ -67,7 +69,7 @@ class OnlineSampler(BaseSampler):
                         type(validation_holdout), type(test_holdout)))
         else:
             self.test_holdout = None
-            if isinstance(validation_holdout, (list)):
+            if isinstance(validation_holdout, (list,)):
             #if type(validation_holdout) == type(list()):
                 print("validation holdout is type list")
                 self.validation_holdout = [
@@ -85,11 +87,6 @@ class OnlineSampler(BaseSampler):
             surrounding_sequence_length / 2)
         self.sequence_length = sequence_length
         self.bin_radius = int((center_bin_to_predict - 1) / 2)
-        print(self.surrounding_sequence_radius, self.sequence_length, self.bin_radius)
-
-        np.random.seed(random_seed)
-        random.seed(random_seed + 1)
-        self.random_seed = random_seed
 
         self.genome = Genome(genome)
 
@@ -98,8 +95,7 @@ class OnlineSampler(BaseSampler):
             for line in file_handle:
                 self._features.append(line.strip())
         self.n_features = len(self._features)
-        print(self.n_features)
-
+        
         self.query_feature_data = GenomicFeatures(
             query_feature_data, self._features,
             feature_thresholds=feature_thresholds)

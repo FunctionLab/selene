@@ -16,8 +16,12 @@ SampleIndices = namedtuple(
 
 
 def _get_indices_and_probabilities(interval_lengths, indices):
-    interval_lens = np.array(interval_lengths)[indices]
-    weights = interval_lens / float(np.sum(interval_lens))
+    """Given a list of different interval lengths and the indices of interest in
+    that list, weight the probability that we will sample one of the indices
+    in `indices` based on the interval lengths in that sublist.
+    """
+    select_interval_lens = np.array(interval_lengths)[indices]
+    weights = select_interval_lens / float(np.sum(select_interval_lens))
 
     keep_indices = []
     for index, weight in enumerate(weights):
@@ -80,21 +84,25 @@ class IntervalsSampler(OnlineSampler):
                 chrom = cols[0]
                 start = int(cols[1])
                 end = int(cols[2])
-                self.sample_from_intervals.append(
-                    (chrom, start, end))
+                self.sample_from_intervals.append((chrom, start, end))
                 self.interval_lengths.append(end - start)
-        select_indices = list(range(len(self.sample_from_intervals)))
+        n_intervals = len(self.sample_from_intervals)
+
+        # all indices in the intervals list are shuffled
+        select_indices = list(range(n_intervals))
         np.random.shuffle(select_indices)
-        n_indices_validate = int(
-            len(self.sample_from_intervals) * self.validation_holdout)
+
+        # the first section of indices is used as the validation set
+        n_indices_validate = int(n_intervals * self.validation_holdout)
         val_indices, val_weights = _get_indices_and_probabilities(
             self.interval_lengths, select_indices[:n_indices_validate])
         self.sample_from_mode["validate"] = SampleIndices(
             val_indices, val_weights)
 
         if self.test_holdout:
-            n_indices_test = int(
-                len(self.sample_from_intervals) * self.test_holdout)
+            # if applicable, the second section of indices is used as the
+            # test set
+            n_indices_test = int(n_intervals * self.test_holdout)
             test_indices_end = n_indices_test + n_indices_validate
             test_indices, test_weights = _get_indices_and_probabilities(
                 self.interval_lengths,
@@ -102,11 +110,13 @@ class IntervalsSampler(OnlineSampler):
             self.sample_from_mode["test"] = SampleIndices(
                 test_indices, test_weights)
 
+            # remaining indices are for the training set
             tr_indices, tr_weights = _get_indices_and_probabilities(
                 self.interval_lengths, select_indices[test_indices_end:])
             self.sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
         else:
+            # remaining indices are for the training set
             tr_indices, tr_weights = _get_indices_and_probabilities(
                 self.interval_lengths, select_indices[n_indices_validate:])
             self.sample_from_mode["train"] = SampleIndices(
@@ -130,8 +140,7 @@ class IntervalsSampler(OnlineSampler):
                 else:
                     self.sample_from_mode["train"].indices.append(
                         index)
-                self.sample_from_intervals.append(
-                    (chrom, start, end))
+                self.sample_from_intervals.append((chrom, start, end))
                 self.interval_lengths.append(end - start)
 
         for mode in self.modes:
@@ -167,14 +176,6 @@ class IntervalsSampler(OnlineSampler):
             replace=True,
             p=self.sample_from_mode[mode].weights)
         self.randcache[mode]["sample_next"] = 0
-        return
-
-    def set_mode(self, mode):
-        if mode not in self.modes:
-            raise ValueError(
-                "Tried to set mode to be '{0}' but the only valid modes are "
-                "{1}".format(mode, self.modes))
-        self.mode = mode
 
     def sample(self, batch_size=1):
         sequences = np.zeros((batch_size, self.sequence_length, 4))

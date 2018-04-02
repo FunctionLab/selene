@@ -9,7 +9,7 @@ from pyfaidx import Fasta
 
 from data_utils.fastloop import _fast_sequence_to_encoding
 
-LOG = logging.getLogger("deepsea")
+LOG = logging.getLogger("selene")
 
 
 def _sequence_to_encoding(sequence, bases_encoding):
@@ -107,6 +107,12 @@ class Genome(object):
         self.genome = Fasta(fa_file)
         self.chrs = sorted(self.genome.keys())
         self.len_chrs = self._get_len_chrs()
+
+    def get_chrs(self):
+        return self.chrs
+
+    def get_chr_lens(self):
+        return list(self.len_chrs.items())
 
     def _get_len_chrs(self):
         """Gets the length of each chromosome sequence in the file.

@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 
-from sampler import Sampler
+from online_sampler import OnlineSampler
 
 
 SampleIndices = namedtuple(
@@ -26,13 +26,12 @@ def _get_indices_and_probabilities(interval_lengths, indices):
             interval_lengths, keep_indices)
 
 
-class IntervalsSampler(Sampler):
+class RandomSampler(OnlineSampler):
 
     def __init__(self,
                  genome,
                  query_feature_data,
                  distinct_features,
-                 intervals_file,
                  random_seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
@@ -40,7 +39,7 @@ class IntervalsSampler(Sampler):
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train"):
-        super(IntervalsSampler, self).__init__(
+        super(RandomSampler, self).__init__(
             genome,
             query_feature_data,
             distinct_features,
@@ -50,7 +49,7 @@ class IntervalsSampler(Sampler):
             sequence_length=sequence_length,
             center_bin_to_predict=center_bin_to_predict,
             feature_thresholds=feature_thresholds,
-            mode="train")
+            mode=mode)
 
         self.sample_from_mode = {}
         self.randcache = {}
@@ -58,26 +57,27 @@ class IntervalsSampler(Sampler):
             self.sample_from_mode[mode] = None
             self.randcache[mode] = {"cache": None, "sample_next": 0}
 
-        self.sample_from_intervals = []
-        self.interval_lengths = []
-
         if self._holdout_type == "chromosome":
-            self._partition_dataset_chromosome(intervals_file)
+            self._partition_genome_by_chromosome()
         else:
-            self._partition_dataset_proportion(intervals_file)
+            self._partition_genome_by_proportion()
 
         self._update_randcache()
 
-    def _partition_dataset_proportion(self, intervals_file):
-        with open(intervals_file, 'r') as file_handle:
-            for line in file_handle:
-                cols = line.strip().split('\t')
-                chrom = cols[0]
-                start = int(cols[1])
-                end = int(cols[2])
-                self.sample_from_intervals.append(
-                    (chrom, start, end))
-                self.interval_lengths.append(end - start)
+    def _partition_genome_by_proportion(self):
+        # what is the diff between a randcache that
+        # randomly selects a position from all
+        # possible positions in chromosomes
+        # vs one that selects the chromosome first
+        # and then the index?
+        total_positions = 0
+        chrom_up_to_position = {}
+        for chrom, len_chrom in self.genome.get_chr_lens():
+            total_positions += len_chrom
+            chrom_up_to_position[chrom] = total_positions
+        # divide total_positions into 10 segments.
+
+
         select_indices = list(range(len(self.sample_from_intervals)))
         np.random.shuffle(select_indices)
         n_indices_validate = int(
@@ -107,7 +107,15 @@ class IntervalsSampler(Sampler):
             self.sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
 
-    def _partition_dataset_chromosome(self, intervals_file):
+    def _partition_genome_by_chromosome(self, intervals_file):
+        training_chrs = self.genome.get_chrs()
+        training_chrs = set(training_chrs) - set(self.validation_holdout)
+        if self.test_holdout:
+            training_chrs = list(
+                training_chrs - set(self.test_holdout))
+        else:
+            training_chrs = list(training_chrs)
+
         for mode in self.modes:
             self.sample_from_mode[mode] = SampleIndices([], [])
         with open(intervals_file, 'r') as file_handle:
@@ -161,13 +169,6 @@ class IntervalsSampler(Sampler):
             p=self.sample_from_mode[mode].weights)
         self.randcache[mode]["sample_next"] = 0
         return
-
-    def set_mode(self, mode):
-        if mode not in self.modes:
-            raise ValueError(
-                "Tried to set mode to be '{0}' but the only valid modes are "
-                "{1}".format(mode, self.modes))
-        self.mode = mode
 
     def sample(self, batch_size):
         sequences = np.zeros((batch_size, self.sequence_length, 4))
