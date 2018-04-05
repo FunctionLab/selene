@@ -19,6 +19,17 @@ def _get_indices_and_probabilities(interval_lengths, indices):
     """Given a list of different interval lengths and the indices of interest in
     that list, weight the probability that we will sample one of the indices
     in `indices` based on the interval lengths in that sublist.
+
+    Parameters
+    ----------
+    interval_lengths : list(int)
+    indices : list(int)
+
+    Returns
+    -------
+    indices, weights : tuple(list, list)
+        Tuple of interval indices to sample from and the corresponding
+    weights of those intervals.
     """
     select_interval_lens = np.array(interval_lengths)[indices]
     weights = select_interval_lens / float(np.sum(select_interval_lens))
@@ -35,6 +46,25 @@ def _get_indices_and_probabilities(interval_lengths, indices):
 
 
 class IntervalsSampler(OnlineSampler):
+    """
+    Parameters
+    ----------
+    genome
+    query_feature_data
+    distinct_features
+    intervals_file
+    random_seed
+    validation_holdout
+    test_holdout
+    sequence_length
+    center_bin_to_predict
+    feature_thresholds
+    mode
+
+    Attributes
+    ----------
+    """
+
 
     def __init__(self,
                  genome,
@@ -60,11 +90,11 @@ class IntervalsSampler(OnlineSampler):
             feature_thresholds=feature_thresholds,
             mode="train")
 
-        self.sample_from_mode = {}
-        self.randcache = {}
+        self._sample_from_mode = {}
+        self._randcache = {}
         for mode in self.modes:
-            self.sample_from_mode[mode] = None
-            self.randcache[mode] = {"cache": None, "sample_next": 0}
+            self._sample_from_mode[mode] = None
+            self._randcache[mode] = {"cache": None, "sample_next": 0}
 
         self.sample_from_intervals = []
         self.interval_lengths = []
@@ -96,7 +126,7 @@ class IntervalsSampler(OnlineSampler):
         n_indices_validate = int(n_intervals * self.validation_holdout)
         val_indices, val_weights = _get_indices_and_probabilities(
             self.interval_lengths, select_indices[:n_indices_validate])
-        self.sample_from_mode["validate"] = SampleIndices(
+        self._sample_from_mode["validate"] = SampleIndices(
             val_indices, val_weights)
 
         if self.test_holdout:
@@ -107,24 +137,24 @@ class IntervalsSampler(OnlineSampler):
             test_indices, test_weights = _get_indices_and_probabilities(
                 self.interval_lengths,
                 select_indices[n_indices_validate:test_indices_end])
-            self.sample_from_mode["test"] = SampleIndices(
+            self._sample_from_mode["test"] = SampleIndices(
                 test_indices, test_weights)
 
             # remaining indices are for the training set
             tr_indices, tr_weights = _get_indices_and_probabilities(
                 self.interval_lengths, select_indices[test_indices_end:])
-            self.sample_from_mode["train"] = SampleIndices(
+            self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
         else:
             # remaining indices are for the training set
             tr_indices, tr_weights = _get_indices_and_probabilities(
                 self.interval_lengths, select_indices[n_indices_validate:])
-            self.sample_from_mode["train"] = SampleIndices(
+            self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
 
     def _partition_dataset_chromosome(self, intervals_file):
         for mode in self.modes:
-            self.sample_from_mode[mode] = SampleIndices([], [])
+            self._sample_from_mode[mode] = SampleIndices([], [])
         with open(intervals_file, 'r') as file_handle:
             for index, line in enumerate(file_handle):
                 cols = line.strip().split('\t')
@@ -132,23 +162,23 @@ class IntervalsSampler(OnlineSampler):
                 start = int(cols[1])
                 end = int(cols[2])
                 if chrom in self.validation_holdout:
-                    self.sample_from_mode["validate"].indices.append(
+                    self._sample_from_mode["validate"].indices.append(
                         index)
                 elif self.test_holdout and chrom in self.test_holdout:
-                    self.sample_from_mode["test"].indices.append(
+                    self._sample_from_mode["test"].indices.append(
                         index)
                 else:
-                    self.sample_from_mode["train"].indices.append(
+                    self._sample_from_mode["train"].indices.append(
                         index)
                 self.sample_from_intervals.append((chrom, start, end))
                 self.interval_lengths.append(end - start)
 
         for mode in self.modes:
-            sample_indices = self.sample_from_mode[mode].indices
+            sample_indices = self._sample_from_mode[mode].indices
             indices, weights = _get_indices_and_probabilities(
                 self.interval_lengths, sample_indices)
-            self.sample_from_mode[mode] = \
-                self.sample_from_mode[mode]._replace(
+            self._sample_from_mode[mode] = \
+                self._sample_from_mode[mode]._replace(
                     indices=indices, weights=weights)
 
     def _retrieve(self, chrom, position):
@@ -170,25 +200,26 @@ class IntervalsSampler(OnlineSampler):
     def _update_randcache(self, mode=None):
         if not mode:
             mode = self.mode
-        self.randcache[mode]["cache_indices"] = np.random.choice(
-            self.sample_from_mode[mode].indices,
-            size=len(self.sample_from_mode[mode].indices),
+        self._randcache[mode]["cache_indices"] = np.random.choice(
+            self._sample_from_mode[mode].indices,
+            size=len(self._sample_from_mode[mode].indices),
             replace=True,
-            p=self.sample_from_mode[mode].weights)
-        self.randcache[mode]["sample_next"] = 0
+            p=self._sample_from_mode[mode].weights)
+        self._randcache[mode]["sample_next"] = 0
 
     def sample(self, batch_size=1):
         sequences = np.zeros((batch_size, self.sequence_length, 4))
         targets = np.zeros((batch_size, self.n_features))
         n_samples_drawn = 0
         while n_samples_drawn < batch_size:
-            sample_index = self.randcache[self.mode]["sample_next"]
-            if sample_index == len(self.sample_from_mode[self.mode].indices):
+            sample_index = self._randcache[self.mode]["sample_next"]
+            if sample_index == len(self._sample_from_mode[self.mode].indices):
                 self._update_randcache()
+                sample_index = 0
 
             rand_interval_index = \
-                self.randcache[self.mode]["cache_indices"][sample_index]
-            self.randcache[self.mode]["sample_next"] += 1
+                self._randcache[self.mode]["cache_indices"][sample_index]
+            self._randcache[self.mode]["sample_next"] += 1
 
             interval_info = self.sample_from_intervals[rand_interval_index]
             interval_length = self.interval_lengths[rand_interval_index]
@@ -234,5 +265,5 @@ class IntervalsSampler(OnlineSampler):
 
     def get_validation_set(self, batch_size, n_samples=None):
         if not n_samples:
-            n_samples = len(self.sample_from_mode["validate"].indices)
+            n_samples = len(self._sample_from_mode["validate"].indices)
         return self.get_data_and_targets("validate", batch_size, n_samples)
