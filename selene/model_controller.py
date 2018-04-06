@@ -1,43 +1,79 @@
 """Execute the necessary steps to train the model
 """
 import logging
+import math
 import os
 import shutil
 from time import time
 
-import h5py
 import numpy as np
 from sklearn.metrics import roc_auc_score
-import scipy.io
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-from utils import AverageMeter
+from .utils import AverageMeter
 
 
-LOG = logging.getLogger("deepsea")
+logger = logging.getLogger("selene")
 torch.set_num_threads(32)
 
 
 class ModelController(object):
 
-    def __init__(self, model, samples_dir,
+    def __init__(self, model, sampler,
                  loss_criterion,
                  optimizer_class, optimizer_args,
                  batch_size,
-                 n_train_batch_per_epoch,
+                 n_steps_per_epoch,
                  output_dir,
                  checkpoint_resume=None,
                  use_cuda=False, data_parallel=False):
+        """Methods to train and validate a PyTorch model.
+
+        Parameters
+        ----------
+        model : torch.nn.Module
+        sampler : Sampler
+        loss_criterion : torch.nn._Loss
+        optimizer_args : dict
+        batch_size : int
+            Specify the batch size to process examples. Should be a power of 2.
+        use_cuda : bool, optional
+            Default is False. Specify whether CUDA is available for torch
+            to use during training.
+        data_parallel : bool, optional
+            Default is False. Specify whether multiple GPUs are available
+            for torch to use during training.
+        prefix_outputs : str, optional
+            Default is None. If None, prefix output files (e.g. the latest
+            checkpoint and the best performing state of the model)
+            with the current day.
+        checkpoint_resume : torch.save object, optional
+            Default is None. If `checkpoint_resume` is not None, assumes
+            the input is a model saved via `torch.save` that can be
+            loaded to resume training.
+
+        Attributes
+        ----------
+        model : torch.nn.Module
+        sampler : Sampler
+        criterion : torch.nn._Loss
+        optimizer : torch.optim
+        batch_size : batch_size
+        use_cuda : bool
+        data_parallel : bool
+        prefix_outputs : str
+        """
         self.model = model
+        self.sampler = sampler
         self.criterion = loss_criterion
         self.optimizer = optimizer_class(
             self.model.parameters(), **optimizer_args)
 
         self.batch_size = batch_size
-        self.n_train_batch_per_epoch = n_train_batch_per_epoch
+        self.n_steps_per_epoch = n_steps_per_epoch
 
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
@@ -46,12 +82,14 @@ class ModelController(object):
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
-            LOG.debug("Wrapped model in DataParallel")
+            logger.debug("Wrapped model in DataParallel")
 
         if self.use_cuda:
             self.model.cuda()
             self.criterion.cuda()
-            LOG.debug("Set modules to use CUDA")
+            logger.debug("Set modules to use CUDA")
+
+        self._create_validation_set()
 
         self.start_epoch = 0
         self.min_loss = float("inf")
@@ -60,7 +98,7 @@ class ModelController(object):
             self.min_loss = checkpoint_resume["min_loss"]
             self.optimizer.load_state_dict(
                 checkpoint_resume["optimizer"])
-            LOG.info(
+            logger.info(
                 ("Resuming from checkpoint: "
                  "epoch {0}, min loss {1}").format(
                     self.start_epoch, self.min_loss))
@@ -71,50 +109,32 @@ class ModelController(object):
             "AUC": []
         }
 
-        self._load_train_validate_mats(samples_dir)
-
-    def _load_train_validate_mats(self, samples_dir):
-        train_mat = h5py.File(
-            os.path.join(samples_dir, "train.mat"), 'r')
-        train_targets = train_mat["traindata"][()].astype(float).T
-        n_train, n_features = train_targets.shape
-
-        train_samples = train_mat["trainxdata"][()].T
-        n_train, n_bases, seq_len = train_samples.shape
-
-        valid_mat = scipy.io.loadmat(
-            os.path.join(samples_dir, "valid.mat"))
-        n_valid, n_features = valid_mat["validdata"].shape
-        n_valid, n_bases, n_sequence = valid_mat["validxdata"].shape
-
-        self.train_targets = train_targets
-        self.train_samples = train_samples
-        self.n_train = n_train
-
-        self.n_features = n_features
-
+    def _create_validation_set(self):
+        """Used in `__init__`.
         """
-        # OVERFITTING TEST
-        n_overfit = 32000
+        t_i = time()
+        self._validation_data, self._all_validation_targets = \
+            self.sampler.get_validation_set(self.batch_size, n_samples=32000)
+        t_f = time()
+        logger.info(("{0} s to load {1} validation examples ({2} validation "
+                     "batches) to evaluate after each training epoch.").format(
+                      t_f - t_i,
+                      len(self._validation_data) * self.batch_size,
+                      len(self._validation_data)))
 
-        self.train_targets = train_targets[:n_overfit, :]
-        self.train_samples = train_samples[:n_overfit, :, :]
-        self.n_train = n_overfit
+    def _get_batch(self):
+        """Sample `self.batch_size` times. Return inputs and targets as a
+        batch.
         """
-
-        self.valid_targets = valid_mat["validdata"].astype(float)
-        self.valid_samples = valid_mat["validxdata"].astype(float)
-        self.n_valid = n_valid
-
-        """
-        # OVERFITTING TEST
-        self.valid_targets = self.valid_targets[:n_overfit - 1024, :]
-        self.valid_samples = self.valid_samples[:n_overfit - 1024, :, :]
-        self.n_valid = n_overfit - 1024
-        """
-
-        print("n_train: {0}, n_valid: {1}".format(n_train, n_valid))
-        train_mat.close()
+        t_i_sampling = time()
+        batch_sequences, batch_targets = self.sampler.sample(
+            batch_size=self.batch_size)
+        t_f_sampling = time()
+        logger.debug(
+            ("[BATCH] Time to sample {0} examples: {1} s.").format(
+                 self.batch_size,
+                 t_f_sampling - t_i_sampling))
+        return (batch_sequences, batch_targets)
 
     def train_and_validate(self, n_epochs):
         """The training and validation process.
@@ -134,37 +154,27 @@ class ModelController(object):
         -------
         None
         """
-        LOG.info(
+        logger.info(
             ("[TRAIN/VALIDATE] n_epochs: {0}, n_train: {1}, "
              "batch_size: {2}").format(
-                n_epochs, self.n_train_batch_per_epoch, self.batch_size))
+                n_epochs, self.n_steps_per_epoch, self.batch_size))
 
         min_loss = self.min_loss
 
-        # TODO: gamma might need to be a parameter somewhere.
-        # learning rate decay.
-        scheduler = StepLR(self.optimizer, step_size=18, gamma=0.05)
-
+        scheduler = ReduceLROnPlateau(
+            self.optimizer, 'max', patience=16, verbose=True,
+            factor=0.8)
         for epoch in range(self.start_epoch, n_epochs):
             t_i = time()
-            scheduler.step()
-
-            train_indices = np.arange(self.n_train)
-            np.random.shuffle(train_indices)
-
-            valid_indices = np.arange(self.n_valid)
-            np.random.shuffle(valid_indices)
-
-            train_loss_avg = self.train(epoch, train_indices)
-            validate_loss_avg = self.validate(epoch, valid_indices)
-
+            train_loss_avg = self.train(epoch)
+            validate_loss_avg = self.validate(epoch)
             self.stats["training_loss"].append(train_loss_avg)
             self.stats["validation_loss"].append(validate_loss_avg)
             auc_avg = self.stats["AUC"][-1]
 
             t_f = time()
 
-            LOG.info(
+            logger.info(
                 ("[EPOCH] {0}: {1} s. "
                  "Training loss: {2}, validation loss: {3}.").format(
                      epoch, t_f - t_i, train_loss_avg, validate_loss_avg))
@@ -172,7 +182,9 @@ class ModelController(object):
             is_best = validate_loss_avg < min_loss
             min_loss = min(validate_loss_avg, min_loss)
 
-            LOG.info(
+            scheduler.step(math.ceil(auc_avg * 1000.0) / 1000.0)
+
+            logger.info(
                 "[EPOCH] {0}: Saving model state to file.".format(epoch))
             self._save_checkpoint({
                 "epoch": epoch,
@@ -181,92 +193,68 @@ class ModelController(object):
                 "min_loss": min_loss,
                 "optimizer": self.optimizer.state_dict()}, is_best)
 
-    def train(self, epoch, train_indices):
+    def train(self, epoch):
         avg_losses_train = AverageMeter()
         self.model.train()
-        n_samples = 1000000
-        #n_samples = self.n_train
-        collect_predictions = []
-        for i in range(0, n_samples, self.batch_size):
-            use_indices = train_indices[i:i+self.batch_size]
-            inputs = self.train_samples[use_indices, :, :]
-            inputs = inputs.astype(float)
-            inputs = np.transpose(inputs, (0, 2, 1))
 
-            targets = self.train_targets[use_indices, :]
-
-            info = self._pass_through_model_train(
-                inputs, targets, int(i / self.batch_size), avg_losses_train)
-            collect_predictions.append(info["predictions"])
-        LOG.debug("[TRAIN] Ep {0} average training loss: {1}".format(
+        for batch_number in range(self.n_steps_per_epoch):
+            self.run_batch_training(avg_losses_train, batch_number)
+        logger.debug("[TRAIN] Ep {0} average training loss: {1}".format(
             epoch, avg_losses_train.avg))
-        self._log_training_info(targets)
-
-        all_predictions = np.vstack(tuple(collect_predictions))
-        feature_aucs = []
-        for index, feature_preds in enumerate(all_predictions.T):
-            feature_targets = self.train_targets[train_indices[:n_samples], index]
-            if len(np.unique(feature_targets)) > 1:
-                auc = roc_auc_score(feature_targets, feature_preds)
-                feature_aucs.append(auc)
-        LOG.debug("[AUC] TRAIN: {0}".format(np.average(feature_aucs)))
-        print("[AUC] TRAIN: {0}".format(np.average(feature_aucs)))
         return avg_losses_train.avg
 
-    def validate(self, epoch, validate_indices):
+    def validate(self, epoch):
         avg_losses_validate = AverageMeter()
         self.model.eval()
 
         collect_predictions = []
-
-        for i in range(0, self.n_valid, self.batch_size):
-            use_indices = validate_indices[i:i+self.batch_size]
-
-            inputs = self.valid_samples[use_indices, :, :]
-            inputs = np.transpose(inputs, (0, 2, 1))
-
-            targets = self.valid_targets[use_indices, :]
+        for batch_number, (inputs, targets) in \
+                enumerate(self._validation_data):
             info = self._pass_through_model_validate(
-                inputs, targets, int(i / self.batch_size),
+                inputs, targets, batch_number,
                 avg_losses_validate)
             collect_predictions.append(info["predictions"])
 
-        LOG.debug("[VALIDATE] Ep {0} average validation loss: {1}".format(
+        logger.debug("[VALIDATE] Ep {0} average validation loss: {1}".format(
             epoch, avg_losses_validate.avg))
 
         all_predictions = np.vstack(collect_predictions)
         feature_aucs = []
         for index, feature_preds in enumerate(all_predictions.T):
-            feature_targets = self.valid_targets[validate_indices, index]
+            feature_targets = self._all_validation_targets[:, index]
             if len(np.unique(feature_targets)) > 1:
                 auc = roc_auc_score(feature_targets, feature_preds)
                 feature_aucs.append(auc)
-        LOG.debug("[AUC] Average: {0}".format(np.average(feature_aucs)))
+        logger.debug("[AUC] Average: {0}".format(np.average(feature_aucs)))
         print("[AUC] average: {0}".format(np.average(feature_aucs)))
 
         self.stats["AUC"].append(np.average(feature_aucs))
         return avg_losses_validate.avg
 
-    def _log_training_info(self, targets):
-        proportion_features_in_inputs = np.sum(targets, axis=1)
-        proportion_features_in_inputs /= float(self.n_features)
-        avg_prop_features = np.average(proportion_features_in_inputs)
-        std_prop_features = np.std(proportion_features_in_inputs)
-        LOG.debug(
-            ("[BATCH] proportion of features present in each example: "
-             "avg {0}, std {1}").format(avg_prop_features,
-                                        std_prop_features))
+    def run_batch_training(self, avg_losses, batch_number):
+        """Create and process a training batch of positive/negative examples.
 
-        count_features = np.sum(targets, axis=0)
-        most_common_features = list(count_features.argsort())
-        most_common_features.reverse()
-        report_n_features = 10
-        common_feats = {}
-        for feature_index in most_common_features[:report_n_features]:
-            common_feats[feature_index] = count_features[feature_index]
-        LOG.debug(
-            "[BATCH] {0} most common features present: {1}".format(
-                report_n_features, common_feats))
+        Parameters
+        ----------
+        avg_losses : AverageMeter
+            Used to track the average loss, within each epoch.
+        batch_number : int
+            The current batch number. Used for monitoring/logging.
+
+        Returns
+        -------
+        dict()
+            Information about [TODO: revise] the current batch time,
+            average batch time, current loss, and average loss.
+            { "batch_time" : float,
+              "batch_time_avg" : float,
+              "loss" : float,
+              "loss_avg" : float }
+        """
+        self.sampler.set_mode("train")
+        inputs, targets = self._get_batch()
+        return self._pass_through_model_train(
+            inputs, targets, batch_number, avg_losses)
 
     def _pass_through_model_train(self, inputs, targets, batch_number,
                                   avg_losses):
@@ -281,23 +269,22 @@ class ModelController(object):
         inputs = Variable(inputs)
         targets = Variable(targets)
 
-        output = self.model(inputs.transpose(1, 2))
-        loss = self.criterion(output, targets)
+        def closure():
+            batch_output = self.model(inputs.transpose(1, 2))
+            loss = self.criterion(batch_output, targets)
+            loss.backward()
+            avg_losses.update(loss.data[0], inputs.size(0))
+            return loss
 
+        logger.debug("Updating the model after a training batch.")
         self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-
-        avg_losses.update(loss.data[0], inputs.size(0))
-
-        LOG.debug("Updating the model after a training batch.")
+        self.optimizer.step(closure)
 
         batch_time = time() - t_i
 
         log_info = {"batch_time": batch_time,
                     "loss": avg_losses.val,
-                    "loss_avg": avg_losses.avg,
-                    "predictions": output.data.cpu().numpy()}
+                    "loss_avg": avg_losses.avg}
         return log_info
 
     def _pass_through_model_validate(self, inputs, targets, batch_number,

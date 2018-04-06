@@ -1,10 +1,6 @@
-import random
-
-import numpy as np
-
 from .base_sampler import BaseSampler
-from data_utils import Genome
-from data_utils import GenomicFeatures
+from ..sequences import Genome
+from ..targets import GenomicFeatures
 
 
 class OnlineSampler(BaseSampler):
@@ -95,7 +91,7 @@ class OnlineSampler(BaseSampler):
             for line in file_handle:
                 self._features.append(line.strip())
         self.n_features = len(self._features)
-        
+
         self.query_feature_data = GenomicFeatures(
             query_feature_data, self._features,
             feature_thresholds=feature_thresholds)

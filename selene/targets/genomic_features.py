@@ -21,7 +21,7 @@ import types
 import tabix
 import numpy as np
 
-from data_utils.fastloop import _fast_get_feature_data
+from ._genomic_features import _fast_get_feature_data
 
 
 def _any_positive_rows(rows, query_start, query_end, thresholds):

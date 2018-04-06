@@ -7,7 +7,7 @@ import logging
 import numpy as np
 from pyfaidx import Fasta
 
-from data_utils.fastloop import _fast_sequence_to_encoding
+from ._genome import _fast_sequence_to_encoding
 
 LOG = logging.getLogger("selene")
 
