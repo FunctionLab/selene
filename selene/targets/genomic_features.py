@@ -3,15 +3,9 @@ where each row of [start, end) coordinates corresponds to a genomic feature
 in the sequence.
 
 It accepts the path to a tabix-indexed .bed.gz file of genomic coordinates.
-Such a file can be created from a tab-delimited features file (.tsv/.bed) using
-the following shell script:
-    ../index_coordinates_file.sh
-Please consult the description provided in the shell script in order to
-determine what dependencies you need to install and what modifications
-you should make in order to run it on your file.
 
 This .tsv/.bed file must contain the following columns, in order:
-    chrom, start (0-based), end, strand, feature
+    chrom ('1', '2', ..., 'X', 'Y'), start (0-based), end, feature
 Additionally, the column names should be omitted from the file itself
 (i.e. there is no header and the first line in the file is the first
 row of genome coordinates for a feature).
@@ -36,26 +30,6 @@ def _any_positive_rows(rows, query_start, query_end, thresholds):
 
 def _is_positive_row(query_start, query_end,
                      feat_start, feat_end, threshold):
-    """Helper function to determine whether a single row from a successful
-    query is considered a positive example.
-
-    Parameters
-    ----------
-    query_start : int
-    query_end : int
-    feat_start : int
-    feat_end : int
-    threshold : [0.0, 1.0], float
-        The threshold specifies the proportion of
-        the [`start`, `end`) window that needs to be covered by
-        at least one feature for the example to be considered
-        positive.
-    Returns
-    -------
-    bool
-        True if this row meets the criterion for a positive example,
-        False otherwise.
-    """
     overlap_start = max(feat_start, query_start)
     overlap_end = min(feat_end, query_end)
     min_overlap_needed = int(
@@ -90,15 +64,32 @@ class GenomicFeatures(object):
             `dataset` should be a *.gz file that has a corresponding
             *.tbi file in the same directory.
         features : list[str]
-            The list of genomic features (labels) we are interested in
+            The unique list of genomic features (labels) we are interested in
             predicting.
+        feature_thresholds : float|dict|types.FunctionType
+            A genomic region is determined to be a positive sample if at least
+            1 genomic feature peak takes up a proportion of the region greater
+            than or equal to the threshold specified for that feature.
+            - float : a single threshold applies to all the features
+                in the dataset
+            - dict : str (feature) -> float (threshold). Assign different
+                thresholds to different features. If a feature's
+                threshold is not specified in the dict, we assume that
+                a key "default" exists in the dict that has the default
+                threshold value we should assign to the feature.
+            - types.FunctionType : define a function that takes as input the
+                feature name and returns the feature's threshold.
 
         Attributes
         ----------
         data : tabix.open
         n_features : int
         feature_index_map : dict
-            feature (key) -> position index (value) in `features`
+            feature (str) -> position index (int) in `features`
+        index_feature_map : dict
+            position index (int) -> feature (str)
+        feature_thresholds : dict
+            feature (str) -> threshold (float)
         """
         self.data = tabix.open(dataset)
 
@@ -110,25 +101,24 @@ class GenomicFeatures(object):
         self.index_feature_map = dict(list(enumerate(features)))
 
         self.feature_thresholds = {}
-        self.feature_thresholds_vec = np.zeros(self.n_features)
+        self._feature_thresholds_vec = np.zeros(self.n_features)
         if isinstance(feature_thresholds, float):
             for i, f in enumerate(features):
                 self.feature_thresholds[f] = feature_thresholds
-                self.feature_thresholds_vec[i] = feature_thresholds
+                self._feature_thresholds_vec[i] = feature_thresholds
         elif isinstance(feature_thresholds, dict):
             for i, f in enumerate(features):
                 if f in feature_thresholds:
                     self.feature_thresholds[f] = feature_thresholds[f]
-                    self.feature_thresholds_vec[i] = feature_thresholds[f]
+                    self._feature_thresholds_vec[i] = feature_thresholds[f]
                 else:
                     self.feature_thresholds[f] = feature_thresholds["default"]
-                    self.feature_thresholds_vec[i] = feature_thresholds["default"]
+                    self._feature_thresholds_vec[i] = feature_thresholds["default"]
         elif isinstance(feature_thresholds, types.FunctionType):
             for i, f in enumerate(features):
                 self.feature_thresholds[f] = feature_thresholds(f)
-                self.feature_thresholds_vec[i] = feature_thresholds(f)
-        self.feature_thresholds_vec = self.feature_thresholds_vec.astype(np.float32)
-        #print(self.feature_thresholds_vec.tolist())
+                self._feature_thresholds_vec[i] = feature_thresholds(f)
+        self._feature_thresholds_vec = self._feature_thresholds_vec.astype(np.float32)
 
     def _query_tabix(self, chrom, start, end):
         try:
@@ -138,21 +128,15 @@ class GenomicFeatures(object):
 
     def is_positive(self, chrom, start, end):
         """Determines whether the (chrom, start, end) queried
-        contains features that occupy over `threshold` * 100%
-        of the [start, end) region. If so, this is a positive
-        example.
+        contains any genomic features within the [start, end) region.
+        If so, the query is considered positive.
 
         Parameters
         ----------
         chrom : str
-            e.g. "chr1".
+            e.g. '1', '2', ..., 'X', 'Y'.
         start : int
         end : int
-        threshold : [0.0, 1.0], float, optional
-            Default is 0.50. The threshold specifies the proportion of
-            the [`start`, `end`) window that needs to be covered by
-            at least one feature for the example to be considered
-            positive.
 
         Returns
         -------
@@ -176,14 +160,9 @@ class GenomicFeatures(object):
         Parameters
         ----------
         chrom : str
-            e.g. "chr1".
+            e.g. '1', '2', ..., 'X', 'Y'.
         start : int
         end : int
-        threshold : [0.0, 1.0], float, optional
-            Default is 0.50. The threshold specifies the proportion of
-            the [`start`, `end`) window that needs to be covered by
-            at least one feature for the example to be considered
-            positive.
 
         Returns
         -------
@@ -194,5 +173,5 @@ class GenomicFeatures(object):
             in the queried region and return a numpy.ndarray of all 0s.
         """
         return _get_feature_data(
-            chrom, start, end, self.feature_thresholds_vec,
+            chrom, start, end, self._feature_thresholds_vec,
             self.feature_index_map, self._query_tabix)
