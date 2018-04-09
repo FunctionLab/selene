@@ -1,9 +1,10 @@
+import os
 import unittest
 
 import numpy as np
 
-from data_utils.genomic_features import GenomicFeatures
-from data_utils.genomic_features import _any_positive_rows, \
+from selene.targets import GenomicFeatures
+from selene.targets.genomic_features import _any_positive_rows, \
     _is_positive_row, _get_feature_data
 
 
@@ -196,21 +197,24 @@ class TestGenomicFeatures(unittest.TestCase):
     ############################################
 
     def test_GenomicFeatures_single_threshold(self):
+        data_path = os.path.join(
+            "selene", "targets", "tests",
+            "files", "sorted_aggregate.bed.gz")
         query_features = GenomicFeatures(
-            "tests/files/ChIP_CTCF_6feats/sorted_aggregate.bed.gz",
-            self.features,
-            0.50)
+            data_path, self.features, 0.50)
         self.assertDictEqual(
             query_features.feature_thresholds,
             {k: 0.50 for k in self.features})
         self.assertSequenceEqual(
-            query_features.feature_thresholds_vec.tolist(),
+            query_features._feature_thresholds_vec.tolist(),
             [0.50] * self.n_features)
 
     def test_GenomicFeatures_diff_thresholds(self):
+        data_path = os.path.join(
+            "selene", "targets", "tests",
+            "files", "sorted_aggregate.bed.gz")
         query_features = GenomicFeatures(
-            "tests/files/ChIP_CTCF_6feats/sorted_aggregate.bed.gz",
-            self.features,
+            data_path, self.features,
             {"default": 0.50, "CTCF": 0.0, "Pol2": 0.15})
         self.assertEqual(
             query_features.feature_thresholds,
@@ -218,7 +222,7 @@ class TestGenomicFeatures(unittest.TestCase):
              "GABP": 0.50, "Pbx3": 0.50,
              "Pol2": 0.15, "TBP": 0.50})
         np.testing.assert_almost_equal(
-            query_features.feature_thresholds_vec.tolist(),
+            query_features._feature_thresholds_vec.tolist(),
             [0.0, 0.50, 0.50, 0.50, 0.15, 0.50])
 
     def test_GenomicFeatures_lambda_thresholds(self):
@@ -230,16 +234,18 @@ class TestGenomicFeatures(unittest.TestCase):
             else:
                 return 0.50
 
+        data_path = os.path.join(
+            "selene", "targets", "tests",
+            "files", "sorted_aggregate.bed.gz")
         query_features = GenomicFeatures(
-            "tests/files/ChIP_CTCF_6feats/sorted_aggregate.bed.gz",
-            self.features, _feature_thresholds)
+            data_path, self.features, _feature_thresholds)
         self.assertEqual(
             query_features.feature_thresholds,
             {"CTCF": 0.40, "eGFP-FOS": 0.50,
              "GABP": 0.50, "Pbx3": 0.30,
              "Pol2": 0.50, "TBP": 0.50})
         np.testing.assert_almost_equal(
-            query_features.feature_thresholds_vec.tolist(),
+            query_features._feature_thresholds_vec.tolist(),
             [0.40, 0.50, 0.50, 0.30, 0.50, 0.50])
 
 if __name__ == "__main__":

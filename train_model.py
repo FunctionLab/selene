@@ -33,9 +33,9 @@ from time import strftime, time
 from docopt import docopt
 import torch
 
-from model_controller import ModelController
-from sampler import ChromatinFeaturesSampler
-from utils import read_yaml_file
+from selene.model_train import ModelController
+from selene.sampler import IntervalsSampler
+from selene.utils import read_yaml_file
 
 if __name__ == "__main__":
     arguments = docopt(
@@ -87,7 +87,8 @@ if __name__ == "__main__":
     to_stdout = arguments["--stdout"]
     verbose = arguments["--verbose"]
 
-    log = logging.getLogger("deepsea")
+    """
+    log = logging.getLogger("selene")
     if verbose:
         log.setLevel(logging.DEBUG)
     else:
@@ -104,40 +105,38 @@ if __name__ == "__main__":
         stream_handle = logging.StreamHandler(sys.stdout)
         stream_handle.setFormatter(formatter)
         log.addHandler(stream_handle)
+    """
 
     t_i = time()
-    sampler_optional_args = sampler_info["optional_args"]
     feature_thresholds = None
-    if "specific_feature_thresholds" in sampler_optional_args:
-        feature_thresholds = sampler_optional_args["specific_feature_thresholds"]
-        del sampler_optional_args["specific_feature_thresholds"]
+    if "specific_feature_thresholds" in sampler_info:
+        feature_thresholds = sampler_info["specific_feature_thresholds"]
+        del sampler_info["specific_feature_thresholds"]
     else:
         feature_thresholds = None
-    if "default_threshold" in sampler_optional_args:
+    if "default_threshold" in sampler_info:
         if feature_thresholds:
             feature_thresholds["default"] = \
-                sampler_optional_args["default_threshold"]
+                sampler_info["default_threshold"]
         else:
-            feature_thresholds = sampler_optional_args["default_threshold"]
-        del sampler_optional_args["default_threshold"]
+            feature_thresholds = sampler_info["default_threshold"]
+        del sampler_info["default_threshold"]
 
     if feature_thresholds:
-        sampler_info["optional_args"]["feature_thresholds"] = feature_thresholds
+        sampler_info["feature_thresholds"] = feature_thresholds
 
-    sampler = ChromatinFeaturesSampler(
+    sampler = IntervalsSampler(
         genome_fasta,
         genomic_features,
-        coords_only,
         distinct_features,
-        sampler_info["holdout_test"],
-        sampler_info["validation_proportion"],
-        **sampler_info["optional_args"])
+        coords_only,
+        **sampler_info)
 
     t_i_model = time()
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
-    model = model_class(sampler.window_size, sampler.n_features)
+    model = model_class(sampler.sequence_length, sampler.n_features)
     print(model)
 
     checkpoint_info = model_controller_info["checkpoint"]
@@ -165,19 +164,22 @@ if __name__ == "__main__":
     log.info(optimizer_args)
 
     batch_size = model_controller_info["batch_size"]
-    n_epochs = model_controller_info["n_epochs"]
-    n_steps_per_epoch = model_controller_info["n_steps_per_epoch"]
+    max_steps = model_controller_info["max_steps"]
+    report_metrics_every_n_steps = \
+        model_controller_info["report_metrics_every_n_steps"]
+    n_validation_samples = model_controller_info["n_validation_samples"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_class, optimizer_args,
-        batch_size, n_steps_per_epoch,
+        batch_size, max_steps, report_metrics_every_n_steps,
         current_run_output_dir,
+        n_validation_samples,
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
 
-    log.info("Training model: {0} epochs, {1} batch size.".format(
-        n_epochs, batch_size))
-    runner.train_and_validate(n_epochs)
+    log.info("Training model: {0} steps, {1} batch size.".format(
+        max_steps, batch_size))
+    runner.train_and_validate()
 
     t_f = time()
     log.info("./train_model.py completed in {0} s.".format(t_f - t_i))
