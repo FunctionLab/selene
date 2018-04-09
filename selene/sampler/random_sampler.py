@@ -1,3 +1,6 @@
+"""TODO: this class is not functional yet. Please do not use/review
+at this time.
+"""
 from collections import namedtuple
 import random
 

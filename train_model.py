@@ -33,10 +33,9 @@ from time import strftime, time
 from docopt import docopt
 import torch
 
-from model_controller import ModelController
-from sampler import IntervalsSampler
-#from sampler import ChromatinFeaturesSampler
-from utils import read_yaml_file
+from selene.model_train import ModelController
+from selene.sampler import IntervalsSampler
+from selene.utils import read_yaml_file
 
 if __name__ == "__main__":
     arguments = docopt(
@@ -88,6 +87,7 @@ if __name__ == "__main__":
     to_stdout = arguments["--stdout"]
     verbose = arguments["--verbose"]
 
+    """
     log = logging.getLogger("selene")
     if verbose:
         log.setLevel(logging.DEBUG)
@@ -105,6 +105,7 @@ if __name__ == "__main__":
         stream_handle = logging.StreamHandler(sys.stdout)
         stream_handle.setFormatter(formatter)
         log.addHandler(stream_handle)
+    """
 
     t_i = time()
     feature_thresholds = None
@@ -163,19 +164,22 @@ if __name__ == "__main__":
     log.info(optimizer_args)
 
     batch_size = model_controller_info["batch_size"]
-    n_epochs = model_controller_info["n_epochs"]
-    n_steps_per_epoch = model_controller_info["n_steps_per_epoch"]
+    max_steps = model_controller_info["max_steps"]
+    report_metrics_every_n_steps = \
+        model_controller_info["report_metrics_every_n_steps"]
+    n_validation_samples = model_controller_info["n_validation_samples"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_class, optimizer_args,
-        batch_size, n_steps_per_epoch,
+        batch_size, max_steps, report_metrics_every_n_steps,
         current_run_output_dir,
+        n_validation_samples,
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
 
-    log.info("Training model: {0} epochs, {1} batch size.".format(
-        n_epochs, batch_size))
-    runner.train_and_validate(n_epochs)
+    log.info("Training model: {0} steps, {1} batch size.".format(
+        max_steps, batch_size))
+    runner.train_and_validate()
 
     t_f = time()
     log.info("./train_model.py completed in {0} s.".format(t_f - t_i))

@@ -13,9 +13,11 @@ sampler:
     mode: train
 model_controller:
     batch_size: 64
-    n_epochs: 1000
-    n_steps_per_epoch: 16000
+    max_steps: 500000
+    report_metrics_every_n_steps: 16000
+    n_validation_samples: 3200
     optional_args:
+        cpu_n_threads: 32
         use_cuda: True
         data_parallel: False
     checkpoint:
