@@ -1,3 +1,6 @@
+"""TODO: nothing in this file works right now. Please do not use/review
+at this time.
+"""
 import numpy as np
 import torch
 from torch.autograde import Variable
