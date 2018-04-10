@@ -6,10 +6,10 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    train_model.py <import-module> <model-class-name> <lr>
+    selene.py <import-module> <model-class-name> <lr>
         <paths-yml> <train-model-yml>
-        [-s | --stdout] [-v | --verbose]
-    train_model.py -h | --help
+        [-s | --stdout] [--verbosity=<level>]
+    selene.py -h | --help
 
 Options:
     -h --help               Show this screen.
@@ -21,13 +21,12 @@ Options:
     <train-model-yml>       Model-specific parameters
     -s --stdout             Will also output logging information to stdout
                             [default: False]
-    -v --verbose            Include debug messages in logging information
-                            [default: False]
+    --verbosity=<level>     Logging verbosity level (0=WARN, 1=INFO, 2=DEBUG)
+                            [default: 1]
 """
 import importlib
 import logging
 import os
-import sys
 from time import strftime, time
 
 from docopt import docopt
@@ -35,13 +34,12 @@ import torch
 
 from selene.model_train import ModelController
 from selene.sampler import IntervalsSampler
-from selene.utils import read_yaml_file
+from selene.utils import initialize_logger, read_yaml_file
 
 if __name__ == "__main__":
     arguments = docopt(
         __doc__,
         version="1.0")
-
     import_model_from = arguments["<import-module>"]
     model_class_name = arguments["<model-class-name>"]
     use_module = importlib.import_module(import_model_from)
@@ -85,27 +83,13 @@ if __name__ == "__main__":
     # OTHER ARGS
     ##################################################
     to_stdout = arguments["--stdout"]
-    verbose = arguments["--verbose"]
+    verbosity_level = int(arguments["--verbosity"])
 
-    """
-    log = logging.getLogger("selene")
-    if verbose:
-        log.setLevel(logging.DEBUG)
-    else:
-        log.setLevel(logging.INFO)
-
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
-    log_output = os.path.join(current_run_output_dir, "train_model_log.out")
-    file_handle = logging.FileHandler(log_output)
-    file_handle.setFormatter(formatter)
-    log.addHandler(file_handle)
-
-    if to_stdout:
-        stream_handle = logging.StreamHandler(sys.stdout)
-        stream_handle.setFormatter(formatter)
-        log.addHandler(stream_handle)
-    """
+    initialize_logger(
+        os.path.join(current_run_output_dir, "{0}.log".format(__name__)),
+        verbosity=verbosity_level,
+        stdout_handler=to_stdout)
+    logger = logging.getLogger("selene")
 
     t_i = time()
     feature_thresholds = None
@@ -144,7 +128,7 @@ if __name__ == "__main__":
     checkpoint = None
     if checkpoint_resume:
         checkpoint_file = checkpoint_info["model_file"]
-        log.info("Resuming training from checkpoint {0}.".format(
+        logger.info("Resuming training from checkpoint {0}.".format(
             checkpoint_file))
         checkpoint = torch.load(checkpoint_file)
         model.load_state_dict(checkpoint["state_dict"])
@@ -154,14 +138,14 @@ if __name__ == "__main__":
     optimizer_class, optimizer_args = use_module.get_optimizer(lr)
 
     t_f_model = time()
-    log.debug(
+    logger.debug(
         "Finished initializing the {0} model from module {1}: {2} s".format(
             model.__class__.__name__,
             import_model_from,
             t_f_model - t_i_model))
 
-    log.info(model)
-    log.info(optimizer_args)
+    logger.info(model)
+    logger.info(optimizer_args)
 
     batch_size = model_controller_info["batch_size"]
     max_steps = model_controller_info["max_steps"]
@@ -177,9 +161,9 @@ if __name__ == "__main__":
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
 
-    log.info("Training model: {0} steps, {1} batch size.".format(
+    logger.info("Training model: {0} steps, {1} batch size.".format(
         max_steps, batch_size))
     runner.train_and_validate()
 
     t_f = time()
-    log.info("./train_model.py completed in {0} s.".format(t_f - t_i))
+    logger.info("./train_model.py completed in {0} s.".format(t_f - t_i))
