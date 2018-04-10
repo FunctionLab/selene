@@ -1,9 +1,7 @@
 # SELENE
 
-## Current to-dos
-- Incorporate plugins for logging information and monitoring.
-- Re-evaluate whether or not the "test" mode would be useful in this framework.
-- Data preparation is still not automated.
+## Updated README
+Please consult [this link](https://hackmd.io/dn2fVwrfRYSInjGIqqPrnQ?both) for the most up-to-date documentation. We expect that the information in the link will replace the current README.
 
 ## Data preparation
 
