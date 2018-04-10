@@ -4,6 +4,7 @@ import logging
 import math
 import os
 import shutil
+import sys
 from time import time
 
 import numpy as np
@@ -12,8 +13,6 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-
-from .utils import AverageMeter
 
 
 logger = logging.getLogger("selene")
@@ -45,8 +44,8 @@ def initialize_logger(out_filepath, verbosity=1, stdout_handler=False):
 
     if stdout_handler:
         stream_handle = logging.StreamHandler(sys.stdout)
-        steam_handle.setFormatter(formatter)
-        log.addHandler(stream_handle)
+        stream_handle.setFormatter(formatter)
+        logger.addHandler(stream_handle)
 
 
 class ModelController(object):
@@ -100,7 +99,7 @@ class ModelController(object):
         prefix_outputs : str
         """
         self.model = model
-        self.sampler = sampler
+        self.sampler = data_sampler
         self.criterion = loss_criterion
         self.optimizer = optimizer_class(
             self.model.parameters(), **optimizer_args)
@@ -114,8 +113,8 @@ class ModelController(object):
 
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
-
-        initialize_logger(os.path.join(output_dir, "{0}.log".format(__name__)))
+        self.output_dir = output_dir
+        #initialize_logger(os.path.join(output_dir, "{0}.log".format(__name__)))
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
@@ -153,6 +152,7 @@ class ModelController(object):
         self._validation_data, self._all_validation_targets = \
             self.sampler.get_validation_set(
                 self.batch_size, n_samples=n_validation_samples)
+        print(len(self._validation_data), len(self._all_validation_targets))
         t_f = time()
         logger.info(("{0} s to load {1} validation examples ({2} validation "
                      "batches) to evaluate after each training step.").format(
@@ -186,9 +186,10 @@ class ModelController(object):
             self.optimizer, 'max', patience=16, verbose=True,
             factor=0.8)
         for step in range(self.start_step, self.max_steps):
-            training_loss = self.train()
+            train_loss = self.train()
             self.training_loss.append(train_loss)
 
+            # @TODO: if step and step % ...
             if step % self.nth_step_report_metrics == 0:
                 validation_loss, auc = self.validate()
                 self.nth_step_stats["validation_loss"].append(validation_loss)
@@ -206,7 +207,7 @@ class ModelController(object):
                 logger.info(
                     ("[METRICS] step={0}: "
                      "Training loss: {1}, validation loss: {2}.").format(
-                        step, train_loss, validate_loss))
+                        step, train_loss, validation_loss))
 
             if step % self.save_checkpoint == 0:
                 self._save_checkpoint({
@@ -218,16 +219,6 @@ class ModelController(object):
 
     def train(self):
         """Create and process a training batch of positive/negative examples.
-
-        Parameters
-        ----------
-        avg_losses : AverageMeter
-            Used to track the average loss, within each step.
-        batch_number : int
-            The current batch number. Used for monitoring/logging.
-
-        Returns
-        -------
         """
         self.model.train()
         self.sampler.set_mode("train")
@@ -243,18 +234,26 @@ class ModelController(object):
         inputs = Variable(inputs)
         targets = Variable(targets)
 
+        predictions = self.model(inputs.transpose(1, 2))
+        loss = self.criterion(predictions, targets)
+
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+        """
         training_loss = None
         def closure():
-            batch_output = self.model(inputs.transpose(1, 2))
-            loss = self.criterion(batch_output, targets)
+            predictions = self.model(inputs.transpose(1, 2))
+            loss = self.criterion(predictions, targets)
             loss.backward()
             training_loss = loss.data[0]
             return loss
 
         self.optimizer.zero_grad()
         self.optimizer.step(closure)
-
-        return training_loss
+        """
+        return loss.data[0]
 
     def validate(self):
         self.model.eval()
@@ -273,21 +272,23 @@ class ModelController(object):
             targets = Variable(targets, volatile=True)
 
             predictions = self.model(inputs.transpose(1, 2))
-            validation_loss = self.criterion(output, targets)
+            validation_loss = self.criterion(
+                predictions, targets).data[0]
 
+            collect_predictions.append(predictions.data.cpu().numpy())
             validation_losses.append(validation_loss)
-            collect_predictions.append(predictions)
         all_predictions = np.vstack(collect_predictions)
+        #print(all_predictions.shape)
         feature_aucs = []
         for index, feature_preds in enumerate(all_predictions.T):
             feature_targets = self._all_validation_targets[:, index]
             if len(np.unique(feature_targets)) > 1:
                 auc = roc_auc_score(feature_targets, feature_preds)
                 feature_aucs.append(auc)
-        logger.debug("[VALIDATE average AUC: {0}".format(np.average(feature_aucs)))
+        logger.debug("[METRICS] average AUC: {0}".format(np.average(feature_aucs)))
         print("[VALIDATE] average AUC: {0}".format(np.average(feature_aucs)))
 
-        self.nth_step_stats["AUC"].append(np.average(feature_aucs))
+        self.nth_step_stats["auc"].append(np.average(feature_aucs))
         return np.average(validation_losses), np.average(feature_aucs)
 
     def _save_checkpoint(self, state, is_best,
