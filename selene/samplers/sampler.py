@@ -1,10 +1,12 @@
 """Sampler interface"""
 import random
+from abc import ABCMeta
+from abc import abstractmethod
 
 import numpy as np
 
 
-class BaseSampler(object):
+class Sampler(metaclass=ABCMeta):
     """The base class for sampler currently enforces that all samplers have
     modes for drawing training and validation samples to train a model
     """
@@ -25,11 +27,14 @@ class BaseSampler(object):
                 "{1}".format(mode, self.modes))
         self.mode = mode
 
+    @abstractmethod
     def sample(self, batch_size=1):
         raise NotImplementedError
 
+    @abstractmethod
     def get_data_and_targets(self, mode, batch_size, n_samples):
         raise NotImplementedError
 
+    @abstractmethod
     def get_validation_set(self, batch_size, n_samples=None):
         raise NotImplementedError

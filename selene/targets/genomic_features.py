@@ -15,6 +15,7 @@ import types
 import tabix
 import numpy as np
 
+from .target import Target
 from ._genomic_features import _fast_get_feature_data
 
 
@@ -47,7 +48,7 @@ def _get_feature_data(query_chrom, query_start, query_end,
     return _fast_get_feature_data(
         query_start, query_end, thresholds, feature_index_map, rows)
 
-class GenomicFeatures(object):
+class GenomicFeatures(Target):
 
     def __init__(self, dataset, features, feature_thresholds):
         """Stores the dataset specifying sequence regions and features.

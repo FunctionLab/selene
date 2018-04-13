@@ -1,9 +1,11 @@
-from .base_sampler import BaseSampler
+from abc import ABCMeta
+
+from .sampler import Sampler
 from ..sequences import Genome
 from ..targets import GenomicFeatures
 
 
-class OnlineSampler(BaseSampler):
+class OnlineSampler(Sampler, metaclass=ABCMeta):
 
     STRAND_SIDES = ('+', '-')
 
@@ -113,11 +115,14 @@ class OnlineSampler(BaseSampler):
     def get_sequence_from_encoding(self, encoding):
         return self.genome.encoding_to_sequence(encoding)
 
-    def sample(self, batch_size):
-        raise NotImplementedError
-
-    def get_data_and_targets(self, mode, batch_size, n_samples):
-        raise NotImplementedError
-
-    def get_validation_set(self, batch_size, n_samples=None):
-        raise NotImplementedError
+    # @abstractmethod
+    # def sample(self, batch_size):
+    #     raise NotImplementedError
+    #
+    # @abstractmethod
+    # def get_data_and_targets(self, mode, batch_size, n_samples):
+    #     raise NotImplementedError
+    #
+    # @abstractmethod
+    # def get_validation_set(self, batch_size, n_samples=None):
+    #     raise NotImplementedError
