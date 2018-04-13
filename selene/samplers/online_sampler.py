@@ -114,15 +114,3 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
     def get_sequence_from_encoding(self, encoding):
         return self.genome.encoding_to_sequence(encoding)
-
-    # @abstractmethod
-    # def sample(self, batch_size):
-    #     raise NotImplementedError
-    #
-    # @abstractmethod
-    # def get_data_and_targets(self, mode, batch_size, n_samples):
-    #     raise NotImplementedError
-    #
-    # @abstractmethod
-    # def get_validation_set(self, batch_size, n_samples=None):
-    #     raise NotImplementedError
