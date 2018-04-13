@@ -6,7 +6,7 @@ import random
 
 import numpy as np
 
-from online_sampler import OnlineSampler
+from .online_sampler import OnlineSampler
 
 
 SampleIndices = namedtuple(

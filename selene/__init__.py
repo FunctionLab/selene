@@ -1,1 +1,1 @@
-__all__ = ["sequences", "targets", "sampler", "model_controller"]
+__all__ = ["sequences", "targets", "samplers", "model_controller"]
