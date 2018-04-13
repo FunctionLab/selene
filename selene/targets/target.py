@@ -12,6 +12,6 @@ class Target(metaclass=ABCMeta):
     @abstractmethod
     def get_feature_data(self, *args, **kwargs):
         """
-        Gets feature data for some input coordinate.
+        Retrieve the feature data for some coordinate.
         """
         raise NotImplementedError
