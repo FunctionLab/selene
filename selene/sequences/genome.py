@@ -8,7 +8,7 @@ from pyfaidx import Fasta
 from ._genome import _fast_sequence_to_encoding
 
 
-def _sequence_to_encoding(sequence, bases_encoding):
+def sequence_to_encoding(sequence, bases_encoding):
     """Converts an input sequence to its one hot encoding.
 
     Parameters
@@ -22,7 +22,7 @@ def _sequence_to_encoding(sequence, bases_encoding):
 
     Returns
     -------
-    numpy.ndarray, dtype=bool
+    np.ndarray, dtype=float32
         The N-by-4 encoding of the sequence.
     """
     return _fast_sequence_to_encoding(sequence, bases_encoding)
@@ -35,7 +35,21 @@ def _get_base_index(encoding_row):
             return index
     return -1
 
-def _encoding_to_sequence(encoding, bases_arr):
+def encoding_to_sequence(encoding, bases_arr):
+    """Converts a sequence one hot encoding to its string
+    sequence.
+
+    Parameters
+    ----------
+    encoding : np.ndarray, dtype=float32
+    bases_arr : list
+        each of ('A', 'C', 'G', 'T' or 'U') in the order that
+        corresponds to the correct columns for those bases in the encoding.
+
+    Returns
+    -------
+    str
+    """
     sequence = []
     for row in encoding:
         base_pos = _get_base_index(row)
@@ -228,7 +242,7 @@ class Genome(object):
         numpy.ndarray, dtype=float64
             The N-by-4 encoding of the sequence.
         """
-        return _sequence_to_encoding(sequence, self.BASES_DICT)
+        return sequence_to_encoding(sequence, self.BASES_DICT)
 
     def encoding_to_sequence(self, encoding):
         """Converts an input encoding to its DNA sequence.
@@ -242,4 +256,4 @@ class Genome(object):
         -------
         str
         """
-        return _encoding_to_sequence(encoding, self.BASES_ARR)
+        return encoding_to_sequence(encoding, self.BASES_ARR)

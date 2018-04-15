@@ -1,7 +1,6 @@
 from collections import namedtuple
 import logging
 import random
-from time import time
 
 import numpy as np
 
@@ -263,7 +262,14 @@ class IntervalsSampler(OnlineSampler):
         targets_mat = np.vstack(targets_mat)
         return sequences_and_targets, targets_mat
 
-    def get_validation_set(self, batch_size, n_samples=None):
+    def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
         if not n_samples:
-            n_samples = len(self._sample_from_mode["validate"].indices)
-        return self.get_data_and_targets("validate", batch_size, n_samples)
+            n_samples = len(self._sample_from_mode[mode].indices)
+        return self.get_data_and_targets(mode, batch_size, n_samples)
+
+    def get_validation_set(self, batch_size, n_samples=None):
+        return self.get_dataset_in_batches(
+            "validate", batch_size, n_samples=n_samples)
+
+    def get_test_set(self, batch_size, n_samples=None):
+        return self.get_dataset_in_batches("test", batch_size, n_samples)

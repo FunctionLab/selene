@@ -1,10 +1,7 @@
-"""Execute the necessary steps to train the model
-"""
 import logging
 import math
 import os
 import shutil
-import sys
 from time import time
 
 import numpy as np
@@ -18,37 +15,87 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 logger = logging.getLogger("selene")
 
 
-def initialize_logger(out_filepath, verbosity=1, stdout_handler=False):
-    """This function can only be called successfully once.
-    If the logger has already been initialized with handlers,
-    the function exits. Otherwise, it proceeds to set the
-    logger configurations.
+def compute_auc(predictions, targets,
+                skip_if_lt_n_samples=10,
+                return_ea_feature_auc=False,
+                get_feature_from_ix=None):
+    """@TODO: remove this method from this file
     """
-    logger = logging.getLogger("selene")
-    # check if logger has already been initialized
-    if len(logger.handlers):
-        return
+    feature_aucs = np.ones(targets.shape[1]) * -1
+    for index, feature_preds in enumerate(predictions.T):
+        feature_targets = targets[:, index]
+        if len(np.unique(feature_targets)) > 1 and \
+                np.sum(feature_targets) > skip_if_lt_n_samples:
+            auc = roc_auc_score(feature_targets, feature_preds)
+            feature_aucs[index] = auc
 
-    if verbosity == 0:
-        logger.setLevel(logging.WARN)
-    elif verbosity == 1:
-        logger.setLevel(logging.INFO)
-    elif verbosity == 2:
-        logger.setLevel(logging.DEBUG)
+    aucs_list = []
+    for auc in feature_aucs:
+        if auc >= 0:
+            aucs_list.append(auc)
+    average_auc = np.average(aucs_list)
 
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
-    file_handle = logging.FileHandler(out_filepath)
-    file_handle.setFormatter(formatter)
-    logger.addHandler(file_handle)
-
-    if stdout_handler:
-        stream_handle = logging.StreamHandler(sys.stdout)
-        stream_handle.setFormatter(formatter)
-        logger.addHandler(stream_handle)
+    if return_ea_feature_auc:
+        feature_auc_dict = {}
+        for index, auc in feature_aucs:
+            feature = get_feature_from_ix(index)
+            if auc >= 0:
+                feature_auc_dict[feature] = auc
+            else:
+                feature_auc_dict[feature] = None
+        return (average_auc, feature_auc_dict)
+    return (average_auc,)
 
 
 class ModelController(object):
+    """Methods to train and validate a PyTorch model.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+    data_sampler : Sampler
+    loss_criterion : torch.nn._Loss
+    optimizer_class :
+    optimizer_args : dict
+    batch_size : int
+        Specify the batch size to process examples. Should be a power of 2.
+    max_steps : int
+    report_stats_every_n_steps : int
+    output_dir : str
+    save_checkpoint_every_n_steps : int|None, optional
+        Default is 1000. If None, set to the same value as
+        `report_stats_every_n_steps`
+    n_validation_samples : int|None, optional
+    n_test_samples : int|None, optional
+    cpu_n_threads : int, optional
+        Default is 32.
+    use_cuda : bool, optional
+        Default is False. Specify whether CUDA is available for torch
+        to use during training.
+    data_parallel : bool, optional
+        Default is False. Specify whether multiple GPUs are available
+        for torch to use during training.
+    checkpoint_resume : torch.save object, optional
+        Default is None. If `checkpoint_resume` is not None, assumes
+        the input is a model saved via `torch.save` that can be
+        loaded to resume training.
+
+    Attributes
+    ----------
+    model : torch.nn.Module
+    sampler : Sampler
+    criterion : torch.nn._Loss
+    optimizer : torch.optim
+    batch_size : int
+    max_steps : int
+    nth_step_report_stats : int
+    nth_step_save_checkpoint : int
+    use_cuda : bool
+    data_parallel : bool
+    output_dir : str
+    training_loss : list(float)
+    nth_step_stats : dict
+    """
 
     def __init__(self,
                  model,
@@ -58,46 +105,15 @@ class ModelController(object):
                  optimizer_args,
                  batch_size,
                  max_steps,
-                 report_metrics_every_n_steps,
+                 report_stats_every_n_steps,
                  output_dir,
-                 n_validation_samples,
-                 save_checkpoint=1000,
+                 save_checkpoint_every_n_steps=1000,
+                 n_validation_samples=None,
+                 n_test_samples=None,
                  cpu_n_threads=32,
                  use_cuda=False,
                  data_parallel=False,
                  checkpoint_resume=None):
-        """Methods to train and validate a PyTorch model.
-
-        Parameters
-        ----------
-        model : torch.nn.Module
-        sampler : Sampler
-        loss_criterion : torch.nn._Loss
-        optimizer_args : dict
-        batch_size : int
-            Specify the batch size to process examples. Should be a power of 2.
-        use_cuda : bool, optional
-            Default is False. Specify whether CUDA is available for torch
-            to use during training.
-        data_parallel : bool, optional
-            Default is False. Specify whether multiple GPUs are available
-            for torch to use during training.
-        checkpoint_resume : torch.save object, optional
-            Default is None. If `checkpoint_resume` is not None, assumes
-            the input is a model saved via `torch.save` that can be
-            loaded to resume training.
-
-        Attributes
-        ----------
-        model : torch.nn.Module
-        sampler : Sampler
-        criterion : torch.nn._Loss
-        optimizer : torch.optim
-        batch_size : batch_size
-        use_cuda : bool
-        data_parallel : bool
-        prefix_outputs : str
-        """
         self.model = model
         self.sampler = data_sampler
         self.criterion = loss_criterion
@@ -106,15 +122,18 @@ class ModelController(object):
 
         self.batch_size = batch_size
         self.max_steps = max_steps
-        self.nth_step_report_metrics = report_metrics_every_n_steps
-        self.save_checkpoint = save_checkpoint
+        self.nth_step_report_stats = report_stats_every_n_steps
+        self.nth_step_save_checkpoint = None
+        if not save_checkpoint_every_n_steps:
+            self.nth_step_save_checkpoint = report_stats_every_n_steps
+        else:
+            self.nth_step_save_checkpoint = save_checkpoint_every_n_steps
 
         torch.set_num_threads(cpu_n_threads)
 
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
         self.output_dir = output_dir
-        #initialize_logger(os.path.join(output_dir, "{0}.log".format(__name__)))
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
@@ -125,34 +144,37 @@ class ModelController(object):
             self.criterion.cuda()
             logger.debug("Set modules to use CUDA")
 
-        self._create_validation_set(n_validation_samples)
+        self._create_validation_set(n_samples=n_validation_samples)
+        if "test" in self.sampler.modes:
+            self._create_test_set(n_samples=n_test_samples)
 
-        self.start_step = 0
-        self.min_loss = float("inf")
+        self._start_step = 0
+        self._min_loss = float("inf")
         if checkpoint_resume is not None:
-            self.start_step = checkpoint_resume["step"]
-            self.min_loss = checkpoint_resume["min_loss"]
+            self._start_step = checkpoint_resume["step"]
+            self._min_loss = checkpoint_resume["min_loss"]
             self.optimizer.load_state_dict(
                 checkpoint_resume["optimizer"])
             logger.info(
                 ("Resuming from checkpoint: "
                  "step {0}, min loss {1}").format(
-                    self.start_step, self.min_loss))
+                    self._start_step, self._min_loss))
 
         self.training_loss = []
         self.nth_step_stats = {
             "validation_loss": [],
             "auc": []
         }
+        # @TODO: should remove AUC-specific things from this class
+        # and create a separate class for this.
+        # report AUC for features that have above a certain number of samples
+        self._has_above_n_samples = 10
 
-    def _create_validation_set(self, n_validation_samples):
-        """Used in `__init__`.
-        """
+    def _create_validation_set(self, n_samples=None):
         t_i = time()
         self._validation_data, self._all_validation_targets = \
             self.sampler.get_validation_set(
-                self.batch_size, n_samples=n_validation_samples)
-        print(len(self._validation_data), len(self._all_validation_targets))
+                self.batch_size, n_samples=n_samples)
         t_f = time()
         logger.info(("{0} s to load {1} validation examples ({2} validation "
                      "batches) to evaluate after each training step.").format(
@@ -160,10 +182,19 @@ class ModelController(object):
                       len(self._validation_data) * self.batch_size,
                       len(self._validation_data)))
 
+    def _create_test_set(self, n_samples=None):
+        t_i = time()
+        self._test_data, self._all_test_targets = \
+            self.sampler.get_test_set(
+                self.batch_size, n_samples=n_samples)
+        t_f = time()
+        logger.info(("{0} s to load {1} test examples ({2} test batches) "
+                     "to evaluate after all training steps.").format(
+                      t_f - t_i,
+                      len(self._test_data) * self.batch_size,
+                      len(self._test_data)))
+
     def _get_batch(self):
-        """Sample `self.batch_size` times. Return inputs and targets as a
-        batch.
-        """
         t_i_sampling = time()
         batch_sequences, batch_targets = self.sampler.sample(
             batch_size=self.batch_size)
@@ -175,22 +206,20 @@ class ModelController(object):
         return (batch_sequences, batch_targets)
 
     def train_and_validate(self):
-        """The training and validation process.
-        """
         logger.info(
             ("[TRAIN] max_steps: {0}, batch_size: {1}").format(
                 self.max_steps, self.batch_size))
 
-        min_loss = self.min_loss
+        min_loss = self._min_loss
         scheduler = ReduceLROnPlateau(
             self.optimizer, 'max', patience=16, verbose=True,
             factor=0.8)
-        for step in range(self.start_step, self.max_steps):
+        for step in range(self._start_step, self.max_steps):
             train_loss = self.train()
             self.training_loss.append(train_loss)
 
             # @TODO: if step and step % ...
-            if step % self.nth_step_report_metrics == 0:
+            if step % self.nth_step_report_stats == 0:
                 validation_loss, auc = self.validate()
                 self.nth_step_stats["validation_loss"].append(validation_loss)
                 self.nth_step_stats["auc"].append(auc)
@@ -205,11 +234,11 @@ class ModelController(object):
                     "min_loss": min_loss,
                     "optimizer": self.optimizer.state_dict()}, is_best)
                 logger.info(
-                    ("[METRICS] step={0}: "
+                    ("[STATS] step={0}: "
                      "Training loss: {1}, validation loss: {2}.").format(
                         step, train_loss, validation_loss))
 
-            if step % self.save_checkpoint == 0:
+            if step % self.nth_step_save_checkpoint == 0:
                 self._save_checkpoint({
                     "step": step,
                     "arch": self.model.__class__.__name__,
@@ -218,8 +247,6 @@ class ModelController(object):
                     "optimizer": self.optimizer.state_dict()}, False)
 
     def train(self):
-        """Create and process a training batch of positive/negative examples.
-        """
         self.model.train()
         self.sampler.set_mode("train")
         inputs, targets = self._get_batch()
@@ -241,26 +268,15 @@ class ModelController(object):
         loss.backward()
         self.optimizer.step()
 
-        """
-        training_loss = None
-        def closure():
-            predictions = self.model(inputs.transpose(1, 2))
-            loss = self.criterion(predictions, targets)
-            loss.backward()
-            training_loss = loss.data[0]
-            return loss
-
-        self.optimizer.zero_grad()
-        self.optimizer.step(closure)
-        """
         return loss.data[0]
 
-    def validate(self):
+    def _evaluate_on_data(self, data_in_batches):
         self.model.eval()
 
-        validation_losses = []
-        collect_predictions = []
-        for (inputs, targets) in self._validation_data:
+        batch_losses = []
+        all_predictions = []
+
+        for (inputs, targets) in data_in_batches:
             inputs = torch.Tensor(inputs)
             targets = torch.Tensor(targets)
 
@@ -272,24 +288,41 @@ class ModelController(object):
             targets = Variable(targets, volatile=True)
 
             predictions = self.model(inputs.transpose(1, 2))
-            validation_loss = self.criterion(
-                predictions, targets).data[0]
+            loss = self.criterion(predictions, targets)
 
-            collect_predictions.append(predictions.data.cpu().numpy())
-            validation_losses.append(validation_loss)
-        all_predictions = np.vstack(collect_predictions)
-        #print(all_predictions.shape)
-        feature_aucs = []
-        for index, feature_preds in enumerate(all_predictions.T):
-            feature_targets = self._all_validation_targets[:, index]
-            if len(np.unique(feature_targets)) > 1:
-                auc = roc_auc_score(feature_targets, feature_preds)
-                feature_aucs.append(auc)
-        logger.debug("[METRICS] average AUC: {0}".format(np.average(feature_aucs)))
-        print("[VALIDATE] average AUC: {0}".format(np.average(feature_aucs)))
+            all_predictions.append(predictions.data.cpu().numpy())
+            batch_losses.append(loss.data[0])
 
-        self.nth_step_stats["auc"].append(np.average(feature_aucs))
-        return np.average(validation_losses), np.average(feature_aucs)
+        all_predictions = np.vstack(all_predictions)
+        return np.average(batch_losses), all_predictions
+
+    def validate(self):
+        average_loss, all_predictions = self._evaluate_on_data(
+            self._validation_data)
+
+        average_auc = compute_auc(
+            all_predictions, self._all_validation_targets)[0]
+
+        logger.debug("[STATS] average AUC: {0}".format(average_auc))
+        print("[VALIDATE] average AUC: {0}".format(average_auc))
+
+        self.nth_step_stats["auc"].append(average_auc)
+        return (average_loss, average_auc)
+
+    def evaluate(self):
+        average_loss, all_predictions = self._evaluate_on_data(
+            self._test_data)
+
+        average_auc, feature_aucs = compute_auc(
+            all_predictions, self._all_test_targets,
+            return_ea_feature_auc=True,
+            get_feature_from_ix=self.data_sampler.get_feature_from_index)
+
+        logger.debug("[STATS] average AUC: {0}".format(average_auc))
+        print("[VALIDATE] average AUC: {0}".format(average_auc))
+
+        self.nth_step_stats["auc"].append(average_auc)
+        return (average_loss, average_auc, feature_aucs)
 
     def _save_checkpoint(self, state, is_best,
                          dir_path=None,

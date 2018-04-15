@@ -149,15 +149,15 @@ if __name__ == "__main__":
 
     batch_size = model_controller_info["batch_size"]
     max_steps = model_controller_info["max_steps"]
-    report_metrics_every_n_steps = \
-        model_controller_info["report_metrics_every_n_steps"]
+    report_stats_every_n_steps = \
+        model_controller_info["report_stats_every_n_steps"]
     n_validation_samples = model_controller_info["n_validation_samples"]
 
     runner = ModelController(
         model, sampler, criterion, optimizer_class, optimizer_args,
-        batch_size, max_steps, report_metrics_every_n_steps,
+        batch_size, max_steps, report_stats_every_n_steps,
         current_run_output_dir,
-        n_validation_samples,
+        n_validation_samples=n_validation_samples,
         checkpoint_resume=checkpoint,
         **model_controller_info["optional_args"])
 

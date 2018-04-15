@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from selene.sequences.genome import _sequence_to_encoding, \
-    _encoding_to_sequence, _get_sequence_from_coords
+from selene.sequences.genome import sequence_to_encoding, \
+    encoding_to_sequence, _get_sequence_from_coords
 
 
 class TestGenome(unittest.TestCase):
@@ -33,9 +33,9 @@ class TestGenome(unittest.TestCase):
             sequence = base_sequence_neg * repeat_base_seq
         return sequence[start:end]
 
-    def test__sequence_to_encoding(self):
+    def test_sequence_to_encoding(self):
         sequence = "ctgCGCAA"
-        observed = _sequence_to_encoding(sequence, self.bases_encoding)
+        observed = sequence_to_encoding(sequence, self.bases_encoding)
         expected = np.array([
             [0., 1., 0., 0.], [0., 0., 0., 1.],  # ct
             [0., 0., 1., 0.], [0., 1., 0., 0.],  # gC
@@ -44,9 +44,9 @@ class TestGenome(unittest.TestCase):
         ])
         self.assertSequenceEqual(observed.tolist(), expected.tolist())
 
-    def test__sequence_to_encoding_unknown_bases(self):
+    def test_sequence_to_encoding_unknown_bases(self):
         sequence = "AnnUAtCa"
-        observed = _sequence_to_encoding(sequence, self.bases_encoding)
+        observed = sequence_to_encoding(sequence, self.bases_encoding)
         expected = np.array([
             [1., 0., 0., 0.], [.25, .25, .25, .25],      # An
             [.25, .25, .25, .25], [.25, .25, .25, .25],  # nU
@@ -55,21 +55,21 @@ class TestGenome(unittest.TestCase):
         ])
         self.assertSequenceEqual(observed.tolist(), expected.tolist())
 
-    def test__encoding_to_sequence(self):
+    def test_encoding_to_sequence(self):
         encoding = np.array([
             [1., 0., 0., 0.], [1., 0., 0., 0.],
             [0., 0., 0., 1.], [0., 0., 1., 0.],
             [0., 1., 0., 0.], [0., 0., 0., 1]])
-        observed = _encoding_to_sequence(encoding, self.bases_arr)
+        observed = encoding_to_sequence(encoding, self.bases_arr)
         expected = "AATGCT"
         self.assertEqual(observed, expected)
 
-    def test__encoding_to_sequence_unknown_bases(self):
+    def test_encoding_to_sequence_unknown_bases(self):
         encoding = np.array([
             [0., 0., 1., 0.], [0.25, 0.25, 0.25, 0.25],
             [1., 0., 0., 0.], [0., 0., 0., 1.],
             [0.25, 0.25, 0.25, 0.25], [0.25, 0.25, 0.25, 0.25]])
-        observed = _encoding_to_sequence(encoding, self.bases_arr)
+        observed = encoding_to_sequence(encoding, self.bases_arr)
         expected = "GNATNN"
         self.assertEqual(observed, expected)
 
