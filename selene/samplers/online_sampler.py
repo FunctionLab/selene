@@ -1,9 +1,11 @@
-from .base_sampler import BaseSampler
+from abc import ABCMeta
+
+from .sampler import Sampler
 from ..sequences import Genome
 from ..targets import GenomicFeatures
 
 
-class OnlineSampler(BaseSampler):
+class OnlineSampler(Sampler, metaclass=ABCMeta):
 
     STRAND_SIDES = ('+', '-')
 
@@ -21,13 +23,12 @@ class OnlineSampler(BaseSampler):
         super(OnlineSampler, self).__init__(
             random_seed=random_seed
         )
-        # @TODO: this could be more flexible. Sequence len and center bin
-        # len do not necessarily need to be odd numbers...
-        if sequence_length % 2 == 0 or center_bin_to_predict % 2 == 0:
+
+        if (sequence_length + center_bin_to_predict) % 2 != 0:
             raise ValueError(
-                "Both the sequence length and the center bin length "
-                "should be odd numbers. Sequence length was {0} and "
-                "bin length was {1}.".format(
+                "Sequence length of {0} with a center bin length of {1} "
+                "is invalid. These 2 inputs should both be odd or both be "
+                "even.".format(
                     sequence_length, center_bin_to_predict))
 
         surrounding_sequence_length = \
@@ -41,13 +42,8 @@ class OnlineSampler(BaseSampler):
         # specifying a test holdout partition is optional
         if test_holdout:
             self.modes.append("test")
-            # @TODO: make sure that isinstance works in this
-            # situation
             if isinstance(validation_holdout, (list,)) and \
                     isinstance(test_holdout, (list,)):
-            #if type(validation_holdout) == type(list()) and \
-            #        type(test_holdout) == type(list()):
-                print("both are type list")
                 self.validation_holdout = [
                     str(c) for c in validation_holdout]
                 self.test_holdout = [str(c) for c in test_holdout]
@@ -66,8 +62,6 @@ class OnlineSampler(BaseSampler):
         else:
             self.test_holdout = None
             if isinstance(validation_holdout, (list,)):
-            #if type(validation_holdout) == type(list()):
-                print("validation holdout is type list")
                 self.validation_holdout = [
                     str(c) for c in validation_holdout]
             else:
@@ -82,7 +76,12 @@ class OnlineSampler(BaseSampler):
         self.surrounding_sequence_radius = int(
             surrounding_sequence_length / 2)
         self.sequence_length = sequence_length
-        self.bin_radius = int((center_bin_to_predict - 1) / 2)
+        self.bin_radius = int(center_bin_to_predict / 2)
+        self._start_radius = self.bin_radius
+        if center_bin_to_predict % 2 == 0:
+            self._end_radius = self.bin_radius
+        else:
+            self._end_radius = self.bin_radius + 1
 
         self.genome = Genome(genome)
 
@@ -112,12 +111,3 @@ class OnlineSampler(BaseSampler):
 
     def get_sequence_from_encoding(self, encoding):
         return self.genome.encoding_to_sequence(encoding)
-
-    def sample(self, batch_size):
-        raise NotImplementedError
-
-    def get_data_and_targets(self, mode, batch_size, n_samples):
-        raise NotImplementedError
-
-    def get_validation_set(self, batch_size, n_samples=None):
-        raise NotImplementedError

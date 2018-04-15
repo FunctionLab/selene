@@ -32,9 +32,8 @@ from time import strftime, time
 from docopt import docopt
 import torch
 
-from selene.model_train import ModelController
-from selene.sampler import IntervalsSampler
 from selene.utils import initialize_logger, read_yaml_file
+from selene.utils import load_path, instantiate
 
 if __name__ == "__main__":
     arguments = docopt(
@@ -49,8 +48,9 @@ if __name__ == "__main__":
 
     paths = read_yaml_file(
         arguments["<paths-yml>"])
-    train_model = read_yaml_file(
-        arguments["<train-model-yml>"])
+
+    train_model = load_path(arguments["<train-model-yml>"], instantiate=False)
+
 
     ##################################################
     # PATHS
@@ -61,7 +61,7 @@ if __name__ == "__main__":
         dir_path, files["genome"])
     genomic_features = os.path.join(
         dir_path, files["genomic_features"])
-    coords_only = os.path.join(
+    intervals_only = os.path.join(
         dir_path, files["sample_from_regions"])
     distinct_features = os.path.join(
         dir_path, files["distinct_features"])
@@ -93,28 +93,23 @@ if __name__ == "__main__":
 
     t_i = time()
     feature_thresholds = None
-    if "specific_feature_thresholds" in sampler_info:
-        feature_thresholds = sampler_info["specific_feature_thresholds"]
-        del sampler_info["specific_feature_thresholds"]
+    if "specific_feature_thresholds" in sampler_info.keywords:
+        feature_thresholds = sampler_info.pop("specific_feature_thresholds")
     else:
         feature_thresholds = None
-    if "default_threshold" in sampler_info:
+    if "default_threshold" in sampler_info.keywords:
         if feature_thresholds:
-            feature_thresholds["default"] = \
-                sampler_info["default_threshold"]
+            feature_thresholds["default"] = sampler_info.pop("default_threshold")
         else:
-            feature_thresholds = sampler_info["default_threshold"]
-        del sampler_info["default_threshold"]
+            feature_thresholds = sampler_info.pop("default_threshold")
 
     if feature_thresholds:
-        sampler_info["feature_thresholds"] = feature_thresholds
-
-    sampler = IntervalsSampler(
-        genome_fasta,
-        genomic_features,
-        distinct_features,
-        coords_only,
-        **sampler_info)
+        sampler_info.bind(feature_thresholds=feature_thresholds)
+    sampler_info.bind(genome=genome_fasta,
+                      query_feature_data=genomic_features,
+                      distinct_features=distinct_features,
+                      intervals_file=intervals_only)
+    sampler = instantiate(sampler_info)
 
     t_i_model = time()
     torch.manual_seed(1337)
@@ -123,16 +118,17 @@ if __name__ == "__main__":
     model = model_class(sampler.sequence_length, sampler.n_features)
     print(model)
 
-    checkpoint_info = model_controller_info["checkpoint"]
-    checkpoint_resume = checkpoint_info["resume"]
+    checkpoint_info = model_controller_info.pop("checkpoint")
+    checkpoint_resume = checkpoint_info.pop("resume")
     checkpoint = None
     if checkpoint_resume:
-        checkpoint_file = checkpoint_info["model_file"]
+        checkpoint_file = checkpoint_info.pop("model_file")
         logger.info("Resuming training from checkpoint {0}.".format(
             checkpoint_file))
         checkpoint = torch.load(checkpoint_file)
         model.load_state_dict(checkpoint["state_dict"])
         model.eval()
+    model_controller_info.bind(checkpoint_resume=checkpoint)
 
     criterion = use_module.criterion()
     optimizer_class, optimizer_args = use_module.get_optimizer(lr)
@@ -147,19 +143,22 @@ if __name__ == "__main__":
     logger.info(model)
     logger.info(optimizer_args)
 
-    batch_size = model_controller_info["batch_size"]
-    max_steps = model_controller_info["max_steps"]
+    batch_size = model_controller_info.keywords["batch_size"] # Would love to find a better way.
+    max_steps = model_controller_info.keywords["max_steps"]
     report_stats_every_n_steps = \
-        model_controller_info["report_stats_every_n_steps"]
-    n_validation_samples = model_controller_info["n_validation_samples"]
+        model_controller_info.keywords["report_stats_every_n_steps"]
+    n_validation_samples = model_controller_info.keywords["n_validation_samples"]
 
-    runner = ModelController(
-        model, sampler, criterion, optimizer_class, optimizer_args,
-        batch_size, max_steps, report_stats_every_n_steps,
-        current_run_output_dir,
-        n_validation_samples=n_validation_samples,
-        checkpoint_resume=checkpoint,
-        **model_controller_info["optional_args"])
+    model_controller_info.bind(model=model,
+                               data_sampler=sampler,
+                               loss_criterion=criterion,
+                               optimizer_class=optimizer_class,
+                               optimizer_args=optimizer_args,
+                               output_dir=current_run_output_dir)
+    if "optional_args" in model_controller_info.keywords:
+        optional_args = model_controller_info.pop("optional_args")
+        model_controller_info.bind(**optional_args)
+    runner = instantiate(model_controller_info)
 
     logger.info("Training model: {0} steps, {1} batch size.".format(
         max_steps, batch_size))

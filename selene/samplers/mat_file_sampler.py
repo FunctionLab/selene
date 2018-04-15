@@ -2,9 +2,9 @@ import h5py
 import numpy as np
 import scipy.io
 
-from base_sampler import BaseSampler
+from .sampler import Sampler
 
-class MatFileSampler(BaseSampler):
+class MatFileSampler(Sampler):
 
     def __init__(self,
                  training_data,

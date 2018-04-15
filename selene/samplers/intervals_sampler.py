@@ -181,8 +181,8 @@ class IntervalsSampler(OnlineSampler):
                     indices=indices, weights=weights)
 
     def _retrieve(self, chrom, position):
-        bin_start = position - self.bin_radius
-        bin_end = position + self.bin_radius + 1
+        bin_start = position - self._start_radius
+        bin_end = position + self._end_radius
         retrieved_targets = self.query_feature_data.get_feature_data(
             chrom, bin_start, bin_end)
         if np.sum(retrieved_targets) == 0:

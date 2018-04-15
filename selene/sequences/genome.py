@@ -5,6 +5,7 @@ into their one hot encodings.
 import numpy as np
 from pyfaidx import Fasta
 
+from .sequence import Sequence
 from ._genome import _fast_sequence_to_encoding
 
 
@@ -95,7 +96,7 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
                 strand))
 
 
-class Genome(object):
+class Genome(Sequence):
 
     BASES_ARR = np.array(['A', 'C', 'G', 'T'])
     BASES_DICT = dict(
