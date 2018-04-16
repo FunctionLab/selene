@@ -51,8 +51,8 @@ class Genome(Sequence):
         0: 'A', 1: 'C', 2: 'G', 3: 'T'
     }
     BASE_TO_INDEX = {
-        'A': 0, 'C': 1, 'G': 2, 'T': 3, 'N': -1,
-        'a': 0, 'c': 1, 'g': 2, 't': 3, 'n': -1
+        'A': 0, 'C': 1, 'G': 2, 'T': 3,
+        'a': 0, 'c': 1, 'g': 2, 't': 3,
     }
     COMPLEMENTARY_BASE = {
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
