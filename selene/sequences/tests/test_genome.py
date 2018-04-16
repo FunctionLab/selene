@@ -2,8 +2,9 @@ import unittest
 
 import numpy as np
 
-from selene.sequences.genome import sequence_to_encoding, \
-    encoding_to_sequence, _get_sequence_from_coords
+from selene.sequences.genome import _get_sequence_from_coords
+from selene.sequences.sequence import sequence_to_encoding, \
+    encoding_to_sequence
 
 
 class TestGenome(unittest.TestCase):
