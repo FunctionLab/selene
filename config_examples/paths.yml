@@ -1,9 +1,0 @@
----
-dir_path: /scratch/data_hg/
-files:
-    genome: male.hg19.fasta
-    genomic_features: sorted_sv_aggregate.bed.gz
-    sample_from_regions: TFs_coords_only.txt
-    distinct_features: distinct_features.txt
-output_dir: /tigress/TROYANSKAYA/kathy/example_outputs
-...

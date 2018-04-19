@@ -1,11 +1,20 @@
 ---
+model: {
+    non_strand_specific_module: True,
+    import_model_from: models.deepsea
+    class: DeepSEA
+}
 sampler: !obj:selene.samplers.IntervalsSampler {
+    genome: /scratch/data_hg/male.hg19.fasta,
+    genomic_features: /scratch/data_hg/sorted_sv_aggregate.bed.gz,
+    distinct_features: /scratch/data_hg/distinct_features.txt,
+    sample_from_regions: /scratch/data_hg/TFs_coords_only.txt,
     test_holdout: [8, 9],
     validation_holdout: [6, 7],
     random_seed: 127,
     sequence_length: 1001,
     center_bin_to_predict: 201,
-    default_threshold: 0.5,
+    feature_thresholds: 0.5,
     mode: "train"
 }
 model_controller: !obj:selene.ModelController {
@@ -17,9 +26,12 @@ model_controller: !obj:selene.ModelController {
         cpu_n_threads: 32,
         use_cuda: True,
         data_parallel: False
+        logging_verbosity: 2
     },
     checkpoint: {
         resume: False
-    }
+    },
+    output_dir: /tigress/TROYANSKAYA/kathy/example_outputs 
 }
+evaluate_on_test: True
 ...
