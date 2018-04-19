@@ -2,7 +2,7 @@ import logging
 import math
 import os
 import shutil
-from time import time
+from time import strftime, time
 
 import numpy as np
 from sklearn.metrics import roc_auc_score
@@ -10,6 +10,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+from .utils import initialize_logger
 
 
 logger = logging.getLogger("selene")
@@ -113,6 +115,7 @@ class ModelController(object):
                  cpu_n_threads=32,
                  use_cuda=False,
                  data_parallel=False,
+                 logging_verbosity=2,
                  checkpoint_resume=None):
         self.model = model
         self.sampler = data_sampler
@@ -133,7 +136,16 @@ class ModelController(object):
 
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
-        self.output_dir = output_dir
+
+        os.makedirs(output_dir, exist_ok=True)
+        current_run_output_dir = os.path.join(
+            output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+        os.makedirs(current_run_output_dir)
+        self.output_dir = current_run_output_dir
+
+        initialize_logger(
+            os.path.join(self.output_dir, f"{__name__}.log"),
+            verbosity=logging_verbosity)
 
         if self.data_parallel:
             self.model = nn.DataParallel(model)
@@ -321,7 +333,7 @@ class ModelController(object):
         logger.debug("[STATS] average AUC: {0}".format(average_auc))
         print("[VALIDATE] average AUC: {0}".format(average_auc))
 
-        self.nth_step_stats["auc"].append(average_auc)
+        #self.nth_step_stats["auc"].append(average_auc)
         return (average_loss, average_auc, feature_aucs)
 
     def _save_checkpoint(self, state, is_best,
