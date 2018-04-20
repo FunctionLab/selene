@@ -36,7 +36,7 @@ def initialize_logger(out_filepath, verbosity=1, stdout_handler=False):
         logger.addHandler(stream_handle)
 
 
-def get_in_silico_mutagenesis_heatmap(baseline_seq, baseline_pred, mut_seqs, mut_preds, sequence):
+def get_in_silico_mutagenesis_heatmap(baseline_seq, mut_seqs, mut_preds, sequence, baseline_pred=None):
     """
     Turns the results of an in silico saturated mutagenesis into a matrix, where each row is a base
     and each column is a position in the sequence. The value is the prediction value when that position
@@ -49,11 +49,17 @@ def get_in_silico_mutagenesis_heatmap(baseline_seq, baseline_pred, mut_seqs, mut
     :return: n*m matrix of predictions by base change.
     """
     baseline_enc = sequence.sequence_to_encoding(baseline_seq)
-    ret = baseline_enc * baseline_pred
-    for mut_seq, mut_pred in zip(mut_seqs, mut_preds):
+    if baseline_pred is None:
+        ret = np.zeros_like(baseline_enc)
+        mask = (baseline_enc == 1)
+    else:
+        ret = baseline_enc * baseline_pred
+        mask = None
+    for i, mut_seq in enumerate(mut_seqs):
+        mut_pred = mut_preds[i]
         mut_enc = sequence.sequence_to_encoding(mut_seq)
         ret += ((mut_enc - baseline_enc) * mut_pred)
-    return sns.heatmap(ret, linewidths=0, yticklabels=sequence.BASES_ARR, cmap="RdBu_r")
+    return sns.heatmap(ret, linewidths=0, yticklabels=sequence.BASES_ARR, cmap="RdBu_r", mask=mask)
 
 
 def read_yaml_file(config_file):
