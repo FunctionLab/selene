@@ -71,7 +71,8 @@ def get_reverse_encoding(encoding,
         else:
             base = complementary_base[bases_arr[base_pos]]
             complem_base_pos = base_to_index[base]
-            reverse_encoding[index, complem_base_pos] = 1
+            rev_index = encoding.shape[0] - row - 1
+            reverse_encoding[rev_index, complem_base_pos] = 1
     return reverse_encoding
 
 
