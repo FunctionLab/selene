@@ -1,4 +1,5 @@
 from abc import ABCMeta
+import os
 
 from .sampler import Sampler
 from ..sequences import Genome
@@ -19,7 +20,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                  sequence_length=1001,
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
-                 mode="train"):
+                 mode="train",
+                 save_datasets=["test"]):
         super(OnlineSampler, self).__init__(
             random_seed=random_seed
         )
@@ -95,6 +97,10 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             query_feature_data, self._features,
             feature_thresholds=feature_thresholds)
 
+        self.save_datasets = {}
+        for mode in save_datasets:
+            self.save_datasets[mode] = []
+
     def get_feature_from_index(self, feature_index):
         """Returns the feature corresponding to an index in the feature
         vector.
@@ -110,4 +116,19 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         return self.query_feature_data.index_feature_map[feature_index]
 
     def get_sequence_from_encoding(self, encoding):
+        """Gets the string sequence from
+        """
         return self.genome.encoding_to_sequence(encoding)
+
+    def save_datasets_to_file(self, output_dir):
+        """This likely only works for validation and test right now.
+        Training data may be too big to store in a list in memory, so
+        it is a @TODO to be able to save training data coordinates
+        intermittently.
+        """
+        for mode, samples in self.save_datasets.items():
+            filepath = os.path.join(output_dir, f"{mode}_data.bed")
+            with open(filepath, 'w+') as file_handle:
+                for cols in samples:
+                    line ='\t'.join([str(c) for c in cols])
+                    file_handle.write(f"{line}\n")
