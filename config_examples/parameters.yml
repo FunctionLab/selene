@@ -1,6 +1,9 @@
 ---
 model: {
-    non_strand_specific_module: True,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    },
     import_model_from: models.deepsea
     class: DeepSEA
 }
