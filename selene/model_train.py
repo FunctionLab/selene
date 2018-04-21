@@ -5,48 +5,15 @@ import shutil
 from time import strftime, time
 
 import numpy as np
-from sklearn.metrics import roc_auc_score
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from .utils import initialize_logger
-
+from .utils import PerformanceMetrics
 
 logger = logging.getLogger("selene")
-
-
-def compute_auc(predictions, targets,
-                skip_if_lt_n_samples=10,
-                return_ea_feature_auc=False,
-                get_feature_from_ix=None):
-    """@TODO: remove this method from this file
-    """
-    feature_aucs = np.ones(targets.shape[1]) * -1
-    for index, feature_preds in enumerate(predictions.T):
-        feature_targets = targets[:, index]
-        if len(np.unique(feature_targets)) > 1 and \
-                np.sum(feature_targets) > skip_if_lt_n_samples:
-            auc = roc_auc_score(feature_targets, feature_preds)
-            feature_aucs[index] = auc
-
-    aucs_list = []
-    for auc in feature_aucs:
-        if auc >= 0:
-            aucs_list.append(auc)
-    average_auc = np.average(aucs_list)
-
-    if return_ea_feature_auc:
-        feature_auc_dict = {}
-        for index, auc in feature_aucs:
-            feature = get_feature_from_ix(index)
-            if auc >= 0:
-                feature_auc_dict[feature] = auc
-            else:
-                feature_auc_dict[feature] = None
-        return (average_auc, feature_auc_dict)
-    return (average_auc,)
 
 
 class ModelController(object):
@@ -110,6 +77,7 @@ class ModelController(object):
                  report_stats_every_n_steps,
                  output_dir,
                  save_checkpoint_every_n_steps=1000,
+                 report_gt_feature_n_positives=10,
                  n_validation_samples=None,
                  n_test_samples=None,
                  cpu_n_threads=32,
@@ -157,8 +125,15 @@ class ModelController(object):
             logger.debug("Set modules to use CUDA")
 
         self._create_validation_set(n_samples=n_validation_samples)
+        self._validation_metrics = PerformanceMetrics(
+            self.sampler.get_feature_from_index,
+            report_gt_feature_n_positives=report_gt_feature_n_positives)
+
         if "test" in self.sampler.modes:
             self._create_test_set(n_samples=n_test_samples)
+            self._test_metrics = PerformanceMetrics(
+                self.sampler.get_feature_from_index,
+                report_gt_feature_n_positives=report_gt_feature_n_positives)
 
         self._start_step = 0
         self._min_loss = float("inf")
@@ -172,15 +147,10 @@ class ModelController(object):
                  "step {0}, min loss {1}").format(
                     self._start_step, self._min_loss))
 
-        self.training_loss = []
-        self.nth_step_stats = {
-            "validation_loss": [],
-            "auc": []
+        self.losses = {
+            "training": [],
+            "validation": [],
         }
-        # @TODO: should remove AUC-specific things from this class
-        # and create a separate class for this.
-        # report AUC for features that have above a certain number of samples
-        self._has_above_n_samples = 10
 
     def _create_validation_set(self, n_samples=None):
         t_i = time()
@@ -228,14 +198,16 @@ class ModelController(object):
             factor=0.8)
         for step in range(self._start_step, self.max_steps):
             train_loss = self.train()
-            self.training_loss.append(train_loss)
+            self.losses["training"].append(train_loss)
 
             # @TODO: if step and step % ...
             if step % self.nth_step_report_stats == 0:
-                validation_loss, auc = self.validate()
-                self.nth_step_stats["validation_loss"].append(validation_loss)
-                self.nth_step_stats["auc"].append(auc)
-                scheduler.step(math.ceil(auc * 1000.0) / 1000.0)
+                valid_scores = self.validate()
+                validation_loss = valid_scores["loss"]
+                self.losses["training"].append(train_loss)
+                self.losses["validation"].append(validation_loss)
+                scheduler.step(
+                    math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
 
                 is_best = validation_loss < min_loss
                 min_loss = min(validation_loss, min_loss)
@@ -312,29 +284,40 @@ class ModelController(object):
         average_loss, all_predictions = self._evaluate_on_data(
             self._validation_data)
 
-        average_auc = compute_auc(
-            all_predictions, self._all_validation_targets)[0]
+        average_scores = self._validation_metrics.update(
+            self._all_validation_targets, all_predictions)
 
-        logger.debug("[STATS] average AUC: {0}".format(average_auc))
-        print("[VALIDATE] average AUC: {0}".format(average_auc))
+        for name, score in average_scores.items():
+            logger.debug(f"[STATS] average {name}: {score}")
+            print(f"[VALIDATE] average {name}: {score}")
 
-        self.nth_step_stats["auc"].append(average_auc)
-        return (average_loss, average_auc)
+        average_scores["loss"] = average_loss
+        return average_scores
 
     def evaluate(self):
         average_loss, all_predictions = self._evaluate_on_data(
             self._test_data)
 
-        average_auc, feature_aucs = compute_auc(
-            all_predictions, self._all_test_targets,
-            return_ea_feature_auc=True,
-            get_feature_from_ix=self.data_sampler.get_feature_from_index)
+        average_scores = self._test_metrics.update(
+            self._all_test_targets, all_predictions)
 
-        logger.debug("[STATS] average AUC: {0}".format(average_auc))
-        print("[VALIDATE] average AUC: {0}".format(average_auc))
+        for name, score in average_scores.items():
+            logger.debug(f"[STATS] average {name}: {score}")
+            print(f"[TEST] average {name}: {score}")
 
-        #self.nth_step_stats["auc"].append(average_auc)
-        return (average_loss, average_auc, feature_aucs)
+        test_performance = os.path.join(
+            self.output_dir, "test_performance.txt")
+        feature_scores_dict = self._test_metrics.write_feature_scores_to_file(
+            test_performance)
+
+        average_scores["loss"] = average_loss
+        return (average_scores, feature_scores_dict)
+
+    def write_datasets_to_file(self):
+        data_dir = os.path.join(
+            self.output_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        self.sampler.save_datasets_to_file(data_dir)
 
     def _save_checkpoint(self, state, is_best,
                          dir_path=None,
