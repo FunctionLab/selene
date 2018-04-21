@@ -50,9 +50,10 @@ if __name__ == "__main__":
     model = model_class(sampler.sequence_length, sampler.n_features)
     print(model)
 
-    if model_info["non_strand_specific_module"]:
+    if model_info["non_strand_specific"]["use_module"]:
         from models.non_strand_specific_module import NonStrandSpecific
-        model = NonStrandSpecific(model)
+        model = NonStrandSpecific(
+            model, mode=model_info["non_strand_specific"]["mode"])
 
     checkpoint_info = model_controller_info.pop("checkpoint")
     checkpoint_resume = checkpoint_info.pop("resume")
@@ -90,3 +91,5 @@ if __name__ == "__main__":
     runner.train_and_validate()
     if configs["evaluate_on_test"]:
         runner.evaluate()
+    if configs["save_datasets"]:
+        runner.write_datasets_to_file()
