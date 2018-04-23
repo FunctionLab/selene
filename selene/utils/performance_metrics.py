@@ -25,7 +25,7 @@ def compute_score(targets, predictions,
 def get_feature_specific_scores(data, get_feature_from_ix_fn):
     feature_score_dict = {}
     for index, score in enumerate(data):
-        feature = get_feature_from_ix_fn[index]
+        feature = get_feature_from_ix_fn(index)
         if score >= 0:
             feature_score_dict[feature] = score
         else:
@@ -66,14 +66,16 @@ class PerformanceMetrics(object):
 
     def write_feature_scores_to_file(self, output_file):
         feature_scores = defaultdict(dict)
-        for name, metric in self.metrics.keys():
+        for name, metric in self.metrics.items():
             feature_score_dict = get_feature_specific_scores(
                 metric.data[-1], self.feature_from_ix)
             for feature, score in feature_score_dict.items():
-                feature_scores[feature][metric] = score
+                feature_scores[feature][name] = score
 
         metric_cols = [m for m in self.metrics.keys()]
         cols = '\t'.join(["features"] + metric_cols)
+        print(output_file)
+        print(cols, len(feature_scores))
         with open(output_file, 'w+') as file_handle:
             file_handle.write(f"{cols}\n")
             for feature, metric_scores in sorted(feature_scores.items()):

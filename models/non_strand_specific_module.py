@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 from torch.nn.modules import Module
 
@@ -23,7 +22,6 @@ class NonStrandSpecific(Module):
     def __init__(self, model, mode="mean"):
         super(NonStrandSpecific, self).__init__()
 
-        print(mode)
         self.model = model
 
         if mode != "mean" and mode != "max":
@@ -42,19 +40,5 @@ class NonStrandSpecific(Module):
         if self.mode == "mean":
             return (output + output_from_rev) / 2
         else:
-            max_output = torch.max(
-                output.abs(), output_from_rev.abs())
-            np_output = output.data.cpu().numpy()
-            print(np_output)
-
-            it = np.nditer(np_output, flags=["multi_index"])
-            while not it.finished:
-                index = it.multi_index
-                print(it[0])
-                if max_output.data[index] != abs(it[0]):
-                    max_output.data[index] = output_from_rev.data[index]
-                else:
-                    max_output.data[index] = it[0]
-                it.iternext()
-            return max_output
+            return torch.max(output, output_from_rev)
 
