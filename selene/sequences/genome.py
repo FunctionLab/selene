@@ -5,46 +5,8 @@ into their one hot encodings.
 import numpy as np
 from pyfaidx import Fasta
 
-from .sequence import Sequence
-from ._genome import _fast_sequence_to_encoding
+from .sequence import Sequence, sequence_to_encoding, encoding_to_sequence
 
-
-def _sequence_to_encoding(sequence, bases_encoding):
-    """Converts an input sequence to its one hot encoding.
-
-    Parameters
-    ----------
-    sequence : str
-        The input sequence of length N.
-    bases_encoding : dict
-       each of ('A', 'C', 'G', 'T' or 'U') as keys -> index (0, 1, 2, 3),
-       specify the position to assign 1/0 when a given base exists/does not
-       exist at a given position in the sequence.
-
-    Returns
-    -------
-    numpy.ndarray, dtype=bool
-        The N-by-4 encoding of the sequence.
-    """
-    return _fast_sequence_to_encoding(sequence, bases_encoding)
-
-def _get_base_index(encoding_row):
-    for index, val in enumerate(encoding_row):
-        if val == 0.25:
-            return -1
-        elif val == 1:
-            return index
-    return -1
-
-def _encoding_to_sequence(encoding, bases_arr):
-    sequence = []
-    for row in encoding:
-        base_pos = _get_base_index(row)
-        if base_pos == -1:
-            sequence.append('N')
-        else:
-            sequence.append(bases_arr[base_pos])
-    return "".join(sequence)
 
 def _get_sequence_from_coords(len_chrs, genome_sequence,
                               chrom, start, end, strand='+'):
@@ -85,8 +47,17 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
 class Genome(Sequence):
 
     BASES_ARR = np.array(['A', 'C', 'G', 'T'])
-    BASES_DICT = dict(
-        [(base, index) for index, base in enumerate(BASES_ARR)])
+    INDEX_TO_BASE = {
+        0: 'A', 1: 'C', 2: 'G', 3: 'T'
+    }
+    BASE_TO_INDEX = {
+        'A': 0, 'C': 1, 'G': 2, 'T': 3,
+        'a': 0, 'c': 1, 'g': 2, 't': 3,
+    }
+    COMPLEMENTARY_BASE = {
+        'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
+        'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
+    }
 
     def __init__(self, fa_file):
         """Wrapper class around the pyfaix.Fasta class.
@@ -229,7 +200,7 @@ class Genome(Sequence):
         numpy.ndarray, dtype=float64
             The N-by-4 encoding of the sequence.
         """
-        return _sequence_to_encoding(sequence, self.BASES_DICT)
+        return sequence_to_encoding(sequence, self.BASE_TO_INDEX)
 
     def encoding_to_sequence(self, encoding):
         """Converts an input encoding to its DNA sequence.
@@ -243,4 +214,4 @@ class Genome(Sequence):
         -------
         str
         """
-        return _encoding_to_sequence(encoding, self.BASES_ARR)
+        return encoding_to_sequence(encoding, self.BASES_ARR)

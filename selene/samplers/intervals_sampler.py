@@ -1,7 +1,6 @@
 from collections import namedtuple
 import logging
 import random
-from time import time
 
 import numpy as np
 
@@ -77,7 +76,8 @@ class IntervalsSampler(OnlineSampler):
                  sequence_length=1001,
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
-                 mode="train"):
+                 mode="train",
+                 save_datasets=["test"]):
         super(IntervalsSampler, self).__init__(
             genome,
             query_feature_data,
@@ -88,7 +88,8 @@ class IntervalsSampler(OnlineSampler):
             sequence_length=sequence_length,
             center_bin_to_predict=center_bin_to_predict,
             feature_thresholds=feature_thresholds,
-            mode="train")
+            mode="train",
+            save_datasets=["test"])
 
         self._sample_from_mode = {}
         self._randcache = {}
@@ -182,20 +183,43 @@ class IntervalsSampler(OnlineSampler):
                     indices=indices, weights=weights)
 
     def _retrieve(self, chrom, position):
-        bin_start = position - self.bin_radius
-        bin_end = position + self.bin_radius + 1
+        bin_start = position - self._start_radius
+        bin_end = position + self._end_radius
         retrieved_targets = self.query_feature_data.get_feature_data(
             chrom, bin_start, bin_end)
         if np.sum(retrieved_targets) == 0:
+            logger.info("No features found in region surrounding "
+                        "chr{0} position {1}. Sampling again.".format(
+                            chrom, position))
             return None
 
         window_start = bin_start - self.surrounding_sequence_radius
         window_end = bin_end + self.surrounding_sequence_radius
         strand = self.STRAND_SIDES[random.randint(0, 1)]
-        retrieved_sequence = \
+        retrieved_seq = \
             self.genome.get_encoding_from_coords(
-                "chr{0}".format(chrom), window_start, window_end, strand)
-        return (retrieved_sequence, retrieved_targets)
+                f"chr{chrom}", window_start, window_end, strand)
+        if retrieved_seq.shape[0] == 0:
+            logger.info("Full sequence centered at chr{0} position {1} "
+                        "could not be retrieved. Sampling again.".format(
+                            chrom, position))
+            return None
+        elif np.sum(retrieved_seq) / float(retrieved_seq.shape[0]) < 0.60:
+            logger.info("Over 30% of the bases in the sequence centered "
+                        "at chr{0} position {1} are ambiguous ('N'). "
+                        "Sampling again.".format(chrom, position))
+            return None
+
+        if self.mode in self.save_datasets:
+            feature_indices = ';'.join(
+                [str(f) for f in np.nonzero(retrieved_targets)[0]])
+            self.save_datasets[self.mode].append(
+                [f"chr{chrom}",
+                 window_start,
+                 window_end,
+                 strand,
+                 feature_indices])
+        return (retrieved_seq, retrieved_targets)
 
     def _update_randcache(self, mode=None):
         if not mode:
@@ -230,21 +254,8 @@ class IntervalsSampler(OnlineSampler):
 
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
-                logger.info("No features found in region surrounding "
-                            "chr{0} position {1}. Sampling again.".format(
-                                chrom, position))
                 continue
             seq, seq_targets = retrieve_output
-            if seq.shape[0] == 0:
-                logger.info("Full sequence centered at chr{0} position {1} "
-                            "could not be retrieved. Sampling again.".format(
-                                chrom, position))
-                continue
-            elif np.sum(seq) / float(seq.shape[0]) < 0.60:
-                logger.info("Over 30% of the bases in the sequence centered "
-                            "at chr{0} position {1} are ambiguous ('N'). "
-                            "Sampling again.".format(chrom, position))
-                continue
             sequences[n_samples_drawn, :, :] = seq
             targets[n_samples_drawn, :] = seq_targets
             n_samples_drawn += 1
@@ -263,7 +274,14 @@ class IntervalsSampler(OnlineSampler):
         targets_mat = np.vstack(targets_mat)
         return sequences_and_targets, targets_mat
 
-    def get_validation_set(self, batch_size, n_samples=None):
+    def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
         if not n_samples:
-            n_samples = len(self._sample_from_mode["validate"].indices)
-        return self.get_data_and_targets("validate", batch_size, n_samples)
+            n_samples = len(self._sample_from_mode[mode].indices)
+        return self.get_data_and_targets(mode, batch_size, n_samples)
+
+    def get_validation_set(self, batch_size, n_samples=None):
+        return self.get_dataset_in_batches(
+            "validate", batch_size, n_samples=n_samples)
+
+    def get_test_set(self, batch_size, n_samples=None):
+        return self.get_dataset_in_batches("test", batch_size, n_samples)

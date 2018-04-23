@@ -3,8 +3,8 @@ import numpy as np
 from Cython.Build import cythonize
 
 genome_module = Extension(
-    "selene.sequences._genome",
-    ["selene/sequences/_genome.pyx"],
+    "selene.sequences._sequence",
+    ["selene/sequences/_sequence.pyx"],
     include_dirs=[np.get_include()])
 
 genomic_features_module = Extension(
