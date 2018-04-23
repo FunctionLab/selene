@@ -63,21 +63,6 @@ def get_heatmap_from_in_silico_mutagenesis_results(mut_encs, mut_preds, ref_enc,
     return sns.heatmap(mat, linewidths=0., yticklabels=base_arr, cmap="RdBu_r", mask=mask)
 
 
-def get_sequence_logo_from_in_silico_mutagenesis_results(mut_encs, mut_preds, ref_enc, ref_pred, base_arr=None):
-    """
-    Produces a sequence logo from the results of the in silico mutagenesis.
-
-    :param ref_enc: Encoded unmutated sequence.
-    :param ref_pred: Prediction for unmutated sequence. Leave as zero to not include these.
-    :param mut_encs: Mutant sequences.
-    :param mut_preds: Predictions for mutant sequences.
-    :param base_arr: Bases to use as Y labels.
-    :return: n*m matrix of predictions by base change.
-    :return: sequence logo of in silico mutagenesis results matrix.
-    """
-    pass
-
-
 class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
     """
     This is a class for re-rendering text paths and preserving their scale.
@@ -102,39 +87,39 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 
-def sequence_logo(scores, bases, font_family="Arial", font_size=80, width=1., font_properties=None):
+def sequence_logo(scores, bases, font_family="Helvetica", font_size=180, width=0.8, font_properties=None, axis=None):
     """
     Generates a sequence logo plot for input scored sequences.
     :param scores: Scores for each base in the sequence.
     :param bases: The bases in the sequence.
-    :param font_family: The font style used for the sequence logo.
+    :param font_family: The font used for the sequence logo.
     :param font_size: The scale used for the fonts. If letters are being distorted, increase or decrease this.
     :param font_properties: A FontProperties object.
     :return: Sequence logo plot.
     """
     # TODO: Add more color schemes.
-    COLOR_SCHEME = {'G': "orange",
-                    'A': "red",
-                    'C': "blue",
-                    'T': "darkgreen"}
+    COLOR_SCHEME = ["orange", "red", "blue", "darkgreen"]
+    scores = np.flip(scores, axis=0)
+    bases = bases[::-1]
     mpl.rcParams["font.family"] = font_family
-    figure, axis = plt.subplots(figsize=scores.shape)
+    if axis is None:
+        _, axis = plt.subplots(figsize=scores.shape)
     if font_properties is None:
-        font_properties = FontProperties(weight="bold", size=font_size)
+        font_properties = FontProperties(size=font_size)
     else:
         font_properties.set_size(font_size)
 
     # Create stacked barplot, stacking after each base.
     for base_idx in range(scores.shape[0]):
         base = bases[base_idx]
-        x_coords = np.arange(scores.shape[1]) + 1
+        x_coords = np.arange(scores.shape[1]) + 0.5
         y_coords = scores[base_idx, :]
         if base_idx == 0:
             bottoms = np.zeros_like(y_coords)
         else:
             bottoms = np.sum(scores[:base_idx, :], axis=0)
-        plt.bar(x_coords, y_coords,
-                color=COLOR_SCHEME[base],
+        axis.bar(x_coords, y_coords,
+                color=COLOR_SCHEME[base_idx],
                 width=width,
                 bottom=bottoms)
 
@@ -154,21 +139,19 @@ def sequence_logo(scores, bases, font_family="Arial", font_size=80, width=1., fo
                         fontproperties=font_properties)
         b_x, b_y, b_w, b_h = bar.get_extents().bounds
         t_x, t_y, t_w, t_h = text.get_extents().bounds
-        translation = (b_x - t_x, b_y - t_y)
         scale = (b_w / t_w, b_h / t_h)
+        translation = (b_x - t_x, b_y - t_y)
         text = PathPatch(text, facecolor=bar.get_facecolor(), lw=0.)
         bar.set_facecolor("none")
-        text.set_path_effects([TextPathRenderingEffect(bar)]) # This redraws the letters on resize.
-        transform = transforms.Affine2D().scale(*scale).translate(*translation)
+        text.set_path_effects([TextPathRenderingEffect(bar)])  # This redraws the letters on resize.
+        transform = transforms.Affine2D().translate(*translation).scale(*scale)
         text.set_transform(transform)
-        # bar.set_clip_path(text)
         new_patches.append(text)
 
     for patch in new_patches:
         axis.add_patch(patch)
-
-    sns.despine(ax=axis, trim=True)
-    return figure
+    axis.set_xlim(0, scores.shape[1])
+    return axis
 
 
 if __name__ == "__main__":
@@ -180,5 +163,11 @@ if __name__ == "__main__":
                             [1., 4., 7., 10., 13.],
                             [2., 5., 8., 11., 14.],
                             [3., 6., 9., 12., 15.]])
-    sequence_logo(second_score, ["G", "A", "C", "T"])
+    scores = second_score
+    bases = ["G", "A", "C", "T"]
+    figure, (logo_axis, heatmap_axis) = plt.subplots(2, 1, figsize=(scores.shape[0], scores.shape[1]))
+    sns.heatmap(scores, linewidths=0., yticklabels=bases, cmap="RdBu_r", cbar=False, ax=heatmap_axis)
+    sequence_logo(scores, bases, axis=logo_axis)
+
+    #sequence_logo(scores, bases)
     plt.show()
