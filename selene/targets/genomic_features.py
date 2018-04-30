@@ -48,6 +48,31 @@ def _get_feature_data(query_chrom, query_start, query_end,
     return _fast_get_feature_data(
         query_start, query_end, thresholds, feature_index_map, rows)
 
+def _define_feature_thresholds(feature_thresholds, features):
+    feature_thresholds_dict = {}
+    feature_thresholds_vec = np.zeros(len(features))
+    if isinstance(feature_thresholds, float):
+        feature_thresholds_dict = dict.fromkeys(features, feature_thresholds)
+        feature_thresholds_vec += feature_thresholds
+    elif isinstance(feature_thresholds, dict):
+        # assign the default value to everything first
+        feature_thresholds_dict = dict.fromkeys(
+            features, feature_thresholds["default"])
+        feature_thresholds_vec += feature_thresholds["default"]
+        for i, f in enumerate(features):
+            if f in feature_thresholds:
+                feature_thresholds_dict[f] = feature_thresholds[f]
+                feature_thresholds_vec[i] = feature_thresholds[f]
+    # this branch will not be accessed if you use a config.yml file to
+    # specify input parameters
+    elif isinstance(feature_thresholds, types.FunctionType):
+        for i, f in enumerate(features):
+            threshold = feature_thresholds(f)
+            feature_thresholds_dict[f] = threshold
+            feature_thresholds_vec[i] = threshold
+    feature_thresholds_vec = feature_thresholds_vec.astype(np.float32)
+    return feature_thresholds_dict, feature_thresholds_vec
+
 class GenomicFeatures(Target):
 
     def __init__(self, dataset, features, feature_thresholds):
@@ -101,25 +126,8 @@ class GenomicFeatures(Target):
 
         self.index_feature_map = dict(list(enumerate(features)))
 
-        self.feature_thresholds = {}
-        self._feature_thresholds_vec = np.zeros(self.n_features)
-        if isinstance(feature_thresholds, float):
-            for i, f in enumerate(features):
-                self.feature_thresholds[f] = feature_thresholds
-                self._feature_thresholds_vec[i] = feature_thresholds
-        elif isinstance(feature_thresholds, dict):
-            for i, f in enumerate(features):
-                if f in feature_thresholds:
-                    self.feature_thresholds[f] = feature_thresholds[f]
-                    self._feature_thresholds_vec[i] = feature_thresholds[f]
-                else:
-                    self.feature_thresholds[f] = feature_thresholds["default"]
-                    self._feature_thresholds_vec[i] = feature_thresholds["default"]
-        elif isinstance(feature_thresholds, types.FunctionType):
-            for i, f in enumerate(features):
-                self.feature_thresholds[f] = feature_thresholds(f)
-                self._feature_thresholds_vec[i] = feature_thresholds(f)
-        self._feature_thresholds_vec = self._feature_thresholds_vec.astype(np.float32)
+        self.feature_thresholds, self._feature_thresholds_vec = \
+            _define_feature_thresholds(feature_thresholds, features)
 
     def _query_tabix(self, chrom, start, end):
         try:
