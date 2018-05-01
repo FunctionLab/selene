@@ -206,8 +206,9 @@ class ModelController(object):
                 validation_loss = valid_scores["loss"]
                 self.losses["training"].append(train_loss)
                 self.losses["validation"].append(validation_loss)
-                scheduler.step(
-                    math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
+                if valid_scores["roc_auc"]:
+                    scheduler.step(
+                        math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
 
                 is_best = validation_loss < min_loss
                 min_loss = min(validation_loss, min_loss)
