@@ -1,9 +1,6 @@
 import logging
 
 
-VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
-
-
 def initialize_logger(out_filepath, verbosity=2):
     """This function can only be called successfully once.
     If the logger has already been initialized with handlers,
@@ -27,30 +24,3 @@ def initialize_logger(out_filepath, verbosity=2):
     file_handle = logging.FileHandler(out_filepath)
     file_handle.setFormatter(formatter)
     logger.addHandler(file_handle)
-
-
-def read_vcf_file(vcf_file):
-    """Read the relevant columns for a VCF file to collect variants
-    for variant effect prediction.
-    """
-    variants = []
-    with open(vcf_file, 'r') as file_handle:
-        for line in file_handle:
-            if "#CHROM" in line:
-                cols = line.strip().split('\t')
-                if cols[:5] != VCF_REQUIRED_COLS:
-                    raise ValueError(
-                        "First 5 columns in file {0} were {1}. "
-                        "Expected columns: {2}".format(
-                            vcf_file, cols[:5], VCF_REQUIRED_COLS))
-                break
-
-        for line in file_handle:
-            cols = line.strip().split('\t')
-            chrom = str(cols[0])
-            pos = int(cols[1])
-            ref = cols[3]
-            alt = cols[4]
-            variants.append((chrom, pos, ref, alt))
-    return variants
-
