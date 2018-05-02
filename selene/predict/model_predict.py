@@ -13,7 +13,7 @@ from ..sequences import sequence_to_encoding
 
 ISM_COLS = ["pos", "ref", "alt"]
 VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
-VARIANTEFFECT_COLS = ["chrom", "pos", "id", "ref", "alt"]
+VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
 
 
 def in_silico_mutagenesis_sequences(sequence,
@@ -334,6 +334,7 @@ class AnalyzeSequences(object):
     def handle_ref_alt_predictions(self,
                                    batch_ref_seqs,
                                    batch_alt_seqs,
+                                   batch_ids,
                                    reporters):
         """
         Parameters
@@ -358,7 +359,8 @@ class AnalyzeSequences(object):
             else:
                 r.handle_batch_predictions(alt_outputs, batch_ids)
 
-    def _process_alts(self, ref, reference_sequence, genome):
+    def _process_alts(self, all_alts, ref, chrom, start, end,
+                      reference_sequence, genome):
         alt_encodings = []
         for a in all_alts:
             prefix = reference_sequence[:self._start_radius]
@@ -431,21 +433,23 @@ class AnalyzeSequences(object):
             ref_encoding = genome.sequence_to_encoding(reference_sequence)
 
             all_alts = alt.split(',')
-            alt_encodings = self._process_alts(ref, reference_sequence_genome)
+            alt_encodings = self._process_alts(
+                all_alts, ref, chrom, start, end, reference_sequence, genome)
             for a in all_alts:
                 batch_ref_seqs.append(ref_encoding)
                 batch_ids.append((chrom, pos, name, ref, a))
-            batch_alt_seqs += alt_encoding
+            batch_alt_seqs += alt_encodings
 
             if len(batch_ref_seqs) >= self.batch_size:
                 self.handle_ref_alt_predictions(
-                    batch_ref_seqs, batch_alt_seqs, reporters)
+                    batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
                 batch_ref_seqs = []
                 batch_alt_seqs = []
                 batch_ids = []
 
-        self.handle_ref_alt_predictions(
-            batch_ref_seqs, batch_alt_seqs, reporters)
+        if batch_ref_seqs:
+            self.handle_ref_alt_predictions(
+                batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
 
         for r in reporters:
             r.write_to_file()
