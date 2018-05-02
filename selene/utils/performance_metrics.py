@@ -1,9 +1,11 @@
 from collections import defaultdict, namedtuple
+import logging
 
 import numpy as np
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 
+logger = logging.getLogger("selene")
 Metric = namedtuple("Metric", ["fn", "data"])
 
 
@@ -14,11 +16,14 @@ def compute_score(targets, predictions,
     for index, feature_preds in enumerate(predictions.T):
         feature_targets = targets[:, index]
         if len(np.unique(feature_targets)) > 1 and \
-                np.sum(feature_targets) < report_gt_feature_n_positives:
+                np.sum(feature_targets) > report_gt_feature_n_positives:
             feature_scores[index] = compute_score_fn(
                 feature_targets, feature_preds)
-
+        else:
+            print("Did not compute metrics for a feature.")
     valid_feature_scores = [s for s in feature_scores if s >= 0]
+    if not valid_feature_scores:
+        return None, feature_scores
     average_score = np.average(valid_feature_scores)
     return average_score, feature_scores
 
@@ -70,18 +75,21 @@ class PerformanceMetrics(object):
             feature_score_dict = get_feature_specific_scores(
                 metric.data[-1], self.feature_from_ix)
             for feature, score in feature_score_dict.items():
-                feature_scores[feature][name] = score
+                if score is None:
+                    feature_scores[feature] = None
+                else:
+                    feature_scores[feature][name] = score
 
         metric_cols = [m for m in self.metrics.keys()]
         cols = '\t'.join(["features"] + metric_cols)
-        print(output_file)
-        print(cols, len(feature_scores))
         with open(output_file, 'w+') as file_handle:
             file_handle.write(f"{cols}\n")
             for feature, metric_scores in sorted(feature_scores.items()):
-                metric_score_cols = '\t'.join(
-                    [f"{s:.4f}" for s in metric_scores.values()])
-                file_handle.write(f"{feature}\t{metric_score_cols}\n")
-
+                if not metric_scores:
+                    file_handle.write(f"{feature}\tNA\tNA\n")
+                else:
+                    metric_score_cols = '\t'.join(
+                        [f"{s:.4f}" for s in metric_scores.values()])
+                    file_handle.write(f"{feature}\t{metric_score_cols}\n")
         return feature_scores
 

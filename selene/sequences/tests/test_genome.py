@@ -10,8 +10,11 @@ from selene.sequences.sequence import sequence_to_encoding, \
 class TestGenome(unittest.TestCase):
 
     def setUp(self):
-        self.bases_arr = ['A', 'C', 'G', 'T']
-        self.bases_encoding = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
+        self.bases_arr = np.array(['A', 'C', 'G', 'T'])
+        self.bases_encoding = {
+            'A': 0, 'C': 1, 'G': 2, 'T': 3,
+            'a': 0, 'c': 1, 'g': 2, 't': 3,
+        }
 
         self.len_chrs = {
             "chr1": 104,

@@ -15,7 +15,7 @@ class MatFileSampler(Sampler):
         super(MatFileSampler, self).__init__(
             random_seed=random_seed
         )
-        if test_holdout:
+        if test_data:
             self.modes.append("test")
 
         self.sample_from_mode = {}
@@ -34,14 +34,15 @@ class MatFileSampler(Sampler):
         valid_data_mats, n_validate = self._load_mat_file(validation_data)
         self.sample_from_mode["validate"]["data"] = valid_data_mats
         self.sample_from_mode["validate"]["indices"] = \
-            np.arange(n_valid).tolist()
+            np.arange(n_validate).tolist()
 
-        if test_holdout:
+        if test_data:
             test_data_mats, n_test = self._load_mat_file(test_data)
             self.sample_from_mode["test"]["data"] = test_data_mats
             self.sample_from_mode["test"]["indices"] = \
                 np.arange(n_test).tolist()
 
+        self.sequence_length = train_data_mats[0].shape[1]
         self.n_features = train_data_mats[1].shape[1]
 
         for mode, mode_info in self.sample_from_mode.items():
@@ -69,16 +70,18 @@ class MatFileSampler(Sampler):
             return (sequence_data, tgts, n_samples)
 
     def sample(self, batch_size=1):
+        mode = self.mode
         indices = self.sample_from_mode[mode]["indices"]
         input_data, target_data = self.sample_from_mode[mode]["data"]
 
         sample_up_to = self.sample_from_mode["sample_next"] + batch_size
         use_indices = None
-        if sample_next > len(indices):
+        if sample_up_to > len(indices):
             np.random.shuffle(self.sample_from_mode[mode]["indices"])
             self.sample_from_mode["sample_next"] = 0
             use_indices = indices[:batch_size]
         else:
+            sample_next = self.sample_from_mode["sample_next"] + batch_size
             use_indices = indices[sample_next:sample_next + batch_size]
         self.sample_from_mode["sample_next"] += batch_size
         sequences = np.transpose(
@@ -114,4 +117,4 @@ class MatFileSampler(Sampler):
     def get_validation_set(self, batch_size, n_samples=None):
         if not n_samples:
             n_samples = len(self.sample_from_mode["validate"].indices)
-        return get_data_and_targets("validate", batch_size, n_samples)
+        return self.get_data_and_targets("validate", batch_size, n_samples)
