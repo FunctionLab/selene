@@ -9,16 +9,19 @@ model: {
 }
 sampler: !obj:selene.samplers.IntervalsSampler {
     genome: /scratch/data_hg/male.hg19.fasta,
-    genomic_features: /scratch/data_hg/sorted_sv_aggregate.bed.gz,
+    genomic_features: /scratch/data_hg/sorted_regions.bed.gz,
     distinct_features: /scratch/data_hg/distinct_features.txt,
-    sample_from_regions: /scratch/data_hg/TFs_coords_only.txt,
+    sample_from_regions: /scratch/data_hg/intervals_only.txt,
     test_holdout: [8, 9],
     validation_holdout: [6, 7],
     random_seed: 127,
-    sequence_length: 1001,
-    center_bin_to_predict: 201,
+    sequence_length: 1000,
+    center_bin_to_predict: 200,
     feature_thresholds: 0.5,
-    mode: "train"
+    mode: "train",
+    save_datasets: [
+        test
+    ]
 }
 model_controller: !obj:selene.ModelController {
     batch_size: 64,
@@ -34,7 +37,8 @@ model_controller: !obj:selene.ModelController {
     checkpoint: {
         resume: False
     },
-    output_dir: /tigress/TROYANSKAYA/kathy/example_outputs 
+    output_dir: /home/kathy/example_outputs 
 }
 evaluate_on_test: True
+save_datasets: True
 ...

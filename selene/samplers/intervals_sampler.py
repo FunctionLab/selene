@@ -70,6 +70,7 @@ class IntervalsSampler(OnlineSampler):
                  query_feature_data,
                  distinct_features,
                  intervals_file,
+                 sample_negative=False,
                  random_seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
@@ -107,6 +108,8 @@ class IntervalsSampler(OnlineSampler):
 
         for mode in self.modes:
             self._update_randcache(mode=mode)
+
+        self.sample_negative = sample_negative
 
     def _partition_dataset_proportion(self, intervals_file):
         with open(intervals_file, 'r') as file_handle:
@@ -187,7 +190,7 @@ class IntervalsSampler(OnlineSampler):
         bin_end = position + self._end_radius
         retrieved_targets = self.query_feature_data.get_feature_data(
             chrom, bin_start, bin_end)
-        if np.sum(retrieved_targets) == 0:
+        if not self.sample_negative and np.sum(retrieved_targets) == 0:
             logger.info("No features found in region surrounding "
                         "chr{0} position {1}. Sampling again.".format(
                             chrom, position))

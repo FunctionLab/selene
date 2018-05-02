@@ -206,8 +206,9 @@ class ModelController(object):
                 validation_loss = valid_scores["loss"]
                 self.losses["training"].append(train_loss)
                 self.losses["validation"].append(validation_loss)
-                scheduler.step(
-                    math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
+                if valid_scores["roc_auc"]:
+                    scheduler.step(
+                        math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
 
                 is_best = validation_loss < min_loss
                 min_loss = min(validation_loss, min_loss)
@@ -300,6 +301,10 @@ class ModelController(object):
 
         average_scores = self._test_metrics.update(
             self._all_test_targets, all_predictions)
+
+        np.savez_compressed(
+            os.path.join(self.output_dir, "test_predictions.npz"),
+            data=all_predictions)
 
         for name, score in average_scores.items():
             logger.debug(f"[STATS] average {name}: {score}")
