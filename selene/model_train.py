@@ -302,6 +302,10 @@ class ModelController(object):
         average_scores = self._test_metrics.update(
             self._all_test_targets, all_predictions)
 
+        np.savez_compressed(
+            os.path.join(self.output_dir, "test_predictions.npz"),
+            data=all_predictions)
+
         for name, score in average_scores.items():
             logger.debug(f"[STATS] average {name}: {score}")
             print(f"[TEST] average {name}: {score}")
