@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 
 
-class DeepSEA(nn.Module):
+class DeepSEA2(nn.Module):
     def __init__(self, window_size, n_genomic_features):
         """
         Parameters
@@ -19,7 +19,7 @@ class DeepSEA(nn.Module):
         n_channels : int
         classifier : torch.nn.Sequential
         """
-        super(DeepSEA, self).__init__()
+        super(DeepSEA2, self).__init__()
         conv_kernel_size = 8
         pool_kernel_size = 4
 
