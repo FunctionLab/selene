@@ -80,6 +80,10 @@ class Sequence(metaclass=ABCMeta):
     """
     The base class for biological sequence classes.
     """
+    BASE_TO_INDEX = None # TODO: Determine if this is a good way to do this.
+    INDEX_TO_BASE = None
+    BASES_ARR = None
+
     @abstractmethod
     def sequence_in_bounds(self, *args, **kwargs):
         """
@@ -101,15 +105,17 @@ class Sequence(metaclass=ABCMeta):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def sequence_to_encoding(self, sequence):
+    def sequence_to_encoding(cls, sequence):
         """
         Transforms a biological sequence into a numerical representation.
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def encoding_to_sequence(self, encoding):
+    def encoding_to_sequence(cls, encoding):
         """
         Transforms the input numerical representation of a biological sequence into a string representation.
         """

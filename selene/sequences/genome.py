@@ -53,7 +53,7 @@ class Genome(Sequence):
     BASE_TO_INDEX = {
         'A': 0, 'C': 1, 'G': 2, 'T': 3,
         'a': 0, 'c': 1, 'g': 2, 't': 3,
-    }
+    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make it more general?
     COMPLEMENTARY_BASE = {
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
@@ -187,7 +187,8 @@ class Genome(Sequence):
         encoding = self.sequence_to_encoding(sequence)
         return encoding
 
-    def sequence_to_encoding(self, sequence):
+    @classmethod
+    def sequence_to_encoding(cls, sequence):
         """Converts an input sequence to its one hot encoding.
 
         Parameters
@@ -200,9 +201,10 @@ class Genome(Sequence):
         numpy.ndarray, dtype=float64
             The N-by-4 encoding of the sequence.
         """
-        return sequence_to_encoding(sequence, self.BASE_TO_INDEX)
+        return sequence_to_encoding(sequence, cls.BASE_TO_INDEX)
 
-    def encoding_to_sequence(self, encoding):
+    @classmethod
+    def encoding_to_sequence(cls, encoding):
         """Converts an input encoding to its DNA sequence.
 
         Parameters
@@ -214,4 +216,4 @@ class Genome(Sequence):
         -------
         str
         """
-        return encoding_to_sequence(encoding, self.BASES_ARR)
+        return encoding_to_sequence(encoding, cls.BASES_ARR)
