@@ -21,7 +21,6 @@ def write_NAs_to_file(info_cols, column_names, filename):
         file_handle.write("{columns}\n".format(
             columns='\t'.join(column_names)))
         for info in info_cols:
-            print(info)
             write_info = '\t'.join([str(i) for i in info])
             file_handle.write(f"{write_info}\n")
 
