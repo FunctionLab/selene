@@ -174,6 +174,46 @@ def read_vcf_file(vcf_file):
     return variants
 
 
+def _add_sequence_surrounding_alt(alt_sequence,
+                                  sequence_length,
+                                  chrom,
+                                  ref_start,
+                                  ref_end,
+                                  genome):
+    alt_len = len(alt_sequence)
+    add_start = int((sequence_length - alt_len) / 2)
+    add_end = add_start
+    if (sequence_length - alt_len) % 2 != 0:
+        add_end += 1
+
+    lhs_end = ref_start
+    lhs_start = ref_start - add_start
+
+    rhs_start = ref_end
+    rhs_end = ref_end + add_end
+
+    if not genome.sequence_in_bounds(chrom, rhs_start, rhs_end):
+        # add everything to the LHS
+        lhs_start = ref_start - sequence_length + alt_len
+        alt_sequence = genome.get_sequence_from_coords(
+            chrom, lhs_start, lhs_end) + alt_sequence
+    elif not genome.sequence_in_bounds(chrom, lhs_start, lhs_end):
+        # add everything to RHS
+        rhs_end = ref_end + sequence_length - alt_len
+        alt_sequence += genome.get_sequence_from_coords(
+            chrom, rhs_start, rhs_end)
+    else:
+        if lhs_start >= lhs_end:
+            lhs_sequence = ""
+        else:
+            lhs_sequence = genome.get_sequence_from_coords(
+                chrom, lhs_start, lhs_end)
+        rhs_sequence = genome.get_sequence_from_coords(
+            chrom, rhs_start, rhs_end)
+        alt_sequence = lhs_sequence + alt_sequence + rhs_sequence
+    return alt_sequence
+
+
 class AnalyzeSequences(object):
     """Score sequences and their variants using the predictions made
     by a trained model."""
@@ -386,40 +426,9 @@ class AnalyzeSequences(object):
                     end += 1
                 alt_sequence = alt_sequence[start:end]
             elif len(alt_sequence) < self.sequence_length:
-                add_start = int((self.sequence_length - len(alt_sequence)) / 2)
-                add_end = add_start
-                if (self.sequence_length - len(alt_sequence)) % 2 != 0:
-                    add_end += 1
-
-                lhs_end = start
-                lhs_start = start - add_start
-
-                rhs_start = end
-                rhs_end = end + add_end
-
-                if not genome.sequence_in_bounds(chrom, rhs_start, rhs_end):
-                    # add everything to the LHS
-                    lhs_start = start - self.sequence_length + len(alt_sequence)
-                    alt_sequence = genome.get_sequence_from_coords(
-                        chrom, lhs_start, lhs_end) + alt_sequence
-                elif not genome.sequence_in_bounds(chrom, lhs_start, lhs_end):
-                    # add everything to RHS
-                    rhs_end = end + self.sequence_length - len(alt_sequence)
-                    alt_sequence += genome.get_sequence_from_coords(
-                        chrom, rhs_start, rhs_end)
-                else:
-                    if lhs_start >= lhs_end:
-                        lhs_sequence = ""
-                    else:
-                        lhs_sequence = genome.get_sequence_from_coords(
-                            chrom, lhs_start, lhs_end)
-                    rhs_sequence = genome.get_sequence_from_coords(
-                        chrom, rhs_start, rhs_end)
-                    print("add to both sides: {0}, {1}".format(
-                        (lhs_start, lhs_end), (rhs_start, rhs_end)))
-                    alt_sequence = lhs_sequence + alt_sequence + rhs_sequence
-
-            print(f"\t{a}")
+                alt_sequence = _add_sequence_surrounding_alt(
+                    alt_sequence, self.sequence_length,
+                    chrom, start, end, genome)
             # @TODO: remove after testing
             assert len(alt_sequence) == self.sequence_length
             alt_encoding = genome.sequence_to_encoding(alt_sequence)
@@ -468,7 +477,6 @@ class AnalyzeSequences(object):
                 continue
             reference_sequence = genome.get_sequence_from_coords(
                 chrom, start, end)
-            print((chrom, pos, name, ref, alt), (center, start, end))
 
             # @TODO: remove after testing
             assert len(reference_sequence) == self.sequence_length
