@@ -12,7 +12,6 @@ class WriteRefAltHandler(PredictionsHandler):
 
     def handle_NA(self, batch_ids):
         self.ref_writer.handle_NA(batch_ids)
-        self.alt_writer.handle_NA(batch_ids)
 
     def handle_batch_predictions(self,
                                  batch_predictions,

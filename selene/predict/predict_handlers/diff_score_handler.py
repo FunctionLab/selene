@@ -13,6 +13,7 @@ class DiffScoreHandler(PredictionsHandler):
         self.column_names = nonfeature_columns + features_list
         self.results = []
         self.samples = []
+        self.NA_samples = []
         self.out_filename = out_filename
 
     def handle_NA(self, batch_ids):
