@@ -9,7 +9,7 @@ from .predict_handlers import DiffScoreHandler, LogitScoreHandler, \
         WritePredictionsHandler, WriteRefAltHandler
 from ..sequences import Genome
 from ..sequences import sequence_to_encoding
-
+from ..utils import load_features_list
 
 ISM_COLS = ["pos", "ref", "alt"]
 VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
@@ -158,6 +158,7 @@ def read_vcf_file(vcf_file):
                         "First 5 columns in file {0} were {1}. "
                         "Expected columns: {2}".format(
                             vcf_file, cols[:5], VCF_REQUIRED_COLS))
+                index += 1
                 break
 
         for line in lines[index:]:
@@ -181,9 +182,19 @@ class AnalyzeSequences(object):
                  model,
                  sequence_length,
                  batch_size,
-                 features_list,
+                 features_file,
+                 trained_model_file,
                  use_cuda=False):
         self.model = model
+
+        trained_model = torch.load(trained_model_file)
+        self.model.load_state_dict(trained_model["state_dict"])
+        self.model.eval()
+
+        self.use_cuda = use_cuda
+        if self.use_cuda:
+            self.model.cuda()
+
         self.sequence_length = sequence_length
 
         self._start_radius = int(sequence_length / 2)
@@ -192,8 +203,7 @@ class AnalyzeSequences(object):
             self._end_radius += 1
 
         self.batch_size = batch_size
-        self.features_list = features_list
-        self.use_cuda = use_cuda
+        self.features_list = load_features_list(features_file)
 
     def predict(self, batch_sequences):
         """
@@ -368,18 +378,48 @@ class AnalyzeSequences(object):
             alt_sequence = prefix + a + suffix
 
             if len(alt_sequence) > self.sequence_length:
-                alt_sequence = alt_sequence[:self.sequence_length]
+                # truncate on both sides equally
+                midpoint = int(len(alt_sequence) / 2)
+                start = midpoint - int(self.sequence_length / 2)
+                end = midpoint + int(self.sequence_length / 2)
+                if self.sequence_length % 2 != 0:
+                    end += 1
+                alt_sequence = alt_sequence[start:end]
             elif len(alt_sequence) < self.sequence_length:
-                add_start = end
-                add_end = end + self.sequence_length - len(alt_sequence)
-                if not genome.sequence_in_bounds(chrom, add_start, add_end):
-                    add_end = start
-                    add_start = start - self.sequence_length + len(alt_sequence)
+                add_start = int((self.sequence_length - len(alt_sequence)) / 2)
+                add_end = add_start
+                if (self.sequence_length - len(alt_sequence)) % 2 != 0:
+                    add_end += 1
+
+                lhs_end = start
+                lhs_start = start - add_start
+
+                rhs_start = end
+                rhs_end = end + add_end
+
+                if not genome.sequence_in_bounds(chrom, rhs_start, rhs_end):
+                    # add everything to the LHS
+                    lhs_start = start - self.sequence_length + len(alt_sequence)
                     alt_sequence = genome.get_sequence_from_coords(
-                        chrom, add_start, add_end) + alt_sequence
-                else:
+                        chrom, lhs_start, lhs_end) + alt_sequence
+                elif not genome.sequence_in_bounds(chrom, lhs_start, lhs_end):
+                    # add everything to RHS
+                    rhs_end = end + self.sequence_length - len(alt_sequence)
                     alt_sequence += genome.get_sequence_from_coords(
-                        chrom, add_start, add_end)
+                        chrom, rhs_start, rhs_end)
+                else:
+                    if lhs_start >= lhs_end:
+                        lhs_sequence = ""
+                    else:
+                        lhs_sequence = genome.get_sequence_from_coords(
+                            chrom, lhs_start, lhs_end)
+                    rhs_sequence = genome.get_sequence_from_coords(
+                        chrom, rhs_start, rhs_end)
+                    print("add to both sides: {0}, {1}".format(
+                        (lhs_start, lhs_end), (rhs_start, rhs_end)))
+                    alt_sequence = lhs_sequence + alt_sequence + rhs_sequence
+
+            print(f"\t{a}")
             # @TODO: remove after testing
             assert len(alt_sequence) == self.sequence_length
             alt_encoding = genome.sequence_to_encoding(alt_sequence)
@@ -419,14 +459,17 @@ class AnalyzeSequences(object):
         batch_alt_seqs = []
         batch_ids = []
         for (chrom, pos, name, ref, alt) in variants:
-            start = pos - self._start_radius
-            end = pos + self._end_radius
+            center = pos + int(len(ref) / 2)
+            start = center - self._start_radius
+            end = center + self._end_radius
             if not genome.sequence_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
-
+                continue
             reference_sequence = genome.get_sequence_from_coords(
                 chrom, start, end)
+            print((chrom, pos, name, ref, alt), (center, start, end))
+
             # @TODO: remove after testing
             assert len(reference_sequence) == self.sequence_length
 
