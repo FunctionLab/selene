@@ -5,6 +5,8 @@ from .handler import write_NAs_to_file, write_to_file, PredictionsHandler
 class WritePredictionsHandler(PredictionsHandler):
 
     def __init__(self, features_list, nonfeature_columns, out_filename):
+        super(WritePredictionsHandler).__init__()
+
         self.needs_base_pred = False
         self.column_names = nonfeature_columns + features_list
         self.results = []

@@ -4,6 +4,8 @@ from .write_predictions_handler import WritePredictionsHandler
 class WriteRefAltHandler(PredictionsHandler):
 
     def __init__(self, features_list, nonfeature_columns, out_filename):
+        super(WriteRefAltHandler).__init__()
+
         self.needs_base_pred = True
         self.ref_writer = WritePredictionsHandler(
             features_list, nonfeature_columns, f"{out_filename}.ref")

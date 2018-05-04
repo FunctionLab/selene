@@ -10,6 +10,8 @@ class LogitScoreHandler(PredictionsHandler):
                  features_list,
                  nonfeature_columns,
                  out_filename):
+        super(LogitScoreHandler).__init__()
+
         self.needs_base_pred = True
         self.column_names = nonfeature_columns + features_list
         self.results = []
