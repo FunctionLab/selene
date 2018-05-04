@@ -128,6 +128,8 @@ class Genome(Sequence):
             Whether we can retrieve a sequence from the bounds specified
             in the input
         """
+        if chrom not in self.len_chrs:
+            return False
         if start > self.len_chrs[chrom] or end > self.len_chrs[chrom] \
                 or start < 0:
             return False

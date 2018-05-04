@@ -1,6 +1,14 @@
 import logging
 
 
+def load_features_list(features_file):
+    features = []
+    with open(features_file, 'r') as file_handle:
+        for line in file_handle:
+            features.append(line.strip())
+    return features
+
+
 def initialize_logger(out_filepath, verbosity=2):
     """This function can only be called successfully once.
     If the logger has already been initialized with handlers,

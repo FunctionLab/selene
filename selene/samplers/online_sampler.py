@@ -4,7 +4,7 @@ import os
 from .sampler import Sampler
 from ..sequences import Genome
 from ..targets import GenomicFeatures
-
+from ..utils import load_features_list
 
 class OnlineSampler(Sampler, metaclass=ABCMeta):
 
@@ -87,10 +87,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         self.genome = Genome(genome)
 
-        self._features = []
-        with open(distinct_features, 'r') as file_handle:
-            for line in file_handle:
-                self._features.append(line.strip())
+        self._features = load_features_list(distinct_features)
         self.n_features = len(self._features)
 
         self.query_feature_data = GenomicFeatures(
