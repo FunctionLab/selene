@@ -7,6 +7,7 @@ from matplotlib.patches import PathPatch
 import matplotlib.patheffects
 from matplotlib.text import TextPath
 import numpy as np
+from copy import deepcopy
 from selene.sequences import Genome
 
 
@@ -52,7 +53,8 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 
-def sequence_logo(scores, sequence_type=Genome, font_family="sans", font_size=180, width=1.0,
+def sequence_logo(scores, order="value", sequence_type=Genome,
+                  font_family="sans", width=1.0, font_size=180,
                   font_properties=None, ax=None, **kwargs):
     """
 
@@ -60,6 +62,10 @@ def sequence_logo(scores, sequence_type=Genome, font_family="sans", font_size=18
     ----------
     scores : np.ndarray
         A Lx|bases| matrix containing the scores for each position.
+    order : str
+        The ordering to use for the bases in the motif plots.
+            alpha: Bases go in the order they are found in the sequence alphabet.
+            value: Bases go in the order of their effect size, with the largest at the bottom.
     sequence_type : class
         The type of sequence that the ISM results are associated with.
     font_family : str
@@ -81,6 +87,7 @@ def sequence_logo(scores, sequence_type=Genome, font_family="sans", font_size=18
         An axis containing the sequence logo plot.
 
     """
+    scores = deepcopy(scores)  # Everything will break if we do not deepcopy.
     scores = scores.transpose()
 
     if "colors" in kwargs:
@@ -101,31 +108,75 @@ def sequence_logo(scores, sequence_type=Genome, font_family="sans", font_size=18
     if ax is None:
         _, ax = plt.subplots(figsize=scores.shape)
 
-    # Create stacked barplot, stacking after each base.
-    last_positive_offset = np.zeros(scores.shape[1])
-    last_negative_offset = np.zeros(scores.shape[1])
-    for base_idx in range(scores.shape[0]):
-        base = sequence_type.BASES_ARR[base_idx]
+    # Determine offsets depending on sort order.
+    positive_offsets = np.zeros_like(scores)
+    negative_offsets = np.zeros_like(scores)
+    bases = np.empty(scores.shape, dtype=object)
+    bases[:, :] = "?"  # Do not leave it as none. Should be visually obvious something happened.
+
+    # Change ordering of things based on input arguments.
+    if order == "alpha":
+        for i in range(scores.shape[0]):
+            bases[i, :] = sequence_type.BASES_ARR[i]
+
+    elif order == "value":
+        if np.sum(scores < 0) != 0:
+            sorted_scores = np.zeros_like(scores)
+            for j in range(scores.shape[1]):
+                # Sort the negative values and put them at bottom.
+                div = np.sum(scores[:, j] < 0.)
+                negative_idx = np.argwhere(scores[:, j] < 0.).flatten()
+                negative_sort_idx = np.argsort(scores[negative_idx, j], axis=None)
+                sorted_scores[:div, j] = scores[negative_idx[negative_sort_idx], j]
+                bases[:div, j] = sequence_type.BASES_ARR[negative_idx[negative_sort_idx]].flatten()
+
+                # Sort the positive values and stack atop the negatives.
+                positive_idx = np.argwhere(scores[:, j] >= 0.).flatten()
+                positive_sort_idx = np.argsort(scores[positive_idx, j], axis=None)
+                sorted_scores[div:, j] = scores[positive_idx[positive_sort_idx], j]
+                bases[div:, j] = sequence_type.BASES_ARR[positive_idx[positive_sort_idx]].flatten()
+            scores = sorted_scores
+        else:
+            for j in range(scores.shape[1]):
+                sort_idx = np.argsort(scores[:, j], axis=None)[::-1]
+                bases[:, j] = sequence_type.BASES_ARR[sort_idx]
+                scores[:, j] = scores[sort_idx, j]
+
+    # Create offsets for each bar.
+    for i in range(scores.shape[0] - 1):
+        y_coords = scores[i, :]
+        if i > 0:
+            negative_offsets[i + 1, :] = negative_offsets[i, :]
+            positive_offsets[i + 1, :] = positive_offsets[i, :]
+        neg_idx = np.argwhere(y_coords < 0.)
+        pos_idx = np.argwhere(y_coords >= 0.)
+        negative_offsets[i + 1, neg_idx] += y_coords[neg_idx]
+        positive_offsets[i + 1, pos_idx] += y_coords[pos_idx]
+
+    for i in range(scores.shape[0]):
         x_coords = np.arange(scores.shape[1]) + 0.5
-        y_coords = scores[base_idx, :]
+        y_coords = scores[i, :]
 
         # Manage negatives and positives separately.
-        offset = np.zeros_like(y_coords)
-        negative_locs = y_coords < 0
-        offset[negative_locs] = last_negative_offset[negative_locs]
-        last_negative_offset[negative_locs] += y_coords[negative_locs]
-        positive_locs = y_coords >= 0
-        offset[positive_locs] = last_positive_offset[positive_locs]
-        last_positive_offset[positive_locs] += y_coords[positive_locs]
-        ax.bar(x_coords, y_coords, color=color_scheme[sequence_type.BASE_TO_INDEX[base]], width=width, bottom=offset)
+        offsets = np.zeros(scores.shape[1])
+        negative_idx = np.argwhere(y_coords < 0.)
+        positive_idx = np.argwhere(y_coords >= 0.)
+        offsets[negative_idx] = negative_offsets[i, negative_idx]
+        offsets[positive_idx] = positive_offsets[i, positive_idx]
+        bars = ax.bar(x_coords, y_coords, color="black", width=width, bottom=offsets)
+        for j, bar in enumerate(bars):
+            base = bases[i, j]
+            bar.set_color(color_scheme[sequence_type.BASE_TO_INDEX[base]])
+            bar.set_edgecolor(None)
 
     # Iterate over the barplot's bars and turn them into letters.
     new_patches = []
     for i, bar in enumerate(ax.patches):
         base_idx = i // scores.shape[1]
+        seq_idx = i % scores.shape[1]
+        base = bases[base_idx, seq_idx]
         # We construct a text path that tracks the bars in the barplot.
         # Thus, the barplot takes care of scaling and translation, and we just copy it.
-        base = sequence_type.BASES_ARR[base_idx]
         text = TextPath((0., 0.), base, fontproperties=font_properties)
         b_x, b_y, b_w, b_h = bar.get_extents().bounds
         t_x, t_y, t_w, t_h = text.get_extents().bounds
