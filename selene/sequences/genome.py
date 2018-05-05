@@ -32,7 +32,7 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
     ValueError
         If the input char to `strand` is not one of the specified choices.
     """
-    if start > len_chrs[chrom] or end > len_chrs[chrom] \
+    if start > len_chrs[chrom] or end > (len_chrs[chrom] + 1) \
             or start < 0:
         return ""
 
@@ -58,6 +58,7 @@ class Genome(Sequence):
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
     }
+    UNK_BASE = "N"
 
     def __init__(self, fa_file):
         """Wrapper class around the pyfaix.Fasta class.
@@ -128,7 +129,7 @@ class Genome(Sequence):
             Whether we can retrieve a sequence from the bounds specified
             in the input
         """
-        if start > self.len_chrs[chrom] or end > self.len_chrs[chrom] \
+        if start > self.len_chrs[chrom] or end > (self.len_chrs[chrom] + 1) \
                 or start < 0:
             return False
         return True

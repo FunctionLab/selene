@@ -3,10 +3,9 @@ This class is the abstract base class for biological sequences to load training 
 """
 from abc import ABCMeta
 from abc import abstractmethod
-
 import numpy as np
-
 from ._sequence import _fast_sequence_to_encoding
+
 
 def sequence_to_encoding(sequence, base_to_index):
     """Converts an input sequence to its one hot encoding.
@@ -27,6 +26,7 @@ def sequence_to_encoding(sequence, base_to_index):
     """
     return _fast_sequence_to_encoding(sequence, base_to_index)
 
+
 def _get_base_index(encoding_row):
     for index, val in enumerate(encoding_row):
         if val == 0.25:
@@ -34,6 +34,7 @@ def _get_base_index(encoding_row):
         elif val == 1:
             return index
     return -1
+
 
 def encoding_to_sequence(encoding, bases_arr):
     """Converts a sequence one hot encoding to its string
@@ -59,6 +60,7 @@ def encoding_to_sequence(encoding, bases_arr):
             sequence.append(bases_arr[base_pos])
     return "".join(sequence)
 
+
 def get_reverse_encoding(encoding,
                          bases_arr,
                          base_to_index,
@@ -80,9 +82,10 @@ class Sequence(metaclass=ABCMeta):
     """
     The base class for biological sequence classes.
     """
-    BASE_TO_INDEX = None # TODO: Determine if this is a good way to do this.
+    BASE_TO_INDEX = None # TODO: Determine if this is a good way to specify these requirements.
     INDEX_TO_BASE = None
     BASES_ARR = None
+    UNK_BASE = '?'
 
     @abstractmethod
     def sequence_in_bounds(self, *args, **kwargs):

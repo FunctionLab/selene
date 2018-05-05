@@ -297,6 +297,3 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
     else:
         cmap = "Blues_r"
     return sns.heatmap(scores, mask=mask, yticklabels=yticklabels, cbar_kws=cbar_kws, cmap=cmap, **kwargs)
-
-
-    #return _plot_sequence_logo(scores=rescaled_scores.transpose(), sequence_type=sequence_type, **kwargs)
