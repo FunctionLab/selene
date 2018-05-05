@@ -244,9 +244,11 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
         pass
     elif position_scaling == "max_effect":
         max_effects = np.max(scores, axis=0) - np.min(scores, axis=0)
-        rescaled_scores /= max_effects
+        rescaled_scores /= rescaled_scores.sum(axis=0)[np.newaxis, :]
+        rescaled_scores *= max_effects[np.newaxis, :]
+
     elif position_scaling == "probability":
-        rescaled_scores /= np.sum(scores, axis=0)
+        rescaled_scores /= np.sum(scores, axis=0)[np.newaxis, :]
     else:
         raise ValueError(f"Could not find position scaling \"{position_scaling}\".")
     return rescaled_scores.transpose()
