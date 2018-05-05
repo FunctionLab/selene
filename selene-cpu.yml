@@ -20,6 +20,7 @@ dependencies:
   - anaconda::click=6.7
   - anaconda::sqlalchemy=1.2.5
   - conda-forge::bzip2=1.0.6
+  - pkgs/free::pandas=0.22.0
   - pkgs/free::cffi=1.10.0
   - pkgs/free::curl=7.54.1
   - pkgs/free::freetype=2.5.5
@@ -50,7 +51,6 @@ dependencies:
   - pkgs/free::wheel=0.29.0
   - pkgs/free::xz=5.2.3
   - pkgs/free::zlib=1.2.11
-  - pytorch::cuda80=1.0
   - pytorch::torchvision=0.2.0
   - pytorch::pytorch-cpu=0.3.1
   - bioconda::bcftools=1.6
