@@ -5,6 +5,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - anaconda::matplotlib=2.0.2
   - anaconda::cython=0.27.3
   - anaconda::docopt=0.6.2
   - anaconda::h5py=2.7.1
