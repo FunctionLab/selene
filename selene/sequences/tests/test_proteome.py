@@ -9,6 +9,7 @@ from selene.sequences.proteome import _get_sequence_from_coords
 class TestProteome(unittest.TestCase):
     def setUp(self):
         self.proteome = Proteome("selene/sequences/tests/files/small.faa")
+        self.fill_value = np.divide(1, len(Proteome.BASES_ARR), dtype=np.float32)
 
     def test_sequence_to_encoding(self):
         sequence = "ARNDCEQGHILKMFPSTWYVARNDCEQGHILKMFPSTWYV"
@@ -19,7 +20,7 @@ class TestProteome(unittest.TestCase):
     def test_sequence_to_encoding_unknown_bases(self):
         sequence = "ARNDCEQGHILKMFPSTWYVXARNDCEQGHILKMFPSTWYV"
         observed = Proteome.sequence_to_encoding(sequence)
-        expected = np.vstack([np.identity(20), np.zeros(20), np.identity(20)])
+        expected = np.vstack([np.identity(20), np.full(20, self.fill_value), np.identity(20)])
         self.assertSequenceEqual(observed.tolist(), expected.tolist())
 
     def test_encoding_to_sequence(self):
@@ -29,7 +30,7 @@ class TestProteome(unittest.TestCase):
         self.assertEqual(observed, expected)
 
     def test_encoding_to_sequence_unknown_bases(self):
-        encoding = np.vstack([np.zeros(20), np.identity(20)])
+        encoding = np.vstack([np.full(20, self.fill_value), np.identity(20)])
         observed = Proteome.encoding_to_sequence(encoding)
         expected = "XARNDCEQGHILKMFPSTWYV"
         self.assertEqual(observed, expected)
@@ -43,7 +44,7 @@ class TestProteome(unittest.TestCase):
 
     def test_get_encoding_from_coords(self):
         encoding = self.proteome.get_encoding_from_coords("prot0", 0, 42)
-        expected = np.vstack([np.identity(20), np.zeros(20), np.identity(20)])
+        expected = np.vstack([np.identity(20), np.full(20, self.fill_value), np.identity(20)])
         self.assertSequenceEqual(encoding.tolist(), expected.tolist())
 
     def test_get_sequence_from_coords(self):

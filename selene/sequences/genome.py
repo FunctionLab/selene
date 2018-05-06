@@ -5,7 +5,9 @@ into their one hot encodings.
 import numpy as np
 from pyfaidx import Fasta
 
-from .sequence import Sequence, sequence_to_encoding, encoding_to_sequence
+from .sequence import Sequence
+from .sequence import sequence_to_encoding
+from .sequence import encoding_to_sequence
 
 
 def _get_sequence_from_coords(len_chrs, genome_sequence,
@@ -157,8 +159,8 @@ class Genome(Sequence):
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        return _get_sequence_from_coords(
-            self.len_chrs, self._genome_sequence, chrom, start, end, strand)
+        return _get_sequence_from_coords(self.len_chrs, self._genome_sequence,
+                                         chrom, start, end, strand)
 
     def get_encoding_from_coords(self, chrom, start, end, strand='+'):
         """Gets the genomic sequence given the chromosome, sequence start,
@@ -202,7 +204,7 @@ class Genome(Sequence):
         numpy.ndarray, dtype=float64
             The N-by-4 encoding of the sequence.
         """
-        return sequence_to_encoding(sequence, cls.BASE_TO_INDEX)
+        return sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
 
     @classmethod
     def encoding_to_sequence(cls, encoding):
@@ -217,4 +219,4 @@ class Genome(Sequence):
         -------
         str
         """
-        return encoding_to_sequence(encoding, cls.BASES_ARR)
+        return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)

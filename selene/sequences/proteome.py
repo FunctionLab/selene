@@ -5,6 +5,8 @@
 import numpy as np
 from pyfaidx import Fasta
 from .sequence import Sequence
+from .sequence import sequence_to_encoding
+from .sequence import encoding_to_sequence
 
 
 def _get_sequence_from_coords(len_prots, proteome_sequence,
@@ -171,12 +173,16 @@ class Proteome(Sequence):
         numpy.ndarray, dtype=float64
             The N-by-20 encoding of the sequence.
         """
-        # FIXME: Replace after abstracting sequence methods more.
-        ret = np.zeros((len(sequence), len(cls.BASES_ARR)))
-        for i in range(len(sequence)):
-            if sequence[i] != cls.UNK_BASE:
-                ret[i, cls.BASE_TO_INDEX[sequence[i]]] = 1.
+        ret = sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
+        print(ret)
         return ret
+        #
+        # # FIXME: Replace after abstracting sequence methods more.
+        # ret = np.zeros((len(sequence), len(cls.BASES_ARR)))
+        # for i in range(len(sequence)):
+        #     if sequence[i] != cls.UNK_BASE:
+        #         ret[i, cls.BASE_TO_INDEX[sequence[i]]] = 1.
+        # return ret
 
     @classmethod
     def encoding_to_sequence(cls, encoding):
@@ -191,11 +197,12 @@ class Proteome(Sequence):
         -------
         str
         """
+        return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)
         # FIXME: Replace after abstracting sequence methods more.
-        ret = np.empty(encoding.shape[0], dtype=object)
-        unk_idx = np.argwhere(encoding.sum(axis=1) == 0)
-        ret = cls.BASES_ARR[np.argmax(encoding, axis=1)]
-        ret[unk_idx] = cls.UNK_BASE
-        ret = "".join(ret)
-        return ret
+        # ret = np.empty(encoding.shape[0], dtype=object)
+        # unk_idx = np.argwhere(encoding.sum(axis=1) == 0)
+        # ret = cls.BASES_ARR[np.argmax(encoding, axis=1)]
+        # ret[unk_idx] = cls.UNK_BASE
+        # ret = "".join(ret)
+        # return ret
 

@@ -7,7 +7,7 @@ import numpy as np
 from ._sequence import _fast_sequence_to_encoding
 
 
-def sequence_to_encoding(sequence, base_to_index):
+def sequence_to_encoding(sequence, base_to_index, bases_arr):
     """Converts an input sequence to its one hot encoding.
 
     Parameters
@@ -18,25 +18,28 @@ def sequence_to_encoding(sequence, base_to_index):
        each of ('A', 'C', 'G', 'T' or 'U') as keys -> index (0, 1, 2, 3),
        specify the position to assign 1/0 when a given base exists/does not
        exist at a given position in the sequence.
+    bases_arr : list
+        The basis in the alphabet.
 
     Returns
     -------
     np.ndarray, dtype=float32
         The N-by-4 encoding of the sequence.
     """
-    return _fast_sequence_to_encoding(sequence, base_to_index)
+    return _fast_sequence_to_encoding(sequence, base_to_index, len(bases_arr))
 
 
 def _get_base_index(encoding_row):
+    unk_val = 1 / len(encoding_row)
     for index, val in enumerate(encoding_row):
-        if val == 0.25:
+        if np.isclose(val, unk_val) is True:
             return -1
         elif val == 1:
             return index
     return -1
 
 
-def encoding_to_sequence(encoding, bases_arr):
+def encoding_to_sequence(encoding, bases_arr, unk_base):
     """Converts a sequence one hot encoding to its string
     sequence.
 
@@ -44,8 +47,10 @@ def encoding_to_sequence(encoding, bases_arr):
     ----------
     encoding : np.ndarray, dtype=float32
     bases_arr : list
-        each of ('A', 'C', 'G', 'T' or 'U') in the order that
-        corresponds to the correct columns for those bases in the encoding.
+        each of the bases in the sequence's alphabet that corresponds to the
+        correct columns for those bases in the encoding.
+    unk_base : str
+        The base corresponding to the "unknown" character in this encoding.
 
     Returns
     -------
@@ -55,7 +60,7 @@ def encoding_to_sequence(encoding, bases_arr):
     for row in encoding:
         base_pos = _get_base_index(row)
         if base_pos == -1:
-            sequence.append('N')
+            sequence.append(unk_base)
         else:
             sequence.append(bases_arr[base_pos])
     return "".join(sequence)
@@ -69,7 +74,7 @@ def get_reverse_encoding(encoding,
     for index, row in enumerate(encoding):
         base_pos = _get_base_index(row)
         if base_pos == -1:
-            reverse_encoding[index, :] = 0.25
+            reverse_encoding[index, :] = 1 / len(bases_arr)
         else:
             base = complementary_base[bases_arr[base_pos]]
             complem_base_pos = base_to_index[base]
