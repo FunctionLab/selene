@@ -14,8 +14,7 @@ def _fast_sequence_to_encoding(str sequence, dict base_to_index, int bases_size)
     cdef int index
     cdef str base
     cdef FDTYPE_t n_fill = np.divide(1, bases_size, dtype=np.float32)
-    print(n_fill)
-    
+
     for index in range(sequence_len):
         base = sequence[index]
         if base in base_to_index:
