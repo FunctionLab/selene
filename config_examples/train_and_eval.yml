@@ -11,10 +11,10 @@ model: {
     }
 }
 sampler: !obj:selene.samplers.IntervalsSampler {
-    genome: /scratch/data_hg/male.hg19.fasta,
-    genomic_features: /scratch/data_hg/sorted_regions.bed.gz,
-    distinct_features: /scratch/data_hg/distinct_features.txt,
-    sample_from_regions: /scratch/data_hg/intervals_only.txt,
+    genome: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/mm9.fasta,
+    query_feature_data: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/sorted_mm9_heart.bed.gz,
+    distinct_features: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/distinct_features.txt,
+    intervals_file: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/intervals_only.txt,
     sequence_length: 1000,
     center_bin_to_predict: 200,
     test_holdout: [8, 9],
@@ -35,7 +35,7 @@ train_model: !obj:selene.TrainModel {
     use_cuda: True,
     data_parallel: False
     logging_verbosity: 2,
-    output_dir: /home/kathy/example_outputs 
+    output_dir: /data/home/ecofer/data/cardiac_deepsea/example_outputs
 }
 lr: 0.10
 evaluate_on_test: True

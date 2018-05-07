@@ -5,7 +5,9 @@ into their one hot encodings.
 import numpy as np
 from pyfaidx import Fasta
 
-from .sequence import Sequence, sequence_to_encoding, encoding_to_sequence
+from .sequence import Sequence
+from .sequence import sequence_to_encoding
+from .sequence import encoding_to_sequence
 
 
 def _get_sequence_from_coords(len_chrs, genome_sequence,
@@ -32,7 +34,7 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
     ValueError
         If the input char to `strand` is not one of the specified choices.
     """
-    if start > len_chrs[chrom] or end > len_chrs[chrom] \
+    if start > len_chrs[chrom] or end > (len_chrs[chrom] + 1) \
             or start < 0:
         return ""
 
@@ -53,11 +55,12 @@ class Genome(Sequence):
     BASE_TO_INDEX = {
         'A': 0, 'C': 1, 'G': 2, 'T': 3,
         'a': 0, 'c': 1, 'g': 2, 't': 3,
-    }
+    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make it more general?
     COMPLEMENTARY_BASE = {
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
     }
+    UNK_BASE = "N"
 
     def __init__(self, fa_file):
         """Wrapper class around the pyfaix.Fasta class.
@@ -130,7 +133,7 @@ class Genome(Sequence):
         """
         if chrom not in self.len_chrs:
             return False
-        if start > self.len_chrs[chrom] or end > self.len_chrs[chrom] \
+        if start > self.len_chrs[chrom] or end > (self.len_chrs[chrom] + 1) \
                 or start < 0:
             return False
         return True
@@ -158,8 +161,8 @@ class Genome(Sequence):
         ValueError
             If the input char to `strand` is not one of the specified choices.
         """
-        return _get_sequence_from_coords(
-            self.len_chrs, self._genome_sequence, chrom, start, end, strand)
+        return _get_sequence_from_coords(self.len_chrs, self._genome_sequence,
+                                         chrom, start, end, strand)
 
     def get_encoding_from_coords(self, chrom, start, end, strand='+'):
         """Gets the genomic sequence given the chromosome, sequence start,
@@ -189,7 +192,8 @@ class Genome(Sequence):
         encoding = self.sequence_to_encoding(sequence)
         return encoding
 
-    def sequence_to_encoding(self, sequence):
+    @classmethod
+    def sequence_to_encoding(cls, sequence):
         """Converts an input sequence to its one hot encoding.
 
         Parameters
@@ -202,9 +206,10 @@ class Genome(Sequence):
         numpy.ndarray, dtype=float64
             The N-by-4 encoding of the sequence.
         """
-        return sequence_to_encoding(sequence, self.BASE_TO_INDEX)
+        return sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
 
-    def encoding_to_sequence(self, encoding):
+    @classmethod
+    def encoding_to_sequence(cls, encoding):
         """Converts an input encoding to its DNA sequence.
 
         Parameters
@@ -216,4 +221,4 @@ class Genome(Sequence):
         -------
         str
         """
-        return encoding_to_sequence(encoding, self.BASES_ARR)
+        return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)
