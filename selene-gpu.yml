@@ -57,9 +57,11 @@ dependencies:
 - wheel=0.29.0=py36_0
 - xz=5.2.3=0
 - zlib=1.2.11=0
+- matplotlib=2.0.2-np113py36_0
+- seaborn=0.8.1=py36hfad7ec4_0
 - cuda80=1.0=0
 - pytorch=0.2.0=py36h53baedd_4cu80
-- torchvision=0.1.9=py36h7584368_1
+- torchvision=0.1.9=py36h7584368_
 - pip:
   - pyfaidx==0.5.3.1
   - torch==0.2.0.post4

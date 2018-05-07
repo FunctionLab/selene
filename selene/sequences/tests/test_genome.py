@@ -39,7 +39,7 @@ class TestGenome(unittest.TestCase):
 
     def test_sequence_to_encoding(self):
         sequence = "ctgCGCAA"
-        observed = sequence_to_encoding(sequence, self.bases_encoding)
+        observed = sequence_to_encoding(sequence, self.bases_encoding, self.bases_arr)
         expected = np.array([
             [0., 1., 0., 0.], [0., 0., 0., 1.],  # ct
             [0., 0., 1., 0.], [0., 1., 0., 0.],  # gC
@@ -50,7 +50,7 @@ class TestGenome(unittest.TestCase):
 
     def test_sequence_to_encoding_unknown_bases(self):
         sequence = "AnnUAtCa"
-        observed = sequence_to_encoding(sequence, self.bases_encoding)
+        observed = sequence_to_encoding(sequence, self.bases_encoding, self.bases_arr)
         expected = np.array([
             [1., 0., 0., 0.], [.25, .25, .25, .25],      # An
             [.25, .25, .25, .25], [.25, .25, .25, .25],  # nU
@@ -64,7 +64,7 @@ class TestGenome(unittest.TestCase):
             [1., 0., 0., 0.], [1., 0., 0., 0.],
             [0., 0., 0., 1.], [0., 0., 1., 0.],
             [0., 1., 0., 0.], [0., 0., 0., 1]])
-        observed = encoding_to_sequence(encoding, self.bases_arr)
+        observed = encoding_to_sequence(encoding, self.bases_arr, "N")
         expected = "AATGCT"
         self.assertEqual(observed, expected)
 
@@ -73,7 +73,7 @@ class TestGenome(unittest.TestCase):
             [0., 0., 1., 0.], [0.25, 0.25, 0.25, 0.25],
             [1., 0., 0., 0.], [0., 0., 0., 1.],
             [0.25, 0.25, 0.25, 0.25], [0.25, 0.25, 0.25, 0.25]])
-        observed = encoding_to_sequence(encoding, self.bases_arr)
+        observed = encoding_to_sequence(encoding, self.bases_arr, "N")
         expected = "GNATNN"
         self.assertEqual(observed, expected)
 
