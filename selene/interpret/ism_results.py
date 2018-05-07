@@ -15,7 +15,8 @@ class ISMResult(object):
         data_frame : pandas.DataFrame
             The data frame with the ISM results.
 
-        sequence_type : class
+        sequence_type : class, optional
+            Default is selene.sequences.Genome
             The type of sequence that the ISM results are associated with.
 
         """
@@ -77,14 +78,15 @@ class ISMResult(object):
         feature : str
             The name of the feature to extract as a matrix.
 
-        reference_mask : float, None
-            A value to mask the reference entries with. If None, then no masking will be performed on the reference
-            positions.
+        reference_mask : float, optional
+            Default is None.
+            A value to mask the reference entries with. If left as None, then no masking
+            will be performed on the reference positions.
 
         Returns
         -------
         numpy.ndarray
-            A len(reference_sequence) x |ALPHABET|  array holding the results from the ISM experiment for
+            A len(reference_sequence) x |ALPHABET| shaped array holding the results from the ISM experiment for
             the specified feature.
 
         """
@@ -104,7 +106,7 @@ class ISMResult(object):
         return ret
 
     @staticmethod
-    def from_file(input_path, sequence_type=Genome):
+    def ism_from_file(input_path, sequence_type=Genome):
         """
         Loads ISMResult from a DataFrame in a file.
 
@@ -113,12 +115,13 @@ class ISMResult(object):
         input_path : str
             A path to the input file.
 
-        sequence_type : class
+        sequence_type : class, optional
+            Default is selene.sequences.Genome
             The type of sequence that the ISM results are associated with.
 
         Returns
         -------
-        ISMResult :
+        ISMResult
             The results that were stored in the file.
         """
         return ISMResult(pd.read_csv(input_path, sep="\t", header=0), sequence_type=sequence_type)

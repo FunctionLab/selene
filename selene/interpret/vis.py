@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -6,8 +9,7 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.patches import PathPatch
 import matplotlib.patheffects
 from matplotlib.text import TextPath
-import numpy as np
-from copy import deepcopy
+
 from selene.sequences import Genome
 
 
@@ -22,13 +24,17 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         ----------
         bar : matplotlib.patches.Patch
             The patch where the letter is.
-        x_translation : float
+        x_translation : float, optional
+            Default is 0.
             Amount by which to translate the x coordinate.
-        y_translation : float
+        y_translation : float, optional
+            Default is 0.
             Amount by which to translate the y coordinate.
-        x_scale : float
+        x_scale : float, optional
+            Default is 1.
             Amount by which to scale the width.
-        y_scale : float
+        y_scale : float, optional
+            Default is 1.
             Amount by which to scale the height.
         """
         self._bar = bar
@@ -61,24 +67,31 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
     Parameters
     ----------
     scores : np.ndarray
-        A Lx|bases| matrix containing the scores for each position.
-    order : str
+        A len(reference_sequence) x |ALPHABET| matrix containing the scores for each position.
+    order : {"alpha", "value"}
         The ordering to use for the bases in the motif plots.
             alpha: Bases go in the order they are found in the sequence alphabet.
             value: Bases go in the order of their effect size, with the largest at the bottom.
-    sequence_type : class
+    sequence_type : class, optional
+        Default is selene.sequences.Genome
         The type of sequence that the ISM results are associated with.
-    font_family : str
-        The font family to use.
-    font_size : int
+    font_family : str, optional
+        Default is `sans`.
+        The font family to use. Availability of various families is controlled by system, not Selene.
+    font_size : int, optional
+        Default is 180.
         The size of the font to use.
-    width : float
-        The size width of each character.
-    font_properties : matplotlib.font_manager.FontProperties
-        A FontProperties object specifying the properties of the font used.
-    ax : matplotlib.pyplot.Axes
-        An axes to plot on.
-    color_scheme: list
+    width : float, optional
+        The default is 1.
+        The size width of each character. A value of 1 will mean that there is no gap between each character.
+    font_properties : matplotlib.font_manager.FontProperties, optional
+        Default is None.
+        A FontProperties object specifying the properties of the font used. If None is provided,
+        a font property with the input font_size will be created.
+    ax : matplotlib.pyplot.Axes, optional
+        Default is None.
+        An axes to plot on. If not provided, an axis will be created.
+    color_scheme: list[str]
         A list containing the colors to use, appearing in the order of the bases of the sequence type.
 
     Returns
@@ -187,7 +200,6 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
         text.set_path_effects([TextPathRenderingEffect(bar)])  # This redraws the letters on resize.
         transform = transforms.Affine2D().translate(*translation).scale(*scale)
         text.set_transform(transform)
-        # axis.add_artist(text)
         new_patches.append(text)
 
     for patch in new_patches:
@@ -204,9 +216,9 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
     ----------
     scores : numpy.ndarray
         A Lx|bases| matrix containing the scores for each position.
-    base_scaling : str
+    base_scaling : {"identity", "probability", "max_effect"}
         The type of scaling performed on each base at a given position.
-            identity: No transformation will be applied to the data.
+            identity : No transformation will be applied to the data.
             probability : The relative sizes of the bases will be the original input probabilities.
             max_effect : The relative sizes of the bases will be the max effect of the original input values.
     position_scaling : str
@@ -222,7 +234,7 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
 
     Returns
     -------
-    numpy.ndarray :
+    numpy.ndarray
         The transformed array.
 
     """
@@ -230,26 +242,21 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
     rescaled_scores = scores
 
     # Scale individual bases.
-    if base_scaling == "identity":
+    if base_scaling == "identity" or base_scaling == "probability":
         pass
     elif base_scaling == "max_effect":
         rescaled_scores = scores - np.min(scores, axis=0)
-    elif base_scaling == "probability":
-        pass
     else:
         raise ValueError(f"Could not find base scaling \"{base_scaling}\".")
 
     # Scale each position
-    if position_scaling == "identity":
-        pass
-    elif position_scaling == "max_effect":
+    if position_scaling == "max_effect":
         max_effects = np.max(scores, axis=0) - np.min(scores, axis=0)
         rescaled_scores /= rescaled_scores.sum(axis=0)[np.newaxis, :]
         rescaled_scores *= max_effects[np.newaxis, :]
-
     elif position_scaling == "probability":
         rescaled_scores /= np.sum(scores, axis=0)[np.newaxis, :]
-    else:
+    elif position_scaling != "identity":
         raise ValueError(f"Could not find position scaling \"{position_scaling}\".")
     return rescaled_scores.transpose()
 

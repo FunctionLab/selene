@@ -4,6 +4,7 @@
 """
 import numpy as np
 from pyfaidx import Fasta
+
 from .sequence import Sequence
 from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
