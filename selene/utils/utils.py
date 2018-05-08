@@ -1,6 +1,28 @@
 import logging
 
 
+def load_features_list(features_file):
+    """Reads in a file of distinct features line-by-line and returns
+    these features as a list
+
+    Parameters
+    ----------
+    features_file : str
+        Path to the features file. Each feature must be on its own line.
+
+    Returns
+    -------
+    list
+        The list of features. Order of features matches that of the
+    file (reading from top to bottom).
+    """
+    features = []
+    with open(features_file, 'r') as file_handle:
+        for line in file_handle:
+            features.append(line.strip())
+    return features
+
+
 def initialize_logger(out_filepath, verbosity=2):
     """This function can only be called successfully once.
     If the logger has already been initialized with handlers,

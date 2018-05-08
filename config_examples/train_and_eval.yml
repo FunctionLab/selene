@@ -1,44 +1,43 @@
 ---
+ops: [train, evaluate]
 model: {
+    file: /home/kathy/models/deepsea.py,
+    class: DeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 919,
     non_strand_specific: {
         use_module: True,
         mode: mean
-    },
-    import_model_from: models.deepsea,
-    class: DeepSEA
+    }
 }
 sampler: !obj:selene.samplers.IntervalsSampler {
     genome: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/mm9.fasta,
     query_feature_data: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/sorted_mm9_heart.bed.gz,
     distinct_features: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/distinct_features.txt,
     intervals_file: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/intervals_only.txt,
-    test_holdout: [8, 9],
-    validation_holdout: [6, 7],
-    random_seed: 127,
     sequence_length: 1000,
     center_bin_to_predict: 200,
+    test_holdout: [8, 9],
+    validation_holdout: [6, 7],
     feature_thresholds: 0.5,
+    random_seed: 127,
     mode: "train",
     save_datasets: [
         test
     ]
 }
-model_controller: !obj:selene.ModelController {
+train_model: !obj:selene.TrainModel {
     batch_size: 64,
     max_steps: 500000,
     report_stats_every_n_steps: 16000,
     n_validation_samples: 32000,
-    optional_args: {
-        cpu_n_threads: 32,
-        use_cuda: False,
-        data_parallel: False,
-        logging_verbosity: 2
-    },
-    checkpoint: {
-        resume: False
-    },
+    cpu_n_threads: 32,
+    use_cuda: True,
+    data_parallel: False,
+    logging_verbosity: 2,
     output_dir: /data/home/ecofer/data/cardiac_deepsea/example_outputs
 }
+lr: 0.10
 evaluate_on_test: True
 save_datasets: True
 ...

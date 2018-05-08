@@ -1,2 +1,3 @@
-__all__ = ["predict", "sequences", "targets", "samplers", "utils", "interpret"]
-from .model_train import ModelController
+__all__ = ["sequences", "targets", "samplers", "utils",
+           "predict", "interpret"]
+from .train_model import TrainModel

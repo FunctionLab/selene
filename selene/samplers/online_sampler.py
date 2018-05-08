@@ -4,10 +4,15 @@ import os
 from .sampler import Sampler
 from ..sequences import Genome
 from ..targets import GenomicFeatures
-
+from ..utils import load_features_list
 
 class OnlineSampler(Sampler, metaclass=ABCMeta):
-
+    """
+    A sampler in which training/validation/test data is constructed from
+    random sampling of the dataset for each batch passed to the model.
+    This form of sampling may alleviate the problem of loading an
+    extremely large dataset into memory when developing a new model.
+    """
     STRAND_SIDES = ('+', '-')
 
     def __init__(self,
@@ -17,11 +22,45 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                  random_seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
-                 sequence_length=1001,
-                 center_bin_to_predict=201,
+                 sequence_length=1000,
+                 center_bin_to_predict=200,
                  feature_thresholds=0.5,
                  mode="train",
                  save_datasets=["test"]):
+        """@TODO: This is specific to Genome/GenomicFeatures. Is there a way
+        to make this idea more general in the future?
+
+        Parameters
+        ----------
+        genome : str
+            Path to indexed FASTA file
+        query_feature_data : str
+            Path to tabix-indexed, compressed BED file (*.bed.gz) of genomic
+            coordinates mapped to the genomic features we want to predict.
+        distinct_features : str
+            Path to the distinct list of genomic features we want to predict.
+        random_seed : int, optional
+            Default is 436. Set the random seed for sampling.
+        validation_holdout : list of str or float, optional
+            Default is ['6', '7']. Holdout can be chromosomal or proportional.
+            If chromosomal, expects a list (e.g. ['X', 'Y']). Chromosomes
+            must match those specified in the first column of the
+            tabix-indexed BED file. If proportional, specify a percentage
+            between (0.0, 1.0). Typically 0.10 or 0.20.
+        test_holdout : list of str or float, optional
+            Default is ['8', '9']. See documentation for `validation_holdout`.
+        sequence_length : int, optional
+            Default is 1000. Model is trained on sequences of `sequence_length`
+            where genomic features are annotated to the center regions of
+            these sequences.
+        center_bin_to_predict : int, optional
+            Default is 200. Query the tabix-indexed file for a region of
+            length `center_bin_to_predict`.
+        feature_thresholds : float [0.0, 1.0], optional
+        mode : {"train", "validate", "test"}
+        save_datasets : list of str
+            Default is ["test"].
+        """
         super(OnlineSampler, self).__init__(
             random_seed=random_seed
         )
@@ -87,10 +126,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         self.genome = Genome(genome)
 
-        self._features = []
-        with open(distinct_features, 'r') as file_handle:
-            for line in file_handle:
-                self._features.append(line.strip())
+        self._features = load_features_list(distinct_features)
         self.n_features = len(self._features)
 
         self.query_feature_data = GenomicFeatures(
@@ -116,7 +152,17 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         return self.query_feature_data.index_feature_map[feature_index]
 
     def get_sequence_from_encoding(self, encoding):
-        """Gets the string sequence from
+        """Gets the string sequence from the one-hot encoding
+        of the sequence.
+
+        Parameters
+        ----------
+        encoding : numpy.ndarray
+            The one-hot encoding of the sequence
+
+        Returns
+        -------
+        str
         """
         return self.genome.encoding_to_sequence(encoding)
 
@@ -125,6 +171,13 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         Training data may be too big to store in a list in memory, so
         it is a @TODO to be able to save training data coordinates
         intermittently.
+
+        Save samples for each partition (train/validate/tests) to file.
+
+        Parameters
+        ----------
+        output_dir : str
+            Path to the output directory to which we should save the datasets.
         """
         for mode, samples in self.save_datasets.items():
             filepath = os.path.join(output_dir, f"{mode}_data.bed")
