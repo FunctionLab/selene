@@ -1,7 +1,6 @@
 import itertools
 import os
 
-from joblib import Parallel, delayed
 import numpy as np
 from pyfaidx import Fasta
 import torch
@@ -17,27 +16,9 @@ VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
 
 
-
-def _ism_combinations(sequence, mutate_n_bases):
-    for x in itertools.combinations(range(len(sequence)), mutate_n_bases):
-        yield x
-
-def _ism_mutator(indices, sequence_alts):
-    pos_mutations = []
-    for i in indices:
-        pos_mutations.append(sequence_alts[i])        
-    cur_mutated_sequences = []
-    for mutations in itertools.product(*pos_mutations):
-        cur_mutated_sequences.append(list(zip(indices, mutations)))
-    return cur_mutated_sequences
-    # for mutations in itertools.product(*pos_mutations):
-    #     yield list(zip(indices, mutations))
-
-
 def in_silico_mutagenesis_sequences(sequence,
                                     mutate_n_bases=1,
-                                    bases_arr=None,
-                                    n_jobs=1):
+                                    bases_arr=None):
     """Creates a list containing each mutation that occurs from in silico
     mutagenesis across the whole sequence.
 
@@ -52,8 +33,6 @@ def in_silico_mutagenesis_sequences(sequence,
     bases_arr : list or None
         List of bases. If None, uses `Genome.BASES_ARR` the DNA bases
         by default.
-    n_jobs : int
-        The number of jobs to use.
 
     Returns
     -------
@@ -77,25 +56,14 @@ def in_silico_mutagenesis_sequences(sequence,
                 continue
             alts.append(base)
         sequence_alts.append(alts)
-    all_mutated_sequences = []  
-    if n_jobs == 1:
-        for indices in itertools.combinations(
-                range(len(sequence)), mutate_n_bases):
-            pos_mutations = []
-            for i in indices:
-                pos_mutations.append(sequence_alts[i])
-            for mutations in itertools.product(*pos_mutations):
-                all_mutated_sequences.append(list(zip(indices, mutations)))
-    else:
-        # f"n_jobs*{mutate_n_bases}"
-        all_mutated_sequences = Parallel(n_jobs=n_jobs,
-                                         pre_dispatch="n_jobs")(
-                                         delayed(_ism_mutator)(x, sequence_alts) for x in 
-                                         _ism_combinations(sequence, mutate_n_bases))
-        print(type(all_mutated_sequences), flush=True)
-        print(len(all_mutated_sequences), flush=True)
-        print(type(all_mutated_sequences[0]), flush=True)
-        print(len(all_mutated_sequences[0]), flush=True)
+    all_mutated_sequences = []
+    for indices in itertools.combinations(
+            range(len(sequence)), mutate_n_bases):
+        pos_mutations = []
+        for i in indices:
+            pos_mutations.append(sequence_alts[i])
+        for mutations in itertools.product(*pos_mutations):
+            all_mutated_sequences.append(list(zip(indices, mutations)))
     return all_mutated_sequences
 
 
