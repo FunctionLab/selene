@@ -50,6 +50,7 @@ def initialize_model(model_configs, train=True, lr=None):
     else:
         return model
 
+
 def execute(operation, config, model=None):
     if operation == "train":
         model, loss, optim, optim_args = initialize_model(
@@ -91,6 +92,17 @@ def execute(operation, config, model=None):
             for filepath in vareff_info.pop("vcf_files"):
                 analyze_seqs.variant_effect_prediction(
                     filepath, **vareff_info)
+        if "in_silico_mutagenesis" in configs:
+            ism_info = configs["in_silico_mutagenesis"]
+            if "input_sequence" in ism_info:
+                analyze_seqs.in_silico_mutagenesis(**ism_info)
+            elif "input_path" in ism_info:
+                analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)
+            else:
+                raise ValueError("in siliico mutagenesis requires as input "
+                                 "the path to the FASTA file ('input_path')"
+                                 " or a sequences ('input_sequence'), but "
+                                 " found neither.")
 
 if __name__ == "__main__":
     arguments = docopt(

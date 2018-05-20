@@ -2,13 +2,13 @@ import itertools
 import os
 
 import numpy as np
+from pyfaidx import Fasta
 import torch
 from torch.autograd import Variable
 
 from .predict_handlers import DiffScoreHandler, LogitScoreHandler, \
         WritePredictionsHandler, WriteRefAltHandler
-from ..sequences import Genome
-from ..sequences import sequence_to_encoding
+from ..sequences import Genome  # TODO: Make me generic.
 from ..utils import load_features_list
 
 ISM_COLS = ["pos", "ref", "alt"]
@@ -56,7 +56,6 @@ def in_silico_mutagenesis_sequences(sequence,
                 continue
             alts.append(base)
         sequence_alts.append(alts)
-
     all_mutated_sequences = []
     for indices in itertools.combinations(
             range(len(sequence)), mutate_n_bases):
@@ -315,8 +314,7 @@ class AnalyzeSequences(object):
             Writes results to files corresponding to each reporter in
             `reporters`.
         """
-        current_sequence_encoding = sequence_to_encoding(
-            sequence, Genome.BASE_TO_INDEX)
+        current_sequence_encoding = Genome.sequence_to_encoding(sequence)
         for i in range(0, len(mutations_list), self.batch_size):
             start = i
             end = i + self.batch_size
@@ -341,7 +339,6 @@ class AnalyzeSequences(object):
         for r in reporters:
             r.write_to_file()
 
-
     def in_silico_mutagenesis(self,
                               input_sequence,
                               save_data,
@@ -361,14 +358,24 @@ class AnalyzeSequences(object):
         -------
         None
         """
+        n = len(input_sequence)
+        if n < self.sequence_length: # Pad string length as necessary.
+             diff = (self.sequence_length - n) / 2
+             pad_l = int(np.floor(diff))
+             pad_r = int(np.ceil(diff))
+             input_sequence = ('N' * pad_l) + input_sequence + ('N' * pad_r)
+        elif n > self.sequence_length:  # Extract center substring of proper length.
+            start = int((n - self.sequence_length) // 2)
+            end = int(start + self.sequence_length)
+            input_sequence = input_sequence[start:end]
+
         mutated_sequences = in_silico_mutagenesis_sequences(
             input_sequence, mutate_n_bases=1)
 
         reporters = self._initialize_reporters(
             save_data, output_dir, filename_prefix, ISM_COLS)
 
-        current_sequence_encoding = sequence_to_encoding(
-            input_sequence, Genome.BASE_TO_INDEX)
+        current_sequence_encoding = Genome.sequence_to_encoding(input_sequence)
 
         base_encoding = current_sequence_encoding.reshape(
             (1, *current_sequence_encoding.shape))
@@ -380,6 +387,59 @@ class AnalyzeSequences(object):
 
         self.in_silico_mutagenesis_predict(
             input_sequence, base_preds, mutated_sequences, reporters=reporters)
+
+    def in_silico_mutagenesis_from_file(self,
+                                        input_path,
+                                        save_data,
+                                        output_dir,
+                                        filename_prefix="ism",
+                                        mutate_n_bases=1):
+        """
+        Parameters
+        ----------
+        input_path: str
+        save_data : list of str
+        output_dir : str
+        filename_prefix : str, optional
+        mutate_n_bases : int, optional
+
+        Please note that we have not parallelized this function yet, so runtime
+        increases exponentially when you increase `mutate_n_bases`.
+
+        Returns
+        -------
+        None
+        """
+        fasta_file = Fasta(input_path)
+        for i, fasta_record in enumerate(fasta_file):
+            cur_sequence = str(fasta_record)
+            n = len(cur_sequence)
+            if n < self.sequence_length:
+                 diff = (self.sequence_length - n) / 2
+                 pad_l = int(np.floor(diff))
+                 pad_r = int(np.ceil(diff))
+                 cur_sequence = ('N' * pad_l) + cur_sequence + ('N' * pad_r)
+            elif n > self.sequence_length:
+                start = int((n - self.sequence_length) // 2)
+                end = int(start + self.sequence_length)
+                cur_sequence = cur_sequence[start:end]
+
+            # Generate mut sequences and base preds.
+            mutated_sequences = in_silico_mutagenesis_sequences(cur_sequence, mutate_n_bases=mutate_n_bases)
+            cur_sequence_encoding = Genome.sequence_to_encoding(cur_sequence)
+            base_encoding = cur_sequence_encoding.reshape(1, *cur_sequence_encoding.shape)
+            base_preds = self.predict(base_encoding)
+
+            # Write base to file, and make mut preds.
+            reporters = self._initialize_reporters(save_data, output_dir,
+                                                   "{0}.{1}".format(i, filename_prefix), ISM_COLS)
+            predictions_reporter = reporters[-1]
+            predictions_reporter.handle_batch_predictions(base_preds, [["NA", "NA", "NA"]])
+            self.in_silico_mutagenesis_predict(
+                cur_sequence, base_preds, mutated_sequences, reporters=reporters)
+        fasta_file.close()
+
+
 
     def handle_ref_alt_predictions(self,
                                    batch_ref_seqs,

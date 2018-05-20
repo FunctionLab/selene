@@ -114,7 +114,6 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
         raise ValueError(f"Got score with {scores.shape[0]} bases for sequence"
                          f"with {len(sequence_type.BASES_ARR)} bases.")
 
-    scores = np.flip(scores, axis=0)
     mpl.rcParams["font.family"] = font_family
     if font_properties is None:
         font_properties = FontProperties(size=font_size, weight="black")
@@ -205,6 +204,8 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
     for patch in new_patches:
         ax.add_patch(patch)
     ax.set_xlim(0, scores.shape[1])
+    ax.set_xticks(np.arange(scores.shape[1]) + 0.5)
+    ax.set_xticklabels(np.arange(scores.shape[1]))
     return ax
 
 
@@ -288,9 +289,13 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
 
     """
 
+    # This flipping is so that ordering is consistent with ordering in the sequence logo.
     if mask is not None:
         mask = mask.transpose()
+        mask = np.flip(mask, axis=0)
     scores = scores.transpose()
+    scores = np.flip(scores, axis=0)
+
     if "yticklabels" in kwargs:
         yticklabels = kwargs.pop("yticklabels")
     else:
