@@ -403,11 +403,13 @@ class AnalyzeSequences(object):
         filename_prefix : str, optional
         mutate_n_bases : int, optional
 
+        Please note that we have not parallelized this function yet, so runtime
+        increases exponentially when you increase `mutate_n_bases`.
+
         Returns
         -------
         None
         """
-        # TODO: Add warning if mutate_n_bases is > 1?
         fasta_file = Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str(fasta_record)
