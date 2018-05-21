@@ -229,8 +229,6 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         base = bases[base_idx, seq_idx]
         # We construct a text path that tracks the bars in the barplot.
         # Thus, the barplot takes care of scaling and translation, and we just copy it.
-        #text = TextPath((0., 0.), base, fontproperties=font_properties)
-        # print(base, len(_SVG_PATHS[base][0]), len(_SVG_PATHS[base][1]), flush=True)
         text = Path(_SVG_PATHS[base][0], _SVG_PATHS[base][1])
         b_x, b_y, b_w, b_h = bar.get_extents().bounds
         t_x, t_y, t_w, t_h = text.get_extents().bounds
