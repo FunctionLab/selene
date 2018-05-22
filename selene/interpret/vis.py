@@ -1,4 +1,5 @@
 import re
+import warnings
 from copy import deepcopy
 
 import numpy as np
@@ -7,7 +8,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib import transforms
 from matplotlib.path import Path
-from matplotlib.font_manager import FontProperties
 from matplotlib.patches import PathPatch
 import matplotlib.patheffects
 from matplotlib.text import TextPath
@@ -115,7 +115,8 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 
-def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=None, **kwargs):
+def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=None,
+    font_properties=None, **kwargs):
     """
 
     Parameters
@@ -131,12 +132,21 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         The type of sequence that the ISM results are associated with.
     width : float, optional
         The default is 1.
-        The size width of each character. A value of 1 will mean that there is no gap between each character.
+        The size width of each character. A value of 1 will mean that there is no gap
+        between each character.
+    font_properties : matplotlib.font_manager.FontProperties, optional
+        Default is None. A FontProperties object that specifies the properties of the font to
+        use for plotting the motif. If None, no font will be used, and the text will be rendered
+        by a path. This method of rendering is preferable, as it ensures all character heights
+        correspond to the actual values, and that there are no gaps between characters at a
+        position in the motif. If the user opts to use `font_properties` other than None, then
+        no such guarantee can be made.
     ax : matplotlib.pyplot.Axes, optional
         Default is None.
         An axes to plot on. If not provided, an axis will be created.
     color_scheme: list[str]
-        A list containing the colors to use, appearing in the order of the bases of the sequence type.
+        A list containing the colors to use, appearing in the order of the bases of the
+        sequence type.
 
     Returns
     -------
@@ -146,6 +156,12 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
     """
     scores = deepcopy(scores)  # Everything will break if we do not deepcopy.
     scores = scores.transpose()
+    if font_properties is not None:
+        warnings.warn("Specifying a value for `font_properties` (other than `None`) will use the "
+                      "`matplotlib`-based character paths, and causes distortions in the plotted "
+                      "motif. We recommend leaving `font_properties=None`. See the documentation "
+                      "for information.",
+                      UserWarning)
 
     if "colors" in kwargs:
         color_scheme = kwargs.pop("colors")
@@ -229,7 +245,10 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         base = bases[base_idx, seq_idx]
         # We construct a text path that tracks the bars in the barplot.
         # Thus, the barplot takes care of scaling and translation, and we just copy it.
-        text = Path(_SVG_PATHS[base][0], _SVG_PATHS[base][1])
+        if font_properties is None:
+            text = Path(_SVG_PATHS[base][0], _SVG_PATHS[base][1])
+        else:
+            text = TextPath((0., 0.), base, fontproperties=font_properties)
         b_x, b_y, b_w, b_h = bar.get_extents().bounds
         t_x, t_y, t_w, t_h = text.get_extents().bounds
         scale = (b_w / t_w, b_h / t_h)
@@ -260,8 +279,10 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
     base_scaling : {"identity", "probability", "max_effect"}
         The type of scaling performed on each base at a given position.
             identity : No transformation will be applied to the data.
-            probability : The relative sizes of the bases will be the original input probabilities.
-            max_effect : The relative sizes of the bases will be the max effect of the original input values.
+            probability : The relative sizes of the bases will be the original
+                          input probabilities.
+            max_effect : The relative sizes of the bases will be the max effect
+            of the original input values.
     position_scaling : str
         The type of scaling performed on each position.
             identity: No transformation will be applied to the data.
