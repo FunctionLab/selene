@@ -1,6 +1,12 @@
+"""This module provides the `Sequence` class. This class class is the base class for biological
+sequence collections (e.g. genomes).
+
+"""
 from abc import ABCMeta
 from abc import abstractmethod
+
 import numpy as np
+
 from ._sequence import _fast_sequence_to_encoding
 
 
@@ -21,7 +27,7 @@ def sequence_to_encoding(sequence, base_to_index, bases_arr):
     Returns
     -------
     np.ndarray, dtype=numpy.float32
-        The N-by-X encoding of the sequence, where X is the size of the alphabet.
+        The N-by-X encoding of the sequence, where X is the size of the alphabet.'
     """
     return _fast_sequence_to_encoding(sequence, base_to_index, len(bases_arr))
 
@@ -37,9 +43,7 @@ def _get_base_index(encoding_row):
 
 
 def encoding_to_sequence(encoding, bases_arr, unk_base):
-    """
-    Converts a sequence one-hot encoding to its string
-    sequence.
+    """Converts a sequence one-hot encoding to its string sequence.
 
     Parameters
     ----------
@@ -55,6 +59,7 @@ def encoding_to_sequence(encoding, bases_arr, unk_base):
     -------
     str
         The sequence of N characters decoded from the input array.
+
     """
     sequence = []
     for row in encoding:
@@ -85,8 +90,8 @@ def get_reverse_encoding(encoding,
 
 
 class Sequence(metaclass=ABCMeta):
-    """
-    The base class for biological sequence classes.
+    """The base class for biological sequence classes.
+
     """
     BASE_TO_INDEX = None  # TODO: Determine if this is a good way to specify these requirements.
     INDEX_TO_BASE = None
@@ -95,30 +100,29 @@ class Sequence(metaclass=ABCMeta):
 
     @abstractmethod
     def sequence_in_bounds(self, *args, **kwargs):
-        """
-        Checks if given coordinates are in the sequence.
+        """Checks if given coordinates are in the sequence.
+
         """
         raise NotImplementedError()
 
     @abstractmethod
     def get_sequence_from_coords(self, *args, **kwargs):
-        """
-        Extracts a string of sequence at the given coordinates.
+        """Extracts a string of sequence at the given coordinates.
+
         """
         raise NotImplementedError()
 
     @abstractmethod
     def get_encoding_from_coords(self, *args, **kwargs):
-        """
-        Extracts the numerical encoding for a sequence occuring at the given coordinates.
+        """Extracts the numerical encoding for a sequence occuring at the given coordinates.
+
         """
         raise NotImplementedError()
 
     @classmethod
     @abstractmethod
     def sequence_to_encoding(cls, sequence):
-        """
-        Transforms a biological sequence into a numerical representation.
+        """Transforms a biological sequence into a numerical representation.
 
         Parameters
         ----------
@@ -130,24 +134,24 @@ class Sequence(metaclass=ABCMeta):
         numpy.ndarray, dtype=numpy.float32
             The N-by-X encoding of the sequence, where N is the length of the input sequence and
             X is the size of the sequence type alphabet.
+
         """
         raise NotImplementedError()
 
     @classmethod
     @abstractmethod
     def encoding_to_sequence(cls, encoding):
-        """
-        Transforms the input numerical representation of a biological sequence into a string representation.
+        """Transforms the input numerical representation of a sequence into a string representation.
 
         Parameters
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
             The N-by-X encoding of the sequence, where X is the size of the sequence type alphabet.
 
-
         Returns
         -------
         str
             The sequence of N bases decoded from the input array.
+
         """
         raise NotImplementedError()

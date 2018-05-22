@@ -1,16 +1,18 @@
+"""This module provides the `Genome` class. This class wraps the indexed FASTA file
+for an organism's genomic sequence. It supports retrieving parts of the sequence and
+converting these parts into their one hot encodings.
+
+"""
 import numpy as np
-from pyfaidx import Fasta
+import pyfaidx
 
 from .sequence import Sequence
 from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
 
 
-def _get_sequence_from_coords(len_chrs, genome_sequence,
-                              chrom, start, end, strand='+'):
-    """
-    Gets the genomic sequence given the chromosome, sequence start,
-    sequence end, and strand side.
+def _get_sequence_from_coords(len_chrs, genome_sequence, chrom, start, end, strand='+'):
+    """Gets the genomic sequence at the input coordinates.
 
     Parameters
     ----------
@@ -36,6 +38,7 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
     ------
     ValueError
         If the input char to `strand` is not one of the specified choices.
+
     """
     if start > len_chrs[chrom] or end > (len_chrs[chrom] + 1) \
             or start < 0:
@@ -50,6 +53,22 @@ def _get_sequence_from_coords(len_chrs, genome_sequence,
 
 
 class Genome(Sequence):
+    """This class provides access to an organism's genomic sequence.
+
+    This class supports retrieving parts of the sequence and converting these
+    parts into their one-hot encodings. It is essentially a wrapper class
+    around the `pyfaix.Fasta` class.
+
+    Attributes
+    ----------
+    genome : pyfaidx.Fasta
+        The Fasta file containing the genome sequence.
+    chrs : list(str)
+        The list of chromosome names.
+    len_chrs : dict
+        The length of each chromosome sequence in the file.
+
+    """
 
     BASES_ARR = np.array(['A', 'C', 'G', 'T'])
     INDEX_TO_BASE = {
@@ -66,10 +85,7 @@ class Genome(Sequence):
     UNK_BASE = "N"
 
     def __init__(self, input_path):
-        """
-        This class wraps the indexed FASTA file for an organism's genomic sequence.
-        It supports retrieving parts of the sequence and converting these parts into their one-hot encodings.
-        It is essentially a wrapper class around the pyfaix.Fasta class.
+        """Constructs a `Genome` object.
 
         Parameters
         ----------
@@ -78,37 +94,30 @@ class Genome(Sequence):
             corresponding *.fai file in the same directory.
             This file should contain the target organism's genome sequence.
 
-        Attributes
-        ----------
-        genome : pyfaidx.Fasta
-            The Fasta file containing the genome sequence.
-        chrs : list(str)
-            The list of chromosome names.
-        len_chrs : dict
-            The length of each chromosome sequence in the file.
         """
-        self.genome = Fasta(input_path)
+        self.genome = pyfaidx.Fasta(input_path)
         self.chrs = sorted(self.genome.keys())
         self.len_chrs = self._get_len_chrs()
 
     def get_chrs(self):
-        """
-        Gets the list of chromosomes.
+        """Gets the list of chromosome names.
 
         Returns
         -------
         list(str)
+            A list of the chromosome names.
+
         """
         return self.chrs
 
     def get_chr_lens(self):
-        """
-        Gets the length of each chromosome sequence in the file.
+        """Gets the length of each chromosome sequence in the file.
 
         Returns
         -------
         list(tup)
             Tuples of chromosome (str) and chromosome length (int).
+
         """
         return list(self.len_chrs.items())
 
@@ -125,9 +134,7 @@ class Genome(Sequence):
             return self.genome[chrom][start:end].reverse.complement.seq
 
     def sequence_in_bounds(self, chrom, start, end):
-        """
-        Check if the region we want to query is within the bounds of the
-        start and end index for a chromosome in the genome.
+        """Check if the region we want to query is within the bounds of the queried chromosome.
 
         Parameters
         ----------
@@ -143,6 +150,7 @@ class Genome(Sequence):
         bool
             Whether we can retrieve a sequence from the bounds specified
             in the input.
+
         """
         if chrom not in self.len_chrs:
             return False
@@ -152,9 +160,7 @@ class Genome(Sequence):
         return True
 
     def get_sequence_from_coords(self, chrom, start, end, strand='+'):
-        """
-        Gets the genomic sequence given the chromosome, sequence start,
-        sequence end, and strand side.
+        """Gets the queried chromosome's sequence at the input coordinates.
 
         Parameters
         ----------
@@ -176,14 +182,13 @@ class Genome(Sequence):
         ------
         ValueError
             If the input char to `strand` is not one of the specified choices.
+
         """
         return _get_sequence_from_coords(self.len_chrs, self._genome_sequence,
                                          chrom, start, end, strand)
 
     def get_encoding_from_coords(self, chrom, start, end, strand='+'):
-        """
-        Gets the genomic sequence given the chromosome, sequence start,
-        sequence end, and strand side; and return its one-hot encoding.
+        """Gets the one-hot encoding of the genomic sequence at the queried coordinates.
 
         Parameters
         ----------
@@ -206,6 +211,7 @@ class Genome(Sequence):
         ValueError
             If the input char to `strand` is not one of the specified choices.
             (Raised in the call to `self.get_sequence_from_coords`)
+
         """
         sequence = self.get_sequence_from_coords(chrom, start, end, strand)
         encoding = self.sequence_to_encoding(sequence)
@@ -213,8 +219,7 @@ class Genome(Sequence):
 
     @classmethod
     def sequence_to_encoding(cls, sequence):
-        """
-        Converts an input sequence to its one-hot encoding.
+        """Converts an input sequence to its one-hot encoding.
 
         Parameters
         ----------
@@ -225,13 +230,13 @@ class Genome(Sequence):
         -------
         numpy.ndarray, dtype=numpy.float32
             The N-by-4 one-hot encoding of the sequence.
+
         """
         return sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
 
     @classmethod
     def encoding_to_sequence(cls, encoding):
-        """
-        Converts an input one-hot encoding to its DNA sequence.
+        """Converts an input one-hot encoding to its DNA sequence.
 
         Parameters
         ----------
@@ -242,5 +247,6 @@ class Genome(Sequence):
         -------
         str
             The sequence of N nucleotides decoded from the input array.
+
         """
         return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)
