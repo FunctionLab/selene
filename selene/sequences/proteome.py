@@ -1,7 +1,3 @@
-"""This class wraps the indexed FASTA file for an organism's proteomic sequence.
-    It supports retrieving parts of the sequence and converting these parts
-    into their one hot encodings.
-"""
 import numpy as np
 from pyfaidx import Fasta
 
@@ -12,21 +8,26 @@ from .sequence import encoding_to_sequence
 
 def _get_sequence_from_coords(len_prots, proteome_sequence,
                               prot, start, end):
-    """Gets the amino acid sequence given the protein, sequence start, and
-    sequence end.
+    """
+    Gets the amino acid sequence at specified coordinates.
 
     Parameters
     ----------
+    len_prots : dict
+        A dictionary mapping protein names to lengths.
+    proteome_sequence : function
+        A closure that returns the sequence at given coordinates.
     prot : str
-        e.g. "YFP".
+        The name of a protein, e.g. "YFP".
     start : int
+        The 0-based start coordinate of the first position in the sequence.
     end : int
+        One past the 0-based last position in the sequence.
 
     Returns
     -------
     str
         The amino acid sequence.
-
     """
     if start > len_prots[prot] or (end > len_prots[prot] + 1) or start < 0:
         return ""
@@ -47,12 +48,15 @@ class Proteome(Sequence):
     }  # TODO: Consider renaming BASE to ALPHA or CHAR to make it more general?
     UNK_BASE = "X"
 
-    def __init__(self, faa_file):
-        """Wrapper class around the pyfaix.Fasta class.
+    def __init__(self, input_path):
+        """
+        This class represents an organism's proteomic sequence.
+        It supports retrieving parts of the sequence and converting these parts into their one-hot encodings.
+        It is essentially a wrapper class around the `pyfaix.Fasta` class.
 
         Parameters
         ----------
-        faa_file : str
+        input_path : str
             Path to an indexed FASTA file containing amino acid sequences,
             that is, a *.faa file with a corresponding *.fai file in the
             same directory. File should contain the sequences from which
@@ -60,26 +64,31 @@ class Proteome(Sequence):
 
         Attributes
         ----------
-        proteome : Fasta
-        prots : list[str]
+        proteome : pyfaidx.Fasta
+            The Fasta file containing the protein sequences.
+        prots : list(str)
+            The list of protein names.
         len_prots : dict
             The length of each protein sequence in the file.
         """
-        self.proteome = Fasta(faa_file)
+        self.proteome = Fasta(input_path)
         self.prots = sorted(self.proteome.keys())
         self.len_prots = self._get_len_prots()
 
     def get_prots(self):
-        """Gets the list of proteins.
+        """
+        Gets the list of protein names.
 
         Returns
         -------
         list(str)
+            The list of protein names.
         """
         return self.prots
 
     def get_prot_lens(self):
-        """Gets the length of each protein sequence in the file.
+        """
+        Gets the length of each protein sequence in the file.
 
         Returns
         -------
@@ -98,21 +107,24 @@ class Proteome(Sequence):
         return self.proteome[prot][start:end].seq
 
     def sequence_in_bounds(self, prot, start, end):
-        """Check if the region we want to query is within the bounds of the
+        """
+        Check if the region we want to query is within the bounds of the
         start and end index for a protein in the proteome.
 
         Parameters
         ----------
         prot : str
-            e.g. "YFP".
+            The name of the protein, e.g. "YFP".
         start : int
+            The 0-based start coordinate of the first position in the sequence.
         end : int
+            One past the 0-based last position in the sequence.
 
         Returns
         -------
         bool
             Whether we can retrieve a sequence from the bounds specified
-            in the input
+            in the input.
         """
         if start > self.len_prots[prot] or end > (self.len_prots[prot] + 1) \
                 or start < 0:
@@ -120,41 +132,45 @@ class Proteome(Sequence):
         return True
 
     def get_sequence_from_coords(self, prot, start, end):
-        """Gets the amino acid sequence given the protein, sequence start, and
+        """
+        Gets the amino acid sequence given the protein, sequence start, and
         sequence end.
 
         Parameters
         ----------
         prot : str
-            e.g. "YFP".
+            The protein name, e.g. "YFP".
         start : int
+            The 0-based start coordinate of the first position in the sequence.
         end : int
+            One past the 0-based last position in the sequence.
 
         Returns
         -------
         str
-            The amino acid sequence.
-
+            The amino acid sequence at the specified coordinates.
         """
         return _get_sequence_from_coords(
             self.len_prots, self._proteome_sequence, prot, start, end)
 
     def get_encoding_from_coords(self, prot, start, end):
-        """Gets the proteomic sequence given the protein, sequence start,
+        """
+        Gets the amino acid sequence given the protein, sequence start,
         sequence end; and return its one hot encoding.
 
         Parameters
         ----------
         prot : str
-            e.g. "YFP".
+            The name of the protein, e.g. "YFP".
         start : int
+            The 0-based start coordinate of the first position in the sequence.
         end : int
+            One past the 0-based last position in the sequence.
 
         Returns
         -------
         numpy.ndarray, dtype=bool
             The N-by-20 encoding of the sequence.
-
         """
         sequence = self.get_sequence_from_coords(prot, start, end)
         encoding = self.sequence_to_encoding(sequence)
@@ -162,31 +178,34 @@ class Proteome(Sequence):
 
     @classmethod
     def sequence_to_encoding(cls, sequence):
-        """Converts an input sequence to its one hot encoding.
+        """
+        Converts an input sequence to its one hot encoding.
 
         Parameters
         ----------
         sequence : str
-            The input sequence of length N.
+            The input sequence of amino acids of length N.
 
         Returns
         -------
-        numpy.ndarray, dtype=float64
+        numpy.ndarray, dtype=numpy.float32
             The N-by-20 encoding of the sequence.
         """
         return sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
 
     @classmethod
     def encoding_to_sequence(cls, encoding):
-        """Converts an input encoding to its amino acid sequence.
+        """
+        Converts an input one-hot encoding to its amino acid sequence.
 
         Parameters
         ----------
-        encoding : numpy.ndarray, dtype=float64
+        encoding : numpy.ndarray, dtype=numpy.float32
             The N-by-20 encoding of the sequence
 
         Returns
         -------
         str
+            The sequence of N amino acids decoded from the input array.
         """
         return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)
