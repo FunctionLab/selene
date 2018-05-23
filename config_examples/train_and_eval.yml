@@ -20,7 +20,7 @@ sampler: !obj:selene.samplers.IntervalsSampler {
     test_holdout: [8, 9],
     validation_holdout: [6, 7],
     feature_thresholds: 0.5,
-    random_seed: 127,
+    seed: 127,
     mode: "train",
     save_datasets: [
         test
