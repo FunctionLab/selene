@@ -24,7 +24,8 @@ class ISMResult(object):
         sequence_type : class, optional
             Default is `selene.sequences.Genome`. The type of sequence
             that the *in silico* mutagenesis results are associated
-            with.
+            with. This should generally be a subclass of
+            `selene.sequences.Sequence`
 
         """
         # Construct the reference sequence.
@@ -36,22 +37,23 @@ class ISMResult(object):
                 cur_ref = row["ref"]
                 if cur_ref not in alpha:
                     raise ValueError(
-                        f"Found character \'{cur_ref}\' "
-                        f"from outside current alphabet on row {row_idx}.")
+                        "Found character \'{0}\' from outside current alphabet"
+                        " on row {1}.".format(cur_ref, row_idx))
                 i = int(row["pos"])
                 seen.add(i)
                 if ref_seq[i] != "":
                     if ref_seq[i] != cur_ref:
                         raise Exception(
-                            f"Found 2 different letters for reference "
-                            f"\'{ref_seq[i]}\' and \'{cur_ref}\' "
-                            f"on row {row_idx}.")
+                            "Found 2 different letters for reference \'{0}\'"
+                            " and \'{1}\' on row {2}.".format(ref_seq[i],
+                                                              cur_ref,
+                                                              row_idx))
                 else:
                     ref_seq[i] = cur_ref
         if len(seen) != len(ref_seq):
             raise Exception(
-                f"Expected characters for {len(ref_seq)} positions, but "
-                f"only found {len(seen)} of them.")
+                "Expected characters for {0} positions, but only found {1} of "
+                "them.".format(len(ref_seq), len(seen)))
         ref_seq = "".join(ref_seq)
         self._reference_sequence = ref_seq
         self._data_frame = data_frame
@@ -122,8 +124,8 @@ class ISMResult(object):
             i = int(row["pos"])
             if base not in alpha:
                 raise ValueError(
-                    f"Found character \'{base}\' from outside current alphabet"
-                    f" on row {row_idx}.")
+                    "Found character \'{0}\' from outside current alphabet"
+                    " on row {1}.".format(base, row_idx))
             ret[i, self._sequence_type.BASE_TO_INDEX[base]] = row[feature]
         return ret
 

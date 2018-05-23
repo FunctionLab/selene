@@ -192,8 +192,9 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
             "Color scheme is shorter than number of bases in sequence.")
 
     if scores.shape[0] != len(sequence_type.BASES_ARR):
-        raise ValueError(f"Got score with {scores.shape[0]} bases for sequence"
-                         f"with {len(sequence_type.BASES_ARR)} bases.")
+        raise ValueError(
+            "Got score with {0} bases for sequence with {1} bases.".format(
+                scores.shape[0], len(sequence_type.BASES_ARR)))
     if ax is None:
         _, ax = plt.subplots(figsize=scores.shape)
 
@@ -337,7 +338,8 @@ def rescale_feature_matrix(scores, base_scaling="identity",
     elif base_scaling == "max_effect":
         rescaled_scores = scores - np.min(scores, axis=0)
     else:
-        raise ValueError(f"Could not find base scaling \"{base_scaling}\".")
+        raise ValueError(
+            "Could not find base scaling \"{0}\".".format(base_scaling))
 
     # Scale each position
     if position_scaling == "max_effect":
@@ -348,7 +350,8 @@ def rescale_feature_matrix(scores, base_scaling="identity",
         rescaled_scores /= np.sum(scores, axis=0)[np.newaxis, :]
     elif position_scaling != "identity":
         raise ValueError(
-            f"Could not find position scaling \"{position_scaling}\".")
+            "Could not find position scaling \"{0}\".".format(
+                position_scaling))
     return rescaled_scores.transpose()
 
 
