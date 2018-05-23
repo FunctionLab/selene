@@ -56,7 +56,7 @@ class WritePredictionsHandler(PredictionsHandler):
                 self.out_filename.split('.')[:-1])
             write_NAs_to_file(self.NA_samples,
                               self.column_names,
-                              f"{NA_file_prefix}.NA")
+                              "{0}.NA".format(NA_file_prefix))
         self.results = np.vstack(self.results)
         self.samples = np.vstack(self.samples)
         write_to_file(self.results,

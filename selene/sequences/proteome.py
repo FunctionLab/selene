@@ -193,7 +193,7 @@ class Proteome(Sequence):
 
     @classmethod
     def sequence_to_encoding(cls, sequence):
-        """Converts an input sequence to its one hot encoding.
+        """Converts an input sequence to its one-hot encoding.
 
         Parameters
         ----------
@@ -215,7 +215,8 @@ class Proteome(Sequence):
         Parameters
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
-            The N-by-20 encoding of the sequence
+            The N-by-20 encoding of the sequence, where N is the length
+            of the output sequence.
 
         Returns
         -------

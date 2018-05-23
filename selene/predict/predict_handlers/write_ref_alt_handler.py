@@ -25,9 +25,9 @@ class WriteRefAltHandler(PredictionsHandler):
 
         self.needs_base_pred = True
         self.ref_writer = WritePredictionsHandler(
-            features_list, nonfeature_columns, f"{out_filename}.ref")
+            features_list, nonfeature_columns, "{0}.ref".format(out_filename))
         self.alt_writer = WritePredictionsHandler(
-            features_list, nonfeature_columns, f"{out_filename}.alt")
+            features_list, nonfeature_columns, "{1}.alt".format(out_filename))
 
     def handle_NA(self, batch_ids):
         self.ref_writer.handle_NA(batch_ids)

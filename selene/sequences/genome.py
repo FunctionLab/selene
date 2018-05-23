@@ -1,6 +1,6 @@
 """This module provides the `Genome` class. This class wraps the indexed
 FASTA file for an organism's genomic sequence. It supports retrieving
-parts of the sequence and converting these parts into their one hot
+parts of the sequence and converting these parts into their one-hot
 encodings.
 
 """
@@ -250,7 +250,8 @@ class Genome(Sequence):
         Parameters
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
-            An N-by-4 one-hot encoding of the sequence.
+            An N-by-4 one-hot encoding of the sequence, where N is the
+            length of the output sequence.
 
         Returns
         -------

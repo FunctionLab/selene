@@ -158,7 +158,8 @@ class Sequence(metaclass=ABCMeta):
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
             The N-by-X encoding of the sequence, where X is the size of
-            the sequence type alphabet.
+            the sequence type alphabet, and N is the length of the
+            sequence.
 
         Returns
         -------

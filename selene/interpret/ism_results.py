@@ -87,11 +87,11 @@ class ISMResult(object):
         return self._sequence_type
 
     def get_feature_matrix(self, feature, reference_mask=None):
-        """Extracts a feature from the ISM results as a matrix, where
-        the reference base positions hold the value for the reference
-        prediction, and alternative positions hold the results for
-        making a one-base change from the reference base to the
-        specified alternative base.
+        """Extracts a feature from the *in silico* mutagenesis results
+        as a matrix, where the reference base positions hold the value
+        for the reference prediction, and alternative positions hold the
+        results for making a one-base change from the reference base to
+        the specified alternative base.
 
         Parameters
         ----------
@@ -108,7 +108,7 @@ class ISMResult(object):
         numpy.ndarray, dtype=np.float32
             A LxN shaped array (where L is the sequence length, and N
             is the size of the alphabet) that holds the results from the
-            ISM experiment for the specified feature.
+            *in silico* mutagenesis experiment for the specified feature.
 
         """
         ret = self._sequence_type.sequence_to_encoding(
@@ -131,7 +131,8 @@ class ISMResult(object):
 
     @staticmethod
     def ism_from_file(input_path, sequence_type=Genome):
-        """Loads ISMResult from a DataFrame in a file.
+        """Loads an `ISMResult` from a `pandas.DataFrame` stored in a
+        file.
 
         Parameters
         ----------
@@ -139,8 +140,8 @@ class ISMResult(object):
             A path to the input file.
 
         sequence_type : class, optional
-            Default is selene.sequences.Genome
-            The type of sequence that the ISM results are associated
+            Default is `selene.sequences.Genome`. The type of sequence
+            that the *in silico* mutagenesis results are associated
             with.
 
         Returns

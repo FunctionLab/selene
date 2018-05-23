@@ -38,7 +38,7 @@ def write_to_file(data_across_features, info_cols, column_names, filename):
             preds_str = '\t'.join(
                 probabilities_to_string(preds))
             info_str = '\t'.join([str(i) for i in info])
-            file_handle.write(f"{info_str}\t{preds_str}\n")
+            file_handle.write("{0}\t{1}\n".format(info_str, preds_str))
 
 
 def write_NAs_to_file(info_cols, column_names, filename):
@@ -66,7 +66,7 @@ def write_NAs_to_file(info_cols, column_names, filename):
             columns='\t'.join(column_names)))
         for info in info_cols:
             write_info = '\t'.join([str(i) for i in info])
-            file_handle.write(f"{write_info}\n")
+            file_handle.write("{0}\n".format(write_info))
 
 
 def probabilities_to_string(probabilities):

@@ -161,7 +161,7 @@ class GenomicFeatures(Target):
 
     def get_feature_data(self, chrom, start, end):
         """For a sequence of length L = `end` - `start`, return the features'
-        one hot encoding corresponding to that region.
+        one-hot encoding corresponding to that region.
             e.g. for `n_features`, each position in that sequence will
             have a binary vector specifying whether the genomic feature's
             coordinates overlap with that position.

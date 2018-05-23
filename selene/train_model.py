@@ -124,7 +124,7 @@ class TrainModel(object):
         self.output_dir = current_run_output_dir
 
         initialize_logger(
-            os.path.join(self.output_dir, f"{__name__}.log"),
+            os.path.join(self.output_dir, "{0}.log".format(__name__)),
             verbosity=logging_verbosity)
 
         if self.data_parallel:
@@ -305,8 +305,8 @@ class TrainModel(object):
             self._all_validation_targets, all_predictions)
 
         for name, score in average_scores.items():
-            logger.debug(f"[STATS] average {name}: {score}")
-            print(f"[VALIDATE] average {name}: {score}")
+            logger.debug("[STATS] average {0}: {1}".format(name, score))
+            print("[VALIDATE] average {0}: {1}".format(name, score))
 
         average_scores["loss"] = average_loss
         return average_scores
@@ -323,8 +323,8 @@ class TrainModel(object):
             data=all_predictions)
 
         for name, score in average_scores.items():
-            logger.debug(f"[STATS] average {name}: {score}")
-            print(f"[TEST] average {name}: {score}")
+            logger.debug("[STATS] average {0}: {1}".format(name, score))
+            print("[TEST] average {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")

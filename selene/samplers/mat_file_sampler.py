@@ -1,20 +1,38 @@
+"""This module provides the `MatFileSampler` class, which defines a
+sampler type that allows  # TODO(DOCUMENTATION): Finish.
+
+"""
 import h5py
 import numpy as np
 import scipy.io
 
 from .sampler import Sampler
 
+
 class MatFileSampler(Sampler):
+    """  # TODO(DOCUMENTATION): Finish.
+
+    Attributes
+    ----------
+    """
 
     def __init__(self,
                  training_data,
                  validation_data,
                  test_data=None,
-                 random_seed=436,
+                 seed=436,
                  mode="train"):
-        super(MatFileSampler, self).__init__(
-            random_seed=random_seed
-        )
+        """  # TODO(DOCUMENTATION): Finish.
+
+        Parameters
+        ----------
+        training_data
+        validation_data
+        test_data
+        seed
+        mode
+        """
+        super(MatFileSampler, self).__init__(seed=seed)
         if test_data:
             self.modes.append("test")
 

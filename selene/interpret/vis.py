@@ -360,7 +360,7 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
 
     Parameters
     ----------
-    scores : numpy.ndarray, dtype=numeric
+    scores : numpy.ndarray, dtype=numpy.float32
         An LxN matrix (where L is the length of the sequence, and N is
         the size of the alphabet) matrix containing the scores for each
         position.

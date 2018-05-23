@@ -1,3 +1,6 @@
+"""  # TODO(DOCUMENTATION): Finish.
+
+"""
 from collections import namedtuple
 import logging
 import random
@@ -46,22 +49,10 @@ def _get_indices_and_probabilities(interval_lengths, indices):
 
 class IntervalsSampler(OnlineSampler):
     """
-    Parameters
-    ----------
-    genome
-    query_feature_data
-    distinct_features
-    intervals_file
-    random_seed
-    validation_holdout
-    test_holdout
-    sequence_length
-    center_bin_to_predict
-    feature_thresholds
-    mode
 
     Attributes
     ----------
+    
     """
 
 
@@ -71,7 +62,7 @@ class IntervalsSampler(OnlineSampler):
                  distinct_features,
                  intervals_file,
                  sample_negative=False,
-                 random_seed=436,
+                 seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
                  sequence_length=1001,
@@ -79,11 +70,29 @@ class IntervalsSampler(OnlineSampler):
                  feature_thresholds=0.5,
                  mode="train",
                  save_datasets=["test"]):
+        """
+
+        Parameters
+        ----------
+        genome
+        query_feature_data
+        distinct_features
+        intervals_file
+        sample_negative
+        seed
+        validation_holdout
+        test_holdout
+        sequence_length
+        center_bin_to_predict
+        feature_thresholds
+        mode
+        save_datasets
+        """
         super(IntervalsSampler, self).__init__(
             genome,
             query_feature_data,
             distinct_features,
-            random_seed=random_seed,
+            seed=seed,
             validation_holdout=validation_holdout,
             test_holdout=test_holdout,
             sequence_length=sequence_length,
@@ -201,7 +210,7 @@ class IntervalsSampler(OnlineSampler):
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.genome.get_encoding_from_coords(
-                f"chr{chrom}", window_start, window_end, strand)
+                "chr{0}".format(chrom), window_start, window_end, strand)
         if retrieved_seq.shape[0] == 0:
             logger.info("Full sequence centered at chr{0} position {1} "
                         "could not be retrieved. Sampling again.".format(
@@ -217,7 +226,7 @@ class IntervalsSampler(OnlineSampler):
             feature_indices = ';'.join(
                 [str(f) for f in np.nonzero(retrieved_targets)[0]])
             self.save_datasets[self.mode].append(
-                [f"chr{chrom}",
+                ["chr{0}".format(chrom),
                  window_start,
                  window_end,
                  strand,

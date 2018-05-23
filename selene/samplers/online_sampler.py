@@ -1,3 +1,7 @@
+"""This module provides the `OnlineSampler` class, which defines a
+sampler that loads examples "on the fly".
+
+"""
 from abc import ABCMeta
 import os
 
@@ -6,12 +10,16 @@ from ..sequences import Genome
 from ..targets import GenomicFeatures
 from ..utils import load_features_list
 
+
 class OnlineSampler(Sampler, metaclass=ABCMeta):
-    """
-    A sampler in which training/validation/test data is constructed from
-    random sampling of the dataset for each batch passed to the model.
-    This form of sampling may alleviate the problem of loading an
+    """A sampler in which training/validation/test data is constructed
+    from random sampling of the dataset for each batch passed to the
+    model. This form of sampling may alleviate the problem of loading an
     extremely large dataset into memory when developing a new model.
+
+    Attributes
+    ----------
+    # TODO(DOCUMENTATION): Define the attributes.
     """
     STRAND_SIDES = ('+', '-')
 
@@ -19,7 +27,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                  genome,
                  query_feature_data,
                  distinct_features,
-                 random_seed=436,
+                 seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
                  sequence_length=1000,
@@ -39,7 +47,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             coordinates mapped to the genomic features we want to predict.
         distinct_features : str
             Path to the distinct list of genomic features we want to predict.
-        random_seed : int, optional
+        seed : int, optional
             Default is 436. Set the random seed for sampling.
         validation_holdout : list of str or float, optional
             Default is ['6', '7']. Holdout can be chromosomal or proportional.
@@ -57,13 +65,13 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             Default is 200. Query the tabix-indexed file for a region of
             length `center_bin_to_predict`.
         feature_thresholds : float [0.0, 1.0], optional
+            # TODO(DOCUMENTATION): Finish.
         mode : {"train", "validate", "test"}
+            # TODO(DOCUMENTATION): Finish.
         save_datasets : list of str
             Default is ["test"].
         """
-        super(OnlineSampler, self).__init__(
-            random_seed=random_seed
-        )
+        super(OnlineSampler, self).__init__(seed=seed)
 
         if (sequence_length + center_bin_to_predict) % 2 != 0:
             raise ValueError(
@@ -180,8 +188,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             Path to the output directory to which we should save the datasets.
         """
         for mode, samples in self.save_datasets.items():
-            filepath = os.path.join(output_dir, f"{mode}_data.bed")
+            filepath = os.path.join(output_dir, "{0}_data.bed".format(mode))
             with open(filepath, 'w+') as file_handle:
                 for cols in samples:
                     line ='\t'.join([str(c) for c in cols])
-                    file_handle.write(f"{line}\n")
+                    file_handle.write("{0}\n".format(line))
