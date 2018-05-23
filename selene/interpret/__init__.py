@@ -1,4 +1,5 @@
-"""This module provides functions and classes for interpreting modules trained with Selene.
+"""This module provides functions and classes for interpreting modules
+trained with Selene.
 
 """
 from .vis import sequence_logo
