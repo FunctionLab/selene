@@ -1,23 +1,27 @@
+"""This module provides the `ISMResult` class, which stores results for an *in silico* mutagenesis experiment.
+
+"""
 import pandas as pd
+
 from selene.sequences import Genome
 
 
 class ISMResult(object):
-    """
-    An object storing the results of an in silico mutagenesis experiment.
+    """An object storing the results of an *in silico* mutagenesis experiment.
+
     """
     def __init__(self, data_frame, sequence_type=Genome):
-        """
-        Constructs a new ISMResult object.
+        """Constructs a new `ISMResult` object.
 
         Parameters
         ----------
         data_frame : pandas.DataFrame
-            The data frame with the ISM results.
+            The data frame with the results from the *in silico* mutagenesis
+            experiments.
 
         sequence_type : class, optional
-            Default is selene.sequences.Genome
-            The type of sequence that the ISM results are associated with.
+            Default is `selene.sequences.Genome`. The type of sequence that the ISM
+            results are associated with.
 
         """
         # Construct the reference sequence.
@@ -46,32 +50,33 @@ class ISMResult(object):
 
     @property
     def reference_sequence(self):
-        """
+        """The reference sequence that the *in silico* mutagenesis experiment was performed on.
 
         Returns
         -------
         str
             The reference sequence (i.e. non-mutated input) as a string of characters.
+
         """
         return self._reference_sequence
 
     @property
     def sequence_type(self):
-        """
+        """The type of underlying sequence.
 
         Returns
         -------
         class
-            The type of sequence that this ISM was performed on.
+            The type of sequence that the *in silico* mutagenesis was performed on.
 
         """
         return self._sequence_type
 
     def get_feature_matrix(self, feature, reference_mask=None):
-        """
-        Extracts a feature from the ISM results as a matrix, where the reference base positions hold the value for the
-        reference prediction, and alternative positions hold the results for making a one-base change from the
-        reference base to the specified alternative base.
+        """Extracts a feature from the ISM results as a matrix, where the reference
+        base positions hold the value for the reference prediction, and alternative
+        positions hold the results for making a one-base change from the reference
+        base to the specified alternative base.
 
         Parameters
         ----------
@@ -79,15 +84,14 @@ class ISMResult(object):
             The name of the feature to extract as a matrix.
 
         reference_mask : float, optional
-            Default is None.
-            A value to mask the reference entries with. If left as None, then no masking
-            will be performed on the reference positions.
+            Default is `None`. A value to mask the reference entries with. If left
+            as `None`, then no masking will be performed on the reference positions.
 
         Returns
         -------
         numpy.ndarray
-            A len(reference_sequence) x |ALPHABET| shaped array holding the results from the ISM experiment for
-            the specified feature.
+            A LxN shaped array (where L is the sequence length, and N is the size of the alphabet) that
+            holds the results from the ISM experiment for the specified feature.
 
         """
         ret = self._sequence_type.sequence_to_encoding(self._reference_sequence)
@@ -107,8 +111,7 @@ class ISMResult(object):
 
     @staticmethod
     def ism_from_file(input_path, sequence_type=Genome):
-        """
-        Loads ISMResult from a DataFrame in a file.
+        """Loads ISMResult from a DataFrame in a file.
 
         Parameters
         ----------
@@ -123,5 +126,6 @@ class ISMResult(object):
         -------
         ISMResult
             The results that were stored in the file.
+
         """
         return ISMResult(pd.read_csv(input_path, sep="\t", header=0), sequence_type=sequence_type)

@@ -1,3 +1,6 @@
+"""This module provides the methods for visualizing different ouputs from Selene.
+
+"""
 import re
 import warnings
 from copy import deepcopy
@@ -5,7 +8,6 @@ from copy import deepcopy
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 from matplotlib import transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
@@ -27,20 +29,21 @@ _SVG_PATHS = {'T': "M 0,100 l 100, 0 l 0,-25 l -37.5, 0 l 0,-75 l -25, 0 l 0,75 
                     "l 25,0 L 100,50 C 100,50 100,0, 50,0 C 50,0 0,0 0,50 l 0,50 z")}
 
 
-def _svg_parse(path):
-    """
-    Functionality for parsing a string from source vector graphics (SVG).
+def _svg_parse(path_string):
+    """Functionality for parsing a string from source vector graphics (SVG).
+
     Source is from `https://matplotlib.org/2.1.1/gallery/showcase/firefox.html` with minor modifications.
 
     Parameters
     ----------
-    path : str
-        Path string from SVG.
+    path_string : str
+        String containing the path code from an SVG file.
 
     Returns
     -------
-    tuple(list[numpy.uint8], numpy.ndarray)
+    list(numpy.uint8), numpy.ndarray, dtype=np.float32
         A 2-tuple containing code types and coordinates for a matplotlib path.
+
     """
     commands = {'M': (Path.MOVETO,),
                 'L': (Path.LINETO,),
@@ -52,7 +55,7 @@ def _svg_parse(path):
     vertices = []
     codes = []
     last = (0, 0)
-    for cmd, values in path_re.findall(path):
+    for cmd, values in path_re.findall(path_string):
         points = [float(v) for v in float_re.findall(values)]
         points = np.array(points).reshape((len(points)//2, 2))
         if cmd.islower():
@@ -70,28 +73,25 @@ for k in _SVG_PATHS.keys():
 
 
 class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
-    """
-    This is a class for re-rendering text paths and preserving their scale.
+    """This class provides an effect for continuously rendering a text path over another path.
+
     """
     def __init__(self, bar, x_translation=0., y_translation=0., x_scale=1., y_scale=1.):
-        """
+        """This is a class for re-rendering text paths and preserving their scale.
 
         Parameters
         ----------
         bar : matplotlib.patches.Patch
             The patch where the letter is.
         x_translation : float, optional
-            Default is 0.
-            Amount by which to translate the x coordinate.
+            Default is 0. Amount by which to translate the x coordinate.
         y_translation : float, optional
-            Default is 0.
-            Amount by which to translate the y coordinate.
+            Default is 0. Amount by which to translate the y coordinate.
         x_scale : float, optional
-            Default is 1.
-            Amount by which to scale the width.
+            Default is 1. Amount by which to scale the width.
         y_scale : float, optional
-            Default is 1.
-            Amount by which to scale the height.
+            Default is 1. Amount by which to scale the height.
+
         """
         self._bar = bar
         self._x_translation = x_translation
@@ -100,8 +100,8 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         self._y_scale = y_scale
 
     def draw_path(self, renderer, gc, tpath, affine, rgbFace=None):
-        """
-        Redraws the path.
+        """Redraws the path.
+
         """
         b_x, b_y, b_w, b_h = self._bar.get_extents().bounds
         t_x, t_y, t_w, t_h = tpath.get_extents().bounds
@@ -116,12 +116,12 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
 
 
 def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=None,
-    font_properties=None, **kwargs):
-    """
+                  font_properties=None, **kwargs):
+    """Plots a sequence logo for visualizing motifs.
 
     Parameters
     ----------
-    scores : np.ndarray
+    scores : np.ndarray, dtype=np.float32
         A len(reference_sequence) x |ALPHABET| matrix containing the scores for each position.
     order : {"alpha", "value"}
         The ordering to use for the bases in the motif plots.
@@ -131,9 +131,8 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         Default is selene.sequences.Genome
         The type of sequence that the ISM results are associated with.
     width : float, optional
-        The default is 1.
-        The size width of each character. A value of 1 will mean that there is no gap
-        between each character.
+        The default is 1. The size width of each character. A value of 1 will mean that there
+        is no gap between each character.
     font_properties : matplotlib.font_manager.FontProperties, optional
         Default is None. A FontProperties object that specifies the properties of the font to
         use for plotting the motif. If None, no font will be used, and the text will be rendered
@@ -142,9 +141,8 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         position in the motif. If the user opts to use `font_properties` other than None, then
         no such guarantee can be made.
     ax : matplotlib.pyplot.Axes, optional
-        Default is None.
-        An axes to plot on. If not provided, an axis will be created.
-    color_scheme: list[str]
+        Default is None. An axes to plot on. If not provided, an axis will be created.
+    color_scheme: list(str)
         A list containing the colors to use, appearing in the order of the bases of the
         sequence type.
 
@@ -269,8 +267,7 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
 
 
 def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="identity"):
-    """
-    Performs base-wise and position-wise scaling of a feature matrix.
+    """Performs base-wise and position-wise scaling of a feature matrix.
 
     Parameters
     ----------
@@ -282,7 +279,7 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
             probability : The relative sizes of the bases will be the original
                           input probabilities.
             max_effect : The relative sizes of the bases will be the max effect
-            of the original input values.
+                         of the original input values.
     position_scaling : str
         The type of scaling performed on each position.
             identity: No transformation will be applied to the data.
@@ -291,12 +288,10 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
             max_effect: The sum of values at a position will be equal to the
                         sum of the max effect values of the original input
                         values at that position.
-    kwargs : dict
-        Passed to plot_sequence_logo
 
     Returns
     -------
-    numpy.ndarray
+    numpy.ndarray, dtype=np.float32
         The transformed array.
 
     """
@@ -324,8 +319,7 @@ def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="id
 
 
 def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
-    """
-    Plots scores on a heatmap.
+    """Plots scores on a heatmap.
 
     Parameters
     ----------
@@ -346,7 +340,7 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
     Returns
     -------
     matplotlib.pytplot.Axes
-        An axis containing the heatmap plot.
+        An axes containing the heatmap plot.
 
     """
 
