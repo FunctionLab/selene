@@ -1,5 +1,5 @@
-"""This module provides the `Sequence` class. This class class is the base class for biological
-sequence collections (e.g. genomes).
+"""This module provides the `Sequence` class. This class class is the
+base class for biological sequence collections (e.g. genomes).
 
 """
 from abc import ABCMeta
@@ -18,16 +18,20 @@ def sequence_to_encoding(sequence, base_to_index, bases_arr):
     sequence : str
         The input sequence of length N.
     base_to_index : dict
-        A dict that maps input characters to indices, where the indices specify the position to assign 1/0 to
-        when a base exists/does not exist at a given position in the sequence. For instance, for a genome you would
-        have each of `['A', 'C', 'G', 'T']` as keys, mapping to values of `[0, 1, 2, 3]`.
+        A dict that maps input characters to indices, where the indices
+        specify the position to assign 1/0 to when a base exists/does
+        not exist at a given position in the sequence. For instance, for
+        a genome you would have each of `['A', 'C', 'G', 'T']` as keys,
+        mapping to values of `[0, 1, 2, 3]`.
     bases_arr : list(str)
         The characters in the sequence's alphabet.
 
     Returns
     -------
     np.ndarray, dtype=numpy.float32
-        The N-by-X encoding of the sequence, where X is the size of the alphabet.'
+        The N-by-X encoding of the sequence, where X is the size of the
+        alphabet.'
+
     """
     return _fast_sequence_to_encoding(sequence, base_to_index, len(bases_arr))
 
@@ -48,12 +52,14 @@ def encoding_to_sequence(encoding, bases_arr, unk_base):
     Parameters
     ----------
     encoding : np.ndarray, dtype=numpy.float32
-        The N-by-X encoding of the sequence, where N is the length and X is the size of the alphabet.
+        The N-by-X encoding of the sequence, where N is the length and X
+         is the size of the alphabet.
     bases_arr : list(str)
-        A list of the bases in the sequence's alphabet that corresponds to the
-        correct columns for those bases in the encoding.
+        A list of the bases in the sequence's alphabet that corresponds
+        to the correct columns for those bases in the encoding.
     unk_base : str
-        The base corresponding to the "unknown" character in this encoding.
+        The base corresponding to the "unknown" character in this
+        encoding.
 
     Returns
     -------
@@ -93,7 +99,8 @@ class Sequence(metaclass=ABCMeta):
     """The base class for biological sequence classes.
 
     """
-    BASE_TO_INDEX = None  # TODO: Determine if this is a good way to specify these requirements.
+    # TODO: Determine if this is a good way to specify these requirements.
+    BASE_TO_INDEX = None
     INDEX_TO_BASE = None
     BASES_ARR = None
     UNK_BASE = '?'
@@ -114,7 +121,8 @@ class Sequence(metaclass=ABCMeta):
 
     @abstractmethod
     def get_encoding_from_coords(self, *args, **kwargs):
-        """Extracts the numerical encoding for a sequence occuring at the given coordinates.
+        """Extracts the numerical encoding for a sequence occuring at
+        the given coordinates.
 
         """
         raise NotImplementedError()
@@ -122,7 +130,8 @@ class Sequence(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def sequence_to_encoding(cls, sequence):
-        """Transforms a biological sequence into a numerical representation.
+        """Transforms a biological sequence into a numerical
+        representation.
 
         Parameters
         ----------
@@ -132,8 +141,9 @@ class Sequence(metaclass=ABCMeta):
         Returns
         -------
         numpy.ndarray, dtype=numpy.float32
-            The N-by-X encoding of the sequence, where N is the length of the input sequence and
-            X is the size of the sequence type alphabet.
+            The N-by-X encoding of the sequence, where N is the length
+            of the input sequence and X is the size of the sequence type
+            alphabet.
 
         """
         raise NotImplementedError()
@@ -141,12 +151,14 @@ class Sequence(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def encoding_to_sequence(cls, encoding):
-        """Transforms the input numerical representation of a sequence into a string representation.
+        """Transforms the input numerical representation of a sequence
+        into a string representation.
 
         Parameters
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
-            The N-by-X encoding of the sequence, where X is the size of the sequence type alphabet.
+            The N-by-X encoding of the sequence, where X is the size of
+            the sequence type alphabet.
 
         Returns
         -------

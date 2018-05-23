@@ -1,6 +1,7 @@
-"""This module provides the `Genome` class. This class wraps the indexed FASTA file
-for an organism's genomic sequence. It supports retrieving parts of the sequence and
-converting these parts into their one hot encodings.
+"""This module provides the `Genome` class. This class wraps the indexed
+FASTA file for an organism's genomic sequence. It supports retrieving
+parts of the sequence and converting these parts into their one hot
+encodings.
 
 """
 import numpy as np
@@ -11,7 +12,8 @@ from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
 
 
-def _get_sequence_from_coords(len_chrs, genome_sequence, chrom, start, end, strand='+'):
+def _get_sequence_from_coords(len_chrs, genome_sequence, chrom,
+                              start, end, strand='+'):
     """Gets the genomic sequence at the input coordinates.
 
     Parameters
@@ -37,7 +39,8 @@ def _get_sequence_from_coords(len_chrs, genome_sequence, chrom, start, end, stra
     Raises
     ------
     ValueError
-        If the input char to `strand` is not one of the specified choices.
+        If the input char to `strand` is not one of the specified
+        choices.
 
     """
     if start > len_chrs[chrom] or end > (len_chrs[chrom] + 1) \
@@ -55,9 +58,9 @@ def _get_sequence_from_coords(len_chrs, genome_sequence, chrom, start, end, stra
 class Genome(Sequence):
     """This class provides access to an organism's genomic sequence.
 
-    This class supports retrieving parts of the sequence and converting these
-    parts into their one-hot encodings. It is essentially a wrapper class
-    around the `pyfaix.Fasta` class.
+    This class supports retrieving parts of the sequence and converting
+    these parts into their one-hot encodings. It is essentially a
+    wrapper class around the `pyfaix.Fasta` class.
 
     Attributes
     ----------
@@ -77,7 +80,7 @@ class Genome(Sequence):
     BASE_TO_INDEX = {
         'A': 0, 'C': 1, 'G': 2, 'T': 3,
         'a': 0, 'c': 1, 'g': 2, 't': 3,
-    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make it more general?
+    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make more general?
     COMPLEMENTARY_BASE = {
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
@@ -90,9 +93,9 @@ class Genome(Sequence):
         Parameters
         ----------
         input_path : str
-            Path to an indexed FASTA file, that is, a *.fasta file with a
-            corresponding *.fai file in the same directory.
-            This file should contain the target organism's genome sequence.
+            Path to an indexed FASTA file, that is, a *.fasta file with
+            a corresponding *.fai file in the same directory. This file
+            should contain the target organism's genome sequence.
 
         """
         self.genome = pyfaidx.Fasta(input_path)
@@ -134,7 +137,8 @@ class Genome(Sequence):
             return self.genome[chrom][start:end].reverse.complement.seq
 
     def sequence_in_bounds(self, chrom, start, end):
-        """Check if the region we want to query is within the bounds of the queried chromosome.
+        """Check if the region we want to query is within the bounds of
+         the queried chromosome.
 
         Parameters
         ----------
@@ -154,13 +158,14 @@ class Genome(Sequence):
         """
         if chrom not in self.len_chrs:
             return False
-        if start > self.len_chrs[chrom] or end > (self.len_chrs[chrom] + 1) \
-                or start < 0:
+        if (start > self.len_chrs[chrom] or end > (self.len_chrs[chrom] + 1)
+                or start < 0):
             return False
         return True
 
     def get_sequence_from_coords(self, chrom, start, end, strand='+'):
-        """Gets the queried chromosome's sequence at the input coordinates.
+        """Gets the queried chromosome's sequence at the input
+         coordinates.
 
         Parameters
         ----------
@@ -181,21 +186,24 @@ class Genome(Sequence):
         Raises
         ------
         ValueError
-            If the input char to `strand` is not one of the specified choices.
+            If the input char to `strand` is not one of the specified
+            choices.
 
         """
         return _get_sequence_from_coords(self.len_chrs, self._genome_sequence,
                                          chrom, start, end, strand)
 
     def get_encoding_from_coords(self, chrom, start, end, strand='+'):
-        """Gets the one-hot encoding of the genomic sequence at the queried coordinates.
+        """Gets the one-hot encoding of the genomic sequence at the
+        queried coordinates.
 
         Parameters
         ----------
         chrom : str
             The name of the chromosome or region, e.g. "chr1".
         start : int
-            The 0-based start coordinate of the first position in the sequence.
+            The 0-based start coordinate of the first position in the
+            sequence.
         end : int
             One past the 0-based last position in the sequence.
         strand : {'+', '-'}, optional
@@ -209,7 +217,8 @@ class Genome(Sequence):
         Raises
         ------
         ValueError
-            If the input char to `strand` is not one of the specified choices.
+            If the input char to `strand` is not one of the specified
+            choices.
             (Raised in the call to `self.get_sequence_from_coords`)
 
         """

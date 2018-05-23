@@ -1,6 +1,7 @@
-"""This module provides the `Proteome` clasee. This class wraps the indexed FASTA file
-for an organism's proteomic sequence. It supports retrieving parts of the sequence and
-converting these parts into their one hot encodings.
+"""This module provides the `Proteome` clasee. This class wraps the
+indexed FASTA file for an organism's proteomic sequence. It supports
+retrieving parts of the sequence and converting these parts into their
+one-hot encodings.
 
 """
 import numpy as np
@@ -24,7 +25,8 @@ def _get_sequence_from_coords(len_prots, proteome_sequence,
     prot : str
         The name of a protein, e.g. "YFP".
     start : int
-        The 0-based start coordinate of the first position in the sequence.
+        The 0-based start coordinate of the first position in the
+        sequence.
     end : int
         One past the 0-based last position in the sequence.
 
@@ -42,9 +44,9 @@ def _get_sequence_from_coords(len_prots, proteome_sequence,
 class Proteome(Sequence):
     """Provides access to an organism's proteomic sequence.
 
-    It supports retrieving parts of the sequence and converting these parts into
-    their one-hot encodings. It is essentially a wrapper class around the `pyfaix.Fasta`
-    class.
+    It supports retrieving parts of the sequence and converting these
+    parts into their one-hot encodings. It is essentially a wrapper
+    class around the `pyfaix.Fasta` class.
 
     Attributes
     ----------
@@ -59,14 +61,15 @@ class Proteome(Sequence):
 
     BASES_ARR = np.array(['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I',
                           'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V'])
-    INDEX_TO_BASE = {0: 'A', 1: 'R', 2: 'N', 3: 'D', 4: 'C',  5: 'E', 6: 'Q',
-                     7: 'G', 8: 'H', 9: 'I', 10: 'L', 11: 'K', 12: 'M', 13: 'F',
-                     14: 'P', 15: 'S', 16: 'T', 17: 'W', 18: 'Y', 19: 'V'}
+    INDEX_TO_BASE = {0: 'A', 1: 'R', 2: 'N', 3: 'D', 4: 'C', 5: 'E', 6: 'Q',
+                     7: 'G', 8: 'H', 9: 'I', 10: 'L', 11: 'K', 12: 'M',
+                     13: 'F', 14: 'P', 15: 'S', 16: 'T', 17: 'W', 18: 'Y',
+                     19: 'V'}
     BASE_TO_INDEX = {
         'A': 0, 'R': 1, 'N': 2, 'D': 3, 'C': 4, 'E': 5, 'Q': 6,
         'G': 7, 'H': 8, 'I': 9, 'L': 10, 'K': 11, 'M': 12, 'F': 13,
         'P': 14, 'S': 15, 'T': 16, 'W': 17, 'Y': 18, 'V': 19
-    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make it more general?
+    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make more general?
     UNK_BASE = "X"
 
     def __init__(self, input_path):
@@ -75,10 +78,10 @@ class Proteome(Sequence):
         Parameters
         ----------
         input_path : str
-            Path to an indexed FASTA file containing amino acid sequences,
-            that is, a *.faa file with a corresponding *.fai file in the
-            same directory. File should contain the sequences from which
-            training examples will be created..
+            Path to an indexed FASTA file containing amino acid
+            sequences, that is, a *.faa file with a corresponding *.fai
+            file in the same directory. File should contain the
+            sequences from which training examples will be created.
 
         """
         self.proteome = pyfaidx.Fasta(input_path)
@@ -117,14 +120,16 @@ class Proteome(Sequence):
         return self.proteome[prot][start:end].seq
 
     def sequence_in_bounds(self, prot, start, end):
-        """Check if the region we want to query is within the bounds of the queried protein.
+        """Check if the region we want to query is within the bounds of
+         the queried protein.
 
         Parameters
         ----------
         prot : str
             The name of the protein, e.g. "YFP".
         start : int
-            The 0-based start coordinate of the first position in the sequence.
+            The 0-based start coordinate of the first position in the
+            sequence.
         end : int
             One past the 0-based last position in the sequence.
 
@@ -135,8 +140,8 @@ class Proteome(Sequence):
             in the input.
 
         """
-        if start > self.len_prots[prot] or end > (self.len_prots[prot] + 1) \
-                or start < 0:
+        if (start > self.len_prots[prot] or end > (self.len_prots[prot] + 1)
+                or start < 0):
             return False
         return True
 
@@ -148,7 +153,8 @@ class Proteome(Sequence):
         prot : str
             The protein name, e.g. "YFP".
         start : int
-            The 0-based start coordinate of the first position in the sequence.
+            The 0-based start coordinate of the first position in the
+            sequence.
         end : int
             One past the 0-based last position in the sequence.
 
@@ -162,14 +168,16 @@ class Proteome(Sequence):
             self.len_prots, self._proteome_sequence, prot, start, end)
 
     def get_encoding_from_coords(self, prot, start, end):
-        """Gets the one-hot encoding of the protein's sequence at the input coordinates.
+        """Gets the one-hot encoding of the protein's sequence at the
+        input coordinates.
 
         Parameters
         ----------
         prot : str
             The name of the protein, e.g. "YFP".
         start : int
-            The 0-based start coordinate of the first position in the sequence.
+            The 0-based start coordinate of the first position in the
+             sequence.
         end : int
             One past the 0-based last position in the sequence.
 
