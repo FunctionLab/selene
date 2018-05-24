@@ -71,16 +71,41 @@ class Proteome(Sequence):
 
     BASES_ARR = np.array(['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I',
                           'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V'])
-    INDEX_TO_BASE = {0: 'A', 1: 'R', 2: 'N', 3: 'D', 4: 'C', 5: 'E', 6: 'Q',
-                     7: 'G', 8: 'H', 9: 'I', 10: 'L', 11: 'K', 12: 'M',
-                     13: 'F', 14: 'P', 15: 'S', 16: 'T', 17: 'W', 18: 'Y',
-                     19: 'V'}
+    """
+    This is an array with the alphabet (i.e. all possible symbols
+    that may occur in a sequence). We expect that
+    `INDEX_TO_BASE[i]==BASES_ARR[i]` is `True` for all valid `i`.
+    """
+
     BASE_TO_INDEX = {
         'A': 0, 'R': 1, 'N': 2, 'D': 3, 'C': 4, 'E': 5, 'Q': 6,
         'G': 7, 'H': 8, 'I': 9, 'L': 10, 'K': 11, 'M': 12, 'F': 13,
         'P': 14, 'S': 15, 'T': 16, 'W': 17, 'Y': 18, 'V': 19
-    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make more general?
+    }
+    """
+    A dictionary mapping members of the alphabet (i.e. all
+    possible symbols that can occur in a sequence) to integers.
+    """
+
+    INDEX_TO_BASE = {0: 'A', 1: 'R', 2: 'N', 3: 'D', 4: 'C', 5: 'E', 6: 'Q',
+                     7: 'G', 8: 'H', 9: 'I', 10: 'L', 11: 'K', 12: 'M',
+                     13: 'F', 14: 'P', 15: 'S', 16: 'T', 17: 'W', 18: 'Y',
+                     19: 'V'}
+    """
+    A dictionary mapping integers to members of the alphabet (i.e.
+    all possible symbols that can occur in a sequence). We expect
+    that `INDEX_TO_BASE[i]==BASES_ARR[i]` is `True` for all
+    valid `i`.
+    """
+
     UNK_BASE = "X"
+    """
+    This is a base used to represent unknown positions. This is not
+    the same as a character from outside the sequence's alphabet. A
+    character from outside the alphabet is an error. A position with
+    an unknown base signifies that the position is one of the bases
+    from the alphabet, but we are uncertain which.
+    """
 
     def __init__(self, input_path):
         """Constructs a `Proteome` object.

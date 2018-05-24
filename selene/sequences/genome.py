@@ -75,18 +75,48 @@ class Genome(Sequence):
     """
 
     BASES_ARR = np.array(['A', 'C', 'G', 'T'])
-    INDEX_TO_BASE = {
-        0: 'A', 1: 'C', 2: 'G', 3: 'T'
-    }
+    """
+    This is an array with the alphabet (i.e. all possible symbols
+    that may occur in a sequence). We expect that
+    `INDEX_TO_BASE[i]==BASES_ARR[i]` is `True` for all valid `i`.
+
+    """
+
     BASE_TO_INDEX = {
         'A': 0, 'C': 1, 'G': 2, 'T': 3,
         'a': 0, 'c': 1, 'g': 2, 't': 3,
     }
+    """
+    A dictionary mapping members of the alphabet (i.e. all
+    possible symbols that can occur in a sequence) to integers.
+    """
+
+    INDEX_TO_BASE = {
+        0: 'A', 1: 'C', 2: 'G', 3: 'T'
+    }
+    """
+    A dictionary mapping integers to members of the alphabet (i.e.
+    all possible symbols that can occur in a sequence). We expect
+    that `INDEX_TO_BASE[i]==BASES_ARR[i]` is `True` for all
+    valid `i`.
+    """
+
     COMPLEMENTARY_BASE = {
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
     }
+    """
+    # TODO(DOCUMENTATION): ADD ME.
+    """
+
     UNK_BASE = "N"
+    """
+    This is a base used to represent unknown positions. This is not
+    the same as a character from outside the sequence's alphabet. A
+    character from outside the alphabet is an error. A position with
+    an unknown base signifies that the position is one of the bases
+    from the alphabet, but we are uncertain which.
+    """
 
     def __init__(self, input_path):
         """Constructs a `Genome` object.
@@ -166,8 +196,8 @@ class Genome(Sequence):
         return True
 
     def get_sequence_from_coords(self, chrom, start, end, strand='+'):
-        """Gets the queried chromosome's sequence at the input
-         coordinates.
+        """
+        Gets the queried chromosome's sequence at the input coordinates.
 
         Parameters
         ----------
@@ -176,7 +206,7 @@ class Genome(Sequence):
         start : int
             The 0-based start coordinate of the sequence.
         end : int
-            One past the last coordinate of the sequence.
+            One past the 0-based last position in the sequence.
         strand : {'+', '-'}, optional
             Default is '+'. The strand the sequence is located on.
 
