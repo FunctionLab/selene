@@ -12,6 +12,19 @@ def load_features_list(input_path):
     these features as a list. Each feature name in the file must occur
     on a separate line.
 
+    Parameters
+    ----------
+    input_path : str
+        Path to the features file. Each feature in the input file must
+        on its own line.
+
+    Returns
+    -------
+    list(str)
+        The list of features. The features will appear in the list in
+        the same order they appeared in the file (reading from top to
+        bottom).
+
     Examples
     --------
     A file at "input_features.txt", for the feature names :math:`YFP`
@@ -25,19 +38,6 @@ def load_features_list(input_path):
 
     >>> load_features_list("input_features.txt")
     ["YFP", "YFG"]
-
-    Parameters
-    ----------
-    input_path : str
-        Path to the features file. Each feature in the input file must
-        on its own line.
-
-    Returns
-    -------
-    list(str)
-        The list of features. The features will appear in the list in
-        the same order they appeared in the file (reading from top to
-        bottom).
 
     """
     features = []
