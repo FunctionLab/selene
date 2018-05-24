@@ -80,7 +80,7 @@ class Genome(Sequence):
     BASE_TO_INDEX = {
         'A': 0, 'C': 1, 'G': 2, 'T': 3,
         'a': 0, 'c': 1, 'g': 2, 't': 3,
-    }  # TODO: Consider renaming BASE to ALPHA or CHAR to make more general?
+    }
     COMPLEMENTARY_BASE = {
         'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N',
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'

@@ -2,6 +2,7 @@
 an *in silico* mutagenesis experiment.
 
 """
+import numpy as np
 import pandas as pd
 
 from selene.sequences import Genome
@@ -86,7 +87,8 @@ class ISMResult(object):
         """
         return self._sequence_type
 
-    def get_feature_matrix(self, feature, reference_mask=None):
+    def get_score_matrix_for(self, feature, reference_mask=None,
+                             dtype=np.float32):
         """Extracts a feature from the *in silico* mutagenesis results
         as a matrix, where the reference base positions hold the value
         for the reference prediction, and alternative positions hold the
@@ -103,16 +105,20 @@ class ISMResult(object):
             with. If left as `None`, then no masking will be performed
             on the reference positions.
 
+        dtype : `numpy.dtype`, optional
+            Default is `numpy.float32`. The data type to use for the returned
+            matrix.
+
         Returns
         -------
-        numpy.ndarray, dtype=np.float32
+        numpy.ndarray, dtype=`dtype`
             A LxN shaped array (where L is the sequence length, and N
             is the size of the alphabet) that holds the results from the
             *in silico* mutagenesis experiment for the specified feature.
 
         """
         ret = self._sequence_type.sequence_to_encoding(
-            self._reference_sequence)
+            self._reference_sequence).astype(dtype=dtype)
         alpha = set(self._sequence_type.BASES_ARR)
         for row_idx, row in self._data_frame.iterrows():
             if row_idx == 0:  # Extract reference value in first row.
@@ -130,7 +136,7 @@ class ISMResult(object):
         return ret
 
     @staticmethod
-    def ism_from_file(input_path, sequence_type=Genome):
+    def from_file(input_path, sequence_type=Genome):
         """Loads an `ISMResult` from a `pandas.DataFrame` stored in a
         file.
 

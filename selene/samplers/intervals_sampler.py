@@ -52,7 +52,7 @@ class IntervalsSampler(OnlineSampler):
 
     Attributes
     ----------
-    
+
     """
 
 

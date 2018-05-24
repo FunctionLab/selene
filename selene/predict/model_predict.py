@@ -2,12 +2,14 @@ import itertools
 import os
 
 import numpy as np
-from pyfaidx import Fasta
+import pyfaidx
 import torch
 from torch.autograd import Variable
 
-from .predict_handlers import DiffScoreHandler, LogitScoreHandler, \
-        WritePredictionsHandler, WriteRefAltHandler
+from .predict_handlers import DiffScoreHandler
+from .predict_handlers import LogitScoreHandler
+from .predict_handlers import WritePredictionsHandler
+from .predict_handlers import WriteRefAltHandler
 from ..sequences import Genome  # TODO: Make me generic.
 from ..utils import load_features_list
 
@@ -109,6 +111,7 @@ def mutate_sequence(encoded_sequence,
     return mutated_seq
 
 
+# TODO: This method should be in sequences, not here.
 def reverse_strand(sequence, complementary_base_dict=None):
     """
 
@@ -215,7 +218,13 @@ def _add_sequence_surrounding_alt(alt_sequence,
 
 class AnalyzeSequences(object):
     """Score sequences and their variants using the predictions made
-    by a trained model."""
+    by a trained model.
+
+
+    Attributes
+    ----------
+    # TODO(DOCUMENATION): Finish.
+    """
 
     def __init__(self,
                  model,
@@ -224,6 +233,23 @@ class AnalyzeSequences(object):
                  features_file,
                  trained_model_file,
                  use_cuda=False):
+        """
+
+        Parameters
+        ----------
+        model : torch.nn.Module
+            A sequence-based model that has already been trained.
+        sequence_length : long
+            The length of sequences that the model is expecting.
+        batch_size : long
+            The size of the mini-batches to use.
+        features_file :
+            # TODO(DOCUMENTATION): Finish.
+        trained_model_file :
+            # TODO(DOCUMENTATION): Finish.
+        use_cuda : bool
+            Default is `False`. Specifies whether to use CUDA or not.
+        """
         self.model = model
 
         trained_model = torch.load(trained_model_file)
@@ -245,15 +271,17 @@ class AnalyzeSequences(object):
         self.features_list = load_features_list(features_file)
 
     def predict(self, batch_sequences):
-        """
+        """# TODO(DOCUMENTATION): Finish.
 
         Parameters
         ----------
         batch_sequences : np.ndarray
+            # TODO(DOCUMENTATION): Finish.
 
         Returns
         -------
         np.ndarray
+            # TODO(DOCUMENTATION): Finish.
         """
         inputs = torch.Tensor(batch_sequences)
         if self.use_cuda:
@@ -300,7 +328,8 @@ class AnalyzeSequences(object):
                                       base_preds,
                                       mutations_list,
                                       reporters=[]):
-        """
+        """# TODO(DOCUMENTATION): Finish.
+
         Parameters
         ----------
         sequence : str
@@ -345,7 +374,8 @@ class AnalyzeSequences(object):
                               output_dir,
                               filename_prefix="ism",
                               mutate_n_bases=1):
-        """
+        """# TODO(DOCUMENTATION): Finish.
+
         Parameters
         ----------
         input_sequence : str
@@ -410,7 +440,7 @@ class AnalyzeSequences(object):
         -------
         None
         """
-        fasta_file = Fasta(input_path)
+        fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str(fasta_record)
             n = len(cur_sequence)
@@ -438,8 +468,6 @@ class AnalyzeSequences(object):
             self.in_silico_mutagenesis_predict(
                 cur_sequence, base_preds, mutated_sequences, reporters=reporters)
         fasta_file.close()
-
-
 
     def handle_ref_alt_predictions(self,
                                    batch_ref_seqs,

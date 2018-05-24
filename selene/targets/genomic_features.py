@@ -29,6 +29,7 @@ def _any_positive_rows(rows, query_start, query_end, thresholds):
             return True
     return False
 
+
 def _is_positive_row(query_start, query_end,
                      feat_start, feat_end, threshold):
     overlap_start = max(feat_start, query_start)
@@ -42,11 +43,13 @@ def _is_positive_row(query_start, query_end,
     else:
         return False
 
+
 def _get_feature_data(query_chrom, query_start, query_end,
                       thresholds, feature_index_map, get_feature_rows):
     rows = get_feature_rows(query_chrom, query_start, query_end)
     return _fast_get_feature_data(
         query_start, query_end, thresholds, feature_index_map, rows)
+
 
 def _define_feature_thresholds(feature_thresholds, features):
     feature_thresholds_dict = {}
@@ -73,15 +76,28 @@ def _define_feature_thresholds(feature_thresholds, features):
     feature_thresholds_vec = feature_thresholds_vec.astype(np.float32)
     return feature_thresholds_dict, feature_thresholds_vec
 
-class GenomicFeatures(Target):
 
-    def __init__(self, dataset, features, feature_thresholds):
-        """Stores the dataset specifying sequence regions and features.
+class GenomicFeatures(Target):
+    """Stores the dataset specifying sequence regions and features.
         Accepts a tabix-indexed .bed file with the following columns,
         in order:
             [chrom, start (0-based), end, strand, feature]
         Additional columns that follow these 5 are acceptable.
 
+    Attributes
+    ----------
+    data : tabix.open
+    n_features : int
+    feature_index_map : dict
+        feature (str) -> position index (int) in `features`
+    index_feature_map : dict
+        position index (int) -> feature (str)
+    feature_thresholds : dict
+        feature (str) -> threshold (float)
+    """
+
+    def __init__(self, dataset, features, feature_thresholds):
+        """
         Parameters
         ----------
         dataset : str
@@ -106,16 +122,6 @@ class GenomicFeatures(Target):
             - types.FunctionType : define a function that takes as input the
                 feature name and returns the feature's threshold.
 
-        Attributes
-        ----------
-        data : tabix.open
-        n_features : int
-        feature_index_map : dict
-            feature (str) -> position index (int) in `features`
-        index_feature_map : dict
-            position index (int) -> feature (str)
-        feature_thresholds : dict
-            feature (str) -> threshold (float)
         """
         self.data = tabix.open(dataset)
 

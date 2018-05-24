@@ -1,6 +1,7 @@
 from .handler import PredictionsHandler
 from .write_predictions_handler import WritePredictionsHandler
 
+
 class WriteRefAltHandler(PredictionsHandler):
     """Used during variant effect prediction. Write the prediction values
     for the reference and alternate sequences in 2 separate files.

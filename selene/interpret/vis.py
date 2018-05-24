@@ -128,13 +128,13 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 
-def sequence_logo(scores, order="value", sequence_type=Genome,
-                  width=1.0, ax=None, font_properties=None, **kwargs):
+def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
+                  sequence_type=Genome, font_properties=None, **kwargs):
     """Plots a sequence logo for visualizing motifs.
 
     Parameters
     ----------
-    scores : np.ndarray, dtype=np.float32
+    score_matrix : np.ndarray
         An LxN matrix (where L is the length of the sequence, and N is
         the size of the alphabet) containing the scores for each
         position.
@@ -144,26 +144,26 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
                    alphabet.
             value: Bases go in the order of their effect size, with the
                    largest at the bottom.
-    sequence_type : class, optional
-        Default is selene.sequences.Genome
-        The type of sequence that the ISM results are associated with.
     width : float, optional
         Default is 1. The size width of each character. A value of 1
-        will mean that there
-        is no gap between each character.
+        will mean that there is no gap between each character.
+    ax : matplotlib.pyplot.Axes, optional
+        Default is `None`. An axes to plot on. If not provided, an axis
+        will be created.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The type of sequence that
+        the *in silico* mutagenesis results are associated with.
     font_properties : matplotlib.font_manager.FontProperties, optional
-        Default is `None`. A FontProperties object that specifies the
+        Default is `None`. A `FontProperties` object that specifies the
         properties of the font to use for plotting the motif. If `None`,
         no font will be used, and the text will be rendered by a path.
         This method of rendering is preferable, as it ensures all
         character heights correspond to the actual values, and that
         there are no gaps between characters at a position in the motif.
-        If the user opts to use `font_properties` other than None, then
-        no such guarantee can be made.
-    ax : matplotlib.pyplot.Axes, optional
-        Default is `None`. An axes to plot on. If not provided, an axis
-        will be created.
-    color_scheme: list(str)
+        If the user opts to use `font_properties` other than `None`,
+        then no such guarantee can be made.
+
+    color_scheme : list(str)
         A list containing the colors to use, appearing in the order of
         the bases of the sequence type.
 
@@ -173,8 +173,10 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
         An axis containing the sequence logo plot.
 
     """
-    scores = deepcopy(scores)  # Everything will break if we do not deepcopy.
-    scores = scores.transpose()
+    # Note that everything will break if we do not deepcopy.
+    score_matrix = deepcopy(score_matrix)
+
+    score_matrix = score_matrix.transpose()
     if font_properties is not None:
         warnings.warn(
             "Specifying a value for `font_properties` (other than `None`) "
@@ -191,56 +193,56 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
         raise ValueError(
             "Color scheme is shorter than number of bases in sequence.")
 
-    if scores.shape[0] != len(sequence_type.BASES_ARR):
+    if score_matrix.shape[0] != len(sequence_type.BASES_ARR):
         raise ValueError(
             "Got score with {0} bases for sequence with {1} bases.".format(
-                scores.shape[0], len(sequence_type.BASES_ARR)))
+                score_matrix.shape[0], len(sequence_type.BASES_ARR)))
     if ax is None:
-        _, ax = plt.subplots(figsize=scores.shape)
+        _, ax = plt.subplots(figsize=score_matrix.shape)
 
     # Determine offsets depending on sort order.
-    positive_offsets = np.zeros_like(scores)
-    negative_offsets = np.zeros_like(scores)
-    bases = np.empty(scores.shape, dtype=object)
+    positive_offsets = np.zeros_like(score_matrix)
+    negative_offsets = np.zeros_like(score_matrix)
+    bases = np.empty(score_matrix.shape, dtype=object)
     bases[:, :] = "?"  # This ensures blanks are visually obvious.
 
     # Change ordering of things based on input arguments.
     if order == "alpha":
-        for i in range(scores.shape[0]):
+        for i in range(score_matrix.shape[0]):
             bases[i, :] = sequence_type.BASES_ARR[i]
 
     elif order == "value":
-        if np.sum(scores < 0) != 0:
-            sorted_scores = np.zeros_like(scores)
-            for j in range(scores.shape[1]):
+        if np.sum(score_matrix < 0) != 0:
+            sorted_scores = np.zeros_like(score_matrix)
+            for j in range(score_matrix.shape[1]):
                 # Sort the negative values and put them at bottom.
-                div = np.sum(scores[:, j] < 0.)
-                negative_idx = np.argwhere(scores[:, j] < 0.).flatten()
-                negative_sort_idx = np.argsort(scores[negative_idx, j],
+                div = np.sum(score_matrix[:, j] < 0.)
+                negative_idx = np.argwhere(score_matrix[:, j] < 0.).flatten()
+                negative_sort_idx = np.argsort(score_matrix[negative_idx, j],
                                                axis=None)
-                sorted_scores[:div, j] = scores[
+                sorted_scores[:div, j] = score_matrix[
                     negative_idx[negative_sort_idx], j]
                 bases[:div, j] = sequence_type.BASES_ARR[
                     negative_idx[negative_sort_idx]].flatten()
 
                 # Sort the positive values and stack atop the negatives.
-                positive_idx = np.argwhere(scores[:, j] >= 0.).flatten()
-                positive_sort_idx = np.argsort(scores[positive_idx, j],
+                positive_idx = np.argwhere(score_matrix[:, j] >= 0.).flatten()
+                positive_sort_idx = np.argsort(score_matrix[positive_idx, j],
                                                axis=None)
-                sorted_scores[div:, j] = scores[
+                sorted_scores[div:, j] = score_matrix[
                     positive_idx[positive_sort_idx], j]
                 bases[div:, j] = sequence_type.BASES_ARR[
                     positive_idx[positive_sort_idx]].flatten()
-            scores = sorted_scores
+            score_matrix = sorted_scores
         else:
-            for j in range(scores.shape[1]):
-                sort_idx = np.argsort(scores[:, j], axis=None)[::-1]
+            for j in range(score_matrix.shape[1]):
+                sort_idx = np.argsort(score_matrix[:, j], axis=None)[::-1]
                 bases[:, j] = sequence_type.BASES_ARR[sort_idx]
-                scores[:, j] = scores[sort_idx, j]
+                score_matrix[:, j] = score_matrix[sort_idx, j]
 
     # Create offsets for each bar.
-    for i in range(scores.shape[0] - 1):
-        y_coords = scores[i, :]
+    for i in range(score_matrix.shape[0] - 1):
+        y_coords = score_matrix[i, :]
         if i > 0:
             negative_offsets[i + 1, :] = negative_offsets[i, :]
             positive_offsets[i + 1, :] = positive_offsets[i, :]
@@ -249,12 +251,12 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
         negative_offsets[i + 1, neg_idx] += y_coords[neg_idx]
         positive_offsets[i + 1, pos_idx] += y_coords[pos_idx]
 
-    for i in range(scores.shape[0]):
-        x_coords = np.arange(scores.shape[1]) + 0.5
-        y_coords = scores[i, :]
+    for i in range(score_matrix.shape[0]):
+        x_coords = np.arange(score_matrix.shape[1]) + 0.5
+        y_coords = score_matrix[i, :]
 
         # Manage negatives and positives separately.
-        offsets = np.zeros(scores.shape[1])
+        offsets = np.zeros(score_matrix.shape[1])
         negative_idx = np.argwhere(y_coords < 0.)
         positive_idx = np.argwhere(y_coords >= 0.)
         offsets[negative_idx] = negative_offsets[i, negative_idx]
@@ -269,8 +271,8 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
     # Iterate over the barplot's bars and turn them into letters.
     new_patches = []
     for i, bar in enumerate(ax.patches):
-        base_idx = i // scores.shape[1]
-        seq_idx = i % scores.shape[1]
+        base_idx = i // score_matrix.shape[1]
+        seq_idx = i % score_matrix.shape[1]
         base = bases[base_idx, seq_idx]
         # We construct a text path that tracks the bars in the barplot.
         # Thus, the barplot takes care of scaling and translation,
@@ -292,20 +294,23 @@ def sequence_logo(scores, order="value", sequence_type=Genome,
 
     for patch in new_patches:
         ax.add_patch(patch)
-    ax.set_xlim(0, scores.shape[1])
-    ax.set_xticks(np.arange(scores.shape[1]) + 0.5)
-    ax.set_xticklabels(np.arange(scores.shape[1]))
+    ax.set_xlim(0, score_matrix.shape[1])
+    ax.set_xticks(np.arange(score_matrix.shape[1]) + 0.5)
+    ax.set_xticklabels(np.arange(score_matrix.shape[1]))
     return ax
 
 
-def rescale_feature_matrix(scores, base_scaling="identity",
-                           position_scaling="identity"):
-    """Performs base-wise and position-wise scaling of a feature matrix.
+def rescale_score_matrix(score_matrix, base_scaling="identity",
+                         position_scaling="identity"):
+    """Performs base-wise and position-wise scaling of a score matrix for a
+    feature, usually produced from an *in silico* mutagenesis experiment.
 
     Parameters
     ----------
-    scores : numpy.ndarray
-        A Lx|bases| matrix containing the scores for each position.
+    score_matrix : numpy.ndarray
+        A LxN matrix containing the scores for each position,
+        where L is the length of the sequence, and N is the number of
+        characters in the alphabet.
     base_scaling : {"identity", "probability", "max_effect"}
         The type of scaling performed on each base at a given position.
             identity : No transformation will be applied to the data.
@@ -325,29 +330,33 @@ def rescale_feature_matrix(scores, base_scaling="identity",
 
     Returns
     -------
-    numpy.ndarray, dtype=np.float32
+    numpy.ndarray, dtype=score_matrix.dtype
         The transformed array.
 
     """
-    scores = scores.transpose()
-    rescaled_scores = scores
+    # Note that things can break if we do not deepcopy.
+    score_matrix = deepcopy(score_matrix)
+
+    score_matrix = score_matrix.transpose()
+    rescaled_scores = score_matrix
 
     # Scale individual bases.
     if base_scaling == "identity" or base_scaling == "probability":
         pass
     elif base_scaling == "max_effect":
-        rescaled_scores = scores - np.min(scores, axis=0)
+        rescaled_scores = score_matrix - np.min(score_matrix, axis=0)
     else:
         raise ValueError(
             "Could not find base scaling \"{0}\".".format(base_scaling))
 
     # Scale each position
     if position_scaling == "max_effect":
-        max_effects = np.max(scores, axis=0) - np.min(scores, axis=0)
+        max_effects = np.max(score_matrix, axis=0) - np.min(score_matrix,
+                                                            axis=0)
         rescaled_scores /= rescaled_scores.sum(axis=0)[np.newaxis, :]
         rescaled_scores *= max_effects[np.newaxis, :]
     elif position_scaling == "probability":
-        rescaled_scores /= np.sum(scores, axis=0)[np.newaxis, :]
+        rescaled_scores /= np.sum(score_matrix, axis=0)[np.newaxis, :]
     elif position_scaling != "identity":
         raise ValueError(
             "Could not find position scaling \"{0}\".".format(
@@ -355,22 +364,23 @@ def rescale_feature_matrix(scores, base_scaling="identity",
     return rescaled_scores.transpose()
 
 
-def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
-    """Plots scores on a heatmap.
+def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
+    """Plots the input matrix of scores, generally those produced by an
+    *in siliico* mutagenesis experiment, on a heatmap.
 
     Parameters
     ----------
-    scores : numpy.ndarray, dtype=numpy.float32
+    score_matrix : numpy.ndarray
         An LxN matrix (where L is the length of the sequence, and N is
         the size of the alphabet) matrix containing the scores for each
         position.
-    sequence_type : class
-        The type of sequence that the *in silico* mutagenesis results
-        are associated with.
     mask : numpy.ndarray, dtype=bool, optional
         Default is `None`. A matrix containing 1s or `True` at positions
         in the heatmap to mask.
-    kwargs : dict
+    sequence_type : class
+        The type of sequence that the *in silico* mutagenesis results
+        are associated with.
+    **kwargs : dict
         Keyword arguments to pass to `seaborn.heatmap`.
         Some useful ones are:
             cbar_kws: Change keyword arguments to the colorbar.
@@ -385,14 +395,16 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
         An axes containing the heatmap plot.
 
     """
+    # Note that some things can break if we do not deepcopy.
+    score_matrix = deepcopy(score_matrix)
 
     # This flipping is so that ordering is consistent with ordering
     # in the sequence logo.
     if mask is not None:
         mask = mask.transpose()
         mask = np.flip(mask, axis=0)
-    scores = scores.transpose()
-    scores = np.flip(scores, axis=0)
+    score_matrix = score_matrix.transpose()
+    score_matrix = np.flip(score_matrix, axis=0)
 
     if "yticklabels" in kwargs:
         yticklabels = kwargs.pop("yticklabels")
@@ -406,7 +418,7 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
         cmap = kwargs.pop("cmap")
     else:
         cmap = "Blues_r"
-    ret = sns.heatmap(scores, mask=mask, yticklabels=yticklabels,
+    ret = sns.heatmap(score_matrix, mask=mask, yticklabels=yticklabels,
                       cbar_kws=cbar_kws, cmap=cmap, **kwargs)
     ret.set_yticklabels(labels=ret.get_yticklabels(), rotation=0)
     return ret

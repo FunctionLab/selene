@@ -4,8 +4,12 @@ from .handler import write_to_file, PredictionsHandler
 
 
 class DiffScoreHandler(PredictionsHandler):
-    """Diff calculates the absolute difference between `alt` and `ref`
+    """The "diff score" is the absolute difference between `alt` and `ref`
     predictions.
+
+    Attributes
+    ----------
+    # TODO(DOCUMENTATION): Finish.
     """
 
     def __init__(self,
