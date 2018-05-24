@@ -50,16 +50,19 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_parsers = {
+'.md' : 'recommonmark.parser.CommonMarkParser'
+}
+source_suffix = ['.rst', '.md']
+#source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
 project = 'selene'
-copyright = '2018, Jian Zhou, Kathleen Chen, Evan Cofer'
-author = 'Jian Zhou, Kathleen Chen, Evan Cofer'
+copyright = '2018, The Authors'
+author = 'Author'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -94,7 +97,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -151,7 +154,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'selene.tex', 'selene Documentation',
-     'Jian Zhou, Kathleen Chen, Evan Cofer', 'manual'),
+    'An Author', 'Another Author', 'manual'),
 ]
 
 
