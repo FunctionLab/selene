@@ -1,5 +1,14 @@
-selene\.predict package
-=======================
+selene.predict package
+======================
+
+.. automodule:: selene.predict
+    :undoc-members:
+    :show-inheritance:
+
+AnalyzeSequences
+----------------------
+.. autoclass:: AnalyzeSequences
+    :members:
 
 Subpackages
 -----------
@@ -8,22 +17,3 @@ Subpackages
 
     selene.predict.predict_handlers
 
-Submodules
-----------
-
-selene\.predict\.model\_predict module
---------------------------------------
-
-.. automodule:: selene.predict.model_predict
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
-.. automodule:: selene.predict
-    :members:
-    :undoc-members:
-    :show-inheritance:

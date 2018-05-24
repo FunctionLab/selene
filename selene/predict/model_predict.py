@@ -194,12 +194,12 @@ def _add_sequence_surrounding_alt(alt_sequence,
     rhs_start = ref_end
     rhs_end = ref_end + add_end
 
-    if not genome.sequence_in_bounds(chrom, rhs_start, rhs_end):
+    if not genome.coords_in_bounds(chrom, rhs_start, rhs_end):
         # add everything to the LHS
         lhs_start = ref_start - sequence_length + alt_len
         alt_sequence = genome.get_sequence_from_coords(
             chrom, lhs_start, lhs_end) + alt_sequence
-    elif not genome.sequence_in_bounds(chrom, lhs_start, lhs_end):
+    elif not genome.coords_in_bounds(chrom, lhs_start, lhs_end):
         # add everything to RHS
         rhs_end = ref_end + sequence_length - alt_len
         alt_sequence += genome.get_sequence_from_coords(
@@ -559,7 +559,7 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
-            if not genome.sequence_in_bounds(chrom, start, end):
+            if not genome.coords_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
                 continue

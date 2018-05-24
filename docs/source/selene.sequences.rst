@@ -1,38 +1,34 @@
-selene\.sequences package
-=========================
-
-Submodules
-----------
-
-selene\.sequences\.genome module
---------------------------------
-
-.. automodule:: selene.sequences.genome
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-selene\.sequences\.proteome module
-----------------------------------
-
-.. automodule:: selene.sequences.proteome
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-selene\.sequences\.sequence module
-----------------------------------
-
-.. automodule:: selene.sequences.sequence
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
+selene.sequences package
+========================
 
 .. automodule:: selene.sequences
-    :members:
     :undoc-members:
     :show-inheritance:
+
+Sequence
+-------------------------
+.. autoclass:: Sequence
+    :members:
+
+Genome
+-------------------------
+.. autoclass:: Genome
+    :members:
+
+Proteome
+-------------------------
+.. autoclass:: Proteome
+    :members:
+
+sequence_to_encoding
+-------------------------
+.. autofunction:: sequence_to_encoding
+
+encoding_to_sequence
+-------------------------
+.. autofunction:: encoding_to_sequence
+
+get_reverse_encoding
+------------------------
+.. autofunction:: get_reverse_encoding
+

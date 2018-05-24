@@ -14,7 +14,8 @@ from .sequence import encoding_to_sequence
 
 def _get_sequence_from_coords(len_prots, proteome_sequence,
                               prot, start, end):
-    """Gets the amino acid sequence at specified coordinates.
+    """
+    Gets the amino acid sequence at specified coordinates.
 
     Parameters
     ----------
@@ -46,16 +47,25 @@ class Proteome(Sequence):
 
     It supports retrieving parts of the sequence and converting these
     parts into their one-hot encodings. It is essentially a wrapper
-    class around the `pyfaix.Fasta` class.
+    class around the `pyfaidx.Fasta` class.
 
     Attributes
     ----------
     proteome : pyfaidx.Fasta
-        The Fasta file containing the protein sequences.
+        The FASTA or FAA file containing the protein sequences.
     prots : list(str)
         The list of protein names.
     len_prots : dict
-        The length of each protein sequence in the file.
+        A dictionary that maps protein names to the lengths, and does so
+        for all protein sequences in the proteome.
+
+    Parameters
+    ----------
+    input_path : str
+        Path to an indexed FASTA file containing amino acid
+        sequences, that is, a *.fasta file with a corresponding *.fai
+        file in the same directory. File should contain the
+        sequences from which training examples will be created.
 
     """
 
@@ -75,14 +85,6 @@ class Proteome(Sequence):
     def __init__(self, input_path):
         """Constructs a `Proteome` object.
 
-        Parameters
-        ----------
-        input_path : str
-            Path to an indexed FASTA file containing amino acid
-            sequences, that is, a *.faa file with a corresponding *.fai
-            file in the same directory. File should contain the
-            sequences from which training examples will be created.
-
         """
         self.proteome = pyfaidx.Fasta(input_path)
         self.prots = sorted(self.proteome.keys())
@@ -94,34 +96,47 @@ class Proteome(Sequence):
         Returns
         -------
         list(str)
-            The list of protein names.
+            A list of the protein names.
 
         """
         return self.prots
 
     def get_prot_lens(self):
-        """Gets the length of each protein sequence in the file.
+        """
+        Gets the length of each protein sequence in the file.
 
         Returns
         -------
-        list(tup)
-            Tuples of protein name (str) and protein length (int).
+        list(int)
+            A list of the protein lengths.
 
         """
         return list(self.len_prots.items())
 
     def _get_len_prots(self):
+        """
+        Returns
+        -------
+        dict
+            A dictionary mapping the names of proteins to their lengths.
+
+        """
         len_prots = {}
         for prot in self.prots:
             len_prots[prot] = len(self.proteome[prot])
         return len_prots
 
     def _proteome_sequence(self, prot, start, end):
+        """
+        Returns
+        -------
+        str
+            The amino acid sequence at the query coordinates.
+        """
         return self.proteome[prot][start:end].seq
 
-    def sequence_in_bounds(self, prot, start, end):
-        """Check if the region we want to query is within the bounds of
-         the queried protein.
+    def coords_in_bounds(self, prot, start, end):
+        """Check if the coordinates we want to query is valid.
 
         Parameters
         ----------
@@ -136,8 +151,8 @@ class Proteome(Sequence):
         Returns
         -------
         bool
-            Whether we can retrieve a sequence from the bounds specified
-            in the input.
+            A boolean indicating whether we can retrieve a sequence from
+            the queried coordinates.
 
         """
         if (start > self.len_prots[prot] or end > (self.len_prots[prot] + 1)
@@ -161,7 +176,8 @@ class Proteome(Sequence):
         Returns
         -------
         str
-            The amino acid sequence at the specified coordinates.
+            The sequence of :math:`L` amino acids at the specified
+            coordinates, where :math:`L = end - start`.
 
         """
         return _get_sequence_from_coords(
@@ -177,14 +193,15 @@ class Proteome(Sequence):
             The name of the protein, e.g. "YFP".
         start : int
             The 0-based start coordinate of the first position in the
-             sequence.
+            sequence.
         end : int
             One past the 0-based last position in the sequence.
 
         Returns
         -------
-        numpy.ndarray, dtype=bool
-            The N-by-20 encoding of the sequence.
+        numpy.ndarray, dtype=numpy.float32
+            The :math:`L \\times 20` encoding of the sequence, where
+            :math:`L = end - start`.
 
         """
         sequence = self.get_sequence_from_coords(prot, start, end)
@@ -198,12 +215,13 @@ class Proteome(Sequence):
         Parameters
         ----------
         sequence : str
-            The input sequence of amino acids of length N.
+            The input sequence of amino acids of length :math:`L`.
 
         Returns
         -------
         numpy.ndarray, dtype=numpy.float32
-            The N-by-20 encoding of the sequence.
+            The :math:`L \\times 20` array, where `L` was the length of
+            the input sequence.
 
         """
         return sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
@@ -215,13 +233,14 @@ class Proteome(Sequence):
         Parameters
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
-            The N-by-20 encoding of the sequence, where N is the length
-            of the output sequence.
+            The :math:`L \\times 20` encoding of the sequence, where
+            :math:`L` is the length of the output amino acid sequence.
 
         Returns
         -------
         str
-            The sequence of N amino acids decoded from the input array.
+            The sequence of :math:`L` amino acids decoded from the
+            input array.
 
         """
         return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)

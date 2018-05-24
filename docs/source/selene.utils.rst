@@ -1,38 +1,26 @@
-selene\.utils package
-=====================
-
-Submodules
-----------
-
-selene\.utils\.config module
-----------------------------
-
-.. automodule:: selene.utils.config
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-selene\.utils\.performance\_metrics module
-------------------------------------------
-
-.. automodule:: selene.utils.performance_metrics
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-selene\.utils\.utils module
----------------------------
-
-.. automodule:: selene.utils.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
+selene.utils package
+====================
 
 .. automodule:: selene.utils
-    :members:
     :undoc-members:
     :show-inheritance:
+
+PerformanceMetrics
+--------------------
+.. autoclass:: PerformanceMetrics
+    :members:
+
+initialize_logger
+-------------------
+.. autofunction:: initialize_logger
+
+load_features_list
+-------------------
+.. autofunction:: load_features_list
+
+Configuration
+-------------------
+
+.. autofunction:: instantiate
+.. autofunction:: load
+.. autofunction:: load_path

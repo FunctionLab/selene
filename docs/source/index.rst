@@ -11,28 +11,29 @@ TODO: Description
 .. toctree::
    :glob:
    :maxdepth: 1
-   :caption: Overview:
+   :caption: Overview
 
-   overview/*
+   overview/installation
+   overview/tutorials
+   overview/faq
+   overview/extending
 
 
 .. toctree::
    :maxdepth: 1
    :caption: Reference
 
-   selene
-   interpret
-   predict
-   samplers
-   sequences
-   targets
-   utils
-   train_model
+   selene.interpret
+   selene.predict
+   selene.samplers
+   selene.sequences
+   selene.targets
+   selene.utils
+   selene.train_model
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

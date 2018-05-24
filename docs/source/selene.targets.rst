@@ -1,30 +1,17 @@
-selene\.targets package
-=======================
-
-Submodules
-----------
-
-selene\.targets\.genomic\_features module
------------------------------------------
-
-.. automodule:: selene.targets.genomic_features
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-selene\.targets\.target module
-------------------------------
-
-.. automodule:: selene.targets.target
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
+selene.targets package
+======================
 
 .. automodule:: selene.targets
-    :members:
     :undoc-members:
     :show-inheritance:
+
+Target
+----------------------------
+.. autoclass:: Target
+    :members:
+
+GenomicFeatures
+----------------------------
+.. autoclass:: GenomicFeatures
+    :members:
+

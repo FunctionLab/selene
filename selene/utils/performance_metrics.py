@@ -11,6 +11,7 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 logger = logging.getLogger("selene")
 Metric = namedtuple("Metric", ["fn", "data"])
+# TODO(DOCUMENTATION): Add documentation for Metric?
 
 
 def compute_score(targets, predictions,
@@ -75,18 +76,21 @@ class PerformanceMetrics(object):
     Attributes
     ----------
     # TODO(DOCUMENTATION): Finish.
+
+   Parameters
+    ----------
+    get_feature_from_ix_fn
+    report_gt_feature_n_positives
+
     """
 
     def __init__(self,
                 get_feature_from_ix_fn,
                 report_gt_feature_n_positives=10):
         """
+        Creates a new object of the `PerformanceMetrics` class.
         # TODO(DOCUMENTATION): Finish.
 
-        Parameters
-        ----------
-        get_feature_from_ix_fn
-        report_gt_feature_n_positives
         """
         self.skip_threshold = report_gt_feature_n_positives
         self.feature_from_ix = get_feature_from_ix_fn
@@ -148,13 +152,15 @@ class PerformanceMetrics(object):
             metric_scores[name] = avg_score
         return metric_scores
 
-    def write_feature_scores_to_file(self, output_file):
+    def write_feature_scores_to_file(self, output_path):
         """
         # TODO(DOCUMENTATION): Finish.
 
         Parameters
         ----------
-        output_file
+        output_path : str
+            The path to the output file where performance metrics will
+            be written.
 
         Returns
         -------
@@ -172,7 +178,7 @@ class PerformanceMetrics(object):
 
         metric_cols = [m for m in self.metrics.keys()]
         cols = '\t'.join(["features"] + metric_cols)
-        with open(output_file, 'w+') as file_handle:
+        with open(output_path, 'w+') as file_handle:
             file_handle.write("{0}\n".format(cols))
             for feature, metric_scores in sorted(feature_scores.items()):
                 if not metric_scores:

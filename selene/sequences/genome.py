@@ -60,16 +60,17 @@ class Genome(Sequence):
 
     This class supports retrieving parts of the sequence and converting
     these parts into their one-hot encodings. It is essentially a
-    wrapper class around the `pyfaix.Fasta` class.
+    wrapper class around the `pyfaidx.Fasta` class.
 
     Attributes
     ----------
     genome : pyfaidx.Fasta
-        The Fasta file containing the genome sequence.
+        The FASTA file containing the genome sequence.
     chrs : list(str)
         The list of chromosome names.
     len_chrs : dict
-        The length of each chromosome sequence in the file.
+        A dictionary mapping the names of each chromosome in the file to
+        the length of said chromosome.
 
     """
 
@@ -118,8 +119,8 @@ class Genome(Sequence):
 
         Returns
         -------
-        list(tup)
-            Tuples of chromosome (str) and chromosome length (int).
+        list(int)
+            A list of the chromosome lengths.
 
         """
         return list(self.len_chrs.items())
@@ -136,9 +137,10 @@ class Genome(Sequence):
         else:
             return self.genome[chrom][start:end].reverse.complement.seq
 
-    def sequence_in_bounds(self, chrom, start, end):
-        """Check if the region we want to query is within the bounds of
-         the queried chromosome.
+    def coords_in_bounds(self, chrom, start, end):
+        """
+        Check if the region we want to query is within the bounds of the
+        queried chromosome.
 
         Parameters
         ----------
@@ -181,7 +183,8 @@ class Genome(Sequence):
         Returns
         -------
         str
-            The genomic sequence.
+            The genomic sequence of length :math:`L` where
+            :math:`L = end - start`.
 
         Raises
         ------
@@ -212,7 +215,8 @@ class Genome(Sequence):
         Returns
         -------
         numpy.ndarray, dtype=bool
-            The N-by-4 encoding of the sequence.
+            The :math:`L \\times 4` encoding of the sequence, where
+            :math:`L = end - start`.
 
         Raises
         ------
@@ -233,12 +237,12 @@ class Genome(Sequence):
         Parameters
         ----------
         sequence : str
-            A nucleotide sequence of length N.
+            A nucleotide sequence of length :math:`L`
 
         Returns
         -------
         numpy.ndarray, dtype=numpy.float32
-            The N-by-4 one-hot encoding of the sequence.
+            The :math:`L \\times 4` one-hot encoding of the sequence.
 
         """
         return sequence_to_encoding(sequence, cls.BASE_TO_INDEX, cls.BASES_ARR)
@@ -250,13 +254,14 @@ class Genome(Sequence):
         Parameters
         ----------
         encoding : numpy.ndarray, dtype=numpy.float32
-            An N-by-4 one-hot encoding of the sequence, where N is the
-            length of the output sequence.
+            An :math:`L \\times 4` one-hot encoding of the sequence,
+            where :math:`L` is the length of the output sequence.
 
         Returns
         -------
         str
-            The sequence of N nucleotides decoded from the input array.
+            The sequence of :math:`L` nucleotides decoded from the
+            input array.
 
         """
         return encoding_to_sequence(encoding, cls.BASES_ARR, cls.UNK_BASE)

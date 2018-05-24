@@ -9,24 +9,40 @@ from selene.sequences import Genome
 
 
 class ISMResult(object):
-    """An object storing the results of an *in silico* mutagenesis
-     experiment.
+    """
+    An object storing the results of an *in silico* mutagenesis
+    experiment.
+
+    Parameters
+    ----------
+    data_frame : pandas.DataFrame
+        The data frame with the results from the *in silico*
+        mutagenesis experiments.
+
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The type of sequence
+        that the *in silico* mutagenesis results are associated
+        with. This should generally be a subclass of
+        `selene.sequences.Sequence`
+
+    Raises
+    ------
+    ValueError
+        If the input data frame contains a base not included in the
+        alphabet of `sequence_type`.
+
+    Exception
+        If multiple reference positions are specified in the input
+        data frame.
+
+    Exception
+        If the input data does not contain scores for every mutation
+        at every position.
 
     """
     def __init__(self, data_frame, sequence_type=Genome):
-        """Constructs a new `ISMResult` object.
-
-        Parameters
-        ----------
-        data_frame : pandas.DataFrame
-            The data frame with the results from the *in silico*
-            mutagenesis experiments.
-
-        sequence_type : class, optional
-            Default is `selene.sequences.Genome`. The type of sequence
-            that the *in silico* mutagenesis results are associated
-            with. This should generally be a subclass of
-            `selene.sequences.Sequence`
+        """
+        Constructs a new `selene.interpret.ISMResult` object.
 
         """
         # Construct the reference sequence.
@@ -62,7 +78,8 @@ class ISMResult(object):
 
     @property
     def reference_sequence(self):
-        """The reference sequence that the *in silico* mutagenesis
+        """
+        The reference sequence that the *in silico* mutagenesis
         experiment was performed on.
 
         Returns
@@ -76,7 +93,9 @@ class ISMResult(object):
 
     @property
     def sequence_type(self):
-        """The type of underlying sequence.
+        """
+        The type of underlying sequence. This should generally be a
+        subclass of `selene.sequences.Sequence`.
 
         Returns
         -------
@@ -88,8 +107,9 @@ class ISMResult(object):
         return self._sequence_type
 
     def get_score_matrix_for(self, feature, reference_mask=None,
-                             dtype=np.float32):
-        """Extracts a feature from the *in silico* mutagenesis results
+                             dtype=np.float64):
+        """
+        Extracts a feature from the *in silico* mutagenesis results
         as a matrix, where the reference base positions hold the value
         for the reference prediction, and alternative positions hold the
         results for making a one-base change from the reference base to
@@ -105,17 +125,24 @@ class ISMResult(object):
             with. If left as `None`, then no masking will be performed
             on the reference positions.
 
-        dtype : `numpy.dtype`, optional
-            Default is `numpy.float32`. The data type to use for the returned
-            matrix.
+        dtype : numpy.dtype, optional
+            Default is `numpy.float64`. The data type to use for the
+            returned matrix.
 
         Returns
         -------
-        numpy.ndarray, dtype=`dtype`
-            A LxN shaped array (where L is the sequence length, and N
-            is the size of the alphabet) that holds the results from the
-            *in silico* mutagenesis experiment for the specified feature.
+        numpy.ndarray
+            A :math:`L \\times N` shaped array (where :math:`L` is the
+            sequence length, and :math:`N` is the size of the alphabet
+            of `sequence_type`) that holds the results from the
+            *in silico* mutagenesis experiment for the specified
+            feature. The elements will be of type `dtype`.
 
+        Raises
+        ------
+        ValueError
+            If the input data frame contains a base not included in the
+            alphabet of `sequence_type`.
         """
         ret = self._sequence_type.sequence_to_encoding(
             self._reference_sequence).astype(dtype=dtype)
@@ -137,23 +164,26 @@ class ISMResult(object):
 
     @staticmethod
     def from_file(input_path, sequence_type=Genome):
-        """Loads an `ISMResult` from a `pandas.DataFrame` stored in a
-        file.
+        """
+        Loads a `selene.interpret.ISMResult` from a `pandas.DataFrame`
+        stored in a file of comma separated values (CSV).
 
         Parameters
         ----------
         input_path : str
-            A path to the input file.
+            A path to the file of comma separated input values.
 
         sequence_type : class, optional
             Default is `selene.sequences.Genome`. The type of sequence
             that the *in silico* mutagenesis results are associated
-            with.
+            with. This should generally be a subclass of
+            `selene.sequences.Sequence`.
 
         Returns
         -------
         selene.interpret.ISMResult
-            The results that were stored in the file.
+            The *in silico* mutagenesis results that were stored in the
+            specified input file.
 
         """
         return ISMResult(pd.read_csv(input_path, sep="\t", header=0),

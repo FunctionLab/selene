@@ -39,7 +39,7 @@ class TestProteome(unittest.TestCase):
         self.assertSequenceEqual(self.proteome.get_prots(), ["prot0", "prot1"])
 
     def test_sequence_in_bounds_is_out_of_bounds(self):
-        self.assertEqual(self.proteome.sequence_in_bounds("prot0", 10000, 100001),
+        self.assertEqual(self.proteome.coords_in_bounds("prot0", 10000, 100001),
                          False)
 
     def test_get_encoding_from_coords(self):

@@ -82,7 +82,7 @@ for k in _SVG_PATHS.keys():
     _SVG_PATHS[k] = _svg_parse(_SVG_PATHS[k])
 
 
-class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
+class _TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
     """This class provides an effect for continuously rendering a text
     path over another path.
 
@@ -129,48 +129,68 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
 
 
 def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
-                  sequence_type=Genome, font_properties=None, **kwargs):
+                  sequence_type=Genome, font_properties=None,
+                  color_scheme=None,
+                  **kwargs):
     """Plots a sequence logo for visualizing motifs.
 
     Parameters
     ----------
     score_matrix : np.ndarray
-        An LxN matrix (where L is the length of the sequence, and N is
-        the size of the alphabet) containing the scores for each
-        position.
-    order : {"alpha", "value"}
-        The ordering to use for the bases in the motif plots.
-            alpha: Bases go in the order they are found in the sequence
-                   alphabet.
-            value: Bases go in the order of their effect size, with the
-                   largest at the bottom.
+        An :math:`L \\times N` array (where :math:`L` is the length of
+        the sequence, and :math:`N` is the size of the alphabet)
+        containing the scores for each base occuring at each position.
+    order : {'alpha', 'value'}
+        The manner by which to sort the bases stacked at each position
+        in the sequence logo plot.
+
+            * 'alpha' - Bases go in the order they are found in the\
+                      sequence alphabet.
+            * 'value' - Bases go in the order of their value, with the\
+                        largest at the bottom.
     width : float, optional
-        Default is 1. The size width of each character. A value of 1
-        will mean that there is no gap between each character.
+        Default is 1. The width of each character in the plotted logo.
+        A value of 1 will mean that there is no gap between each the
+        characters at each position. A value of 0 will not draw any
+        characters.
     ax : matplotlib.pyplot.Axes, optional
-        Default is `None`. An axes to plot on. If not provided, an axis
-        will be created.
+        Default is `None`. The axes to plot on. If left as `None`, a new
+        axis will be created.
     sequence_type : class, optional
         Default is `selene.sequences.Genome`. The type of sequence that
-        the *in silico* mutagenesis results are associated with.
+        the *in silico* mutagenesis results are associated with. This
+        should generally be a subclass of `selene.sequences.Sequence`.
     font_properties : matplotlib.font_manager.FontProperties, optional
-        Default is `None`. A `FontProperties` object that specifies the
-        properties of the font to use for plotting the motif. If `None`,
-        no font will be used, and the text will be rendered by a path.
-        This method of rendering is preferable, as it ensures all
-        character heights correspond to the actual values, and that
-        there are no gaps between characters at a position in the motif.
-        If the user opts to use `font_properties` other than `None`,
-        then no such guarantee can be made.
-
-    color_scheme : list(str)
-        A list containing the colors to use, appearing in the order of
-        the bases of the sequence type.
+        Default is `None`. A `matplotlib.font_manager.FontProperties`
+        object that specifies the properties of the font to use for
+        plotting the motif. If `None`, no font will be used, and the
+        text will be rendered by a path. This method of rendering paths
+        is  preferred, as it ensures all character heights correspond to
+        the actual values, and that there are no extra gaps between
+        the tops and bottoms of characters at each position in the
+        sequence logo. If the user opts to use a value other
+        than `None`, then no such guarantee can be made.
+    color_scheme : list(str), optional
+        Default is `None`. A list containing the hex codes or names of
+        colors to use, appearing in the order of the bases of the
+        sequence type. If left as `None`, a default palette will be made
+        with `seaborn.color_palette`, and will have as many
+        colors as there are characters in the input sequence alphabet.
 
     Returns
     -------
     matplotlib.pyplot.Axes
-        An axis containing the sequence logo plot.
+        The axes containing the sequence logo plot.
+
+    Raises
+    ------
+    ValueError
+        If the number of columns in `score_matrix` does not match the
+        number of characters in the alphabet of `sequence_type`.
+
+    ValueError
+        If the number of colors in `color_palette` does not match the
+        number of characters in the alphabet of `sequence_type`.
 
     """
     # Note that everything will break if we do not deepcopy.
@@ -185,10 +205,10 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
             "`font_properties=None`. See the documentation for details.",
             UserWarning)
 
-    if "colors" in kwargs:
-        color_scheme = kwargs.pop("colors")
-    else:
-        color_scheme = ["orange", "red", "blue", "darkgreen"]
+    if color_scheme is None:
+        color_scheme = sns.color_palette("Set1",
+                                         n_colors=len(sequence_type.BASES_ARR))
+        color_scheme = color_scheme.as_hex()
     if len(color_scheme) < len(sequence_type.BASES_ARR):
         raise ValueError(
             "Color scheme is shorter than number of bases in sequence.")
@@ -287,7 +307,7 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
         translation = (b_x - t_x, b_y - t_y)
         text = PathPatch(text, facecolor=bar.get_facecolor(), lw=0.)
         bar.set_facecolor("none")
-        text.set_path_effects([TextPathRenderingEffect(bar)])
+        text.set_path_effects([_TextPathRenderingEffect(bar)])
         transform = transforms.Affine2D().translate(*translation).scale(*scale)
         text.set_transform(transform)
         new_patches.append(text)
@@ -308,30 +328,41 @@ def rescale_score_matrix(score_matrix, base_scaling="identity",
     Parameters
     ----------
     score_matrix : numpy.ndarray
-        A LxN matrix containing the scores for each position,
-        where L is the length of the sequence, and N is the number of
-        characters in the alphabet.
-    base_scaling : {"identity", "probability", "max_effect"}
+        An :math:`L \\times N` matrix containing the scores for each
+        position, where :math:`L` is the length of the sequence, and
+        :math:`N` is the number of characters in the alphabet.
+    base_scaling : {'identity', 'probability', 'max_effect'}
         The type of scaling performed on each base at a given position.
-            identity : No transformation will be applied to the data.
-            probability : The relative sizes of the bases will be the
-                          original input probabilities.
-            max_effect : The relative sizes of the bases will be the max
-                         effect of the original input values.
-    position_scaling : str
+
+            * 'identity' - No transformation will be applied to the\
+                           data.
+            * 'probability' - The relative sizes of the bases will be\
+                              the original input probabilities.
+            * 'max_effect' - The relative sizes of the bases will be\
+                             the max effect of the original input\
+                             values.
+    position_scaling : {'identity', 'probability', 'max_effect'}
         The type of scaling performed on each position.
-            identity: No transformation will be applied to the data.
-            probability: The sum of values at a position will be equal
-                        to the sum of the original input values at that
-                        position.
-            max_effect: The sum of values at a position will be equal to
-                        the sum of the max effect values of the original
-                        input values at that position.
+
+            * 'identity'    - No transformation will be applied to the data.
+            * 'probability' - The sum of values at a position will be\
+                              equal to the sum of the original input\
+                              values at that position.
+            * 'max_effect'  - The sum of values at a position will be\
+                              equal to the sum of the max effect values\
+                              of the original input values at that\
+                              position.
 
     Returns
     -------
-    numpy.ndarray, dtype=score_matrix.dtype
-        The transformed array.
+    numpy.ndarray
+        The transformed score matrix.
+
+    Raises
+    ------
+    ValueError
+        If an unsupported `base_scaling` or `position_scaling` is
+        entered.
 
     """
     # Note that things can break if we do not deepcopy.
@@ -366,33 +397,36 @@ def rescale_score_matrix(score_matrix, base_scaling="identity",
 
 def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
     """Plots the input matrix of scores, generally those produced by an
-    *in siliico* mutagenesis experiment, on a heatmap.
+    *in silico* mutagenesis experiment, on a heatmap.
 
     Parameters
     ----------
     score_matrix : numpy.ndarray
-        An LxN matrix (where L is the length of the sequence, and N is
-        the size of the alphabet) matrix containing the scores for each
-        position.
+        An :math:`L \\times N` array (where :math:`L` is the length of
+        the sequence, and :math:`N` is the size of the alphabet)
+        containing the scores for each base change at each position.
     mask : numpy.ndarray, dtype=bool, optional
-        Default is `None`. A matrix containing 1s or `True` at positions
-        in the heatmap to mask.
-    sequence_type : class
-        The type of sequence that the *in silico* mutagenesis results
-        are associated with.
+        Default is `None`. An :math:`L \\times N` array (where :math:`L`
+        is the length of the sequence, and :math:`N` is the size of the
+        alphabet)  containing `True` at positions in the heatmap to
+        mask. If `None`, no masking will occur.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The class of sequence that
+        the *in silico* mutagenesis results are associated with. This is
+        generally a sub-class of `selene.sequences.Sequence`.
     **kwargs : dict
-        Keyword arguments to pass to `seaborn.heatmap`.
-        Some useful ones are:
-            cbar_kws: Change keyword arguments to the colorbar.
-            yticklabels: Manipulate the tick labels on the y axis.
-            cbar: If `False`, hide the color bar, otherwise show the
-                  colorbar.
-            cmap: The color map to use for the heatmap.
+        Keyword arguments to pass to `seaborn.heatmap`. Some useful ones
+        to remember are:
+            * cbar_kws - Keyword arguments to forward to the colorbar.
+            * yticklabels - Manipulate the tick labels on the y axis.
+            * cbar - If `False`, hide the color bar. If `True`, show\
+                     the colorbar.
+            * cmap - The color map to use for the heatmap.
 
     Returns
     -------
-    matplotlib.pytplot.Axes
-        An axes containing the heatmap plot.
+    matplotlib.pyplot.Axes
+        The axese containing the heatmap plot.
 
     """
     # Note that some things can break if we do not deepcopy.

@@ -1,30 +1,27 @@
-selene\.interpret package
-=========================
+.. role:: hidden
+    :class: hidden-section
 
-Submodules
-----------
-
-selene\.interpret\.ism\_results module
---------------------------------------
-
-.. automodule:: selene.interpret.ism_results
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-selene\.interpret\.vis module
------------------------------
-
-.. automodule:: selene.interpret.vis
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-Module contents
----------------
-
+selene.interpret package
+========================
 .. automodule:: selene.interpret
-    :members:
+.. currentmodule:: selene.interpret
     :undoc-members:
     :show-inheritance:
+
+sequence_logo
+------------------------
+.. autofunction:: sequence_logo
+
+heatmap
+------------------------
+.. autofunction:: heatmap
+
+ISMResult
+------------------------
+.. autoclass:: ISMResult
+    :members:
+
+rescale_score_matrix
+------------------------
+.. autofunction:: rescale_score_matrix
+
