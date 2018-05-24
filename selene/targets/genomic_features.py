@@ -77,53 +77,73 @@ def _define_feature_thresholds(feature_thresholds, features):
     return feature_thresholds_dict, feature_thresholds_vec
 
 
+# TODO: Can this be used for Proteome? It seems like it could be.
 class GenomicFeatures(Target):
-    """Stores the dataset specifying sequence regions and features.
-        Accepts a tabix-indexed .bed file with the following columns,
-        in order:
-            [chrom, start (0-based), end, strand, feature]
-        Additional columns that follow these 5 are acceptable.
+    """
+    Stores the dataset specifying sequence regions and features.
+    Accepts a tabix-indexed `*.bed` file with the following columns,
+    in order:
+    ::
+        [chrom, start (0-based), end, strand, feature]
+
+
+    Additional columns that follow these 5 will simply be ignored.
 
     Attributes
     ----------
     data : tabix.open
+        The data stored in a tabix-indexed `*.bed` file.
     n_features : int
+        The number of distinct features.
     feature_index_map : dict
-        feature (str) -> position index (int) in `features`
+        A dictionary mapping feature names (`str`) to indices (`int`),
+        where the index is the position of the feature in `features`.
     index_feature_map : dict
-        position index (int) -> feature (str)
+        A dictionary mapping indices (`int`) to feature names (`str`),
+        where the index is the position of the feature in the input
+        features.
     feature_thresholds : dict
-        feature (str) -> threshold (float)
+        A dictionary mapping feature names (`str`) to thresholds
+        (`float`), where the threshold is a
+        # TODO(DOCUMENTATION): FINISH.
+
+    Parameters
+    ----------
+    input_path : str
+        Path to the tabix-indexed dataset. Note that for the file to
+        be tabix-indexed, it must have been compressed with `bgzip`.
+        Thus, `input_path` should be a `*.gz` file with a
+        corresponding `*.tbi` file in the same directory.
+    features : list(str)
+        The non-redundant list of genomic features (i.e. labels)
+        that will be predicted.
+    feature_thresholds : float|dict|types.FunctionType
+        A genomic region is determined to be a positive sample if at
+        least one genomic feature peak takes up a proportion of the
+        region greater than or equal to the threshold specified for
+        that feature.
+
+        * `float` - A single threshold applies to all the features\
+                    in the dataset.
+        * `dict` - A dictionary mapping feature names (`str`) to \
+                 threshold values (`float`), which thereby assigns\
+                 different thresholds to different features. If a\
+                 feature's threshold is not specified in this \
+                 dictionary, then we assume that a key `"default"`\
+                 exists in the dictionary that has the default \
+                 threshold value we should assign to the feature \
+                 name that is absent from the dictionary keys.
+        * `types.FunctionType` - define a function that takes as \
+                                 input the feature name and returns\
+                                 the feature's threshold.
+
     """
 
-    def __init__(self, dataset, features, feature_thresholds):
+    def __init__(self, input_path, features, feature_thresholds):
         """
-        Parameters
-        ----------
-        dataset : str
-            Path to the tabix-indexed dataset. Note that for the file to
-            be tabix-indexed, we must have compressed it using bgzip.
-            `dataset` should be a *.gz file that has a corresponding
-            *.tbi file in the same directory.
-        features : list[str]
-            The unique list of genomic features (labels) we are interested in
-            predicting.
-        feature_thresholds : float|dict|types.FunctionType
-            A genomic region is determined to be a positive sample if at least
-            1 genomic feature peak takes up a proportion of the region greater
-            than or equal to the threshold specified for that feature.
-            - float : a single threshold applies to all the features
-                in the dataset
-            - dict : str (feature) -> float (threshold). Assign different
-                thresholds to different features. If a feature's
-                threshold is not specified in the dict, we assume that
-                a key "default" exists in the dict that has the default
-                threshold value we should assign to the feature.
-            - types.FunctionType : define a function that takes as input the
-                feature name and returns the feature's threshold.
-
+        Constructs a new `selene.targets.GenomicFeatures` object.
         """
-        self.data = tabix.open(dataset)
+        self.data = tabix.open(input_path)
 
         self.n_features = len(features)
 
@@ -142,50 +162,55 @@ class GenomicFeatures(Target):
             return None
 
     def is_positive(self, chrom, start, end):
-        """Determines whether the (chrom, start, end) queried
-        contains any genomic features within the [start, end) region.
-        If so, the query is considered positive.
+        """
+        Determines whether the query the `chrom` queried contains any
+        genomic features within the :math:`[start, end)` region. If so,
+        the query is considered positive.
 
         Parameters
         ----------
         chrom : str
-            e.g. '1', '2', ..., 'X', 'Y'.
+            The name of the region (e.g. '1', '2', ..., 'X', 'Y').
         start : int
+            The 0-based first position in the region.
         end : int
-
+            One past the 0-based last position in the region.
         Returns
         -------
         bool
-            True if this meets the criterion for a positive example,
-            False otherwise.
-            Note that if we catch a tabix.TabixError exception, we assume
-            the error was the result of no genomic features being present
-            in the queried region and return False.
+            `True` if this meets the criterion for a positive example,
+            `False` otherwise.
+            Note that if we catch a `tabix.TabixError` exception, we
+            assume the error was the result of no features being present
+            in the queried region and return `False`.
         """
         rows = self._query_tabix(chrom, start, end)
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
     def get_feature_data(self, chrom, start, end):
-        """For a sequence of length L = `end` - `start`, return the features'
-        one-hot encoding corresponding to that region.
-            e.g. for `n_features`, each position in that sequence will
-            have a binary vector specifying whether the genomic feature's
-            coordinates overlap with that position.
+        """For a sequence of length :math:`L = end - start`, return the
+        features' one-hot encoding corresponding to that region. For
+        instance, for `n_features`, each position in that sequence will
+        have a binary vector specifying whether the genomic feature's
+        coordinates overlap with that position. # TODO(DOCUMENTATION): CLARIFY.
 
         Parameters
         ----------
         chrom : str
-            e.g. '1', '2', ..., 'X', 'Y'.
+            The name of the region (e.g. '1', '2', ..., 'X', 'Y').
         start : int
+            The 0-based first position in the region.
         end : int
+            One past the 0-based last position in the region.
 
         Returns
         -------
         numpy.ndarray
-            shape = [L, n_features].
-            Note that if we catch a tabix.TabixError exception, we assume
-            the error was the result of no genomic features being present
-            in the queried region and return a numpy.ndarray of all 0s.
+            A :math:`L \\times N` array, where :math:`L = end - start`
+            and :math:`N =` `self.n_features`. Note that if we catch a
+            `tabix.TabixError`, we assume the error was the result of
+            there being no features present in the queried region and
+            return a `numpy.ndarray` of zeros.
         """
         return _get_feature_data(
             chrom, start, end, self._feature_thresholds_vec,

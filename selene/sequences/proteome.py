@@ -63,8 +63,8 @@ class Proteome(Sequence):
     ----------
     input_path : str
         Path to an indexed FASTA file containing amino acid
-        sequences, that is, a *.fasta file with a corresponding *.fai
-        file in the same directory. File should contain the
+        sequences, that is, a `*.fasta` file with a corresponding
+        `*.fai` file in the same directory. File should contain the
         sequences from which training examples will be created.
 
     """

@@ -14,7 +14,8 @@ from .sequence import encoding_to_sequence
 
 def _get_sequence_from_coords(len_chrs, genome_sequence, chrom,
                               start, end, strand='+'):
-    """Gets the genomic sequence at the input coordinates.
+    """
+    Gets the genomic sequence at the input coordinates.
 
     Parameters
     ----------
@@ -124,8 +125,8 @@ class Genome(Sequence):
         Parameters
         ----------
         input_path : str
-            Path to an indexed FASTA file, that is, a *.fasta file with
-            a corresponding *.fai file in the same directory. This file
+            Path to an indexed FASTA file, that is, a `*.fasta` file with
+            a corresponding `*.fai` file in the same directory. This file
             should contain the target organism's genome sequence.
 
         """
