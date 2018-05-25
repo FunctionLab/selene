@@ -231,7 +231,7 @@ class IntervalsSampler(OnlineSampler):
         window_end = bin_end + self.surrounding_sequence_radius
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
-            self.genome.get_encoding_from_coords(
+            self.reference_sequence.get_encoding_from_coords(
                 "chr{0}".format(chrom), window_start, window_end, strand)
         if retrieved_seq.shape[0] == 0:
             logger.info("Full sequence centered at chr{0} position {1} "

@@ -128,15 +128,15 @@ class Proteome(Sequence):
 
     def get_prot_lens(self):
         """
-        Gets the length of each protein sequence in the file.
+        Gets the name and length of each protein sequence in the file.
 
         Returns
         -------
-        list(int)
-            A list of the protein lengths.
+        list(tuple(str, int))
+            A list of tuples of protein names and protein lengths.
 
         """
-        return list(self.len_prots.items())
+        return [(k, self.len_prots[k]) for k in self.prots]
 
     def _get_len_prots(self):
         """

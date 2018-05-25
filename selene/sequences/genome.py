@@ -146,15 +146,15 @@ class Genome(Sequence):
         return self.chrs
 
     def get_chr_lens(self):
-        """Gets the length of each chromosome sequence in the file.
+        """Gets the name and length of each chromosome sequence in the file.
 
         Returns
         -------
-        list(int)
-            A list of the chromosome lengths.
+        list(tuple(str, int))
+            A list of tuples of the chromosome names and lengths.
 
         """
-        return list(self.len_chrs.items())
+        return [(k, self.len_chrs[v]) for k in self.get_chrs()]
 
     def _get_len_chrs(self):
         len_chrs = {}

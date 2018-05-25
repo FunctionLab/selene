@@ -139,7 +139,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         else:
             self._end_radius = self.bin_radius + 1
 
-        self.genome = Genome(reference_sequence)
+        self.reference_sequence = Genome(reference_sequence)
 
         self._features = features
         self.n_features = len(self._features)
@@ -187,7 +187,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         str
             The sequence of :math:`L` characters decoded from the input.
         """
-        return self.genome.encoding_to_sequence(encoding)
+        return self.reference_sequence.encoding_to_sequence(encoding)
 
     def save_datasets_to_file(self, output_dir):
         """
