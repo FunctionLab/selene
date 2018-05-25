@@ -301,10 +301,16 @@ class IntervalsSampler(OnlineSampler):
         targets_mat = []
 
         n_batches = int(n_samples / batch_size)
-        for _ in range(n_batches):
-            inputs, targets = self.sample(batch_size)
+
+        if n_batches == 0:
+            inputs, targets = self.sample(n_samples)
             sequences_and_targets.append((inputs, targets))
             targets_mat.append(targets)
+        else:
+            for _ in range(n_batches):
+                inputs, targets = self.sample(batch_size)
+                sequences_and_targets.append((inputs, targets))
+                targets_mat.append(targets)
         targets_mat = np.vstack(targets_mat)
         return sequences_and_targets, targets_mat
 

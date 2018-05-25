@@ -192,6 +192,13 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
         If the number of colors in `color_palette` does not match the
         number of characters in the alphabet of `sequence_type`.
 
+    Examples
+    --------
+    We have included an example of the output from a`sequence_logo`
+    plot below:
+
+    .. image:: ../../docs/source/_static/images/sequence_logo_example.png
+
     """
     # Note that everything will break if we do not deepcopy.
     score_matrix = deepcopy(score_matrix)

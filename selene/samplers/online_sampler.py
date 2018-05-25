@@ -8,7 +8,6 @@ import os
 
 from .sampler import Sampler
 from ..targets import GenomicFeatures
-from ..utils import load_features_list
 
 
 class OnlineSampler(Sampler, metaclass=ABCMeta):
@@ -20,7 +19,28 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
     Attributes
     ----------
-    # TODO(DOCUMENTATION): Define all 1 million attributes.
+    reference_sequence : selene.sequences.Sequence
+        The reference sequence that examples are created from.
+    target : selene.targets.Target
+        The `selene.targets.Target` object holding the features that we
+        would like to predict.
+    validation_holdout : list(str)|list(float)
+        # TODO
+    test_holdout : list(str)|list(float)
+        # TODO
+    sequence_length : int
+        # TODO
+    surrounding_sequence_radius : int
+        # TODO
+    bin_radius : int
+        #TODO
+    modes : list(str)
+        The list of modes that the sampler can be run in.
+    mode : str
+        The current mode that the sampler is running in. Must be one of
+        the modes listed in `modes`.
+    save_datasets : list(str)
+        #TODO
 
     Parameters
     ----------
@@ -50,10 +70,10 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         Default is 201. Query the tabix-indexed file for a region of
         length `center_bin_to_predict`.
     feature_thresholds : float [0.0, 1.0], optional
-        # TODO(DOCUMENTATION): Finish.
+        Default is 0.5. # TODO(DOCUMENTATION): Finish.
     mode : {'train', 'validate', 'test'}
         Default is `'train'`. The mode to run the sampler in.
-    save_datasets : list of str
+    save_datasets : list(str)
         Default is `["test"]`. # TODO(DOCUMENTATION): Finish.
 
     """
@@ -75,6 +95,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                  feature_thresholds=0.5,
                  mode="train",
                  save_datasets=["test"]):
+
         """
         Creates a new `OnlineSampler` object.
         """
@@ -206,5 +227,5 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             filepath = os.path.join(output_dir, "{0}_data.bed".format(mode))
             with open(filepath, 'w+') as file_handle:
                 for cols in samples:
-                    line ='\t'.join([str(c) for c in cols])
+                    line = '\t'.join([str(c) for c in cols])
                     file_handle.write("{0}\n".format(line))
