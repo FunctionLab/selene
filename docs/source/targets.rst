@@ -2,8 +2,7 @@ selene.targets
 ======================
 
 .. automodule:: selene.targets
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene.targets
 
 Target
 ----------------------------

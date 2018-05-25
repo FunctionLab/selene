@@ -2,8 +2,7 @@ selene.predict.predict\_handlers
 ========================================
 
 .. automodule:: selene.predict.predict_handlers
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene.predict.predict_handlers
 
 PredictionsHandler
 ----------------------------------------

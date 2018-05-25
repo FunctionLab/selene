@@ -2,8 +2,7 @@ selene.utils
 ====================
 
 .. automodule:: selene.utils
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene.utils
 
 PerformanceMetrics
 --------------------

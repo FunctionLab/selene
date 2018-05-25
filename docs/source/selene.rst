@@ -1,9 +1,7 @@
 selene
 =================================
 .. automodule:: selene
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene
 
 TrainModel
 ---------------------------------

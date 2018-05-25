@@ -5,8 +5,6 @@ selene.interpret
 ========================
 .. automodule:: selene.interpret
 .. currentmodule:: selene.interpret
-    :undoc-members:
-    :show-inheritance:
 
 sequence_logo
 ------------------------

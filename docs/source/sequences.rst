@@ -2,8 +2,7 @@ selene.sequences
 ========================
 
 .. automodule:: selene.sequences
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene.sequences
 
 Sequence
 -------------------------

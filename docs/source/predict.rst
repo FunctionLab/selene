@@ -2,8 +2,7 @@ selene.predict
 ======================
 
 .. automodule:: selene.predict
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene.predict
 
 AnalyzeSequences
 ----------------------

@@ -31,7 +31,6 @@ TODO: Description
    sequences
    targets
    utils
-   train_model
 
 
 Indices and tables

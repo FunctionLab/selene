@@ -1,9 +1,7 @@
 selene.samplers
 =======================
-
 .. automodule:: selene.samplers
-    :undoc-members:
-    :show-inheritance:
+.. currentmodule:: selene.samplers
 
 Sampler
 -------------------------
