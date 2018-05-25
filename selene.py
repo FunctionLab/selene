@@ -26,6 +26,23 @@ from selene.utils import instantiate
 
 
 def initialize_model(model_configs, train=True, lr=None):
+    """
+    TODO
+
+    Parameters
+    ----------
+    model_configs : TODO
+        TODO
+    train : bool
+        TODO
+    lr : TODO
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+    """
     import_model_from = model_configs["file"]
     model_class_name = model_configs["class"]
 
@@ -53,6 +70,24 @@ def initialize_model(model_configs, train=True, lr=None):
 
 
 def execute(operation, config, model=None):
+    """
+    TODO
+
+    Parameters
+    ----------
+    operation : TODO
+        TODO
+    config : TODO
+        TODO
+    model : TODO
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+
+    """
     if operation == "train":
         model, loss, optim, optim_args = initialize_model(
             config["model"], train=True, lr=config["lr"])
@@ -105,6 +140,7 @@ def execute(operation, config, model=None):
                                  " or a sequences ('input_sequence'), but "
                                  " found neither.")
 
+
 if __name__ == "__main__":
     arguments = docopt(
         __doc__,
@@ -123,7 +159,8 @@ if __name__ == "__main__":
               "line value for training.".format(
                   arguments["<config-yml>"], lr))
 
-    # @TODO: allow users to pass in a random seed, optional
+    # @TODO: allow users to pass in a random seed, optional.
+    # @TODO: Should we force this seed to match the seeds elsewhere?
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
