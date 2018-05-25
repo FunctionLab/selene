@@ -1,4 +1,5 @@
-"""This class contains methods to query a file of genomic coordinates,
+"""
+This class contains methods to query a file of genomic coordinates,
 where each row of [start, end) coordinates corresponds to a genomic feature
 in the sequence.
 
@@ -19,52 +20,78 @@ from .target import Target
 from ._genomic_features import _fast_get_feature_data
 
 
-def _any_positive_rows(rows, query_start, query_end, thresholds):
+def _any_positive_rows(rows, start, end, thresholds):
     """
-    TODO
+    Searches through a set of feature annotations for positive examples
+    according to a threshold specific to each feature. For each feature
+    in `rows`, the overlap between the feature and the query region must
+    be greater than that feature's threshold to be considered positive.
 
     Parameters
     ----------
-    rows
-    query_start
-    query_end
-    thresholds
+    rows : list(tuple(int, int, str)) or None
+        A list of tuples of the form `(start, end, feature_name)`, or
+        `None`.
+    start : int
+        The 0-based start coordinate of the region to query.
+    end : int
+        One past the last coordinate of the region to query.
+    thresholds : dict
+        A dictionary mapping feature names (`str`) to
+        thresholds (`float`), where the threshold is the minimum
+        fraction of a region that must overlap with a label for it to be
+        considered a positive example of that label.
 
     Returns
     -------
+    bool
+        `True` if there is at least one feature in `rows` that meets its
+        feature-specific cutoff. `False` otherwise, or if `rows==None`.
 
     """
     if rows is None:
         return False
     for row in rows:  # features within [start, end)
         is_positive = _is_positive_row(
-            query_start, query_end, int(row[1]), int(row[2]), thresholds[row[3]])
+            start, end, int(row[1]), int(row[2]), thresholds[row[3]])
         if is_positive:
             return True
     return False
 
 
-def _is_positive_row(query_start, query_end,
-                     feat_start, feat_end, threshold):
+def _is_positive_row(start, end,
+                     feature_start, feature_end,
+                     threshold):
     """
-    TODO
+    Determine if a feature annotation overlaps enough with a query
+    region to meet a minimal overlap threshold and be considered a
+    positive example of said feature.
 
     Parameters
     ----------
-    query_start
-    query_end
-    feat_start
-    feat_end
-    threshold
+    start : int
+        The 0-based start coordinate of the query region.
+    end : int
+        One past the last coordinate of the query region.
+    feature_start : int
+        The 0-based start coordinate of the feature.
+    feature_end : int
+        One past the last coordinate of the feature.
+    threshold : float
+        The minimum fraction of the query region that a feature must
+        overlap with to be considered positive.
 
     Returns
     -------
+    bool
+        `True` if the feature is a positive example and meets the
+        overlap threshold. Otherwise `False`.
 
     """
-    overlap_start = max(feat_start, query_start)
-    overlap_end = min(feat_end, query_end)
+    overlap_start = max(feature_start, start)
+    overlap_end = min(feature_end, end)
     min_overlap_needed = int(
-        (query_end - query_start) * threshold - 1)
+        (end - start) * threshold - 1)
     if min_overlap_needed < 0:
         min_overlap_needed = 0
     if overlap_end - overlap_start > min_overlap_needed:
@@ -73,40 +100,66 @@ def _is_positive_row(query_start, query_end,
         return False
 
 
-def _get_feature_data(query_chrom, query_start, query_end,
-                      thresholds, feature_index_map, get_feature_rows):
+def _get_feature_data(chrom, start, end,
+                      thresholds, feature_index_dict, get_feature_rows):
     """
-    TODO
+    Generates a target vector for the given query region.
 
     Parameters
     ----------
-    query_chrom
-    query_start
-    query_end
-    thresholds
-    feature_index_map
-    get_feature_rows
+     chrom : str
+        The name of the region (e.g. 'chr1', 'chr2', ..., 'chrX',
+        'chrY') to query inside of.
+    start : int
+        The 0-based start coordinate of the region to query.
+    end : int
+        One past the last coordinate of the region to query.
+    thresholds : np.ndarray, dtype=numpy.float32
+        An array of feature thresholds, where the value in position
+        `i` corresponds to the threshold for the feature name that is
+        mapped to index `i` by `feature_index_dict`.
+    feature_index_dict : dict
+        A dictionary mapping feature names (`str`) to indices (`int`),
+        where the index is the position of the feature in `features`.
+    get_feature_rows : types.FunctionType
+        A function that takes coordinates and returns rows
+        (`list(tuple(int, int, str))`).
 
     Returns
     -------
+    numpy.ndarray, dtype=int
+        A target vector where the `i`th position is equal to one if the
+        `i`th feature is positive, and zero otherwise.
 
     """
-    rows = get_feature_rows(query_chrom, query_start, query_end)
+    rows = get_feature_rows(chrom, start, end)
     return _fast_get_feature_data(
-        query_start, query_end, thresholds, feature_index_map, rows)
+        start, end, thresholds, feature_index_dict, rows)
 
 
 def _define_feature_thresholds(feature_thresholds, features):
     """
-    TODO
+    Defines the minimal overlap thresholds for the various features.
 
     Parameters
     ----------
-    feature_thresholds : float|dict|type.FunctionType
-    features
+    feature_thresholds : float or dict or type.FunctionType
+        Either a function that takes a feature name (`str`) and returns
+        a threshold (`float`) or a constant `float` that will be used
+        for all features.
+    features : list(str)
+        A list of feature names.
 
     Returns
     -------
+    feature_thresholds_dict, feature_thresholds_vec : \
+    tuple(dict, numpy.ndarray)
+        A tuple. The first element, `feature_thresholds_dict`, is a
+        dictionary that maps feature names (`str`) to thresholds
+        (`float`). The second element, `feature_thresholds_vec`, is an
+        array of the thresholds (numpy.`float32`) where the `i`th value
+        corresponds to the threshold for the `i`th feature from
+        the `features` input.
 
     """
     feature_thresholds_dict = {}
@@ -140,10 +193,12 @@ class GenomicFeatures(Target):
     Accepts a tabix-indexed `*.bed` file with the following columns,
     in order:
     ::
-        [chrom, start (0-based), end, strand, feature]
+        [chrom, start, end, strand, feature]
 
 
-    Additional columns that follow these 5 will simply be ignored.
+    Note that `chrom` is interchangeable with any sort of region (e.g.
+    a protein in a FAA file). Further, `start` is 0-based. Lastly, any
+    addition columns following the five shown above will be ignored.
 
     Parameters
     ----------
@@ -155,7 +210,7 @@ class GenomicFeatures(Target):
     features : list(str)
         The non-redundant list of genomic features (i.e. labels)
         that will be predicted.
-    feature_thresholds : float|dict|types.FunctionType
+    feature_thresholds : float or dict or types.FunctionType
         A genomic region is determined to be a positive sample if at
         least one genomic feature peak takes up a proportion of the
         region greater than or equal to the threshold specified for
@@ -181,48 +236,60 @@ class GenomicFeatures(Target):
         The data stored in a tabix-indexed `*.bed` file.
     n_features : int
         The number of distinct features.
-    feature_index_map : dict
+    feature_index_dict : dict
         A dictionary mapping feature names (`str`) to indices (`int`),
         where the index is the position of the feature in `features`.
-    index_feature_map : dict
+    index_feature_dict : dict
         A dictionary mapping indices (`int`) to feature names (`str`),
         where the index is the position of the feature in the input
         features.
     feature_thresholds : dict
         A dictionary mapping feature names (`str`) to thresholds
-        (`float`), where the threshold is a
-        # TODO(DOCUMENTATION): FINISH.
+        (`float`), where the threshold is the minimum overlap that a
+        feature annotation must have with a query region to be
+        considered a positive example of that feature.
 
     """
 
     def __init__(self, input_path, features, feature_thresholds):
         """
-        Constructs a new `selene.targets.GenomicFeatures` object.
+        Constructs a new `GenomicFeatures` object.
         """
         self.data = tabix.open(input_path)
 
         self.n_features = len(features)
 
-        self.feature_index_map = dict(
+        self.feature_index_dict = dict(
             [(feat, index) for index, feat in enumerate(features)])
 
-        self.index_feature_map = dict(list(enumerate(features)))
+        self.index_feature_dict = dict(list(enumerate(features)))
 
         self.feature_thresholds, self._feature_thresholds_vec = \
             _define_feature_thresholds(feature_thresholds, features)
 
     def _query_tabix(self, chrom, start, end):
         """
-        TODO
+        Queries a tabix-indexed `*.bed` file for features falling into
+        the specified region.
 
         Parameters
         ----------
-        chrom
-        start
-        end
+        chrom : str
+            The name of the region (e.g. '1', '2', ..., 'X', 'Y') to
+            query in.
+        start : int
+            The 0-based start position of the query coordinates.
+        end : int
+            One past the last position of the query coordinates.
 
         Returns
         -------
+        list(list(str)) or None
+            A list, wherein each sub-list corresponds to a line from the
+            tabix-indexed file, and each value in a sub-list corresponds
+            to a column in that row. If a `tabix.TabixError` is caught,
+            we assume it was because there were no features present in
+            the query region, and return `None`.
 
         """
         try:
@@ -257,11 +324,13 @@ class GenomicFeatures(Target):
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
     def get_feature_data(self, chrom, start, end):
-        """For a sequence of length :math:`L = end - start`, return the
+        """
+        For a sequence of length :math:`L = end - start`, return the
         features' one-hot encoding corresponding to that region. For
         instance, for `n_features`, each position in that sequence will
         have a binary vector specifying whether the genomic feature's
-        coordinates overlap with that position. # TODO(DOCUMENTATION): CLARIFY.
+        coordinates overlap with that position.
+        @TODO: Clarify with an example, as this is hard to read right now.
 
         Parameters
         ----------
@@ -275,12 +344,13 @@ class GenomicFeatures(Target):
         Returns
         -------
         numpy.ndarray
-            A :math:`L \\times N` array, where :math:`L = end - start`
+            :math:`L \\times N` array, where :math:`L = end - start`
             and :math:`N =` `self.n_features`. Note that if we catch a
             `tabix.TabixError`, we assume the error was the result of
             there being no features present in the queried region and
             return a `numpy.ndarray` of zeros.
+
         """
         return _get_feature_data(
             chrom, start, end, self._feature_thresholds_vec,
-            self.feature_index_map, self._query_tabix)
+            self.feature_index_dict, self._query_tabix)

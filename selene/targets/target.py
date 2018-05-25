@@ -1,4 +1,5 @@
-"""This module provides the `Target` base class, which defines the
+"""
+This module provides the `Target` base class, which defines the
 interface for target feature classes. Target feature classes are classes
 which define a way to access a "target feature" such as a label or
 annotation on an input sequence.

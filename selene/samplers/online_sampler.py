@@ -213,7 +213,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         str
             The name of the feature occurring at the specified index.
         """
-        return self.target.index_feature_map[index]
+        return self.target.index_feature_dict[index]
 
     def get_sequence_from_encoding(self, encoding):
         """
