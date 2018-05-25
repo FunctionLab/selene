@@ -160,7 +160,7 @@ class RandomSampler(OnlineSampler):
         window_end = bin_end + self.surrounding_sequence_radius
         retrieved_sequence = \
             self.reference_sequence.get_encoding_from_coords(
-                "chr{0}".format(chrom), window_start, window_end, strand)
+                chrom, window_start, window_end, strand)
         return (retrieved_sequence, retrieved_targets)
 
     def _update_randcache(self):

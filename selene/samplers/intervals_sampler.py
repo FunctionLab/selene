@@ -223,7 +223,7 @@ class IntervalsSampler(OnlineSampler):
             chrom, bin_start, bin_end)
         if not self.sample_negative and np.sum(retrieved_targets) == 0:
             logger.info("No features found in region surrounding "
-                        "chr{0} position {1}. Sampling again.".format(
+                        "region \"{0}\" position {1}. Sampling again.".format(
                             chrom, position))
             return None
 
@@ -232,15 +232,15 @@ class IntervalsSampler(OnlineSampler):
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
-                "chr{0}".format(chrom), window_start, window_end, strand)
+                chrom, window_start, window_end, strand)
         if retrieved_seq.shape[0] == 0:
-            logger.info("Full sequence centered at chr{0} position {1} "
-                        "could not be retrieved. Sampling again.".format(
+            logger.info("Full sequence centered at region \"{0}\" position "
+                        "{1} could not be retrieved. Sampling again.".format(
                             chrom, position))
             return None
         elif np.sum(retrieved_seq) / float(retrieved_seq.shape[0]) < 0.60:
             logger.info("Over 30% of the bases in the sequence centered "
-                        "at chr{0} position {1} are ambiguous ('N'). "
+                        "at region \"{0}\" position {1} are ambiguous ('N'). "
                         "Sampling again.".format(chrom, position))
             return None
 
@@ -248,7 +248,7 @@ class IntervalsSampler(OnlineSampler):
             feature_indices = ';'.join(
                 [str(f) for f in np.nonzero(retrieved_targets)[0]])
             self.save_datasets[self.mode].append(
-                ["chr{0}".format(chrom),
+                [chrom,
                  window_start,
                  window_end,
                  strand,

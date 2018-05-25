@@ -7,7 +7,6 @@ from abc import ABCMeta
 import os
 
 from .sampler import Sampler
-from ..sequences import Genome
 from ..targets import GenomicFeatures
 from ..utils import load_features_list
 
@@ -139,7 +138,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         else:
             self._end_radius = self.bin_radius + 1
 
-        self.reference_sequence = Genome(reference_sequence)
+        self.reference_sequence = reference_sequence
 
         self._features = features
         self.n_features = len(self._features)
