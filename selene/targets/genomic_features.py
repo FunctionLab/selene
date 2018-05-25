@@ -20,6 +20,20 @@ from ._genomic_features import _fast_get_feature_data
 
 
 def _any_positive_rows(rows, query_start, query_end, thresholds):
+    """
+    TODO
+
+    Parameters
+    ----------
+    rows
+    query_start
+    query_end
+    thresholds
+
+    Returns
+    -------
+
+    """
     if rows is None:
         return False
     for row in rows:  # features within [start, end)
@@ -32,6 +46,21 @@ def _any_positive_rows(rows, query_start, query_end, thresholds):
 
 def _is_positive_row(query_start, query_end,
                      feat_start, feat_end, threshold):
+    """
+    TODO
+
+    Parameters
+    ----------
+    query_start
+    query_end
+    feat_start
+    feat_end
+    threshold
+
+    Returns
+    -------
+
+    """
     overlap_start = max(feat_start, query_start)
     overlap_end = min(feat_end, query_end)
     min_overlap_needed = int(
@@ -46,12 +75,40 @@ def _is_positive_row(query_start, query_end,
 
 def _get_feature_data(query_chrom, query_start, query_end,
                       thresholds, feature_index_map, get_feature_rows):
+    """
+    TODO
+
+    Parameters
+    ----------
+    query_chrom
+    query_start
+    query_end
+    thresholds
+    feature_index_map
+    get_feature_rows
+
+    Returns
+    -------
+
+    """
     rows = get_feature_rows(query_chrom, query_start, query_end)
     return _fast_get_feature_data(
         query_start, query_end, thresholds, feature_index_map, rows)
 
 
 def _define_feature_thresholds(feature_thresholds, features):
+    """
+    TODO
+
+    Parameters
+    ----------
+    feature_thresholds : float|dict|type.FunctionType
+    features
+
+    Returns
+    -------
+
+    """
     feature_thresholds_dict = {}
     feature_thresholds_vec = np.zeros(len(features))
     if isinstance(feature_thresholds, float):
@@ -77,7 +134,6 @@ def _define_feature_thresholds(feature_thresholds, features):
     return feature_thresholds_dict, feature_thresholds_vec
 
 
-# TODO: Can this be used for Proteome? It seems like it could be.
 class GenomicFeatures(Target):
     """
     Stores the dataset specifying sequence regions and features.
@@ -88,24 +144,6 @@ class GenomicFeatures(Target):
 
 
     Additional columns that follow these 5 will simply be ignored.
-
-    Attributes
-    ----------
-    data : tabix.open
-        The data stored in a tabix-indexed `*.bed` file.
-    n_features : int
-        The number of distinct features.
-    feature_index_map : dict
-        A dictionary mapping feature names (`str`) to indices (`int`),
-        where the index is the position of the feature in `features`.
-    index_feature_map : dict
-        A dictionary mapping indices (`int`) to feature names (`str`),
-        where the index is the position of the feature in the input
-        features.
-    feature_thresholds : dict
-        A dictionary mapping feature names (`str`) to thresholds
-        (`float`), where the threshold is a
-        # TODO(DOCUMENTATION): FINISH.
 
     Parameters
     ----------
@@ -137,6 +175,24 @@ class GenomicFeatures(Target):
                                  input the feature name and returns\
                                  the feature's threshold.
 
+    Attributes
+    ----------
+    data : tabix.open
+        The data stored in a tabix-indexed `*.bed` file.
+    n_features : int
+        The number of distinct features.
+    feature_index_map : dict
+        A dictionary mapping feature names (`str`) to indices (`int`),
+        where the index is the position of the feature in `features`.
+    index_feature_map : dict
+        A dictionary mapping indices (`int`) to feature names (`str`),
+        where the index is the position of the feature in the input
+        features.
+    feature_thresholds : dict
+        A dictionary mapping feature names (`str`) to thresholds
+        (`float`), where the threshold is a
+        # TODO(DOCUMENTATION): FINISH.
+
     """
 
     def __init__(self, input_path, features, feature_thresholds):
@@ -156,6 +212,19 @@ class GenomicFeatures(Target):
             _define_feature_thresholds(feature_thresholds, features)
 
     def _query_tabix(self, chrom, start, end):
+        """
+        TODO
+
+        Parameters
+        ----------
+        chrom
+        start
+        end
+
+        Returns
+        -------
+
+        """
         try:
             return self.data.query(chrom, start, end)
         except tabix.TabixError:

@@ -1,4 +1,5 @@
-"""This module provides the `ISMResult` class, which stores results for
+"""
+This module provides the `ISMResult` class, which stores results for
 an *in silico* mutagenesis experiment.
 
 """
@@ -120,7 +121,7 @@ class ISMResult(object):
         feature : str
             The name of the feature to extract as a matrix.
 
-        reference_mask : float, optional
+        reference_mask : float or None, optional
             Default is `None`. A value to mask the reference entries
             with. If left as `None`, then no masking will be performed
             on the reference positions.

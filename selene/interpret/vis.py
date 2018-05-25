@@ -1,4 +1,5 @@
-"""This module provides the methods for visualizing different ouputs
+"""
+This module provides the methods for visualizing different ouputs
 from selene analysis methods.
 
 """
@@ -153,14 +154,14 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
         A value of 1 will mean that there is no gap between each the
         characters at each position. A value of 0 will not draw any
         characters.
-    ax : matplotlib.pyplot.Axes, optional
+    ax : matplotlib.pyplot.Axes or None, optional
         Default is `None`. The axes to plot on. If left as `None`, a new
         axis will be created.
     sequence_type : class, optional
         Default is `selene.sequences.Genome`. The type of sequence that
         the *in silico* mutagenesis results are associated with. This
         should generally be a subclass of `selene.sequences.Sequence`.
-    font_properties : matplotlib.font_manager.FontProperties, optional
+    font_properties : matplotlib.font_manager.FontProperties or None, optional
         Default is `None`. A `matplotlib.font_manager.FontProperties`
         object that specifies the properties of the font to use for
         plotting the motif. If `None`, no font will be used, and the
@@ -170,7 +171,7 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
         the tops and bottoms of characters at each position in the
         sequence logo. If the user opts to use a value other
         than `None`, then no such guarantee can be made.
-    color_scheme : list(str), optional
+    color_scheme : list(str) or None, optional
         Default is `None`. A list containing the hex codes or names of
         colors to use, appearing in the order of the bases of the
         sequence type. If left as `None`, a default palette will be made
@@ -197,7 +198,7 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
     We have included an example of the output from a`sequence_logo`
     plot below:
 
-    .. image:: ../../docs/source/_static/images/sequence_logo_example.png
+    .. image:: ../../docs/source/_static/img/sequence_logo_example.png
 
     """
     # Note that everything will break if we do not deepcopy.
@@ -412,7 +413,7 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
         An :math:`L \\times N` array (where :math:`L` is the length of
         the sequence, and :math:`N` is the size of the alphabet)
         containing the scores for each base change at each position.
-    mask : numpy.ndarray, dtype=bool, optional
+    mask : numpy.ndarray, dtype=bool or None, optional
         Default is `None`. An :math:`L \\times N` array (where :math:`L`
         is the length of the sequence, and :math:`N` is the size of the
         alphabet)  containing `True` at positions in the heatmap to

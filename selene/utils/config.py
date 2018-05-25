@@ -1,5 +1,5 @@
 """Classes and methods for loading configurations from YAML files.
-Taken (with minor changes) from: `Pylearn2`_.
+Taken (with minor changes) from `Pylearn2`_.
 
 
 .. _Pylearn2: \
@@ -47,7 +47,7 @@ class _Proxy(_BaseProxy):
     This particular class mainly exists to  override `_BaseProxy`'s
     `__hash__` (to avoid hashing unhashable namedtuple elements).
 
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -95,7 +95,7 @@ def _do_not_recurse(value):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -123,7 +123,7 @@ def _instantiate_proxy_tuple(proxy, bindings=None):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -174,7 +174,7 @@ def _preprocess(string, environ=None):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -227,7 +227,7 @@ def instantiate(proxy, bindings=None):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -279,7 +279,7 @@ def load(stream, environ=None, instantiate=True, **kwargs):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -328,7 +328,7 @@ def load_path(path, environ=None, instantiate=True, **kwargs):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -418,7 +418,7 @@ def _initialize():
     """
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -439,7 +439,7 @@ def _multi_constructor_obj(loader, tag_suffix, node):
     """
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -459,7 +459,7 @@ def _multi_constructor_obj(loader, tag_suffix, node):
                     str(key)
                 ))
     if '.' not in tag_suffix:
-        # TODO: I'm not sure how this was ever working without eval().
+        # I'm not sure how this was ever working without eval().
         callable = eval(tag_suffix)
     else:
         callable = _try_to_import(tag_suffix)
@@ -473,7 +473,7 @@ def _multi_constructor_import(loader, tag_suffix, node):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -489,7 +489,7 @@ def _constructor_import(loader, node):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from`Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -506,7 +506,7 @@ def _constructor_float(loader, node):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
@@ -523,7 +523,7 @@ def _construct_mapping(node, deep=False):
 
     Notes
     -----
-    Taken (with minor changes) from: `Pylearn2`_.
+    Taken (with minor changes) from `Pylearn2`_.
 
     .. _Pylearn2: \
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py

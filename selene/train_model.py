@@ -301,8 +301,8 @@ class TrainModel(object):
         average_loss, all_predictions = self._evaluate_on_data(
             self._validation_data)
 
-        average_scores = self._validation_metrics.update(
-            self._all_validation_targets, all_predictions)
+        average_scores = self._validation_metrics.update(all_predictions,
+                                                         self._all_validation_targets)
 
         for name, score in average_scores.items():
             logger.debug("[STATS] average {0}: {1}".format(name, score))
@@ -315,8 +315,8 @@ class TrainModel(object):
         average_loss, all_predictions = self._evaluate_on_data(
             self._test_data)
 
-        average_scores = self._test_metrics.update(
-            self._all_test_targets, all_predictions)
+        average_scores = self._test_metrics.update(all_predictions,
+                                                   self._all_test_targets)
 
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),

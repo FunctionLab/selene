@@ -1,4 +1,4 @@
-selene.utils package
+selene.utils
 ====================
 
 .. automodule:: selene.utils
@@ -9,6 +9,7 @@ PerformanceMetrics
 --------------------
 .. autoclass:: PerformanceMetrics
     :members:
+    :show-inheritance:
 
 initialize_logger
 -------------------

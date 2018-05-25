@@ -1,4 +1,4 @@
-selene.sequences package
+selene.sequences
 ========================
 
 .. automodule:: selene.sequences
@@ -9,16 +9,19 @@ Sequence
 -------------------------
 .. autoclass:: Sequence
     :members:
+    :show-inheritance:
 
 Genome
 -------------------------
 .. autoclass:: Genome
     :members:
+    :show-inheritance:
 
 Proteome
 -------------------------
 .. autoclass:: Proteome
     :members:
+    :show-inheritance:
 
 sequence_to_encoding
 -------------------------

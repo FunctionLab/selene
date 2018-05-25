@@ -1,7 +1,7 @@
 .. role:: hidden
     :class: hidden-section
 
-selene.interpret package
+selene.interpret
 ========================
 .. automodule:: selene.interpret
 .. currentmodule:: selene.interpret
@@ -20,6 +20,7 @@ ISMResult
 ------------------------
 .. autoclass:: ISMResult
     :members:
+    :show-inheritance:
 
 rescale_score_matrix
 ------------------------

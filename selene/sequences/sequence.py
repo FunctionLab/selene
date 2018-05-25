@@ -1,4 +1,5 @@
-"""This module provides the `Sequence` class. This class is the abstract
+"""
+This module provides the `Sequence` class. This class is the abstract
 base class for biological sequence collections (e.g. genomes).
 
 """

@@ -1,6 +1,7 @@
 """
-This module provides the `OnlineSampler` class, which defines a
-sampler that loads examples "on the fly".
+This module provides the `OnlineSampler` class and supporting methods.
+Objects of the class `OnlineSampler`, are samplers which load examples
+"on the fly" rather than storing them all persistently in memory.
 
 """
 from abc import ABCMeta
@@ -17,49 +18,24 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     model. This form of sampling may alleviate the problem of loading an
     extremely large dataset into memory when developing a new model.
 
-    Attributes
-    ----------
-    reference_sequence : selene.sequences.Sequence
-        The reference sequence that examples are created from.
-    target : selene.targets.Target
-        The `selene.targets.Target` object holding the features that we
-        would like to predict.
-    validation_holdout : list(str)|list(float)
-        # TODO
-    test_holdout : list(str)|list(float)
-        # TODO
-    sequence_length : int
-        # TODO
-    surrounding_sequence_radius : int
-        # TODO
-    bin_radius : int
-        #TODO
-    modes : list(str)
-        The list of modes that the sampler can be run in.
-    mode : str
-        The current mode that the sampler is running in. Must be one of
-        the modes listed in `modes`.
-    save_datasets : list(str)
-        #TODO
-
     Parameters
     ----------
     reference_sequence : selene.sequences.Sequence
         A reference sequence from which to create examples.
     target_path : str
-        Path to tabix-indexed, compressed BED file (*.bed.gz) of genomic
+        Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
         coordinates mapped to the genomic features we want to predict.
     features : list(str)
         List of distinct features that we aim to predict.
     seed : int, optional
         Default is 436. Sets the random seed for sampling.
-    validation_holdout : list(str)|list(float), optional
+    validation_holdout : list(str) or float, optional
         Default is `['chr6', 'chr7']`. Holdout can be regional or
         proportional. If regional, expects a list (e.g. `['X', 'Y']`).
         Regions must match those specified in the first column of the
         tabix-indexed BED file. If proportional, specify a percentage
         between (0.0, 1.0). Typically 0.10 or 0.20.
-    test_holdout : list(str)|list(float), optional
+    test_holdout : list(str) or float, optional
         Default is `['chr8', 'chr9']`. See documentation for
         `validation_holdout` for additional information.
     sequence_length : int, optional
@@ -70,14 +46,64 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         Default is 201. Query the tabix-indexed file for a region of
         length `center_bin_to_predict`.
     feature_thresholds : float [0.0, 1.0], optional
-        Default is 0.5. # TODO(DOCUMENTATION): Finish.
+        Default is 0.5. The `feature_threshold` to pass to the
+        `GenomicFeatures` object.
     mode : {'train', 'validate', 'test'}
         Default is `'train'`. The mode to run the sampler in.
     save_datasets : list(str)
-        Default is `["test"]`. # TODO(DOCUMENTATION): Finish.
+        Default is `["test"]`. The list of modes for which we should
+        save the sampled data to file.
+
+    Attributes
+    ----------
+    reference_sequence : selene.sequences.Sequence
+        The reference sequence that examples are created from.
+    target : selene.targets.Target
+        The `selene.targets.Target` object holding the features that we
+        would like to predict.
+    validation_holdout : list(str) or float
+        The samples to hold out for validating model performance. These
+        can be "regional" or "proportional". If regional, this is a list
+        of region names (e.g. `['chrX', 'chrY']`). These Regions must
+        match those specified in the first column of the tabix-indexed
+        BED file. If proportional, this is the fraction of total samples
+        that will be held out.
+    test_holdout : list(str) or float
+        The samples to hold out for testing model performance. See the
+        documentation for `validation_holdout` for more details.
+    sequence_length : int
+        The length of the sequences to  train the model on.
+    bin_radius : int
+        From the center of the sequence, the radius in which to detect
+        a feature annotation in order to include it as a sample's label.
+    surrounding_sequence_radius : int
+        The length of sequence falling outside of the feature detection
+        bin (i.e. `bin_radius`) center, but still within the
+        `sequence_length`.
+    modes : list(str)
+        The list of modes that the sampler can be run in.
+    mode : str
+        The current mode that the sampler is running in. Must be one of
+        the modes listed in `modes`.
+    save_datasets : list(str)
+        A list of modes for which we should write the sampled data to a
+        file.
+
+    Raises
+    ------
+    ValueError
+            If `mode` is not a valid mode.
+    ValueError
+        If the parities of `sequence_length` and `center_bin_to_predict`
+        are not the same.
+    ValueError
+        If `sequence_length` is smaller than `center_bin_to_predict` is.
+    ValueError
+        If the types of `validation_holdout` and `test_holdout` are not
+        the same.
 
     """
-
+    # @TODO: Is there a compelling reason why STRAND_SIDES should be here?
     STRAND_SIDES = ('+', '-')
     """
     Defines the strands that features can be sampled from.
@@ -172,22 +198,22 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         for mode in save_datasets:
             self.save_datasets[mode] = []
 
-    def get_feature_from_index(self, feature_index):
+    def get_feature_from_index(self, index):
         """
         Returns the feature corresponding to an index in the feature
         vector.
 
         Parameters
         ----------
-        feature_index : int
+        index : int
             The index of the feature to retrieve the name for.
 
         Returns
         -------
         str
-            The name of the feature occuring at the specified inex.
+            The name of the feature occurring at the specified index.
         """
-        return self.target.index_feature_map[feature_index]
+        return self.target.index_feature_map[index]
 
     def get_sequence_from_encoding(self, encoding):
         """
@@ -209,19 +235,24 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         return self.reference_sequence.encoding_to_sequence(encoding)
 
+    # @TODO: Enable saving of training data coordinates intermittently.
     def save_datasets_to_file(self, output_dir):
         """
-        This likely only works for validation and test right now.
-        Training data may be too big to store in a list in memory, so
-        it is a @TODO to be able to save training data coordinates
-        intermittently.
-
-        Save samples for each partition (train/validate/tests) to file.
+        Save samples for each partition (i.e. train/validate/test) to
+        disk.
 
         Parameters
         ----------
         output_dir : str
-            Path to the output directory to which we should save the datasets.
+            Path to the output directory where we should save each of
+            the datasets.
+
+        Notes
+        -----
+        This likely only works for validation and test right now.
+        Training data may be too big to store in a list in memory, and
+        cannot yet be written to file intermittently.
+
         """
         for mode, samples in self.save_datasets.items():
             filepath = os.path.join(output_dir, "{0}_data.bed".format(mode))

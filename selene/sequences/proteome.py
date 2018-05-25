@@ -1,4 +1,5 @@
-"""This module provides the `Proteome` clasee. This class wraps the
+"""
+This module provides the `Proteome` clasee. This class wraps the
 indexed FASTA file for an organism's proteomic sequence. It supports
 retrieving parts of the sequence and converting these parts into their
 one-hot encodings.
@@ -49,6 +50,14 @@ class Proteome(Sequence):
     parts into their one-hot encodings. It is essentially a wrapper
     class around the `pyfaidx.Fasta` class.
 
+    Parameters
+    ----------
+    input_path : str
+        Path to an indexed FASTA file containing amino acid
+        sequences, that is, a `*.fasta` file with a corresponding
+        `*.fai` file in the same directory. File should contain the
+        sequences from which training examples will be created.
+
     Attributes
     ----------
     proteome : pyfaidx.Fasta
@@ -59,13 +68,6 @@ class Proteome(Sequence):
         A dictionary that maps protein names to the lengths, and does so
         for all protein sequences in the proteome.
 
-    Parameters
-    ----------
-    input_path : str
-        Path to an indexed FASTA file containing amino acid
-        sequences, that is, a `*.fasta` file with a corresponding
-        `*.fai` file in the same directory. File should contain the
-        sequences from which training examples will be created.
 
     """
 

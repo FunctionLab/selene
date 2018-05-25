@@ -1,6 +1,6 @@
 # SELENE
 
-![logo](docs/source/_static/images/logo.png)
+![logo](docs/source/_static/img/selene_logo.png)
 
 ---
 

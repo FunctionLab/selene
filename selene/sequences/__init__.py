@@ -1,5 +1,5 @@
-"""This module provides the types for representing biological sequences.
-
+"""
+This module provides the types for representing biological sequences.
 """
 from .sequence import Sequence
 from .sequence import sequence_to_encoding

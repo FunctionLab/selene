@@ -1,4 +1,5 @@
-"""This module provides utility functions that are not tied to specific
+"""
+This module provides utility functions that are not tied to specific
 classes or concepts, but still perform specific and important roles
 across many of the packages modules.
 
@@ -50,7 +51,6 @@ def load_features_list(input_path):
 def initialize_logger(output_path, verbosity=2):
     """
     Initializes the logger for Selene.
-
     This function can only be called successfully once.
     If the logger has already been initialized with handlers,
     the function exits. Otherwise, it proceeds to set the

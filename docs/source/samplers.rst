@@ -1,4 +1,4 @@
-selene.samplers package
+selene.samplers
 =======================
 
 .. automodule:: selene.samplers
@@ -10,18 +10,21 @@ Sampler
 
 .. autoclass:: Sampler
     :members:
+    :show-inheritance:
 
 OnlineSampler
 ----------------------------
 
 .. autoclass:: OnlineSampler
     :members:
+    :show-inheritance:
 
 IntervalsSampler
 ----------------------------
 
 .. autoclass:: IntervalsSampler
     :members:
+    :show-inheritance:
 
 
 

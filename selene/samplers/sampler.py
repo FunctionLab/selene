@@ -20,9 +20,8 @@ class Sampler(metaclass=ABCMeta):
     ----------
     modes : list(str)
         A list of the names of the modes that the object may operate in.
-    mode : str, optional
-        Default is `None`. The current mode that the object is operating
-        in.
+    mode : str or None
+        Default is `None`. The current mode that the object is operating in.
 
     Parameters
     ----------
@@ -43,7 +42,7 @@ class Sampler(metaclass=ABCMeta):
         self.modes = list(self.BASE_MODES)
         self.mode = None
         np.random.seed(seed)
-        random.seed(seed + 1)  # TODO: Create torch and non-torch seed method.
+        random.seed(seed + 1)
 
     def set_mode(self, mode):
         """
@@ -95,7 +94,7 @@ class Sampler(metaclass=ABCMeta):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int
-            The total number of examples to retrieve.
+            The total number of samples to retrieve.
 
         """
         raise NotImplementedError()
@@ -110,7 +109,7 @@ class Sampler(metaclass=ABCMeta):
         ----------
         batch_size : int
             The size of the batches to divide the data into.
-        n_samples : int, optional
+        n_samples : int or None, optional
             Default is `None`. The total number of validation examples
             to retrieve. If `None`, it will retrieve all validation
             data.

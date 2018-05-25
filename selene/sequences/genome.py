@@ -1,4 +1,5 @@
-"""This module provides the `Genome` class. This class wraps the indexed
+"""
+This module provides the `Genome` class. This class wraps the indexed
 FASTA file for an organism's genomic sequence. It supports retrieving
 parts of the sequence and converting these parts into their one-hot
 encodings.
@@ -63,6 +64,14 @@ class Genome(Sequence):
     these parts into their one-hot encodings. It is essentially a
     wrapper class around the `pyfaidx.Fasta` class.
 
+    Parameters
+    ----------
+    input_path : str
+        Path to an indexed FASTA file, that is, a `*.fasta` file with
+        a corresponding `*.fai` file in the same directory. This file
+        should contain the target organism's genome sequence.
+
+
     Attributes
     ----------
     genome : pyfaidx.Fasta
@@ -72,13 +81,6 @@ class Genome(Sequence):
     len_chrs : dict
         A dictionary mapping the names of each chromosome in the file to
         the length of said chromosome.
-
-    Parameters
-    ----------
-    input_path : str
-        Path to an indexed FASTA file, that is, a `*.fasta` file with
-        a corresponding `*.fai` file in the same directory. This file
-        should contain the target organism's genome sequence.
 
     """
 

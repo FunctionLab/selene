@@ -1,4 +1,4 @@
-selene.predict package
+selene.predict
 ======================
 
 .. automodule:: selene.predict
@@ -9,6 +9,7 @@ AnalyzeSequences
 ----------------------
 .. autoclass:: AnalyzeSequences
     :members:
+    :show-inheritance:
 
 Subpackages
 -----------
