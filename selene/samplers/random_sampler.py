@@ -32,9 +32,9 @@ def _get_indices_and_probabilities(interval_lengths, indices):
 class RandomSampler(OnlineSampler):
 
     def __init__(self,
-                 genome,
-                 query_feature_data,
-                 distinct_features,
+                 reference_sequence,
+                 target_path,
+                 features,
                  seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
@@ -43,9 +43,9 @@ class RandomSampler(OnlineSampler):
                  feature_thresholds=0.5,
                  mode="train"):
         super(RandomSampler, self).__init__(
-            genome,
-            query_feature_data,
-            distinct_features,
+            reference_sequence,
+            target_path,
+            features,
             seed=seed,
             validation_holdout=validation_holdout,
             test_holdout=test_holdout,
@@ -151,7 +151,7 @@ class RandomSampler(OnlineSampler):
     def _retrieve(self, chrom, position, strand):
         bin_start = position - self.bin_radius
         bin_end = position + self.bin_radius + 1
-        retrieved_targets = self.query_feature_data.get_feature_data(
+        retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
         if np.sum(retrieved_targets) == 0:
             return None

@@ -73,6 +73,13 @@ class Genome(Sequence):
         A dictionary mapping the names of each chromosome in the file to
         the length of said chromosome.
 
+    Parameters
+    ----------
+    input_path : str
+        Path to an indexed FASTA file, that is, a `*.fasta` file with
+        a corresponding `*.fai` file in the same directory. This file
+        should contain the target organism's genome sequence.
+
     """
 
     BASES_ARR = np.array(['A', 'C', 'G', 'T'])
@@ -120,15 +127,8 @@ class Genome(Sequence):
     """
 
     def __init__(self, input_path):
-        """Constructs a `Genome` object.
-
-        Parameters
-        ----------
-        input_path : str
-            Path to an indexed FASTA file, that is, a `*.fasta` file with
-            a corresponding `*.fai` file in the same directory. This file
-            should contain the target organism's genome sequence.
-
+        """
+        Constructs a `Genome` object.
         """
         self.genome = pyfaidx.Fasta(input_path)
         self.chrs = sorted(self.genome.keys())

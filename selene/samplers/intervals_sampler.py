@@ -53,45 +53,67 @@ class IntervalsSampler(OnlineSampler):
     Attributes
     ----------
 
+    Parameters
+    ----------
+    reference_sequence : selene.sequences.Sequence
+        A reference sequence from which to create examples.
+    target_path : str
+        Path to tabix-indexed, compressed BED file (*.bed.gz) of genomic
+        coordinates mapped to the genomic features we want to predict.
+    features : list(str)
+        List of distinct features that we aim to predict.
+    intervals_path : str
+        # TODO
+    sample_negative : bool, optional
+        # TODO
+    seed : int, optional
+        Default is 436. Sets the random seed for sampling.
+    validation_holdout : list(str)|list(float), optional
+        Default is `['chr6', 'chr7']`. Holdout can be regional or
+        proportional. If regional, expects a list (e.g. `['X', 'Y']`).
+        Regions must match those specified in the first column of the
+        tabix-indexed BED file. If proportional, specify a percentage
+        between (0.0, 1.0). Typically 0.10 or 0.20.
+    test_holdout : list(str)|list(float), optional
+        Default is `['chr8', 'chr9']`. See documentation for
+        `validation_holdout` for additional information.
+    sequence_length : int, optional
+        Default is 1001. Model is trained on sequences of `sequence_length`
+        where genomic features are annotated to the center regions of
+        these sequences.
+    center_bin_to_predict : int, optional
+        Default is 201. Query the tabix-indexed file for a region of
+        length `center_bin_to_predict`.
+    feature_thresholds : float [0.0, 1.0], optional
+        # TODO(DOCUMENTATION): Finish.
+    mode : {'train', 'validate', 'test'}
+        Default is `'train'`. The mode to run the sampler in.
+    save_datasets : list of str
+        Default is `["test"]`. # TODO(DOCUMENTATION): Finish.
     """
 
 
     def __init__(self,
-                 genome,
-                 query_feature_data,
-                 distinct_features,
-                 intervals_file,
+                 reference_sequence,
+                 target_path,
+                 features,
+                 intervals_path,
                  sample_negative=False,
                  seed=436,
-                 validation_holdout=['6', '7'],
-                 test_holdout=['8', '9'],
+                 validation_holdout=['chr6', 'chr7'],
+                 test_holdout=['chr8', 'chr9'],
                  sequence_length=1001,
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train",
                  save_datasets=["test"]):
         """
-
-        Parameters
-        ----------
-        genome
-        query_feature_data
-        distinct_features
-        intervals_file
-        sample_negative
-        seed
-        validation_holdout
-        test_holdout
-        sequence_length
-        center_bin_to_predict
-        feature_thresholds
-        mode
-        save_datasets
+        Constructs a new `IntervalsSampler` object.
         """
         super(IntervalsSampler, self).__init__(
-            genome,
-            query_feature_data,
-            distinct_features,
+            reference_sequence,
+            target_path,
+            features,
             seed=seed,
             validation_holdout=validation_holdout,
             test_holdout=test_holdout,
@@ -111,9 +133,9 @@ class IntervalsSampler(OnlineSampler):
         self.interval_lengths = []
 
         if self._holdout_type == "chromosome":
-            self._partition_dataset_chromosome(intervals_file)
+            self._partition_dataset_chromosome(intervals_path)
         else:
-            self._partition_dataset_proportion(intervals_file)
+            self._partition_dataset_proportion(intervals_path)
 
         for mode in self.modes:
             self._update_randcache(mode=mode)
@@ -197,7 +219,7 @@ class IntervalsSampler(OnlineSampler):
     def _retrieve(self, chrom, position):
         bin_start = position - self._start_radius
         bin_end = position + self._end_radius
-        retrieved_targets = self.query_feature_data.get_feature_data(
+        retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
         if not self.sample_negative and np.sum(retrieved_targets) == 0:
             logger.info("No features found in region surrounding "

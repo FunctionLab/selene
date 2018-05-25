@@ -21,7 +21,8 @@ import importlib.util
 from docopt import docopt
 import torch
 
-from selene.utils import load_path, instantiate
+from selene.utils import load_path
+from selene.utils import instantiate
 
 
 def initialize_model(model_configs, train=True, lr=None):

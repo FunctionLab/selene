@@ -108,8 +108,8 @@ class Proteome(Sequence):
     """
 
     def __init__(self, input_path):
-        """Constructs a `Proteome` object.
-
+        """
+        Constructs a `Proteome` object.
         """
         self.proteome = pyfaidx.Fasta(input_path)
         self.prots = sorted(self.proteome.keys())

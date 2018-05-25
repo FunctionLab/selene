@@ -1,4 +1,5 @@
-"""This module provides the `OnlineSampler` class, which defines a
+"""
+This module provides the `OnlineSampler` class, which defines a
 sampler that loads examples "on the fly".
 
 """
@@ -12,64 +13,71 @@ from ..utils import load_features_list
 
 
 class OnlineSampler(Sampler, metaclass=ABCMeta):
-    """A sampler in which training/validation/test data is constructed
+    """
+    A sampler in which training/validation/test data is constructed
     from random sampling of the dataset for each batch passed to the
     model. This form of sampling may alleviate the problem of loading an
     extremely large dataset into memory when developing a new model.
 
     Attributes
     ----------
-    # TODO(DOCUMENTATION): Define the attributes.
+    # TODO(DOCUMENTATION): Define all 1 million attributes.
+
+    Parameters
+    ----------
+    reference_sequence : selene.sequences.Sequence
+        A reference sequence from which to create examples.
+    target_path : str
+        Path to tabix-indexed, compressed BED file (*.bed.gz) of genomic
+        coordinates mapped to the genomic features we want to predict.
+    features : list(str)
+        List of distinct features that we aim to predict.
+    seed : int, optional
+        Default is 436. Sets the random seed for sampling.
+    validation_holdout : list(str)|list(float), optional
+        Default is `['chr6', 'chr7']`. Holdout can be regional or
+        proportional. If regional, expects a list (e.g. `['X', 'Y']`).
+        Regions must match those specified in the first column of the
+        tabix-indexed BED file. If proportional, specify a percentage
+        between (0.0, 1.0). Typically 0.10 or 0.20.
+    test_holdout : list(str)|list(float), optional
+        Default is `['chr8', 'chr9']`. See documentation for
+        `validation_holdout` for additional information.
+    sequence_length : int, optional
+        Default is 1001. Model is trained on sequences of `sequence_length`
+        where genomic features are annotated to the center regions of
+        these sequences.
+    center_bin_to_predict : int, optional
+        Default is 201. Query the tabix-indexed file for a region of
+        length `center_bin_to_predict`.
+    feature_thresholds : float [0.0, 1.0], optional
+        # TODO(DOCUMENTATION): Finish.
+    mode : {'train', 'validate', 'test'}
+        Default is `'train'`. The mode to run the sampler in.
+    save_datasets : list of str
+        Default is `["test"]`. # TODO(DOCUMENTATION): Finish.
+
     """
+
     STRAND_SIDES = ('+', '-')
+    """
+    Defines the strands that features can be sampled from.
+    """
 
     def __init__(self,
-                 genome,
-                 query_feature_data,
-                 distinct_features,
+                 reference_sequence,
+                 target_path,
+                 features,
                  seed=436,
-                 validation_holdout=['6', '7'],
-                 test_holdout=['8', '9'],
-                 sequence_length=1000,
-                 center_bin_to_predict=200,
+                 validation_holdout=['chr6', 'chr7'],
+                 test_holdout=['chr8', 'chr9'],
+                 sequence_length=1001,
+                 center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train",
                  save_datasets=["test"]):
-        """@TODO: This is specific to Genome/GenomicFeatures. Is there a way
-        to make this idea more general in the future?
-
-        Parameters
-        ----------
-        genome : str
-            Path to indexed FASTA file
-        query_feature_data : str
-            Path to tabix-indexed, compressed BED file (*.bed.gz) of genomic
-            coordinates mapped to the genomic features we want to predict.
-        distinct_features : str
-            Path to the distinct list of genomic features we want to predict.
-        seed : int, optional
-            Default is 436. Set the random seed for sampling.
-        validation_holdout : list of str or float, optional
-            Default is ['6', '7']. Holdout can be chromosomal or proportional.
-            If chromosomal, expects a list (e.g. ['X', 'Y']). Chromosomes
-            must match those specified in the first column of the
-            tabix-indexed BED file. If proportional, specify a percentage
-            between (0.0, 1.0). Typically 0.10 or 0.20.
-        test_holdout : list of str or float, optional
-            Default is ['8', '9']. See documentation for `validation_holdout`.
-        sequence_length : int, optional
-            Default is 1000. Model is trained on sequences of `sequence_length`
-            where genomic features are annotated to the center regions of
-            these sequences.
-        center_bin_to_predict : int, optional
-            Default is 200. Query the tabix-indexed file for a region of
-            length `center_bin_to_predict`.
-        feature_thresholds : float [0.0, 1.0], optional
-            # TODO(DOCUMENTATION): Finish.
-        mode : {"train", "validate", "test"}
-            # TODO(DOCUMENTATION): Finish.
-        save_datasets : list of str
-            Default is ["test"].
+        """
+        Creates a new `OnlineSampler` object.
         """
         super(OnlineSampler, self).__init__(seed=seed)
 
@@ -80,8 +88,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                 "even.".format(
                     sequence_length, center_bin_to_predict))
 
-        surrounding_sequence_length = \
-            sequence_length - center_bin_to_predict
+        surrounding_sequence_length = sequence_length - center_bin_to_predict
         if surrounding_sequence_length < 0:
             raise ValueError(
                 "Sequence length of {0} is less than the center bin "
@@ -132,13 +139,13 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         else:
             self._end_radius = self.bin_radius + 1
 
-        self.genome = Genome(genome)
+        self.genome = Genome(reference_sequence)
 
-        self._features = load_features_list(distinct_features)
+        self._features = features
         self.n_features = len(self._features)
 
-        self.query_feature_data = GenomicFeatures(
-            query_feature_data, self._features,
+        self.target = GenomicFeatures(
+            target_path, self._features,
             feature_thresholds=feature_thresholds)
 
         self.save_datasets = {}
@@ -146,36 +153,45 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             self.save_datasets[mode] = []
 
     def get_feature_from_index(self, feature_index):
-        """Returns the feature corresponding to an index in the feature
+        """
+        Returns the feature corresponding to an index in the feature
         vector.
 
         Parameters
         ----------
         feature_index : int
+            The index of the feature to retrieve the name for.
 
         Returns
         -------
         str
+            The name of the feature occuring at the specified inex.
         """
-        return self.query_feature_data.index_feature_map[feature_index]
+        return self.target.index_feature_map[feature_index]
 
     def get_sequence_from_encoding(self, encoding):
-        """Gets the string sequence from the one-hot encoding
+        """
+        Gets the string sequence from the one-hot encoding
         of the sequence.
 
         Parameters
         ----------
         encoding : numpy.ndarray
-            The one-hot encoding of the sequence
+            An :math:`L \\times N` array (where :math:`L` is the length
+            of the sequence and :math:`N` is the size of the sequence
+            type's alphabet) containing the one-hot encoding of the
+            sequence.
 
         Returns
         -------
         str
+            The sequence of :math:`L` characters decoded from the input.
         """
         return self.genome.encoding_to_sequence(encoding)
 
     def save_datasets_to_file(self, output_dir):
-        """This likely only works for validation and test right now.
+        """
+        This likely only works for validation and test right now.
         Training data may be too big to store in a list in memory, so
         it is a @TODO to be able to save training data coordinates
         intermittently.
