@@ -32,7 +32,7 @@ def sequence_to_encoding(sequence, base_to_index, bases_arr):
 
     Returns
     -------
-    np.ndarray, dtype=numpy.float32
+    numpy.ndarray, dtype=numpy.float32
         The :math:`L \\times N` encoding of the sequence, where
         :math:`L` is the length of the input sequence and :math:`N` is
         the size of the sequence alphabet.
@@ -56,7 +56,7 @@ def encoding_to_sequence(encoding, bases_arr, unk_base):
 
     Parameters
     ----------
-    encoding : np.ndarray, dtype=numpy.float32
+    encoding : numpy.ndarray, dtype=numpy.float32
         The :math:`L \\times N` encoding of the sequence, where
         :math:`L` is the length of the sequence, and :math:`N` is the
         size of the sequence alphabet.
@@ -114,6 +114,28 @@ def get_reverse_encoding(encoding,
             rev_index = encoding.shape[0] - row - 1
             reverse_encoding[rev_index, complem_base_pos] = 1
     return reverse_encoding
+
+
+def reverse_complement_sequence(sequence, complementary_base_dict):
+    """
+    Finds the reverse complement of a sequence.
+
+    Parameters
+    ----------
+    sequence : str
+        The sequence to reverse complement.
+    complementary_base_dict: dict
+        A dict that maps bases (`str`) to their complementary bases
+        (`str`).
+    Returns
+    -------
+    str
+        The reverse complement of the input sequence.
+    """
+
+    rev_comp_bases = [complementary_base_dict[b] for b in
+                      sequence[::-1]]
+    return ''.join(rev_comp_bases)
 
 
 class Sequence(metaclass=ABCMeta):

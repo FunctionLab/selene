@@ -1,5 +1,3 @@
-# Selene
-
 ![logo](docs/source/_static/img/selene_logo.png)
 
 ---
