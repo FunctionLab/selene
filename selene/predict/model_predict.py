@@ -38,7 +38,9 @@ def in_silico_mutagenesis_sequences(sequence,
     sequence : str
         A string containing the sequence we would like to mutate.
     mutate_n_bases : int, optional
-        Default is 1. TODO: ELABORATE ABOUT HOW THIS IS PAIRWISE
+        Default is 1. The number of base changes to make with each set of
+        mutations evaluated, e.g. `mutate_n_bases = 2` considers all
+        pairs of SNPs.
     sequence_type : class, optional
         Default is `selene.sequences.Genome`. The type of sequence
         that has been passed in.
@@ -52,7 +54,8 @@ def in_silico_mutagenesis_sequences(sequence,
         with which we are replacing the reference base.
 
         For a sequence of length 1000, mutating 1 base at a time means that
-        we return a list of length 3000.
+        we return a list with length of 3000-4000, depending on the number of
+        unknown bases in the input sequences.
     """
     sequence_alts = []
     for index, ref in enumerate(sequence):
@@ -80,7 +83,7 @@ def _ism_sample_id(sequence, mutation_information):
     Parameters
     ----------
     sequence : str
-        TODO
+        The input sequence to mutate.
     mutation_information : list(tuple)
         TODO
 
@@ -133,23 +136,22 @@ def mutate_sequence(encoding,
         mutated_seq[position, :] = 0
         mutated_seq[position, replace_base] = 1
     return mutated_seq
-    # TODO: DOES THIS METHOD WORK WITH `N` where we have 0.25's?
 
 
-# TODO: MAKE ME MORE GENERIC?
+# TODO: Is this a general method that might belong in utils?
 def read_vcf_file(input_path):
     """
-    Read the relevant columns for a VCF file to collect variants
-    for variant effect prediction.
+    Read the relevant columns for a variant call format (VCF) file to
+    collect variants for variant effect prediction.
 
     Parameters
     ----------
     input_path : str
-        Path for the VCF (variant call format) file.
+        Path to the VCF file.
 
     Returns
     -------
-    list of tuple
+    list(tuple)
         List of variants. Tuple = (chrom, position, id, ref, alt)
     """
     variants = []
@@ -252,8 +254,8 @@ class AnalyzeSequences(object):
         The length of sequences that the model is expecting.
     batch_size : int
         The size of the mini-batches to use.
-    features :
-        # TODO(DOCUMENTATION): Finish.
+    features : list(str)
+        The names of the features that the model is predicting.
     use_cuda : bool
         Default is `False`. Specifies whether to use CUDA or not.
     sequence_type : class, optional
@@ -263,7 +265,12 @@ class AnalyzeSequences(object):
 
     Attributes
     ----------
-    # TODO(DOCUMENATION): Finish.
+    model
+    use_cuda
+    sequence_length
+    batch_size
+    features
+    sequence_type
     """
 
     def __init__(self,
@@ -324,11 +331,11 @@ class AnalyzeSequences(object):
         ----------
         save_data : TODO
             TODO
-        output_path_prefix : TODO
+        output_path_prefix : str
             TODO
-        nonfeature_cols : TODO
+        nonfeature_cols : list(str)
             TODO
-        mode : TODO
+        mode : str
             TODO
 
         Returns

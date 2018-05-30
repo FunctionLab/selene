@@ -116,8 +116,7 @@ class Genome(Sequence):
         'a': 'T', 'c': 'G', 'g': 'C', 't': 'A', 'n': 'N'
     }
     """
-    # TODO(DOCUMENTATION): ADD ME.
-    TODO: Shouldn't lower-case letters map to lower-case letters?
+    A dictionary mapping each base to its complementary base.
     """
 
     UNK_BASE = "N"

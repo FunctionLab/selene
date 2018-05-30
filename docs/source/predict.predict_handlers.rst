@@ -1,5 +1,5 @@
 selene.predict.predict\_handlers
-========================================
+===========================================
 
 .. automodule:: selene.predict.predict_handlers
 .. currentmodule:: selene.predict.predict_handlers

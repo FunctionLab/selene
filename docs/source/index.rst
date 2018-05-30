@@ -20,13 +20,13 @@ TODO: Description
 
 
 .. toctree::
-   :glob:
    :maxdepth: 1
-   :caption: Reference
+   :caption: Packages
 
    selene
    interpret
    predict
+   predict.predict_handlers
    samplers
    sequences
    targets

@@ -1,5 +1,6 @@
 """
-TODO
+This module provides the classes and methods for prediction handlers,
+which generally are used for logging and saving outputs from models.
 """
 from .handler import PredictionsHandler
 from .handler import write_to_file

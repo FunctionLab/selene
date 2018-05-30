@@ -88,7 +88,7 @@ def encoding_to_sequence(encoding, bases_arr, unk_base):
 def get_reverse_encoding(encoding,
                          bases_arr,
                          base_to_index,
-                         complementary_base):
+                         complementary_base_dict):
     """
     # TODO(DOCUMENTATION): What is the documentation for this?
     Parameters
@@ -96,7 +96,7 @@ def get_reverse_encoding(encoding,
     encoding
     bases_arr
     base_to_index
-    complementary_base
+    complementary_base_dict : dict
 
     Returns
     -------
@@ -109,7 +109,7 @@ def get_reverse_encoding(encoding,
         if base_pos == -1:
             reverse_encoding[index, :] = 1 / len(bases_arr)
         else:
-            base = complementary_base[bases_arr[base_pos]]
+            base = complementary_base_dict[bases_arr[base_pos]]
             complem_base_pos = base_to_index[base]
             rev_index = encoding.shape[0] - row - 1
             reverse_encoding[rev_index, complem_base_pos] = 1

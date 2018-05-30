@@ -24,5 +24,11 @@ IntervalsSampler
     :members:
     :show-inheritance:
 
+MatFileSampler
+----------------------------
+
+.. autoclass:: MatFileSampler
+    :members:
+    :show-inheritance:
 
 

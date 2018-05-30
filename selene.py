@@ -23,6 +23,7 @@ import torch
 
 from selene.utils import load_path
 from selene.utils import instantiate
+from selene import __version__
 
 
 def initialize_model(model_configs, train=True, lr=None):
@@ -53,7 +54,7 @@ def initialize_model(model_configs, train=True, lr=None):
 
     if train:
         criterion = module.criterion()
-        optim_class, optim_args = module.get_optimizer(lr)
+        optim_class, optim_kwargs = module.get_optimizer(lr)
 
     sequence_length = model_configs["sequence_length"]
     n_classes = model_configs["n_classes_to_predict"]
@@ -64,7 +65,7 @@ def initialize_model(model_configs, train=True, lr=None):
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"]["mode"])
     if train:
-        return model, criterion, optim_class, optim_args
+        return model, criterion, optim_class, optim_kwargs
     else:
         return model
 
@@ -89,7 +90,7 @@ def execute(operation, config, model=None):
 
     """
     if operation == "train":
-        model, loss, optim, optim_args = initialize_model(
+        model, loss, optim, optim_kwargs = initialize_model(
             config["model"], train=True, lr=config["lr"])
 
         sampler_info = configs["sampler"]
@@ -102,7 +103,7 @@ def execute(operation, config, model=None):
             data_sampler=data_sampler,
             loss_criterion=loss,
             optimizer_class=optim,
-            optimizer_args=optim_args)
+            optimizer_kwargs=optim_kwargs)
 
         trainer = instantiate(train_model_info)
         trainer.train_and_validate()
@@ -135,7 +136,7 @@ def execute(operation, config, model=None):
             elif "input_path" in ism_info:
                 analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)
             else:
-                raise ValueError("in siliico mutagenesis requires as input "
+                raise ValueError("in silico mutagenesis requires as input "
                                  "the path to the FASTA file ('input_path')"
                                  " or a sequences ('input_sequence'), but "
                                  " found neither.")
@@ -144,7 +145,7 @@ def execute(operation, config, model=None):
 if __name__ == "__main__":
     arguments = docopt(
         __doc__,
-        version="1.0")
+        version=__version__)
 
     configs = load_path(arguments["<config-yml>"], instantiate=False)
     lr = arguments["--lr"]
