@@ -113,7 +113,7 @@ def execute(operation, config, model=None):
             trainer.write_datasets_to_file()
 
     elif operation == "evaluate":
-        pass  # @TODO: figure out what this entails
+        pass  # @TODO: figure out what this entails.
 
     elif operation == "analyze":
         if not model:

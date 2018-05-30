@@ -532,7 +532,7 @@ class AnalyzeSequences(object):
 
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
-                save_data,"{0}.{1}".format(output_path_prefix, i), ISM_COLS)
+                save_data, "{0}_{1}".format(output_path_prefix, i), ISM_COLS)
             predictions_reporter = reporters[-1]
             predictions_reporter.handle_batch_predictions(
                 base_preds, [["NA", "NA", "NA"]])
