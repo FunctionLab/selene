@@ -48,6 +48,7 @@ class ISMResult(object):
         """
         # Construct the reference sequence.
         alpha = set(sequence_type.BASES_ARR)
+        alpha.add(sequence_type.UNK_BASE)
         ref_seq = [""] * (int(data_frame["pos"].max()) + 1)
         seen = set()
         for row_idx, row in data_frame.iterrows():
@@ -148,6 +149,7 @@ class ISMResult(object):
         ret = self._sequence_type.sequence_to_encoding(
             self._reference_sequence).astype(dtype=dtype)
         alpha = set(self._sequence_type.BASES_ARR)
+        alpha.add(self._sequence_type.UNK_BASE)
         for row_idx, row in self._data_frame.iterrows():
             if row_idx == 0:  # Extract reference value in first row.
                 if reference_mask is None:
