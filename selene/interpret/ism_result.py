@@ -155,12 +155,16 @@ class ISMResult(object):
         alpha = set(self._sequence_type.BASES_ARR)
         for row_idx, row in self._data_frame.iterrows():
             # Extract reference value in first row.
-            if row_idx == 0 and row["alt"] == "NA" and row["ref"] == "NA":
-                if reference_mask is None:
-                    ret *= dtype(row[feature])
-                else:
+            if row_idx == 0:
+                if row["alt"] == "NA" and row["ref"] == "NA":
+                    if reference_mask is None:
+                        reference_mask = dtype(row[feature])
                     ret *= reference_mask
-                continue
+                    continue
+                else:
+                    if reference_mask is None:
+                        reference_mask = 0.
+                    ret *= reference_mask
             base = row["alt"]
             i = int(row["pos"])
             if base not in alpha:

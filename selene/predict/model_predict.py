@@ -346,22 +346,22 @@ class AnalyzeSequences(object):
         """
         reporters = []
         if "diffs" in save_data:
-            filename = "{0}_diffs.txt".format(output_path_prefix)
+            filename = "{0}_diffs.tsv".format(output_path_prefix)
             diff_handler = DiffScoreHandler(
                 self.features, nonfeature_cols, filename)
             reporters.append(diff_handler)
         if "logits" in save_data:
-            filename = "{0}_logits.txt".format(output_path_prefix)
+            filename = "{0}_logits.tsv".format(output_path_prefix)
             logit_handler = LogitScoreHandler(
                 self.features, nonfeature_cols, filename)
             reporters.append(logit_handler)
         if "predictions" in save_data and mode == "ism":
-            filename = "{0}_preds.txt".format(output_path_prefix)
+            filename = "{0}_predictions.tsv".format(output_path_prefix)
             preds_handler = WritePredictionsHandler(
                 self.features, nonfeature_cols, filename)
             reporters.append(preds_handler)
         elif "predictions" in save_data and mode == "varianteffect":
-            filename = "{0}_preds".format(output_path_prefix)
+            filename = "{0}_predictions".format(output_path_prefix)
             preds_handler = WriteRefAltHandler(
                 self.features, nonfeature_cols, filename)
             reporters.append(preds_handler)
