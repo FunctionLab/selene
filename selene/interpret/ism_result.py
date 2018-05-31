@@ -48,12 +48,12 @@ class ISMResult(object):
         """
         # Construct the reference sequence.
         alpha = set(sequence_type.BASES_ARR)
-        ref_seq = [""] * (int(data_frame["pos"].max()) + 1)
+        ref_seq = [""] * (int(data_frame["pos"].iloc[-1]) + 1)
         seen = set()
         for row_idx, row in data_frame.iterrows():
             # Skip the reference value
-            if row_idx != 0 or (row_idx == 0 and row["alt"] != "NA" and
-                                row["ref"] != "NA"):
+            if not (row_idx == 0 and row["alt"] == "NA" and
+                    row["ref"] == "NA"):
                 cur_ref = row["ref"]
                 if cur_ref not in alpha and cur_ref != sequence_type.UNK_BASE:
                     raise ValueError(
@@ -158,6 +158,7 @@ class ISMResult(object):
                     ret *= row[feature]
                 else:
                     ret *= reference_mask
+                continue
             base = row["alt"]
             i = int(row["pos"])
             if base not in alpha:
@@ -193,5 +194,8 @@ class ISMResult(object):
             specified input file.
 
         """
-        return ISMResult(pd.read_csv(input_path, sep="\t", header=0),
+        return ISMResult(pd.read_csv(input_path, sep="\t", header=0,
+                                     dtype={"pos": str,
+                                            "ref": str,
+                                            "alt": str}),
                          sequence_type=sequence_type)
