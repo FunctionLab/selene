@@ -195,7 +195,6 @@ class ISMResult(object):
 
         """
         return ISMResult(pd.read_csv(input_path, sep="\t", header=0,
-                                     dtype={"pos": str,
-                                            "ref": str,
-                                            "alt": str}),
+                                     dtype=str, na_values=None,
+                                     keep_default_na=False),
                          sequence_type=sequence_type)
