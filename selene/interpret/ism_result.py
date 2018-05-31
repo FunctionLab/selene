@@ -147,6 +147,8 @@ class ISMResult(object):
             If the input data frame contains a base not included in the
             alphabet of `sequence_type`.
         """
+        if reference_mask is not None:
+            reference_mask = dtype(reference_mask)
         ret = self._sequence_type.sequence_to_encoding(
             self._reference_sequence).astype(dtype=dtype)
         ret[ret < 0] = 0.  # Set N's to zero to avoid spurious masking.
@@ -155,7 +157,7 @@ class ISMResult(object):
             # Extract reference value in first row.
             if row_idx == 0 and row["alt"] == "NA" and row["ref"] == "NA":
                 if reference_mask is None:
-                    ret *= row[feature]
+                    ret *= dtype(row[feature])
                 else:
                     ret *= reference_mask
                 continue
@@ -167,7 +169,8 @@ class ISMResult(object):
                         "Found character \'{0}\' from outside current alphabet"
                         " on row {1}.".format(base, row_idx))
             else:
-                ret[i, self._sequence_type.BASE_TO_INDEX[base]] = row[feature]
+                ret[i, self._sequence_type.BASE_TO_INDEX[base]] = dtype(
+                    row[feature])
         return ret
 
     @staticmethod
