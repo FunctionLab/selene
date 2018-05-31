@@ -48,13 +48,14 @@ class ISMResult(object):
         """
         # Construct the reference sequence.
         alpha = set(sequence_type.BASES_ARR)
-        alpha.add(sequence_type.UNK_BASE)
         ref_seq = [""] * (int(data_frame["pos"].max()) + 1)
         seen = set()
         for row_idx, row in data_frame.iterrows():
-            if row_idx != 0:  # Skip the reference value
+            # Skip the reference value
+            if row_idx != 0 or (row_idx == 0 and row["alt"] != "NA" and
+                                row["ref"] != "NA"):
                 cur_ref = row["ref"]
-                if cur_ref not in alpha:
+                if cur_ref not in alpha and cur_ref != sequence_type.UNK_BASE:
                     raise ValueError(
                         "Found character \'{0}\' from outside current alphabet"
                         " on row {1}.".format(cur_ref, row_idx))
@@ -148,10 +149,11 @@ class ISMResult(object):
         """
         ret = self._sequence_type.sequence_to_encoding(
             self._reference_sequence).astype(dtype=dtype)
+        ret[ret < 0] = 0.  # Set N's to zero to avoid spurious masking.
         alpha = set(self._sequence_type.BASES_ARR)
-        alpha.add(self._sequence_type.UNK_BASE)
         for row_idx, row in self._data_frame.iterrows():
-            if row_idx == 0:  # Extract reference value in first row.
+            # Extract reference value in first row.
+            if row_idx == 0 and row["alt"] == "NA" and row["ref"] == "NA":
                 if reference_mask is None:
                     ret *= row[feature]
                 else:
@@ -159,10 +161,12 @@ class ISMResult(object):
             base = row["alt"]
             i = int(row["pos"])
             if base not in alpha:
-                raise ValueError(
-                    "Found character \'{0}\' from outside current alphabet"
-                    " on row {1}.".format(base, row_idx))
-            ret[i, self._sequence_type.BASE_TO_INDEX[base]] = row[feature]
+                if base != self._sequence_type.UNK_BASE:
+                    raise ValueError(
+                        "Found character \'{0}\' from outside current alphabet"
+                        " on row {1}.".format(base, row_idx))
+            else:
+                ret[i, self._sequence_type.BASE_TO_INDEX[base]] = row[feature]
         return ret
 
     @staticmethod
