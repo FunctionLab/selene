@@ -11,16 +11,20 @@ model: {
     }
 }
 sampler: !obj:selene.samplers.IntervalsSampler {
-    genome: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/mm9.fasta,
-    query_feature_data: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/sorted_mm9_heart.bed.gz,
-    distinct_features: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/distinct_features.txt,
-    intervals_file: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/intervals_only.txt,
+    reference_sequence: !obj:selene.sequences.Genome {
+            input_path: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/mm9.fasta
+            },
+    features: !obj:selene.utils.load_features_list {
+        input_path: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/distinct_features.txt
+    },
+    target_path: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/sorted_mm9_heart.bed.gz
+    intervals_path: /data/home/ecofer/data/cardiac_deepsea/all_heart_data/intervals_only.txt,
     sequence_length: 1000,
     center_bin_to_predict: 200,
-    test_holdout: [8, 9],
-    validation_holdout: [6, 7],
+    test_holdout: [chr8, chr9],
+    validation_holdout: [chr6, chr7],
     feature_thresholds: 0.5,
-    random_seed: 127,
+    seed: 127,
     mode: "train",
     save_datasets: [
         test

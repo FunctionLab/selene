@@ -1,3 +1,8 @@
+"""
+This module provides the methods for visualizing different ouputs
+from selene analysis methods.
+
+"""
 import re
 import warnings
 from copy import deepcopy
@@ -5,7 +10,6 @@ from copy import deepcopy
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 from matplotlib import transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
@@ -15,32 +19,42 @@ from matplotlib.text import TextPath
 from selene.sequences import Genome
 
 
-_SVG_PATHS = {'T': "M 0,100 l 100, 0 l 0,-25 l -37.5, 0 l 0,-75 l -25, 0 l 0,75 l -37.5,0 l 0,25 z",
-              'C': ("M 100,12.5 l 0,25 c 0,0 -25,-15 -50,-12.5 c 0,0 -25,0 -25,25 c 0,0 0,25 25,25 c 0,0 25,2.5 50,-15 " +
-                    "l 0, 25 C 100,87.5 75,100 50,100 C 50,100 0,100 0,50 C 0,50 0,0 50,0 C 50,0 75,0 100,12.5 z"),
-              'G': ("M 100,12.5 l 0,25 c 0,0 -25,-15 -50,-12.5 c 0,0 -25,0 -25,25 c 0,0 0,25 25,25 c 0,0 25,2.5 50,-15 " +
-                    "l 0, 25 C 100,87.5 75,100 50,100 C 50,100 0,100 0,50 C 0,50 0,0 50,0 C 50,0 75,0 100,12.5" +
-                    "M 100,37.5 l 0,17.5 l -50,0 l 0,-17 l 25,0 l 0,-25 l 25,0 z"),
-              'A': ("M 0,0 l 37.5,100 l 25,0 l 37.5,-100 l -25,0 l -9.375,25 l -31.25,0 l -9.375,-25 l -25,0 z" +
-                    "M 43.75, 50 l 12.5,0 l -5.859375,15.625 l -5.859375,-15.625 z"),
-              'U': ("M 0,100 l 25,0 l 0,-50 C 25,50 25,25 50,25 C 50,25 75,25 75,50 l 0,50 " +
-                    "l 25,0 L 100,50 C 100,50 100,0, 50,0 C 50,0 0,0 0,50 l 0,50 z")}
+_SVG_PATHS = {'T': "M 0,100 l 100, 0 l 0,-25 l -37.5, 0 l 0,-75 l -25, 0 " +
+                   "l 0,75 l -37.5,0 l 0,25 z",
+              'C': ("M 100,12.5 l 0,25 c 0,0 -25,-15 -50,-12.5 " +
+                    "c 0,0 -25,0 -25,25 c 0,0 0,25 25,25 c 0,0 25,2.5 50,-15" +
+                    " l 0, 25 C 100,87.5 75,100 50,100 C 50,100 0,100 0,50 " +
+                    "C 0,50 0,0 50,0 C 50,0 75,0 100,12.5 z"),
+              'G': ("M 100,12.5 l 0,25 c 0,0 -25,-15 -50,-12.5 " +
+                    "c 0,0 -25,0 -25,25 c 0,0 0,25 25,25 c 0,0 25,2.5 50,-15" +
+                    " l 0, 25 C 100,87.5 75,100 50,100 C 50,100 0,100 0,50 " +
+                    "C 0,50 0,0 50,0 C 50,0 75,0 100,12.5 M 100,37.5 " +
+                    "l 0,17.5 l -50,0 l 0,-17 l 25,0 l 0,-25 l 25,0 z"),
+              'A': ("M 0,0 l 37.5,100 l 25,0 l 37.5,-100 l -25,0 l -9.375,25" +
+                    " l -31.25,0 l -9.375,-25 l -25,0 z 0,0 M 43.75, 50 " +
+                    "l 12.5,0 l -5.859375,15.625 l -5.859375,-15.625 z"),
+              'U': ("M 0,100 l 25,0 l 0,-50 C 25,50 25,25 50,25" +
+                    " C 50,25 75,25 75,50 l 0,50 l 25,0 L 100,50 " +
+                    "C 100,50 100,0, 50,0 C 50,0 0,0 0,50 l 0,50 z")}
 
 
-def _svg_parse(path):
-    """
-    Functionality for parsing a string from source vector graphics (SVG).
-    Source is from `https://matplotlib.org/2.1.1/gallery/showcase/firefox.html` with minor modifications.
+def _svg_parse(path_string):
+    """Functionality for parsing a string from source vector graphics.
+
+    Source is from `matplotlib.org/2.1.1/gallery/showcase/firefox.html`
+    with minor modifications.
 
     Parameters
     ----------
-    path : str
-        Path string from SVG.
+    path_string : str
+        String containing the path code from an SVG file.
 
     Returns
     -------
-    tuple(list[numpy.uint8], numpy.ndarray)
-        A 2-tuple containing code types and coordinates for a matplotlib path.
+    list(numpy.uint8), numpy.ndarray, dtype=np.float32
+        A 2-tuple containing code types and coordinates for a matplotlib
+        path.
+
     """
     commands = {'M': (Path.MOVETO,),
                 'L': (Path.LINETO,),
@@ -52,7 +66,7 @@ def _svg_parse(path):
     vertices = []
     codes = []
     last = (0, 0)
-    for cmd, values in path_re.findall(path):
+    for cmd, values in path_re.findall(path_string):
         points = [float(v) for v in float_re.findall(values)]
         points = np.array(points).reshape((len(points)//2, 2))
         if cmd.islower():
@@ -69,29 +83,29 @@ for k in _SVG_PATHS.keys():
     _SVG_PATHS[k] = _svg_parse(_SVG_PATHS[k])
 
 
-class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
+class _TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
+    """This class provides an effect for continuously rendering a text
+    path over another path.
+
     """
-    This is a class for re-rendering text paths and preserving their scale.
-    """
-    def __init__(self, bar, x_translation=0., y_translation=0., x_scale=1., y_scale=1.):
-        """
+    def __init__(self, bar, x_translation=0., y_translation=0.,
+                 x_scale=1., y_scale=1.):
+        """This is a class for re-rendering text paths and preserving
+        their scale.
 
         Parameters
         ----------
         bar : matplotlib.patches.Patch
             The patch where the letter is.
         x_translation : float, optional
-            Default is 0.
-            Amount by which to translate the x coordinate.
+            Default is 0. Amount by which to translate the x coordinate.
         y_translation : float, optional
-            Default is 0.
-            Amount by which to translate the y coordinate.
+            Default is 0. Amount by which to translate the y coordinate.
         x_scale : float, optional
-            Default is 1.
-            Amount by which to scale the width.
+            Default is 1. Amount by which to scale the width.
         y_scale : float, optional
-            Default is 1.
-            Amount by which to scale the height.
+            Default is 1. Amount by which to scale the height.
+
         """
         self._bar = bar
         self._x_translation = x_translation
@@ -100,8 +114,8 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         self._y_scale = y_scale
 
     def draw_path(self, renderer, gc, tpath, affine, rgbFace=None):
-        """
-        Redraws the path.
+        """Redraws the path.
+
         """
         b_x, b_y, b_w, b_h = self._bar.get_extents().bounds
         t_x, t_y, t_w, t_h = tpath.get_extents().bounds
@@ -115,104 +129,148 @@ class TextPathRenderingEffect(matplotlib.patheffects.AbstractPathEffect):
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 
-def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=None,
-    font_properties=None, **kwargs):
-    """
+def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
+                  sequence_type=Genome, font_properties=None,
+                  color_scheme=None,
+                  **kwargs):
+    """Plots a sequence logo for visualizing motifs.
 
     Parameters
     ----------
-    scores : np.ndarray
-        A len(reference_sequence) x |ALPHABET| matrix containing the scores for each position.
-    order : {"alpha", "value"}
-        The ordering to use for the bases in the motif plots.
-            alpha: Bases go in the order they are found in the sequence alphabet.
-            value: Bases go in the order of their effect size, with the largest at the bottom.
-    sequence_type : class, optional
-        Default is selene.sequences.Genome
-        The type of sequence that the ISM results are associated with.
+    score_matrix : np.ndarray
+        An :math:`L \\times N` array (where :math:`L` is the length of
+        the sequence, and :math:`N` is the size of the alphabet)
+        containing the scores for each base occuring at each position.
+    order : {'alpha', 'value'}
+        The manner by which to sort the bases stacked at each position
+        in the sequence logo plot.
+
+            * 'alpha' - Bases go in the order they are found in the\
+                      sequence alphabet.
+            * 'value' - Bases go in the order of their value, with the\
+                        largest at the bottom.
     width : float, optional
-        The default is 1.
-        The size width of each character. A value of 1 will mean that there is no gap
-        between each character.
-    font_properties : matplotlib.font_manager.FontProperties, optional
-        Default is None. A FontProperties object that specifies the properties of the font to
-        use for plotting the motif. If None, no font will be used, and the text will be rendered
-        by a path. This method of rendering is preferable, as it ensures all character heights
-        correspond to the actual values, and that there are no gaps between characters at a
-        position in the motif. If the user opts to use `font_properties` other than None, then
-        no such guarantee can be made.
-    ax : matplotlib.pyplot.Axes, optional
-        Default is None.
-        An axes to plot on. If not provided, an axis will be created.
-    color_scheme: list[str]
-        A list containing the colors to use, appearing in the order of the bases of the
-        sequence type.
+        Default is 1. The width of each character in the plotted logo.
+        A value of 1 will mean that there is no gap between each the
+        characters at each position. A value of 0 will not draw any
+        characters.
+    ax : matplotlib.pyplot.Axes or None, optional
+        Default is `None`. The axes to plot on. If left as `None`, a new
+        axis will be created.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The type of sequence that
+        the *in silico* mutagenesis results are associated with. This
+        should generally be a subclass of `selene.sequences.Sequence`.
+    font_properties : matplotlib.font_manager.FontProperties or None, optional
+        Default is `None`. A `matplotlib.font_manager.FontProperties`
+        object that specifies the properties of the font to use for
+        plotting the motif. If `None`, no font will be used, and the
+        text will be rendered by a path. This method of rendering paths
+        is  preferred, as it ensures all character heights correspond to
+        the actual values, and that there are no extra gaps between
+        the tops and bottoms of characters at each position in the
+        sequence logo. If the user opts to use a value other
+        than `None`, then no such guarantee can be made.
+    color_scheme : list(str) or None, optional
+        Default is `None`. A list containing the hex codes or names of
+        colors to use, appearing in the order of the bases of the
+        sequence type. If left as `None`, a default palette will be made
+        with `seaborn.color_palette`, and will have as many
+        colors as there are characters in the input sequence alphabet.
 
     Returns
     -------
     matplotlib.pyplot.Axes
-        An axis containing the sequence logo plot.
+        The axes containing the sequence logo plot.
+
+    Raises
+    ------
+    ValueError
+        If the number of columns in `score_matrix` does not match the
+        number of characters in the alphabet of `sequence_type`.
+
+    ValueError
+        If the number of colors in `color_palette` does not match the
+        number of characters in the alphabet of `sequence_type`.
+
+    Examples
+    --------
+    We have included an example of the output from a`sequence_logo`
+    plot below:
+
+    .. image:: ../../docs/source/_static/img/sequence_logo_example.png
 
     """
-    scores = deepcopy(scores)  # Everything will break if we do not deepcopy.
-    scores = scores.transpose()
+    # Note that everything will break if we do not deepcopy.
+    score_matrix = deepcopy(score_matrix)
+
+    score_matrix = score_matrix.transpose()
     if font_properties is not None:
-        warnings.warn("Specifying a value for `font_properties` (other than `None`) will use the "
-                      "`matplotlib`-based character paths, and causes distortions in the plotted "
-                      "motif. We recommend leaving `font_properties=None`. See the documentation "
-                      "for information.",
-                      UserWarning)
+        warnings.warn(
+            "Specifying a value for `font_properties` (other than `None`) "
+            "will use the `matplotlib`-based character paths, and causes "
+            "distortions in the plotted motif. We recommend leaving "
+            "`font_properties=None`. See the documentation for details.",
+            UserWarning)
 
-    if "colors" in kwargs:
-        color_scheme = kwargs.pop("colors")
-    else:
-        color_scheme = ["orange", "red", "blue", "darkgreen"]
+    if color_scheme is None:
+        color_scheme = sns.color_palette("Set1",
+                                         n_colors=len(sequence_type.BASES_ARR))
+        color_scheme = color_scheme.as_hex()
     if len(color_scheme) < len(sequence_type.BASES_ARR):
-        raise ValueError("Color scheme is shorter than number of bases in sequence.")
+        raise ValueError(
+            "Color scheme is shorter than number of bases in sequence.")
 
-    if scores.shape[0] != len(sequence_type.BASES_ARR):
-        raise ValueError(f"Got score with {scores.shape[0]} bases for sequence"
-                         f"with {len(sequence_type.BASES_ARR)} bases.")
+    if score_matrix.shape[0] != len(sequence_type.BASES_ARR):
+        raise ValueError(
+            "Got score with {0} bases for sequence with {1} bases.".format(
+                score_matrix.shape[0], len(sequence_type.BASES_ARR)))
     if ax is None:
-        _, ax = plt.subplots(figsize=scores.shape)
+        _, ax = plt.subplots(figsize=score_matrix.shape)
 
     # Determine offsets depending on sort order.
-    positive_offsets = np.zeros_like(scores)
-    negative_offsets = np.zeros_like(scores)
-    bases = np.empty(scores.shape, dtype=object)
-    bases[:, :] = "?"  # Do not leave it as none. Should be visually obvious something happened.
+    positive_offsets = np.zeros_like(score_matrix)
+    negative_offsets = np.zeros_like(score_matrix)
+    bases = np.empty(score_matrix.shape, dtype=object)
+    bases[:, :] = "?"  # This ensures blanks are visually obvious.
 
     # Change ordering of things based on input arguments.
     if order == "alpha":
-        for i in range(scores.shape[0]):
+        for i in range(score_matrix.shape[0]):
             bases[i, :] = sequence_type.BASES_ARR[i]
 
     elif order == "value":
-        if np.sum(scores < 0) != 0:
-            sorted_scores = np.zeros_like(scores)
-            for j in range(scores.shape[1]):
+        if np.sum(score_matrix < 0) != 0:
+            sorted_scores = np.zeros_like(score_matrix)
+            for j in range(score_matrix.shape[1]):
                 # Sort the negative values and put them at bottom.
-                div = np.sum(scores[:, j] < 0.)
-                negative_idx = np.argwhere(scores[:, j] < 0.).flatten()
-                negative_sort_idx = np.argsort(scores[negative_idx, j], axis=None)
-                sorted_scores[:div, j] = scores[negative_idx[negative_sort_idx], j]
-                bases[:div, j] = sequence_type.BASES_ARR[negative_idx[negative_sort_idx]].flatten()
+                div = np.sum(score_matrix[:, j] < 0.)
+                negative_idx = np.argwhere(score_matrix[:, j] < 0.).flatten()
+                negative_sort_idx = np.argsort(score_matrix[negative_idx, j],
+                                               axis=None)
+                sorted_scores[:div, j] = score_matrix[
+                    negative_idx[negative_sort_idx], j]
+                bases[:div, j] = sequence_type.BASES_ARR[
+                    negative_idx[negative_sort_idx]].flatten()
 
                 # Sort the positive values and stack atop the negatives.
-                positive_idx = np.argwhere(scores[:, j] >= 0.).flatten()
-                positive_sort_idx = np.argsort(scores[positive_idx, j], axis=None)
-                sorted_scores[div:, j] = scores[positive_idx[positive_sort_idx], j]
-                bases[div:, j] = sequence_type.BASES_ARR[positive_idx[positive_sort_idx]].flatten()
-            scores = sorted_scores
+                positive_idx = np.argwhere(score_matrix[:, j] >= 0.).flatten()
+                positive_sort_idx = np.argsort(score_matrix[positive_idx, j],
+                                               axis=None)
+                sorted_scores[div:, j] = score_matrix[
+                    positive_idx[positive_sort_idx], j]
+                bases[div:, j] = sequence_type.BASES_ARR[
+                    positive_idx[positive_sort_idx]].flatten()
+            score_matrix = sorted_scores
         else:
-            for j in range(scores.shape[1]):
-                sort_idx = np.argsort(scores[:, j], axis=None)[::-1]
+            for j in range(score_matrix.shape[1]):
+                sort_idx = np.argsort(score_matrix[:, j], axis=None)[::-1]
                 bases[:, j] = sequence_type.BASES_ARR[sort_idx]
-                scores[:, j] = scores[sort_idx, j]
+                score_matrix[:, j] = score_matrix[sort_idx, j]
 
     # Create offsets for each bar.
-    for i in range(scores.shape[0] - 1):
-        y_coords = scores[i, :]
+    for i in range(score_matrix.shape[0] - 1):
+        y_coords = score_matrix[i, :]
         if i > 0:
             negative_offsets[i + 1, :] = negative_offsets[i, :]
             positive_offsets[i + 1, :] = positive_offsets[i, :]
@@ -221,17 +279,18 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         negative_offsets[i + 1, neg_idx] += y_coords[neg_idx]
         positive_offsets[i + 1, pos_idx] += y_coords[pos_idx]
 
-    for i in range(scores.shape[0]):
-        x_coords = np.arange(scores.shape[1]) + 0.5
-        y_coords = scores[i, :]
+    for i in range(score_matrix.shape[0]):
+        x_coords = np.arange(score_matrix.shape[1]) + 0.5
+        y_coords = score_matrix[i, :]
 
         # Manage negatives and positives separately.
-        offsets = np.zeros(scores.shape[1])
+        offsets = np.zeros(score_matrix.shape[1])
         negative_idx = np.argwhere(y_coords < 0.)
         positive_idx = np.argwhere(y_coords >= 0.)
         offsets[negative_idx] = negative_offsets[i, negative_idx]
         offsets[positive_idx] = positive_offsets[i, positive_idx]
-        bars = ax.bar(x_coords, y_coords, color="black", width=width, bottom=offsets)
+        bars = ax.bar(x_coords, y_coords, color="black", width=width,
+                      bottom=offsets)
         for j, bar in enumerate(bars):
             base = bases[i, j]
             bar.set_color(color_scheme[sequence_type.BASE_TO_INDEX[base]])
@@ -240,11 +299,12 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
     # Iterate over the barplot's bars and turn them into letters.
     new_patches = []
     for i, bar in enumerate(ax.patches):
-        base_idx = i // scores.shape[1]
-        seq_idx = i % scores.shape[1]
+        base_idx = i // score_matrix.shape[1]
+        seq_idx = i % score_matrix.shape[1]
         base = bases[base_idx, seq_idx]
         # We construct a text path that tracks the bars in the barplot.
-        # Thus, the barplot takes care of scaling and translation, and we just copy it.
+        # Thus, the barplot takes care of scaling and translation,
+        #  and we just copy it.
         if font_properties is None:
             text = Path(_SVG_PATHS[base][0], _SVG_PATHS[base][1])
         else:
@@ -255,107 +315,138 @@ def sequence_logo(scores, order="value", sequence_type=Genome, width=1.0, ax=Non
         translation = (b_x - t_x, b_y - t_y)
         text = PathPatch(text, facecolor=bar.get_facecolor(), lw=0.)
         bar.set_facecolor("none")
-        text.set_path_effects([TextPathRenderingEffect(bar)])  # This redraws the letters on resize.
+        text.set_path_effects([_TextPathRenderingEffect(bar)])
         transform = transforms.Affine2D().translate(*translation).scale(*scale)
         text.set_transform(transform)
         new_patches.append(text)
 
     for patch in new_patches:
         ax.add_patch(patch)
-    ax.set_xlim(0, scores.shape[1])
-    ax.set_xticks(np.arange(scores.shape[1]) + 0.5)
-    ax.set_xticklabels(np.arange(scores.shape[1]))
+    ax.set_xlim(0, score_matrix.shape[1])
+    ax.set_xticks(np.arange(score_matrix.shape[1]) + 0.5)
+    ax.set_xticklabels(np.arange(score_matrix.shape[1]))
     return ax
 
 
-def rescale_feature_matrix(scores, base_scaling="identity", position_scaling="identity"):
-    """
-    Performs base-wise and position-wise scaling of a feature matrix.
+def rescale_score_matrix(score_matrix, base_scaling="identity",
+                         position_scaling="identity"):
+    """Performs base-wise and position-wise scaling of a score matrix for a
+    feature, usually produced from an *in silico* mutagenesis experiment.
 
     Parameters
     ----------
-    scores : numpy.ndarray
-        A Lx|bases| matrix containing the scores for each position.
-    base_scaling : {"identity", "probability", "max_effect"}
+    score_matrix : numpy.ndarray
+        An :math:`L \\times N` matrix containing the scores for each
+        position, where :math:`L` is the length of the sequence, and
+        :math:`N` is the number of characters in the alphabet.
+    base_scaling : {'identity', 'probability', 'max_effect'}
         The type of scaling performed on each base at a given position.
-            identity : No transformation will be applied to the data.
-            probability : The relative sizes of the bases will be the original
-                          input probabilities.
-            max_effect : The relative sizes of the bases will be the max effect
-            of the original input values.
-    position_scaling : str
+
+            * 'identity' - No transformation will be applied to the\
+                           data.
+            * 'probability' - The relative sizes of the bases will be\
+                              the original input probabilities.
+            * 'max_effect' - The relative sizes of the bases will be\
+                             the max effect of the original input\
+                             values.
+    position_scaling : {'identity', 'probability', 'max_effect'}
         The type of scaling performed on each position.
-            identity: No transformation will be applied to the data.
-            probability: The sum of values at a position will be equal to the
-                         sum of the original input values at that position.
-            max_effect: The sum of values at a position will be equal to the
-                        sum of the max effect values of the original input
-                        values at that position.
-    kwargs : dict
-        Passed to plot_sequence_logo
+
+            * 'identity'    - No transformation will be applied to the data.
+            * 'probability' - The sum of values at a position will be\
+                              equal to the sum of the original input\
+                              values at that position.
+            * 'max_effect'  - The sum of values at a position will be\
+                              equal to the sum of the max effect values\
+                              of the original input values at that\
+                              position.
 
     Returns
     -------
     numpy.ndarray
-        The transformed array.
+        The transformed score matrix.
+
+    Raises
+    ------
+    ValueError
+        If an unsupported `base_scaling` or `position_scaling` is
+        entered.
 
     """
-    scores = scores.transpose()
-    rescaled_scores = scores
+    # Note that things can break if we do not deepcopy.
+    score_matrix = deepcopy(score_matrix)
+
+    score_matrix = score_matrix.transpose()
+    rescaled_scores = score_matrix
 
     # Scale individual bases.
     if base_scaling == "identity" or base_scaling == "probability":
         pass
     elif base_scaling == "max_effect":
-        rescaled_scores = scores - np.min(scores, axis=0)
+        rescaled_scores = score_matrix - np.min(score_matrix, axis=0)
     else:
-        raise ValueError(f"Could not find base scaling \"{base_scaling}\".")
+        raise ValueError(
+            "Could not find base scaling \"{0}\".".format(base_scaling))
 
     # Scale each position
     if position_scaling == "max_effect":
-        max_effects = np.max(scores, axis=0) - np.min(scores, axis=0)
+        max_effects = np.max(score_matrix, axis=0) - np.min(score_matrix,
+                                                            axis=0)
         rescaled_scores /= rescaled_scores.sum(axis=0)[np.newaxis, :]
         rescaled_scores *= max_effects[np.newaxis, :]
     elif position_scaling == "probability":
-        rescaled_scores /= np.sum(scores, axis=0)[np.newaxis, :]
+        rescaled_scores /= np.sum(score_matrix, axis=0)[np.newaxis, :]
     elif position_scaling != "identity":
-        raise ValueError(f"Could not find position scaling \"{position_scaling}\".")
+        raise ValueError(
+            "Could not find position scaling \"{0}\".".format(
+                position_scaling))
     return rescaled_scores.transpose()
 
 
-def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
-    """
-    Plots scores on a heatmap.
+def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
+    """Plots the input matrix of scores, generally those produced by an
+    *in silico* mutagenesis experiment, on a heatmap.
 
     Parameters
     ----------
-    scores : numpy.ndarray
-        A Lx|bases| matrix containing the scores for each position.
-    sequence_type : class
-        The type of sequence that the ISM results are associated with.
-    mask : numpy.ndarray, None
-        A Lx|bases| matrix containing 1s at positions to mask.
-    kwargs : dict
-        Keyword arguments to pass to seaborn.heatmap().
-        Some useful ones are:
-            cbar_kws: Change keyword arguments to the colorbar.
-            yticklabels: Manipulate the tick labels on the y axis.
-            cbar: If False, hide the colorbar, otherwise show the colorbar.
-            cmap: The color map to use for the heatmap.
+    score_matrix : numpy.ndarray
+        An :math:`L \\times N` array (where :math:`L` is the length of
+        the sequence, and :math:`N` is the size of the alphabet)
+        containing the scores for each base change at each position.
+    mask : numpy.ndarray, dtype=bool or None, optional
+        Default is `None`. An :math:`L \\times N` array (where :math:`L`
+        is the length of the sequence, and :math:`N` is the size of the
+        alphabet)  containing `True` at positions in the heatmap to
+        mask. If `None`, no masking will occur.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The class of sequence that
+        the *in silico* mutagenesis results are associated with. This is
+        generally a sub-class of `selene.sequences.Sequence`.
+    **kwargs : dict
+        Keyword arguments to pass to `seaborn.heatmap`. Some useful ones
+        to remember are:
+            * cbar_kws - Keyword arguments to forward to the colorbar.
+            * yticklabels - Manipulate the tick labels on the y axis.
+            * cbar - If `False`, hide the color bar. If `True`, show\
+                     the colorbar.
+            * cmap - The color map to use for the heatmap.
 
     Returns
     -------
-    matplotlib.pytplot.Axes
-        An axis containing the heatmap plot.
+    matplotlib.pyplot.Axes
+        The axese containing the heatmap plot.
 
     """
+    # Note that some things can break if we do not deepcopy.
+    score_matrix = deepcopy(score_matrix)
 
-    # This flipping is so that ordering is consistent with ordering in the sequence logo.
+    # This flipping is so that ordering is consistent with ordering
+    # in the sequence logo.
     if mask is not None:
         mask = mask.transpose()
         mask = np.flip(mask, axis=0)
-    scores = scores.transpose()
-    scores = np.flip(scores, axis=0)
+    score_matrix = score_matrix.transpose()
+    score_matrix = np.flip(score_matrix, axis=0)
 
     if "yticklabels" in kwargs:
         yticklabels = kwargs.pop("yticklabels")
@@ -369,6 +460,7 @@ def heatmap(scores, sequence_type=Genome, mask=None, **kwargs):
         cmap = kwargs.pop("cmap")
     else:
         cmap = "Blues_r"
-    ret = sns.heatmap(scores, mask=mask, yticklabels=yticklabels, cbar_kws=cbar_kws, cmap=cmap, **kwargs)
+    ret = sns.heatmap(score_matrix, mask=mask, yticklabels=yticklabels,
+                      cbar_kws=cbar_kws, cmap=cmap, **kwargs)
     ret.set_yticklabels(labels=ret.get_yticklabels(), rotation=0)
     return ret

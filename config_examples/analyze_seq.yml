@@ -13,14 +13,16 @@ model: {
 analyze_sequences: !obj:selene.AnalyzeSequences {
     sequence_length: 1000,
     batch_size: 64,
-    features_file: /scratch/data_hg/distinct_features.txt,
+    features: !obj:selene.utils.load_feature_list {
+        input_path: /scratch/data_hg/distinct_features.txt
+    },
     use_cuda: True
 }
 variant_effect_prediction: {
     vcf_files: [
         /scratch/data_hg/example1.vcf,
         /scratch/data_hg/example2.vcf
-    ], 
+    ],
     save_data: [diffs, logits, predictions],
     indexed_fasta: /scratch/data_hg/male.hg19.fasta,
     output_dir: /home/kathy/outputs

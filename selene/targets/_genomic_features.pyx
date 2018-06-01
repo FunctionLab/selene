@@ -8,13 +8,13 @@ ctypedef np.float32_t FDTYPE_t
 
 @cython.boundscheck(False)
 @cython.wraparound(False) 
-def _fast_get_feature_data(int query_start, int query_end,
+def _fast_get_feature_data(int start, int end,
                            np.ndarray[FDTYPE_t, ndim=1] thresholds,
-                           dict feature_index_map, 
+                           dict feature_index_dict,
                            rows):
-    cdef int n_features = len(feature_index_map)
-    cdef int query_length = query_end - query_start
-    cdef int feat_start, feat_end, index_start, index_end, index_feat
+    cdef int n_features = len(feature_index_dict)
+    cdef int query_length = end - start
+    cdef int feature_start, feature_end, index_start, index_end, index_feat
     cdef np.ndarray[DTYPE_t, ndim=2] encoding = np.zeros(
         (query_length, n_features), dtype=np.int)
     cdef np.ndarray[DTYPE_t, ndim=1] targets = np.zeros(
@@ -25,11 +25,11 @@ def _fast_get_feature_data(int query_start, int query_end,
         return np.zeros((n_features,))
     
     for row in rows:
-        feat_start = int(row[1])
-        feat_end = int(row[2])
-        index_start = max(0, feat_start - query_start)
-        index_end = min(feat_end - query_start, query_length)
-        index_feat = feature_index_map[row[3]]
+        feature_start = int(row[1])
+        feature_end = int(row[2])
+        index_start = max(0, feature_start - start)
+        index_end = min(feature_end - start, query_length)
+        index_feat = feature_index_dict[row[3]]
         if index_start == index_end:
             index_end += 1
         encoding[index_start:index_end, index_feat] = 1

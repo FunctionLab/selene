@@ -32,10 +32,10 @@ def _get_indices_and_probabilities(interval_lengths, indices):
 class RandomSampler(OnlineSampler):
 
     def __init__(self,
-                 genome,
-                 query_feature_data,
-                 distinct_features,
-                 random_seed=436,
+                 reference_sequence,
+                 target_path,
+                 features,
+                 seed=436,
                  validation_holdout=['6', '7'],
                  test_holdout=['8', '9'],
                  sequence_length=1001,
@@ -43,10 +43,10 @@ class RandomSampler(OnlineSampler):
                  feature_thresholds=0.5,
                  mode="train"):
         super(RandomSampler, self).__init__(
-            genome,
-            query_feature_data,
-            distinct_features,
-            random_seed=random_seed,
+            reference_sequence,
+            target_path,
+            features,
+            seed=seed,
             validation_holdout=validation_holdout,
             test_holdout=test_holdout,
             sequence_length=sequence_length,
@@ -75,7 +75,7 @@ class RandomSampler(OnlineSampler):
         # and then the index?
         total_positions = 0
         chrom_up_to_position = {}
-        for chrom, len_chrom in self.genome.get_chr_lens():
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
             total_positions += len_chrom
             chrom_up_to_position[chrom] = total_positions
         # divide total_positions into 10 segments.
@@ -111,7 +111,7 @@ class RandomSampler(OnlineSampler):
                 tr_indices, tr_weights)
 
     def _partition_genome_by_chromosome(self, intervals_file):
-        training_chrs = self.genome.get_chrs()
+        training_chrs = self.reference_sequence.get_chrs()
         training_chrs = set(training_chrs) - set(self.validation_holdout)
         if self.test_holdout:
             training_chrs = list(
@@ -151,7 +151,7 @@ class RandomSampler(OnlineSampler):
     def _retrieve(self, chrom, position, strand):
         bin_start = position - self.bin_radius
         bin_end = position + self.bin_radius + 1
-        retrieved_targets = self.query_feature_data.get_feature_data(
+        retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
         if np.sum(retrieved_targets) == 0:
             return None
@@ -159,8 +159,8 @@ class RandomSampler(OnlineSampler):
         window_start = bin_start - self.surrounding_sequence_radius
         window_end = bin_end + self.surrounding_sequence_radius
         retrieved_sequence = \
-            self.genome.get_encoding_from_coords(
-                "chr{0}".format(chrom), window_start, window_end, strand)
+            self.reference_sequence.get_encoding_from_coords(
+                chrom, window_start, window_end, strand)
         return (retrieved_sequence, retrieved_targets)
 
     def _update_randcache(self):

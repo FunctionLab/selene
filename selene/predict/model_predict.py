@@ -1,16 +1,23 @@
+"""
+This module provides the `AnalyzeSequences` class and supporting
+methods.
+"""
 import itertools
 import os
 
 import numpy as np
-from pyfaidx import Fasta
+import pyfaidx
 import torch
 from torch.autograd import Variable
 
-from .predict_handlers import DiffScoreHandler, LogitScoreHandler, \
-        WritePredictionsHandler, WriteRefAltHandler
-from ..sequences import Genome  # TODO: Make me generic.
-from ..utils import load_features_list
+from .predict_handlers import DiffScoreHandler
+from .predict_handlers import LogitScoreHandler
+from .predict_handlers import WritePredictionsHandler
+from .predict_handlers import WriteRefAltHandler
+from ..sequences import Genome
 
+
+# TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
 VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
@@ -18,40 +25,42 @@ VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
 
 def in_silico_mutagenesis_sequences(sequence,
                                     mutate_n_bases=1,
-                                    bases_arr=None):
-    """Creates a list containing each mutation that occurs from in silico
-    mutagenesis across the whole sequence.
+                                    sequence_type=Genome):
+    """
+    Creates a list containing each mutation that occurs from an
+    *in silico* mutagenesis across the whole sequence.
 
-    Please note that we have not parallelized this function yet, so runtime
-    increases exponentially when you increase `mutate_n_bases`.
+    Please note that we have not parallelized this function yet, so
+    runtime increases exponentially when you increase `mutate_n_bases`.
 
     Parameters
     ----------
     sequence : str
+        A string containing the sequence we would like to mutate.
     mutate_n_bases : int, optional
-        Default is 1.
-    bases_arr : list or None
-        List of bases. If None, uses `Genome.BASES_ARR` the DNA bases
-        by default.
+        Default is 1. The number of base changes to make with each set of
+        mutations evaluated, e.g. `mutate_n_bases = 2` considers all
+        pairs of SNPs.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The type of sequence
+        that has been passed in.
 
     Returns
     -------
-    list of tuple lists
+    list(list(tuple))
         A list of all possible mutations. Each element in the list is
         itself a list of tuples, e.g. element = [(0, 'T')] when only mutating
         1 base at a time. Each tuple is the position to mutate and the base
         with which we are replacing the reference base.
 
         For a sequence of length 1000, mutating 1 base at a time means that
-        we return a list of length 3000.
+        we return a list with length of 3000-4000, depending on the number of
+        unknown bases in the input sequences.
     """
-    if not bases_arr:
-        bases_arr = Genome.BASES_ARR
-
     sequence_alts = []
     for index, ref in enumerate(sequence):
         alts = []
-        for base in bases_arr:
+        for base in sequence_type.BASES_ARR:
             if base == ref:
                 continue
             alts.append(base)
@@ -68,6 +77,22 @@ def in_silico_mutagenesis_sequences(sequence,
 
 
 def _ism_sample_id(sequence, mutation_information):
+    """
+    TODO
+
+    Parameters
+    ----------
+    sequence : str
+        The input sequence to mutate.
+    mutation_information : list(tuple)
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+
+    """
     positions = []
     refs = []
     alts = []
@@ -78,74 +103,60 @@ def _ism_sample_id(sequence, mutation_information):
     return (';'.join(positions), ';'.join(refs), ';'.join(alts))
 
 
-def mutate_sequence(encoded_sequence,
+def mutate_sequence(encoding,
                     mutation_information,
-                    base_to_index=None):
+                    sequence_type=Genome):
     """
+    Transforms a sequence with a set of mutations.
 
     Parameters
     ----------
-    encoded_sequence : np.ndarray
-        N-by-4 reference sequence one-hot encoding.
-    mutation_information : list of tuple
-        List of tuples of (int, str). Each tuple is the position to mutate and
-        the base to which to mutate that position in the sequence.
-    base_to_index : dict or None
-        Base-to-index dictionary (str -> index). If None, uses
-        `Genome.BASE_TO_INDEX` the DNA base-to-index dictionary by default.
+    encoding : numpy.ndarray
+        An :math:`L \\times N` array (where :math:`L` is the sequence's
+        length and :math:`N` is the size of the sequence type's
+        alphabet) holding the one-hot encoding of the
+        reference sequence.
+    mutation_information : list(tuple)
+        List of tuples of (`int`, `str`). Each tuple is the position to
+        mutate and the base to which to mutate that position in the
+        sequence.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The type of sequence that
+        the input is.
 
     Returns
     -------
-    np.ndarray
-        N-by-4 mutated sequence one-hot encoding.
+    numpy.ndarray
+        An :math:`L \\times N` array holding the one-hot encoding of
+        the mutated sequence.
     """
-    if not base_to_index:
-        base_to_index = Genome.BASE_TO_INDEX
-    mutated_seq = np.copy(encoded_sequence)
+    mutated_seq = np.copy(encoding)
     for (position, alt) in mutation_information:
-        replace_base = base_to_index[alt]
+        replace_base = sequence_type.BASE_TO_INDEX[alt]
         mutated_seq[position, :] = 0
         mutated_seq[position, replace_base] = 1
     return mutated_seq
 
 
-def reverse_strand(sequence, complementary_base_dict=None):
+# TODO: Is this a general method that might belong in utils?
+def read_vcf_file(input_path):
     """
+    Read the relevant columns for a variant call format (VCF) file to
+    collect variants for variant effect prediction.
 
     Parameters
     ----------
-    sequence : str
-    complementary_base_dict : dict or None
-        Base-to-complement dictionary (str -> str). If None, uses
-        `Genome.COMPLEMENTARY_BASE` the DNA dict by default.
+    input_path : str
+        Path to the VCF file.
 
     Returns
     -------
-    str
-    """
-    if not complementary_base_dict:
-        complementary_base_dict = Genome.COMPLEMENTARY_BASE
-    reverse_bases = [complementary_base_dict for b in sequence[::-1]]
-    return ''.join(reverse_bases)
-
-
-def read_vcf_file(vcf_file):
-    """Read the relevant columns for a VCF file to collect variants
-    for variant effect prediction.
-
-    Parameters
-    ----------
-    vcf_file : str
-        Filepath for the VCF file
-
-    Returns
-    -------
-    list of tuple
+    list(tuple)
         List of variants. Tuple = (chrom, position, id, ref, alt)
     """
     variants = []
 
-    with open(vcf_file, 'r') as file_handle:
+    with open(input_path, 'r') as file_handle:
         lines = file_handle.readlines()
         for index, line in enumerate(lines):
             if '#' not in line:
@@ -156,7 +167,7 @@ def read_vcf_file(vcf_file):
                     raise ValueError(
                         "First 5 columns in file {0} were {1}. "
                         "Expected columns: {2}".format(
-                            vcf_file, cols[:5], VCF_REQUIRED_COLS))
+                            input_path, cols[:5], VCF_REQUIRED_COLS))
                 index += 1
                 break
 
@@ -173,12 +184,29 @@ def read_vcf_file(vcf_file):
     return variants
 
 
+# TODO: MAKE GENERIC.
 def _add_sequence_surrounding_alt(alt_sequence,
                                   sequence_length,
                                   chrom,
                                   ref_start,
                                   ref_end,
                                   genome):
+    """
+    TODO
+
+    Parameters
+    ----------
+    alt_sequence
+    sequence_length
+    chrom
+    ref_start
+    ref_end
+    genome
+
+    Returns
+    -------
+
+    """
     alt_len = len(alt_sequence)
     add_start = int((sequence_length - alt_len) / 2)
     add_end = add_start
@@ -191,12 +219,12 @@ def _add_sequence_surrounding_alt(alt_sequence,
     rhs_start = ref_end
     rhs_end = ref_end + add_end
 
-    if not genome.sequence_in_bounds(chrom, rhs_start, rhs_end):
+    if not genome.coords_in_bounds(chrom, rhs_start, rhs_end):
         # add everything to the LHS
         lhs_start = ref_start - sequence_length + alt_len
         alt_sequence = genome.get_sequence_from_coords(
             chrom, lhs_start, lhs_end) + alt_sequence
-    elif not genome.sequence_in_bounds(chrom, lhs_start, lhs_end):
+    elif not genome.coords_in_bounds(chrom, lhs_start, lhs_end):
         # add everything to RHS
         rhs_end = ref_end + sequence_length - alt_len
         alt_sequence += genome.get_sequence_from_coords(
@@ -214,22 +242,48 @@ def _add_sequence_surrounding_alt(alt_sequence,
 
 
 class AnalyzeSequences(object):
-    """Score sequences and their variants using the predictions made
-    by a trained model."""
+    """
+    Score sequences and their variants using the predictions made
+    by a trained model.
+
+      Parameters
+    ----------
+    model : torch.nn.Module
+        A sequence-based model that has already been trained.
+    sequence_length : int
+        The length of sequences that the model is expecting.
+    batch_size : int
+        The size of the mini-batches to use.
+    features : list(str)
+        The names of the features that the model is predicting.
+    use_cuda : bool
+        Default is `False`. Specifies whether to use CUDA or not.
+    sequence_type : class, optional
+        Default is `selene.sequences.Genome`. The type of sequence that
+        this analysis will be performed on.
+
+
+    Attributes
+    ----------
+    model
+    use_cuda
+    sequence_length
+    batch_size
+    features
+    sequence_type
+    """
 
     def __init__(self,
                  model,
                  sequence_length,
                  batch_size,
-                 features_file,
-                 trained_model_file,
-                 use_cuda=False):
+                 features,
+                 use_cuda=False,
+                 sequence_type=Genome):
+        """
+        Constructs a new `AnalyzeSequences` object.
+        """
         self.model = model
-
-        trained_model = torch.load(trained_model_file)
-        self.model.load_state_dict(trained_model["state_dict"])
-        self.model.eval()
-
         self.use_cuda = use_cuda
         if self.use_cuda:
             self.model.cuda()
@@ -242,18 +296,21 @@ class AnalyzeSequences(object):
             self._end_radius += 1
 
         self.batch_size = batch_size
-        self.features_list = load_features_list(features_file)
+        self.features = features
+        self.sequence_type = sequence_type
 
     def predict(self, batch_sequences):
-        """
+        """# TODO(DOCUMENTATION): Finish.
 
         Parameters
         ----------
-        batch_sequences : np.ndarray
+        batch_sequences : numpy.ndarray
+            # TODO(DOCUMENTATION): Finish.
 
         Returns
         -------
-        np.ndarray
+        numpy.ndarray
+            # TODO(DOCUMENTATION): Finish.
         """
         inputs = torch.Tensor(batch_sequences)
         if self.use_cuda:
@@ -264,34 +321,49 @@ class AnalyzeSequences(object):
 
     def _initialize_reporters(self,
                               save_data,
-                              output_dir,
-                              filename_prefix,
+                              output_path_prefix,
                               nonfeature_cols,
                               mode="ism"):
+        """
+        TODO
+
+        Parameters
+        ----------
+        save_data : TODO
+            TODO
+        output_path_prefix : str
+            TODO
+        nonfeature_cols : list(str)
+            TODO
+        mode : str
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        """
         reporters = []
         if "diffs" in save_data:
-            filename = os.path.join(
-                output_dir, f"{filename_prefix}_diffs.txt")
+            filename = "{0}_diffs.tsv".format(output_path_prefix)
             diff_handler = DiffScoreHandler(
-                self.features_list, nonfeature_cols, filename)
+                self.features, nonfeature_cols, filename)
             reporters.append(diff_handler)
         if "logits" in save_data:
-            filename = os.path.join(
-                output_dir, f"{filename_prefix}_logits.txt")
+            filename = "{0}_logits.tsv".format(output_path_prefix)
             logit_handler = LogitScoreHandler(
-                self.features_list, nonfeature_cols, filename)
+                self.features, nonfeature_cols, filename)
             reporters.append(logit_handler)
         if "predictions" in save_data and mode == "ism":
-            filename = os.path.join(
-                output_dir, f"{filename_prefix}_preds.txt")
+            filename = "{0}_predictions.tsv".format(output_path_prefix)
             preds_handler = WritePredictionsHandler(
-                self.features_list, nonfeature_cols, filename)
+                self.features, nonfeature_cols, filename)
             reporters.append(preds_handler)
         elif "predictions" in save_data and mode == "varianteffect":
-            filename = os.path.join(
-                output_dir, f"{filename_prefix}_preds")
+            filename = "{0}_predictions".format(output_path_prefix)
             preds_handler = WriteRefAltHandler(
-                self.features_list, nonfeature_cols, filename)
+                self.features, nonfeature_cols, filename)
             reporters.append(preds_handler)
         return reporters
 
@@ -301,12 +373,18 @@ class AnalyzeSequences(object):
                                       mutations_list,
                                       reporters=[]):
         """
+        # TODO(DOCUMENTATION): Finish.
+
         Parameters
         ----------
         sequence : str
-        base_preds : np.ndarray
-        mutations_list : list of tuple
-        reporters : list of PredictionsHandler
+            TODO
+        base_preds : numpy.ndarray
+            TODO
+        mutations_list : list(tuple)
+            TODO
+        reporters : list(PredictionsHandler)
+            TODO
 
         Returns
         -------
@@ -314,18 +392,20 @@ class AnalyzeSequences(object):
             Writes results to files corresponding to each reporter in
             `reporters`.
         """
-        current_sequence_encoding = Genome.sequence_to_encoding(sequence)
+        current_sequence_encoding = self.sequence_type.sequence_to_encoding(
+            sequence)
         for i in range(0, len(mutations_list), self.batch_size):
             start = i
-            end = i + self.batch_size
+            end = min(i + self.batch_size, len(mutations_list))
 
             mutated_sequences = np.zeros(
-                (self.batch_size, *current_sequence_encoding.shape))
+                (end - start, *current_sequence_encoding.shape))
 
             batch_ids = []
             for ix, mutation_info in enumerate(mutations_list[start:end]):
                 mutated_seq = mutate_sequence(
-                    current_sequence_encoding, mutation_info)
+                    current_sequence_encoding, mutation_info,
+                    sequence_type=self.sequence_type)
                 mutated_sequences[ix, :, :] = mutated_seq
                 batch_ids.append(_ism_sample_id(sequence, mutation_info))
             outputs = self.predict(mutated_sequences)
@@ -340,42 +420,51 @@ class AnalyzeSequences(object):
             r.write_to_file()
 
     def in_silico_mutagenesis(self,
-                              input_sequence,
+                              sequence,
                               save_data,
-                              output_dir,
-                              filename_prefix="ism",
+                              output_path_prefix="ism",
                               mutate_n_bases=1):
         """
+        # TODO(DOCUMENTATION): Finish.
+
         Parameters
         ----------
-        input_sequence : str
+        sequence : str
+            TODO
         save_data : list of str
-        output_dir : str
-        filename_prefix : str, optional
+            TODO
+        output_path_prefix : str, optional
+            TODO
         mutate_n_bases : int, optional
+            TODO
 
         Returns
         -------
         None
+            TODO
         """
-        n = len(input_sequence)
+        n = len(sequence)
         if n < self.sequence_length: # Pad string length as necessary.
              diff = (self.sequence_length - n) / 2
              pad_l = int(np.floor(diff))
              pad_r = int(np.ceil(diff))
-             input_sequence = ('N' * pad_l) + input_sequence + ('N' * pad_r)
+             sequence = ((self.sequence_type.UNK_BASE * pad_l) +
+                         sequence +
+                         (self.sequence_type.UNK_BASE * pad_r))
         elif n > self.sequence_length:  # Extract center substring of proper length.
             start = int((n - self.sequence_length) // 2)
             end = int(start + self.sequence_length)
-            input_sequence = input_sequence[start:end]
+            sequence = sequence[start:end]
 
         mutated_sequences = in_silico_mutagenesis_sequences(
-            input_sequence, mutate_n_bases=1)
+            sequence, mutate_n_bases=1,
+            sequence_type=self.sequence_type)
 
         reporters = self._initialize_reporters(
-            save_data, output_dir, filename_prefix, ISM_COLS)
+            save_data, output_path_prefix, ISM_COLS)
 
-        current_sequence_encoding = Genome.sequence_to_encoding(input_sequence)
+        current_sequence_encoding = self.sequence_type.sequence_to_encoding(
+            sequence)
 
         base_encoding = current_sequence_encoding.reshape(
             (1, *current_sequence_encoding.shape))
@@ -386,31 +475,36 @@ class AnalyzeSequences(object):
             base_preds, [["NA", "NA", "NA"]])
 
         self.in_silico_mutagenesis_predict(
-            input_sequence, base_preds, mutated_sequences, reporters=reporters)
+            sequence, base_preds, mutated_sequences, reporters=reporters)
 
     def in_silico_mutagenesis_from_file(self,
                                         input_path,
                                         save_data,
-                                        output_dir,
-                                        filename_prefix="ism",
+                                        output_path_prefix="ism",
                                         mutate_n_bases=1):
         """
-        Parameters
-        ----------
-        input_path: str
-        save_data : list of str
-        output_dir : str
-        filename_prefix : str, optional
-        mutate_n_bases : int, optional
+        TODO
 
         Please note that we have not parallelized this function yet, so runtime
         increases exponentially when you increase `mutate_n_bases`.
 
-        Returns
+        Parameters
+        ----------
+        input_path: str
+            TODO
+        save_data : list(str)
+            TODO
+        output_path_prefix : str, optional
+            TODO
+        mutate_n_bases : int, optional
+            TODO
+
+        Yields
         -------
         None
+            TODO
         """
-        fasta_file = Fasta(input_path)
+        fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str(fasta_record)
             n = len(cur_sequence)
@@ -418,28 +512,34 @@ class AnalyzeSequences(object):
                  diff = (self.sequence_length - n) / 2
                  pad_l = int(np.floor(diff))
                  pad_r = int(np.ceil(diff))
-                 cur_sequence = ('N' * pad_l) + cur_sequence + ('N' * pad_r)
+                 cur_sequence = ((self.sequence_type.UNK_BASE * pad_l) +
+                                 cur_sequence +
+                                 (self.sequence_type.UNK_BASE * pad_r))
             elif n > self.sequence_length:
                 start = int((n - self.sequence_length) // 2)
                 end = int(start + self.sequence_length)
                 cur_sequence = cur_sequence[start:end]
 
             # Generate mut sequences and base preds.
-            mutated_sequences = in_silico_mutagenesis_sequences(cur_sequence, mutate_n_bases=mutate_n_bases)
-            cur_sequence_encoding = Genome.sequence_to_encoding(cur_sequence)
-            base_encoding = cur_sequence_encoding.reshape(1, *cur_sequence_encoding.shape)
+            mutated_sequences = in_silico_mutagenesis_sequences(
+                cur_sequence, mutate_n_bases=mutate_n_bases,
+                sequence_type=self.sequence_type)
+            cur_sequence_encoding = self.sequence_type.sequence_to_encoding(
+                cur_sequence)
+            base_encoding = cur_sequence_encoding.reshape(
+                1, *cur_sequence_encoding.shape)
             base_preds = self.predict(base_encoding)
 
             # Write base to file, and make mut preds.
-            reporters = self._initialize_reporters(save_data, output_dir,
-                                                   "{0}.{1}".format(i, filename_prefix), ISM_COLS)
+            reporters = self._initialize_reporters(
+                save_data, "{0}_{1}".format(output_path_prefix, i), ISM_COLS)
             predictions_reporter = reporters[-1]
-            predictions_reporter.handle_batch_predictions(base_preds, [["NA", "NA", "NA"]])
+            predictions_reporter.handle_batch_predictions(
+                base_preds, [["NA", "NA", "NA"]])
             self.in_silico_mutagenesis_predict(
-                cur_sequence, base_preds, mutated_sequences, reporters=reporters)
+                cur_sequence, base_preds, mutated_sequences,
+                reporters=reporters)
         fasta_file.close()
-
-
 
     def handle_ref_alt_predictions(self,
                                    batch_ref_seqs,
@@ -447,11 +547,16 @@ class AnalyzeSequences(object):
                                    batch_ids,
                                    reporters):
         """
+        TODO
+
         Parameters
         ----------
-        batch_ref_seqs : list of np.ndarray
-        batch_alt_seqs : list of np.ndarray
-        reporters : list of PredictionsHandler
+        batch_ref_seqs : list(np.ndarray)
+            TODO
+        batch_alt_seqs : list(np.ndarray)
+            TODO
+        reporters : list(PredictionsHandler)
+            TODO
 
         Returns
         -------
@@ -469,8 +574,34 @@ class AnalyzeSequences(object):
             else:
                 r.handle_batch_predictions(alt_outputs, batch_ids)
 
+    #TODO: Make generic.
     def _process_alts(self, all_alts, ref, chrom, start, end,
                       reference_sequence, genome):
+        """
+        TODO
+
+        Parameters
+        ----------
+        all_alts : TODO
+            TODO
+        ref : TODO
+            TODO
+        chrom : str
+            TODO
+        start : TODO
+            TODO
+        end : TODO
+            TODO
+        reference_sequence : TODO
+            TODO
+        genome : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+        """
         alt_encodings = []
         for a in all_alts:
             prefix = reference_sequence[:self._start_radius]
@@ -501,27 +632,35 @@ class AnalyzeSequences(object):
                                   indexed_fasta,
                                   output_dir=None):
         """
+        TODO
+
         Parameters
         ----------
         vcf_file : str
-        save_data : list of str
+            TODO
+        save_data : list(str)
+            TODO
         indexed_fasta : str
+            TODO
         output_dir : str or None, optional
+            TODO
 
         Returns
         -------
         None
         """
         variants = read_vcf_file(vcf_file)
-        genome = Genome(indexed_fasta)
+        genome = self.sequence_type(indexed_fasta)
+        # TODO: Remove this construction from here entirely.
 
+        # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
-        out_prefix = filename.split('.')[0]
+        output_path_prefix = filename.split('.')[0]
         if not output_dir:
             output_dir = path
-
+        output_path_prefix = os.path.join(output_dir, output_path_prefix)
         reporters = self._initialize_reporters(
-            save_data, output_dir, out_prefix, VARIANTEFFECT_COLS,
+            save_data, output_path_prefix, VARIANTEFFECT_COLS,
             mode="varianteffect")
 
         batch_ref_seqs = []
@@ -531,7 +670,7 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
-            if not genome.sequence_in_bounds(chrom, start, end):
+            if not genome.coords_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
                 continue
