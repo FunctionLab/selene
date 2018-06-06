@@ -2,19 +2,26 @@
 
 ---
 
-@TODO: Describe what Selene does at a very high level.
+You have found *selene*, a Python library and command line interface for training deep neural networks from biological sequence data such as genomes.
 
 ## Installation
 
-TODO
+Installing selene with [Anaconda](https://www.anaconda.com/download/):
+@TODO: Add line on installation via anaconda.
+
+Installing selene with pip:
+@TODO: Add line on installation via pip.
+
+Installing selene from source:
+@TODO: Add line on installation from source.
+
 
 ## Tutorials and examples
 
-For tutorials on using Selene, see @TODO: Insert link to webpage
-hosting selene tutorials, as well as the `selene-examples` repository.
+Tutorials for selene are available [here](https://selene.flatironinstitute.org/tutorials/).
+We recommend starting with [this tutorial](https://selene.flatironinstitute.org/tutorials/getting_started_with_selene.html).
 
 ## Documentation
 
-For the full documentation, see @TODO: Insert link to webpage hosting
-the full documentation of API etc.
+The documentation for selene is available [here](https://selene.flatironinstitute.org/docs/).
 
