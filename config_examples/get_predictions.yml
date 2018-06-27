@@ -1,0 +1,26 @@
+---
+ops: [analyze]
+model: {
+    file: /home/kc31/fi-projects/selene/models/deepsea.py,
+    class: DeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 2090,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+analyze_sequences: !obj:selene.predict.AnalyzeSequences {
+    sequence_length: 1000,
+    batch_size: 64,
+    features: !obj:selene.utils.load_features_list {
+        input_path: /scratch/data_hg/distinct_features_ENC.txt
+    },
+    trained_model_file: /tigress/TROYANSKAYA/kathy/outputs/blood_ENC_DSREGIONS/2018-06-25-15-18-03/best_model.pth.tar,
+    use_cuda: True
+}
+prediction: {
+    input_path: /tigress/TROYANSKAYA/kathy/regulatory_mutations_deepimmune.fasta,
+    output_path_prefix: /tigress/TROYANSKAYA/kathy/outputs/blood_ENC_DSREGIONS/predictions/test
+}
+...
