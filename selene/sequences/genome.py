@@ -45,6 +45,9 @@ def _get_sequence_from_coords(len_chrs, genome_sequence, chrom,
         choices.
 
     """
+    if chrom not in len_chrs:
+        return ""
+
     if start > len_chrs[chrom] or end > (len_chrs[chrom] + 1) \
             or start < 0:
         return ""
@@ -156,7 +159,7 @@ class Genome(Sequence):
             A list of tuples of the chromosome names and lengths.
 
         """
-        return [(k, self.len_chrs[v]) for k in self.get_chrs()]
+        return [(k, self.len_chrs[k]) for k in self.get_chrs()]
 
     def _get_len_chrs(self):
         len_chrs = {}
