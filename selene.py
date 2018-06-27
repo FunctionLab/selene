@@ -16,7 +16,10 @@ Options:
     --lr=<lr>               If training, the optimizer's learning rate
                             [default: None]
 """
-import importlib.util
+
+import os
+import importlib
+import sys
 
 from docopt import docopt
 import torch
@@ -47,14 +50,14 @@ def initialize_model(model_configs, train=True, lr=None):
     import_model_from = model_configs["file"]
     model_class_name = model_configs["class"]
 
-    spec = importlib.util.spec_from_file_location("module", import_model_from)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    model_class = getattr(module, model_class_name)
+    # TODO: would like to find a better way...
+    path, filename = os.path.split(import_model_from)
+    parent_path, model_dir = os.path.split(path)
+    sys.path.append(parent_path)
 
-    if train:
-        criterion = module.criterion()
-        optim_class, optim_kwargs = module.get_optimizer(lr)
+    module_name = filename.split('.')[0]
+    module = importlib.import_module("{0}.{1}".format(model_dir, module_name))
+    model_class = getattr(module, model_class_name)
 
     sequence_length = model_configs["sequence_length"]
     n_classes = model_configs["n_classes_to_predict"]
@@ -64,13 +67,15 @@ def initialize_model(model_configs, train=True, lr=None):
         from models.non_strand_specific_module import NonStrandSpecific
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"]["mode"])
+
+    criterion = module.criterion()
     if train:
+        optim_class, optim_kwargs = module.get_optimizer(lr)
         return model, criterion, optim_class, optim_kwargs
-    else:
-        return model
+    return model, criterion
 
 
-def execute(operation, config, model=None):
+def execute(operation, config):
     """
     TODO
 
@@ -89,58 +94,74 @@ def execute(operation, config, model=None):
         TODO
 
     """
-    if operation == "train":
-        model, loss, optim, optim_kwargs = initialize_model(
-            config["model"], train=True, lr=config["lr"])
+    model = None
+    trainer = None
+    for op in operations:
+        if op == "train":
+            model, loss, optim, optim_kwargs = initialize_model(
+                config["model"], train=True, lr=config["lr"])
 
-        sampler_info = configs["sampler"]
-        train_model_info = configs["train_model"]
+            sampler_info = configs["sampler"]
+            train_model_info = configs["train_model"]
 
-        data_sampler = instantiate(sampler_info)
+            data_sampler = instantiate(sampler_info)
 
-        train_model_info.bind(
-            model=model,
-            data_sampler=data_sampler,
-            loss_criterion=loss,
-            optimizer_class=optim,
-            optimizer_kwargs=optim_kwargs)
+            train_model_info.bind(
+                model=model,
+                data_sampler=data_sampler,
+                loss_criterion=loss,
+                optimizer_class=optim,
+                optimizer_kwargs=optim_kwargs)
 
-        trainer = instantiate(train_model_info)
-        trainer.train_and_validate()
-        if "evaluate_on_test" in config and config["evaluate_on_test"]:
-            trainer.evaluate()
-        if "save_datasets" in config and config["save_datasets"]:
-            trainer.write_datasets_to_file()
+            trainer = instantiate(train_model_info)
+            trainer.train_and_validate()
 
-    elif operation == "evaluate":
-        pass  # @TODO: figure out what this entails.
+        elif op == "evaluate":
+            if not model and "evaluate_model" in configs:
+                model, loss = initialize_model(
+                    configs["model"], train=False)
+                sampler_info = configs["sampler"]
+                evaluate_model_info = configs["evaluate_model"]
 
-    elif operation == "analyze":
-        if not model:
-            model = initialize_model(configs["model"], train=False)
+                data_sampler = instantiate(sampler_info)
 
-        analyze_seqs_info = configs["analyze_sequences"]
-        analyze_seqs_info.bind(model=model)
+                evaluate_model_info.bind(
+                    model=model,
+                    criterion=loss,
+                    data_sampler=data_sampler)
+                evaluator = instantiate(evaluate_model_info)
+                evaluator.evaluate()
+            elif trainer is not None:
+                trainer.evaluate()
 
-        analyze_seqs = instantiate(analyze_seqs_info)
+        elif op == "analyze":
+            if not model:
+                model, _ = initialize_model(
+                    configs["model"], train=False)
 
-        if "variant_effect_prediction" in configs:
-            vareff_info = configs["variant_effect_prediction"]
-            for filepath in vareff_info.pop("vcf_files"):
-                analyze_seqs.variant_effect_prediction(
-                    filepath, **vareff_info)
-        if "in_silico_mutagenesis" in configs:
-            ism_info = configs["in_silico_mutagenesis"]
-            if "input_sequence" in ism_info:
-                analyze_seqs.in_silico_mutagenesis(**ism_info)
-            elif "input_path" in ism_info:
-                analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)
-            else:
-                raise ValueError("in silico mutagenesis requires as input "
-                                 "the path to the FASTA file ('input_path')"
-                                 " or a sequences ('input_sequence'), but "
-                                 " found neither.")
+            analyze_seqs_info = configs["analyze_sequences"]
+            analyze_seqs_info.bind(model=model)
+            analyze_seqs = instantiate(analyze_seqs_info)
 
+            if "variant_effect_prediction" in configs:
+                vareff_info = configs["variant_effect_prediction"]
+                for filepath in vareff_info.pop("vcf_files"):
+                    analyze_seqs.variant_effect_prediction(
+                        filepath, **vareff_info)
+            if "in_silico_mutagenesis" in configs:
+                ism_info = configs["in_silico_mutagenesis"]
+                if "input_sequence" in ism_info:
+                    analyze_seqs.in_silico_mutagenesis(**ism_info)
+                elif "input_path" in ism_info:
+                    analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)
+                else:
+                    raise ValueError("in silico mutagenesis requires as input "
+                                     "the path to the FASTA file ('input_path')"
+                                     " or a sequences ('input_sequence'), but "
+                                     " found neither.")
+            if "prediction" in configs:
+                predict_info = configs["prediction"]
+                analyze_seqs.predictions_from_fasta_file(**predict_info)
 
 if __name__ == "__main__":
     arguments = docopt(
@@ -165,5 +186,4 @@ if __name__ == "__main__":
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
-    for op in operations:
-        execute(op, configs)
+    execute(operations, configs)
