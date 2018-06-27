@@ -14,9 +14,21 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from .utils import initialize_logger
+from .utils import load_model_from_state_dict
 from .utils import PerformanceMetrics
 
 logger = logging.getLogger("selene")
+
+
+def _metrics_logger(name, out_filepath):
+    logger = logging.getLogger("{0}".format(name))
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(message)s")
+    file_handle = logging.FileHandler(
+        os.path.join(out_filepath, "{0}.txt".format(name)))
+    file_handle.setFormatter(formatter)
+    logger.addHandler(file_handle)
+    return logger
 
 
 class TrainModel(object):
@@ -149,6 +161,15 @@ class TrainModel(object):
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
 
+        if self.data_parallel:
+            self.model = nn.DataParallel(model)
+            logger.debug("Wrapped model in DataParallel")
+
+        if self.use_cuda:
+            self.model.cuda()
+            self.criterion.cuda()
+            logger.debug("Set modules to use CUDA")
+
         os.makedirs(output_dir, exist_ok=True)
         current_run_output_dir = os.path.join(
             output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
@@ -158,15 +179,6 @@ class TrainModel(object):
         initialize_logger(
             os.path.join(self.output_dir, "{0}.log".format(__name__)),
             verbosity=logging_verbosity)
-
-        if self.data_parallel:
-            self.model = nn.DataParallel(model)
-            logger.debug("Wrapped model in DataParallel")
-
-        if self.use_cuda:
-            self.model.cuda()
-            self.criterion.cuda()
-            logger.debug("Set modules to use CUDA")
 
         self._create_validation_set(n_samples=n_validation_samples)
         self._validation_metrics = PerformanceMetrics(
@@ -182,23 +194,36 @@ class TrainModel(object):
         self._start_step = 0
         self._min_loss = float("inf")
         if checkpoint_resume is not None:
-            checkpoint = torch.load(checkpoint_resume)
-            self.model.load_state_dict(checkpoint["state_dict"])
-            self.model.eval()
+            checkpoint = torch.load(
+                checkpoint_resume,
+                map_location=lambda storage, location: storage)
 
-            self._start_step = checkpoint_resume["step"]
-            self._min_loss = checkpoint_resume["min_loss"]
+            self.model = load_model_from_state_dict(
+                checkpoint["state_dict"], self.model)
+
+            self._start_step = checkpoint["step"]
+            self._min_loss = checkpoint["min_loss"]
             self.optimizer.load_state_dict(
-                checkpoint_resume["optimizer"])
+                checkpoint["optimizer"])
+            if self.use_cuda:
+                for state in self.optimizer.state.values():
+                    for k, v in state.items():
+                        if isinstance(v, torch.Tensor):
+                            state[k] = v.cuda()
 
             logger.info(
                 ("Resuming from checkpoint: step {0}, min loss {1}").format(
                     self._start_step, self._min_loss))
 
-        self.losses = {
-            "training": [],
-            "validation": [],
-        }
+        self._train_logger = _metrics_logger(
+                "{0}.train".format(__name__), self.output_dir)
+        self._validation_logger = _metrics_logger(
+                "{0}.validation".format(__name__), self.output_dir)
+
+        self._train_logger.info("loss")
+        # TODO: this makes the assumption that all models will report ROC AUC,
+        # which is not the case.
+        self._validation_logger.info("loss\troc_auc")
 
     def _create_validation_set(self, n_samples=None):
         """
@@ -244,6 +269,10 @@ class TrainModel(object):
                       t_f - t_i,
                       len(self._test_data) * self.batch_size,
                       len(self._test_data)))
+        np.savez_compressed(
+            os.path.join(self.output_dir, "test_targets.npz"),
+            data=self._all_test_targets)
+        self.write_datasets_to_file()
 
     def _get_batch(self):
         """
@@ -278,17 +307,22 @@ class TrainModel(object):
             factor=0.8)
         for step in range(self._start_step, self.max_steps):
             train_loss = self.train()
-            self.losses["training"].append(train_loss)
 
             # @TODO: if step and step % ...
             if step % self.nth_step_report_stats == 0:
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
-                self.losses["training"].append(train_loss)
-                self.losses["validation"].append(validation_loss)
+                self._train_logger.info(train_loss)
                 if valid_scores["roc_auc"]:
+                    validation_roc_auc = valid_scores["roc_auc"]
+                    self._validation_logger.info(
+                        "{0}\t{1}".format(validation_loss,
+                                          validation_roc_auc))
                     scheduler.step(
-                        math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
+                        math.ceil(validation_roc_auc * 1000.0) / 1000.0)
+                else:
+                    self._validation_logger.info("{0}\tNA".format(
+                        validation_loss))
 
                 is_best = validation_loss < min_loss
                 min_loss = min(validation_loss, min_loss)
@@ -378,6 +412,7 @@ class TrainModel(object):
             loss = self.criterion(predictions, targets)
 
             all_predictions.append(predictions.data.cpu().numpy())
+
             batch_losses.append(loss.data[0])
 
         all_predictions = np.vstack(all_predictions)
@@ -424,7 +459,6 @@ class TrainModel(object):
 
         average_scores = self._test_metrics.update(all_predictions,
                                                    self._all_test_targets)
-
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),
             data=all_predictions)
@@ -445,10 +479,7 @@ class TrainModel(object):
         """
         Writes the sampled datasets to file.
         """
-        data_dir = os.path.join(
-            self.output_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
-        self.sampler.save_datasets_to_file(data_dir)
+        self.sampler.save_datasets_to_file(self.output_dir)
 
     def _save_checkpoint(self, state, is_best,
                          dir_path=None,
