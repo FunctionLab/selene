@@ -2,6 +2,7 @@
 This module provides the `AnalyzeSequences` class and supporting
 methods.
 """
+from collections import OrderedDict
 import itertools
 import os
 
@@ -15,6 +16,7 @@ from .predict_handlers import LogitScoreHandler
 from .predict_handlers import WritePredictionsHandler
 from .predict_handlers import WriteRefAltHandler
 from ..sequences import Genome
+from ..utils import load_model_state_dict
 
 
 # TODO: MAKE THESE GENERIC:
@@ -56,6 +58,7 @@ def in_silico_mutagenesis_sequences(sequence,
         For a sequence of length 1000, mutating 1 base at a time means that
         we return a list with length of 3000-4000, depending on the number of
         unknown bases in the input sequences.
+
     """
     sequence_alts = []
     for index, ref in enumerate(sequence):
@@ -129,6 +132,7 @@ def mutate_sequence(encoding,
     numpy.ndarray
         An :math:`L \\times N` array holding the one-hot encoding of
         the mutated sequence.
+
     """
     mutated_seq = np.copy(encoding)
     for (position, alt) in mutation_information:
@@ -153,11 +157,13 @@ def read_vcf_file(input_path):
     -------
     list(tuple)
         List of variants. Tuple = (chrom, position, id, ref, alt)
+
     """
     variants = []
 
     with open(input_path, 'r') as file_handle:
         lines = file_handle.readlines()
+        index = 0
         for index, line in enumerate(lines):
             if '#' not in line:
                 break
@@ -190,21 +196,22 @@ def _add_sequence_surrounding_alt(alt_sequence,
                                   chrom,
                                   ref_start,
                                   ref_end,
-                                  genome):
+                                  sequence_type):
     """
     TODO
 
     Parameters
     ----------
-    alt_sequence
-    sequence_length
-    chrom
-    ref_start
-    ref_end
-    genome
+    alt_sequence : str
+    sequence_length : int
+    chrom : str
+    ref_start : int
+    ref_end : int
+    sequence_type : selene.sequences.Sequence
 
     Returns
     -------
+    str
 
     """
     alt_len = len(alt_sequence)
@@ -219,23 +226,23 @@ def _add_sequence_surrounding_alt(alt_sequence,
     rhs_start = ref_end
     rhs_end = ref_end + add_end
 
-    if not genome.coords_in_bounds(chrom, rhs_start, rhs_end):
+    if not sequence_type.coords_in_bounds(chrom, rhs_start, rhs_end):
         # add everything to the LHS
         lhs_start = ref_start - sequence_length + alt_len
-        alt_sequence = genome.get_sequence_from_coords(
+        alt_sequence = sequence_type.get_sequence_from_coords(
             chrom, lhs_start, lhs_end) + alt_sequence
-    elif not genome.coords_in_bounds(chrom, lhs_start, lhs_end):
+    elif not sequence_type.coords_in_bounds(chrom, lhs_start, lhs_end):
         # add everything to RHS
         rhs_end = ref_end + sequence_length - alt_len
-        alt_sequence += genome.get_sequence_from_coords(
+        alt_sequence += sequence_type.get_sequence_from_coords(
             chrom, rhs_start, rhs_end)
     else:
         if lhs_start >= lhs_end:
             lhs_sequence = ""
         else:
-            lhs_sequence = genome.get_sequence_from_coords(
+            lhs_sequence = sequence_type.get_sequence_from_coords(
                 chrom, lhs_start, lhs_end)
-        rhs_sequence = genome.get_sequence_from_coords(
+        rhs_sequence = sequence_type.get_sequence_from_coords(
             chrom, rhs_start, rhs_end)
         alt_sequence = lhs_sequence + alt_sequence + rhs_sequence
     return alt_sequence
@@ -246,7 +253,7 @@ class AnalyzeSequences(object):
     Score sequences and their variants using the predictions made
     by a trained model.
 
-      Parameters
+    Parameters
     ----------
     model : torch.nn.Module
         A sequence-based model that has already been trained.
@@ -271,10 +278,12 @@ class AnalyzeSequences(object):
     batch_size
     features
     sequence_type
+
     """
 
     def __init__(self,
                  model,
+                 trained_model_file,
                  sequence_length,
                  batch_size,
                  features,
@@ -283,7 +292,14 @@ class AnalyzeSequences(object):
         """
         Constructs a new `AnalyzeSequences` object.
         """
-        self.model = model
+        trained_model = torch.load(
+                trained_model_file,
+                map_location=lambda storage, location: storage)
+
+        self.model = load_model_from_state_dict(
+            trained_model["state_dict"], model)
+        self.model.eval()
+
         self.use_cuda = use_cuda
         if self.use_cuda:
             self.model.cuda()
@@ -300,17 +316,22 @@ class AnalyzeSequences(object):
         self.sequence_type = sequence_type
 
     def predict(self, batch_sequences):
-        """# TODO(DOCUMENTATION): Finish.
+        """
+        Return model predictions for a batch of sequences.
 
         Parameters
         ----------
         batch_sequences : numpy.ndarray
-            # TODO(DOCUMENTATION): Finish.
+            `batch_sequences` has the shape :math:`B \\times L \\times N`,
+            where :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet.
 
         Returns
         -------
         numpy.ndarray
-            # TODO(DOCUMENTATION): Finish.
+            The model predictions of shape :math:`B \\times F`, where :math:`F`
+            is the number of features (classes) the model predicts.
+
         """
         inputs = torch.Tensor(batch_sequences)
         if self.use_cuda:
@@ -355,7 +376,7 @@ class AnalyzeSequences(object):
             logit_handler = LogitScoreHandler(
                 self.features, nonfeature_cols, filename)
             reporters.append(logit_handler)
-        if "predictions" in save_data and mode == "ism":
+        if "predictions" in save_data and mode != "varianteffect":
             filename = "{0}_predictions.tsv".format(output_path_prefix)
             preds_handler = WritePredictionsHandler(
                 self.features, nonfeature_cols, filename)
@@ -366,6 +387,75 @@ class AnalyzeSequences(object):
                 self.features, nonfeature_cols, filename)
             reporters.append(preds_handler)
         return reporters
+
+    def _pad_sequence(self, sequence):
+        diff = (self.sequence_length - len(sequence)) / 2
+        pad_l = int(np.floor(diff))
+        pad_r = int(np.ceil(diff))
+        sequence = ((self.sequence_type.UNK_BASE * pad_l) +
+                    sequence +
+                    (self.sequence_type.UNK_BASE * pad_r))
+        return str.upper(sequence)
+
+    def _truncate_sequence(self, sequence):
+        start = int((len(sequence) - self.sequence_length) // 2)
+        end = int(start + self.sequence_length)
+        return str.upper(sequence[start:end])
+
+    def predictions_from_fasta_file(self, input_path, output_path_prefix):
+        """
+        # TODO(DOCUMENTATION): Finish.
+
+        Parameters
+        ----------
+        input_path : str
+        output_path_prefix : str
+
+        Returns
+        -------
+        None
+            Writes results to files corresponding to each reporter in
+            `reporters`.
+
+        """
+        reporter = self._initialize_reporters(
+            ["predictions"],
+            output_path_prefix,
+            ["name"],
+            mode="prediction")[0]
+        fasta_file = pyfaidx.Fasta(input_path)
+        sequences = np.zeros((self.batch_size,
+                              self.sequence_length,
+                              len(self.sequence_type.BASES_ARR)))
+        batch_ids = []
+        for i, fasta_record in enumerate(fasta_file):
+            cur_sequence = str(fasta_record)
+
+            if len(cur_sequence) < self.sequence_length:
+                cur_sequence = self._pad_sequence(cur_sequence)
+            elif len(cur_sequence) > self.sequence_length:
+                cur_sequence = self._truncate_sequence(cur_sequence)
+
+            cur_sequence_encoding = self.sequence_type.sequence_to_encoding(
+                cur_sequence)
+            batch_ids.append([fasta_record.name])
+
+            if i and i % self.batch_size == 0:
+                preds = self.predict(sequences)
+                sequences = np.zeros(
+                    self.batch_size, *cur_sequence_encoding.shape)
+                reporter.handle_batch_predictions(preds, batch_ids)
+
+            sequences[i % self.batch_size, :, :] = cur_sequence_encoding
+
+        if i % self.batch_size != 0:
+            sequences = sequences[:i % self.batch_size + 1, :, :]
+            preds = self.predict(sequences)
+            reporter.handle_batch_predictions(preds, batch_ids)
+
+        fasta_file.close()
+        reporter.write_to_file()
+
 
     def in_silico_mutagenesis_predict(self,
                                       sequence,
@@ -456,6 +546,7 @@ class AnalyzeSequences(object):
             end = int(start + self.sequence_length)
             sequence = sequence[start:end]
 
+        sequence = str.upper(sequence)
         mutated_sequences = in_silico_mutagenesis_sequences(
             sequence, mutate_n_bases=1,
             sequence_type=self.sequence_type)
@@ -507,18 +598,10 @@ class AnalyzeSequences(object):
         fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str(fasta_record)
-            n = len(cur_sequence)
-            if n < self.sequence_length:
-                 diff = (self.sequence_length - n) / 2
-                 pad_l = int(np.floor(diff))
-                 pad_r = int(np.ceil(diff))
-                 cur_sequence = ((self.sequence_type.UNK_BASE * pad_l) +
-                                 cur_sequence +
-                                 (self.sequence_type.UNK_BASE * pad_r))
-            elif n > self.sequence_length:
-                start = int((n - self.sequence_length) // 2)
-                end = int(start + self.sequence_length)
-                cur_sequence = cur_sequence[start:end]
+            if len(cur_sequence) < self.sequence_length:
+                cur_sequence = self._pad_sequence(cur_sequence)
+            elif len(cur_sequence) > self.sequence_length:
+                cur_sequence = self._truncate_sequence(cur_sequence)
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
@@ -655,7 +738,7 @@ class AnalyzeSequences(object):
 
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
-        output_path_prefix = filename.split('.')[0]
+        output_path_prefix = '.'.join(filename.split('.')[:-1])
         if not output_dir:
             output_dir = path
         output_path_prefix = os.path.join(output_dir, output_path_prefix)
