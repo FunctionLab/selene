@@ -70,8 +70,6 @@ def compute_score(prediction, target, metric_fn,
                 np.sum(feature_targets) > report_gt_feature_n_positives:
             feature_scores[index] = metric_fn(
                 feature_targets, feature_preds)
-        else:
-            print("Did not compute metrics for a feature.")
     valid_feature_scores = [s for s in feature_scores if s >= 0]
     if not valid_feature_scores:
         return None, feature_scores

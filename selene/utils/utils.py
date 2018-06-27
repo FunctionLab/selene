@@ -4,7 +4,48 @@ classes or concepts, but still perform specific and important roles
 across many of the packages modules.
 
 """
+from collections import OrderedDict
 import logging
+
+import torch
+
+
+def load_model_from_state_dict(state_dict, model):
+    """
+    Loads model weights that were saved to a file previously by `torch.save`.
+    This is a helper function to reconcile state dict keys where a model was
+    saved with/without torch.nn.DataParallel and now must be loaded
+    without/with torch.nn.DataParallel.
+
+    Parameters
+    ----------
+    state_dict : collections.OrderedDict
+        The state of the model.
+    model : torch.nn.Module
+        The PyTorch model, a module composed of submodules.
+
+    Returns
+    -------
+    torch.nn.Module
+        The model with weights loaded from the state dict.
+    """
+    model_keys = model.state_dict.keys()
+    state_dict_keys = state_dict.keys()
+
+    new_state_dict = OrderedDict()
+    for (k1, k2) in zip(model_keys, state_dict_keys):
+        value = state_dict_keys[k2]
+        if k1 == k2:
+            new_state_dict[k2] = value
+        elif ('module' in k1 and k1[7:] == k2) \
+                or ('module' in k2 and k2[7:] == k1):
+            new_state_dict[k1] = value
+        else:
+            raise ValueError("Model state dict keys do not match "
+                             "the keys specified in `state_dict` input. "
+                             "Cannot load state into the model.")
+    model.load_state_dict(new_state_dict)
+    return model
 
 
 def load_features_list(input_path):

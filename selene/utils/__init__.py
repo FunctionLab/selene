@@ -12,5 +12,6 @@ from .config import load
 from .config import load_path
 from .config import instantiate
 
-__all__ = ["initialize_logger", "load_features_list", "PerformanceMetrics",
+__all__ = ["initialize_logger", "load_features_list",
+           "load_model_from_state_dict", "PerformanceMetrics",
            "load", "load_path", "instantiate"]
