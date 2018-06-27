@@ -16,7 +16,7 @@ from .predict_handlers import LogitScoreHandler
 from .predict_handlers import WritePredictionsHandler
 from .predict_handlers import WriteRefAltHandler
 from ..sequences import Genome
-from ..utils import load_model_state_dict
+from ..utils import load_model_from_state_dict
 
 
 # TODO: MAKE THESE GENERIC:

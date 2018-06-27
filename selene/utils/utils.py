@@ -29,12 +29,12 @@ def load_model_from_state_dict(state_dict, model):
     torch.nn.Module
         The model with weights loaded from the state dict.
     """
-    model_keys = model.state_dict.keys()
+    model_keys = model.state_dict().keys()
     state_dict_keys = state_dict.keys()
 
     new_state_dict = OrderedDict()
     for (k1, k2) in zip(model_keys, state_dict_keys):
-        value = state_dict_keys[k2]
+        value = state_dict[k2]
         if k1 == k2:
             new_state_dict[k2] = value
         elif ('module' in k1 and k1[7:] == k2) \

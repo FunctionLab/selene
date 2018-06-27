@@ -7,6 +7,7 @@ thus is included here.
 """
 from .utils import initialize_logger
 from .utils import load_features_list
+from .utils import load_model_from_state_dict
 from .performance_metrics import PerformanceMetrics
 from .config import load
 from .config import load_path
