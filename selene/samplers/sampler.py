@@ -41,8 +41,10 @@ class Sampler(metaclass=ABCMeta):
         """
         self.modes = list(self.BASE_MODES)
         self.mode = None
-        np.random.seed(seed)
-        random.seed(seed + 1)
+        self.seed = seed
+
+        np.random.seed(self.seed)
+        random.seed(self.seed + 1)
 
     def set_mode(self, mode):
         """

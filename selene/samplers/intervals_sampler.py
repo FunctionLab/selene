@@ -26,14 +26,14 @@ indices : list(int)
     The numeric index of each sample.
 weights : list(float)
     The amount of weight assigned to each sample.
-    
+
 Attributes
 ----------
 indices : list(int)
     The numeric index of each sample.
 weights : list(float)
     The amount of weight assigned to each sample.
-    
+
 """
 
 
@@ -206,7 +206,7 @@ class IntervalsSampler(OnlineSampler):
         self._randcache = {}
         for mode in self.modes:
             self._sample_from_mode[mode] = None
-            self._randcache[mode] = {"cache": None, "sample_next": 0}
+            self._randcache[mode] = {"cache_indices": None, "sample_next": 0}
 
         self.sample_from_intervals = []
         self.interval_lengths = []
@@ -494,20 +494,17 @@ class IntervalsSampler(OnlineSampler):
         """
         self.set_mode(mode)
         sequences_and_targets = []
-        targets_mat = []
 
         n_batches = int(n_samples / batch_size)
 
         if n_batches == 0:
             inputs, targets = self.sample(n_samples)
             sequences_and_targets.append((inputs, targets))
-            targets_mat.append(targets)
         else:
-            for _ in range(n_batches):
+            for i in range(n_batches):
                 inputs, targets = self.sample(batch_size)
                 sequences_and_targets.append((inputs, targets))
-                targets_mat.append(targets)
-        targets_mat = np.vstack(targets_mat)
+        targets_mat = np.vstack([t for (s, t) in sequences_and_targets])
         return sequences_and_targets, targets_mat
 
     def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
@@ -533,14 +530,14 @@ class IntervalsSampler(OnlineSampler):
         tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
             Tuple containing the list of sequence-target pairs, as well
             as a single matrix with all targets in the same order.
+            The list is length :math:`S`, where :math:`S =` `n_samples`.
             Note that `sequences_and_targets`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,
             :math:`N` is the size of the sequence type's alphabet, and
             :math:`F` is the number of features. Further,
-            `target_matrix` is of the shape :math:`S \\times F`, where
-            :math:`S =` `n_samples`.
+            `target_matrix` is of the shape :math:`S \\times F`
 
         """
         if not n_samples:
