@@ -21,7 +21,7 @@ class EvaluateModel(object):
     """
     Evaluate model on a test set of sequences with known targets.
 
-    # TODO: include a data_parallel parameter?
+    TODO: include a data_parallel parameter?
 
     Parameters
     ----------

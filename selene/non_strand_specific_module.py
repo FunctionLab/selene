@@ -1,9 +1,13 @@
+"""
+This module provides the NonStrandSpecific class.
+"""
 import torch
 from torch.nn.modules import Module
 
 
-def flip(x, dim):
-    """Reverses the elements in a given dimension `dim` of the Tensor.
+def _flip(x, dim):
+    """
+    Reverses the elements in a given dimension `dim` of the Tensor.
 
     source: https://github.com/pytorch/pytorch/issues/229
     """
@@ -19,6 +23,29 @@ def flip(x, dim):
 
 
 class NonStrandSpecific(Module):
+    """
+    A torch.nn.Module that wraps a user-specified model architecture if the
+    architecture does not need to account for sequence strand-specificity.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        The user-specified model architecture.
+    mode : {'mean', 'max'}, optional
+        Default is 'mean'. NonStrandSpecific will pass the input and the
+        reverse-complement of the input into `model`. The mode specifies
+        whether we should output the mean or max of the predictions as
+        the non-strand specific prediction.
+
+    Attributes
+    ----------
+    model : torch.nn.Module
+        The user-specified model architecture.
+    mode : {'mean', 'max'}
+        How to handle outputting a non-strand specific prediction.
+
+    """
+
     def __init__(self, model, mode="mean"):
         super(NonStrandSpecific, self).__init__()
 
@@ -30,9 +57,8 @@ class NonStrandSpecific(Module):
         self.mode = mode
 
     def forward(self, input):
-
-        reverse_input = flip(
-            flip(input, 1), 2)
+        reverse_input = _flip(
+            _flip(input, 1), 2)
 
         output = self.model.forward(input)
         output_from_rev = self.model.forward(

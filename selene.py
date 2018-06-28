@@ -37,8 +37,10 @@ def initialize_model(model_configs, train=True, lr=None):
     model_configs : dict
         Model-specific configuration
     train : bool, optional
-        Default is True. If
+        Default is True. If `train`, returns the user-specified optimizer
+        and optimizer class that can be found within the input model file.
     lr : float or None, optional
+        If `train`, a learning rate must be specified. Otherwise, None.
 
 
     Returns
@@ -52,6 +54,11 @@ def initialize_model(model_configs, train=True, lr=None):
         * `dict` - the optimizer arguments
         The optimizer and its arguments are only returned if `train` is
         True.
+
+    Raises
+    ------
+    ValueError
+        If `train` but the `lr` specified is not a float.
 
     """
     import_model_from = model_configs["file"]
@@ -76,9 +83,12 @@ def initialize_model(model_configs, train=True, lr=None):
             model, mode=model_configs["non_strand_specific"]["mode"])
 
     criterion = module.criterion()
-    if train:
+    if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)
         return model, criterion, optim_class, optim_kwargs
+    else:
+        raise ValueError("Learning rate must be specified as a float "
+                         "but was {0}".format(lr))
     return model, criterion
 
 
@@ -98,6 +108,11 @@ def execute(operations, config):
     None
         Executes the operations listed and outputs any files
         to the dirs specified in each operation's configuration.
+
+    Raises
+    ------
+    ValueError
+        If an expected key in configuration is missing.
 
     """
     model = None
