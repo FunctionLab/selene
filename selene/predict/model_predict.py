@@ -27,7 +27,7 @@ VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
 
 def in_silico_mutagenesis_sequences(sequence,
                                     mutate_n_bases=1,
-                                    sequence_type=Genome):
+                                    reference_sequence=Genome):
     """
     Creates a list containing each mutation that occurs from an
     *in silico* mutagenesis across the whole sequence.
@@ -43,7 +43,7 @@ def in_silico_mutagenesis_sequences(sequence,
         Default is 1. The number of base changes to make with each set of
         mutations evaluated, e.g. `mutate_n_bases = 2` considers all
         pairs of SNPs.
-    sequence_type : class, optional
+    reference_sequence : class, optional
         Default is `selene.sequences.Genome`. The type of sequence
         that has been passed in.
 
@@ -63,7 +63,7 @@ def in_silico_mutagenesis_sequences(sequence,
     sequence_alts = []
     for index, ref in enumerate(sequence):
         alts = []
-        for base in sequence_type.BASES_ARR:
+        for base in reference_sequence.BASES_ARR:
             if base == ref:
                 continue
             alts.append(base)
@@ -108,7 +108,7 @@ def _ism_sample_id(sequence, mutation_information):
 
 def mutate_sequence(encoding,
                     mutation_information,
-                    sequence_type=Genome):
+                    reference_sequence=Genome):
     """
     Transforms a sequence with a set of mutations.
 
@@ -123,9 +123,9 @@ def mutate_sequence(encoding,
         List of tuples of (`int`, `str`). Each tuple is the position to
         mutate and the base to which to mutate that position in the
         sequence.
-    sequence_type : class, optional
-        Default is `selene.sequences.Genome`. The type of sequence that
-        the input is.
+    reference_sequence : class, optional
+        Default is `selene.sequences.Genome`. A reference sequence
+        from which to retrieve smaller sequences..
 
     Returns
     -------
@@ -136,7 +136,7 @@ def mutate_sequence(encoding,
     """
     mutated_seq = np.copy(encoding)
     for (position, alt) in mutation_information:
-        replace_base = sequence_type.BASE_TO_INDEX[alt]
+        replace_base = reference_sequence.BASE_TO_INDEX[alt]
         mutated_seq[position, :] = 0
         mutated_seq[position, replace_base] = 1
     return mutated_seq
@@ -196,7 +196,7 @@ def _add_sequence_surrounding_alt(alt_sequence,
                                   chrom,
                                   ref_start,
                                   ref_end,
-                                  sequence_type):
+                                  reference_sequence):
     """
     TODO
 
@@ -207,7 +207,7 @@ def _add_sequence_surrounding_alt(alt_sequence,
     chrom : str
     ref_start : int
     ref_end : int
-    sequence_type : selene.sequences.Sequence
+    reference_sequence : selene.sequences.Sequence
 
     Returns
     -------
@@ -226,23 +226,23 @@ def _add_sequence_surrounding_alt(alt_sequence,
     rhs_start = ref_end
     rhs_end = ref_end + add_end
 
-    if not sequence_type.coords_in_bounds(chrom, rhs_start, rhs_end):
+    if not reference_sequence.coords_in_bounds(chrom, rhs_start, rhs_end):
         # add everything to the LHS
         lhs_start = ref_start - sequence_length + alt_len
-        alt_sequence = sequence_type.get_sequence_from_coords(
+        alt_sequence = reference_sequence.get_sequence_from_coords(
             chrom, lhs_start, lhs_end) + alt_sequence
-    elif not sequence_type.coords_in_bounds(chrom, lhs_start, lhs_end):
+    elif not reference_sequence.coords_in_bounds(chrom, lhs_start, lhs_end):
         # add everything to RHS
         rhs_end = ref_end + sequence_length - alt_len
-        alt_sequence += sequence_type.get_sequence_from_coords(
+        alt_sequence += reference_sequence.get_sequence_from_coords(
             chrom, rhs_start, rhs_end)
     else:
         if lhs_start >= lhs_end:
             lhs_sequence = ""
         else:
-            lhs_sequence = sequence_type.get_sequence_from_coords(
+            lhs_sequence = reference_sequence.get_sequence_from_coords(
                 chrom, lhs_start, lhs_end)
-        rhs_sequence = sequence_type.get_sequence_from_coords(
+        rhs_sequence = reference_sequence.get_sequence_from_coords(
             chrom, rhs_start, rhs_end)
         alt_sequence = lhs_sequence + alt_sequence + rhs_sequence
     return alt_sequence
@@ -265,7 +265,7 @@ class AnalyzeSequences(object):
         The names of the features that the model is predicting.
     use_cuda : bool
         Default is `False`. Specifies whether to use CUDA or not.
-    sequence_type : class, optional
+    reference_sequence : class, optional
         Default is `selene.sequences.Genome`. The type of sequence that
         this analysis will be performed on.
 
@@ -277,7 +277,7 @@ class AnalyzeSequences(object):
     sequence_length
     batch_size
     features
-    sequence_type
+    reference_sequence
 
     """
 
@@ -288,7 +288,7 @@ class AnalyzeSequences(object):
                  batch_size,
                  features,
                  use_cuda=False,
-                 sequence_type=Genome):
+                 reference_sequence=Genome):
         """
         Constructs a new `AnalyzeSequences` object.
         """
@@ -313,7 +313,7 @@ class AnalyzeSequences(object):
 
         self.batch_size = batch_size
         self.features = features
-        self.sequence_type = sequence_type
+        self.reference_sequence = reference_sequence
 
     def predict(self, batch_sequences):
         """
@@ -392,9 +392,9 @@ class AnalyzeSequences(object):
         diff = (self.sequence_length - len(sequence)) / 2
         pad_l = int(np.floor(diff))
         pad_r = int(np.ceil(diff))
-        sequence = ((self.sequence_type.UNK_BASE * pad_l) +
+        sequence = ((self.reference_sequence.UNK_BASE * pad_l) +
                     sequence +
-                    (self.sequence_type.UNK_BASE * pad_r))
+                    (self.reference_sequence.UNK_BASE * pad_r))
         return str.upper(sequence)
 
     def _truncate_sequence(self, sequence):
@@ -426,7 +426,7 @@ class AnalyzeSequences(object):
         fasta_file = pyfaidx.Fasta(input_path)
         sequences = np.zeros((self.batch_size,
                               self.sequence_length,
-                              len(self.sequence_type.BASES_ARR)))
+                              len(self.reference_sequence.BASES_ARR)))
         batch_ids = []
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str(fasta_record)
@@ -436,7 +436,7 @@ class AnalyzeSequences(object):
             elif len(cur_sequence) > self.sequence_length:
                 cur_sequence = self._truncate_sequence(cur_sequence)
 
-            cur_sequence_encoding = self.sequence_type.sequence_to_encoding(
+            cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
             batch_ids.append([fasta_record.name])
 
@@ -482,7 +482,7 @@ class AnalyzeSequences(object):
             Writes results to files corresponding to each reporter in
             `reporters`.
         """
-        current_sequence_encoding = self.sequence_type.sequence_to_encoding(
+        current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
             sequence)
         for i in range(0, len(mutations_list), self.batch_size):
             start = i
@@ -495,7 +495,7 @@ class AnalyzeSequences(object):
             for ix, mutation_info in enumerate(mutations_list[start:end]):
                 mutated_seq = mutate_sequence(
                     current_sequence_encoding, mutation_info,
-                    sequence_type=self.sequence_type)
+                    reference_sequence=self.reference_sequence)
                 mutated_sequences[ix, :, :] = mutated_seq
                 batch_ids.append(_ism_sample_id(sequence, mutation_info))
             outputs = self.predict(mutated_sequences)
@@ -538,9 +538,9 @@ class AnalyzeSequences(object):
              diff = (self.sequence_length - n) / 2
              pad_l = int(np.floor(diff))
              pad_r = int(np.ceil(diff))
-             sequence = ((self.sequence_type.UNK_BASE * pad_l) +
+             sequence = ((self.reference_sequence.UNK_BASE * pad_l) +
                          sequence +
-                         (self.sequence_type.UNK_BASE * pad_r))
+                         (self.reference_sequence.UNK_BASE * pad_r))
         elif n > self.sequence_length:  # Extract center substring of proper length.
             start = int((n - self.sequence_length) // 2)
             end = int(start + self.sequence_length)
@@ -549,12 +549,12 @@ class AnalyzeSequences(object):
         sequence = str.upper(sequence)
         mutated_sequences = in_silico_mutagenesis_sequences(
             sequence, mutate_n_bases=1,
-            sequence_type=self.sequence_type)
+            reference_sequence=self.reference_sequence)
 
         reporters = self._initialize_reporters(
             save_data, output_path_prefix, ISM_COLS)
 
-        current_sequence_encoding = self.sequence_type.sequence_to_encoding(
+        current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
             sequence)
 
         base_encoding = current_sequence_encoding.reshape(
@@ -606,8 +606,8 @@ class AnalyzeSequences(object):
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
                 cur_sequence, mutate_n_bases=mutate_n_bases,
-                sequence_type=self.sequence_type)
-            cur_sequence_encoding = self.sequence_type.sequence_to_encoding(
+                reference_sequence=self.reference_sequence)
+            cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
             base_encoding = cur_sequence_encoding.reshape(
                 1, *cur_sequence_encoding.shape)
@@ -657,9 +657,13 @@ class AnalyzeSequences(object):
             else:
                 r.handle_batch_predictions(alt_outputs, batch_ids)
 
-    #TODO: Make generic.
-    def _process_alts(self, all_alts, ref, chrom, start, end,
-                      reference_sequence, genome):
+    def _process_alts(self,
+                      all_alts,
+                      ref,
+                      chrom,
+                      start,
+                      end,
+                      reference_sequence):
         """
         TODO
 
@@ -677,18 +681,19 @@ class AnalyzeSequences(object):
             TODO
         reference_sequence : TODO
             TODO
-        genome : TODO
-            TODO
 
         Returns
         -------
         TODO
             TODO
         """
+        sequence = reference_sequence.get_sequence_from_coords(
+            chrom, start, end)
+
         alt_encodings = []
         for a in all_alts:
-            prefix = reference_sequence[:self._start_radius]
-            suffix = reference_sequence[self._start_radius + len(ref):]
+            prefix = sequence[:self._start_radius]
+            suffix = sequence[self._start_radius + len(ref):]
             alt_sequence = prefix + a + suffix
 
             if len(alt_sequence) > self.sequence_length:
@@ -702,17 +707,16 @@ class AnalyzeSequences(object):
             elif len(alt_sequence) < self.sequence_length:
                 alt_sequence = _add_sequence_surrounding_alt(
                     alt_sequence, self.sequence_length,
-                    chrom, start, end, genome)
-            # @TODO: remove after testing
-            assert len(alt_sequence) == self.sequence_length
-            alt_encoding = genome.sequence_to_encoding(alt_sequence)
+                    chrom, start, end, reference_sequence)
+            alt_encoding = reference_sequence.sequence_to_encoding(
+                alt_sequence)
             alt_encodings.append(alt_encoding)
         return alt_encodings
 
     def variant_effect_prediction(self,
                                   vcf_file,
                                   save_data,
-                                  indexed_fasta,
+                                  reference_sequence,
                                   output_dir=None):
         """
         TODO
@@ -733,8 +737,6 @@ class AnalyzeSequences(object):
         None
         """
         variants = read_vcf_file(vcf_file)
-        genome = self.sequence_type(indexed_fasta)
-        # TODO: Remove this construction from here entirely.
 
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
@@ -753,21 +755,16 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
-            if not genome.coords_in_bounds(chrom, start, end):
+            if not reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
                 continue
-            reference_sequence = genome.get_sequence_from_coords(
+            ref_encoding = reference_sequence.get_encoding_from_coords(
                 chrom, start, end)
-
-            # @TODO: remove after testing
-            assert len(reference_sequence) == self.sequence_length
-
-            ref_encoding = genome.sequence_to_encoding(reference_sequence)
 
             all_alts = alt.split(',')
             alt_encodings = self._process_alts(
-                all_alts, ref, chrom, start, end, reference_sequence, genome)
+                all_alts, ref, chrom, start, end, reference_sequence)
             for a in all_alts:
                 batch_ref_seqs.append(ref_encoding)
                 batch_ids.append((chrom, pos, name, ref, a))
