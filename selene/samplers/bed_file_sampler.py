@@ -1,102 +1,44 @@
-"""
-This module provides the `MatFileSampler` class and its supporting
-methods.
-"""
-import h5py
+import os
+
 import numpy as np
-import scipy.io
 
-
-def load_mat_file(filepath, sequence_key, targets_key=None):
+class BedFileSampler(object):
     """
-    Loads data from a `*.mat` file or a `*.h5` file.
+    A sampler for which the dataset is loaded directly from a `*.bed` file.
 
     Parameters
     ----------
     filepath : str
         The path to the file to load the data from.
-    sequence_key : str
-        The key for the sequences data matrix.
-    targets_key : str, optional
-        Default is None. The key for the targets data matrix.
-
-    Returns
-    -------
-    sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
-        A tuple containing the numeric representation of the
-        sequence examples and their corresponding labels.
-        If no `targets_key` is specified, `targets` returned
-        is None. The shape of `sequences` will be
-        :math:`S \\times N \\times L`, where :math:`S` is
-        the total number of samples, :math:`N` is the
-        size of the sequence type's alphabet, and :math:`L`
-        is the sequence length.
-        The shape of `targets` will be :math:`S \\times F`,
-        where :math:`F` is the number of features.
-    """
-    try:  # see if we can load the file using scipy first
-        mat = scipy.io.loadmat(filepath)
-        targets = None
-        if targets_key:
-            targets = mat[targets_key]
-        return (mat[sequence_key], targets)
-    except ValueError:
-        mat = h5py.File(filepath, 'r')
-        sequences = mat[sequence_key][()]
-        targets = None
-        if targets_key:
-            targets = mat[targets_key][()]
-        mat.close()
-        return (sequences, targets)
-
-
-class MatFileSampler(object):
-    """
-    A sampler for which the dataset is loaded directly from a `*.mat` file.
-
-    Parameters
-    ----------
-    filepath : str
-        The path to the file to load the data from.
-    sequence_key : str
-        The key for the sequences data matrix.
-    targets_key : str, optional
-        Default is None. The key for the targets data matrix.
+    reference_sequence : selene.sequences.Sequence
+    targets_avail : bool, optional
+        Default is False. If `targets_avail`, assumes that it is the
+        last column of the `*.bed` file.
     random_seed : int, optional
         Default is 436. Sets the random seed for sampling.
     shuffle_file : bool, optional
-        Default is True. Shuffle the data in the matrix before
-        sampling from it.
-
-    Attributes
-    ----------
-    n_samples : int
-        The number of samples in the data matrix.
+        Default is False. Shuffle the data in the file before
+        sampling from it. All the data is loaded into memory
+        before doing so.
     """
 
     def __init__(self,
                  filepath,
-                 sequence_key,
-                 targets_key=None,
-                 random_seed=436,
-                 shuffle_file=True):
+                 reference_sequence,
+                 n_samples,
+                 sequence_length=None,
+                 targets_avail=False,
+                 n_total_targets=None):
         """
-        Constructs a new `MatFileSampler` object.
+        Constructs a new `BedFileSampler` object.
         """
-        sequences_mat, targets_mat = load_mat_file(
-            filepath, sequence_key, targets_key=targets_key)
-        self._sample_seqs = sequences_mat
-        self._sample_tgts = targets_mat
-
-        self.n_samples = self._sample_seqs.shape[0]
-
-        self._sample_indices = np.arange(
-            self.n_samples).tolist()
-        self._sample_next = 0
-
-        self._shuffle = shuffle_file
-        if self._shuffle:
-            np.random.shuffle(self._sample_indices)
+        self.filepath = filepath
+        self.file_handle = open(self.filepath, 'r')
+        self.reference_sequence = reference_sequence
+        self.sequence_length = sequence_length
+        self.targets_avail = targets_avail
+        self.n_total_targets = n_total_targets
+        self.n_samples = n_samples
 
     def sample(self, batch_size=1):
         """
@@ -121,21 +63,62 @@ class MatFileSampler(object):
             The shape of `targets` will be :math:`B \\times F`,
             where :math:`F` is the number of features.
         """
-        sample_up_to = self._sample_next + batch_size
-        use_indices = None
-        if sample_up_to >= len(self._sample_indices):
-            if self._shuffle:
-                np.random.shuffle(self._sample_indices)
-            self._sample_next = 0
-            use_indices = self._sample_indices[:batch_size]
-        else:
-            use_indices = self._sample_indices[self._sample_next:sample_up_to]
-        self._sample_next += batch_size
+        sequences = []
+        targets = None
+        if self.targets_avail:
+            targets = []
+        while len(sequences) < batch_size:
+            line = self.file_handle.readline()
+            if not line:
+                # TODO: shuffle file
+                self.file_handle.close()
+                self.file_handle = open(self.filepath, 'r')
+                line = self.file_handle.readline()
+            cols = line.split('\t')
+            chrom = cols[0]
+            start = int(cols[1])
+            end = int(cols[2])
+            strand_side = None
+            features = None
 
-        sequences = np.transpose(
-            self._sample_seqs[use_indices, :, :], (0, 2, 1)).astype(float)
-        if self._sample_tgts is not None:
-            targets = self._sample_tgts[use_indices, :].astype(float)
+            if len(cols) == 5:
+                strand_side = cols[3]
+                features = cols[4].strip()
+            elif len(cols) == 4 and self.targets_avail:
+                features = cols[3].strip()
+            elif len(cols) == 4:
+                strand_side = cols[3].strip()
+
+            # if strand_side is None, assume strandedness does not matter.
+            # can change this to randomly selecting +/- later
+            strand_side = '+'
+            n = end - start
+            if n < self.sequence_length:
+                diff = (self.sequence_length - n) / 2
+                pad_l = int(np.floor(diff))
+                pad_r = int(np.ceil(diff))
+                start = start - pad_l
+                end = end + pad_r
+            elif n > self.sequence_length:
+                start = int((n - self.sequence_length) // 2)
+                end = int(start + self.sequence_length)
+
+            sequence = self.reference_sequence.get_encoding_from_coords(
+                chrom, start, end, strand=strand_side)
+            if sequence.shape[0] == 0:
+                continue
+
+            sequences.append(sequence)
+            if self.targets_avail:
+                tgts = np.zeros((self.n_total_targets))
+                features = [int(f) for f in features.split(';') if f]
+                tgts[features] = 1
+                targets.append(tgts.astype(float))
+
+        sequences = np.array(sequences)
+        #sequences = np.transpose(sequences, (0, 2, 1))
+        if self.targets_avail:
+            targets = np.array(targets)
             return (sequences, targets)
         return sequences,
 
@@ -201,10 +184,10 @@ class MatFileSampler(object):
             `target_matrix` is of the shape :math:`S \\times F`, where
             :math:`S =` `n_samples`.
         """
-        if self._sample_tgts is None:
+        if not self.targets_avail:
             raise ValueError(
-                "No targets matrix was specified during sampler "
-                "initialization. Please use `get_data` instead.")
+                "No targets are specified in the *.bed file. "
+                "Please use `get_data` instead.")
         if not n_samples:
             n_samples = self.n_samples
         sequences_and_targets = []

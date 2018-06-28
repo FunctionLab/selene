@@ -16,7 +16,6 @@ Options:
     --lr=<lr>               If training, the optimizer's learning rate
                             [default: None]
 """
-
 import os
 import importlib
 import sys
@@ -31,21 +30,29 @@ from selene import __version__
 
 def initialize_model(model_configs, train=True, lr=None):
     """
-    TODO
+    Initialize model (and associated criterion, optimizer)
 
     Parameters
     ----------
-    model_configs : TODO
-        TODO
-    train : bool
-        TODO
-    lr : TODO
-        TODO
+    model_configs : dict
+        Model-specific configuration
+    train : bool, optional
+        Default is True. If
+    lr : float or None, optional
+
 
     Returns
     -------
-    TODO
-        TODO
+    model, criterion : tuple(torch.nn.Module, torch.nn._Loss) or \
+            model, criterion, optim_class, optim_kwargs : \
+                tuple(torch.nn.Module, torch.nn._Loss, torch.optim, dict)
+        * `torch.nn.Module` - the model architecture
+        * `torch.nn._Loss` - the loss function associated with the model
+        * `torch.optim` - the optimizer associated with the model
+        * `dict` - the optimizer arguments
+        The optimizer and its arguments are only returned if `train` is
+        True.
+
     """
     import_model_from = model_configs["file"]
     model_class_name = model_configs["class"]
@@ -75,23 +82,22 @@ def initialize_model(model_configs, train=True, lr=None):
     return model, criterion
 
 
-def execute(operation, config):
+def execute(operations, config):
     """
-    TODO
+    Execute operations in _Selene_.
 
     Parameters
     ----------
-    operation : TODO
-        TODO
-    config : TODO
-        TODO
-    model : TODO
-        TODO
+    operations : list(str)
+        The list of operations to carry out in _Selene_.
+    config : dict or object
+        The loaded configurations from a YAML file.
 
     Returns
     -------
-    TODO
-        TODO
+    None
+        Executes the operations listed and outputs any files
+        to the dirs specified in each operation's configuration.
 
     """
     model = None
@@ -145,6 +151,10 @@ def execute(operation, config):
 
             if "variant_effect_prediction" in configs:
                 vareff_info = configs["variant_effect_prediction"]
+                if "vcf_files" not in vareff_info:
+                    raise ValueError("variant effect prediction requires "
+                                     "as input a list of 1 or more *.vcf "
+                                     "files ('vcf_files').")
                 for filepath in vareff_info.pop("vcf_files"):
                     analyze_seqs.variant_effect_prediction(
                         filepath, **vareff_info)
