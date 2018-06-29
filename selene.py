@@ -86,7 +86,7 @@ def initialize_model(model_configs, train=True, lr=None):
     if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)
         return model, criterion, optim_class, optim_kwargs
-    else:
+    elif train:
         raise ValueError("Learning rate must be specified as a float "
                          "but was {0}".format(lr))
     return model, criterion

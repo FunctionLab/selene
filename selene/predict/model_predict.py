@@ -597,7 +597,7 @@ class AnalyzeSequences(object):
         """
         fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
-            cur_sequence = str(fasta_record)
+            cur_sequence = str.upper(str(fasta_record))
             if len(cur_sequence) < self.sequence_length:
                 cur_sequence = self._pad_sequence(cur_sequence)
             elif len(cur_sequence) > self.sequence_length:
