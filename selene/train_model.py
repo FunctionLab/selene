@@ -8,7 +8,6 @@ import shutil
 from time import time
 
 import numpy as np
-from pympler import asizeof
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -270,7 +269,6 @@ class TrainModel(object):
         np.savez_compressed(
             os.path.join(self.output_dir, "test_targets.npz"),
             data=self._all_test_targets)
-        self.write_datasets_to_file()
 
     def _get_batch(self):
         """
@@ -474,12 +472,6 @@ class TrainModel(object):
 
         average_scores["loss"] = average_loss
         return (average_scores, feature_scores_dict)
-
-    def write_datasets_to_file(self):
-        """
-        Writes the sampled datasets to file.
-        """
-        self.sampler.save_datasets_to_file(self.output_dir)
 
     def _save_checkpoint(self, state, is_best,
                          dir_path=None,

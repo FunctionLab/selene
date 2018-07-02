@@ -65,6 +65,7 @@ def load_model_from_state_dict(state_dict, model):
     -------
     torch.nn.Module
         The model with weights loaded from the state dict.
+
     """
     model_keys = model.state_dict().keys()
     state_dict_keys = state_dict.keys()

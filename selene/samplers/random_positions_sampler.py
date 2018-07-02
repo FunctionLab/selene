@@ -7,7 +7,6 @@ import os
 import random
 
 import numpy as np
-from pympler import asizeof
 
 from .online_sampler import OnlineSampler
 from ..utils import get_indices_and_probabilities
