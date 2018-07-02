@@ -19,6 +19,7 @@ Options:
 import os
 import importlib
 import sys
+from time import strftime
 
 from docopt import docopt
 import torch
@@ -92,7 +93,7 @@ def initialize_model(model_configs, train=True, lr=None):
     return model, criterion
 
 
-def execute(operations, config):
+def execute(operations, config, output_dir):
     """
     Execute operations in _Selene_.
 
@@ -102,6 +103,8 @@ def execute(operations, config):
         The list of operations to carry out in _Selene_.
     config : dict or object
         The loaded configurations from a YAML file.
+    output_dir : str
+        The path to the directory where all outputs will be saved.
 
     Returns
     -------
@@ -123,6 +126,8 @@ def execute(operations, config):
                 config["model"], train=True, lr=config["lr"])
 
             sampler_info = configs["sampler"]
+            sampler_info.bind(output_dir=output_dir)
+
             train_model_info = configs["train_model"]
 
             data_sampler = instantiate(sampler_info)
@@ -132,7 +137,8 @@ def execute(operations, config):
                 data_sampler=data_sampler,
                 loss_criterion=loss,
                 optimizer_class=optim,
-                optimizer_kwargs=optim_kwargs)
+                optimizer_kwargs=optim_kwargs,
+                output_dir=output_dir)
 
             trainer = instantiate(train_model_info)
             trainer.train_and_validate()
@@ -142,6 +148,7 @@ def execute(operations, config):
                 model, loss = initialize_model(
                     configs["model"], train=False)
                 sampler_info = configs["sampler"]
+
                 evaluate_model_info = configs["evaluate_model"]
 
                 data_sampler = instantiate(sampler_info)
@@ -197,6 +204,11 @@ if __name__ == "__main__":
     lr = arguments["--lr"]
 
     operations = configs.pop("ops")
+    output_dir = configs.pop("output_dir")
+    os.makedirs(output_dir, exist_ok=True)
+    current_run_output_dir = os.path.join(
+        output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+    os.makedirs(current_run_output_dir)
 
     if "lr" not in configs and lr != "None":
         configs["lr"] = float(arguments["--lr"])
@@ -211,4 +223,4 @@ if __name__ == "__main__":
     torch.manual_seed(1337)
     torch.cuda.manual_seed_all(1337)
 
-    execute(operations, configs)
+    execute(operations, configs, current_run_output_dir)

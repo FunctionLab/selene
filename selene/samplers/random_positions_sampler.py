@@ -1,45 +1,45 @@
+"""
+This module provides the RandomPositionsSampler class.
+"""
 from collections import namedtuple
 import logging
 import os
 import random
 
 import numpy as np
+from pympler import asizeof
 
 from .online_sampler import OnlineSampler
-
+from ..utils import get_indices_and_probabilities
 
 logger = logging.getLogger(__name__)
 
 
 SampleIndices = namedtuple(
     "SampleIndices", ["indices", "weights"])
+"""
+TODO: this is common to both the intervals sampler and the
+random positions sampler. Can we move this to utils or
+somewhere else?
 
+A tuple containing the indices for some samples, and a weight to
+allot to each index when randomly drawing from them.
 
-def _metrics_logger(name, out_filepath):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-    formatter = logging.Formatter("%(message)s")
-    file_handle = logging.FileHandler(
-        os.path.join(out_filepath, f"{name}.txt"))
-    file_handle.setFormatter(formatter)
-    logger.addHandler(file_handle)
-    return logger
+Parameters
+----------
+indices : list(int)
+    The numeric index of each sample.
+weights : list(float)
+    The amount of weight assigned to each sample.
 
+Attributes
+----------
+indices : list(int)
+    The numeric index of each sample.
+weights : list(float)
+    The amount of weight assigned to each sample.
 
-def _get_indices_and_probabilities(interval_lengths, indices):
-    interval_lens = np.array(interval_lengths)[indices]
-    weights = interval_lens / float(np.sum(interval_lens))
-
-    keep_indices = []
-    for index, weight in enumerate(weights):
-        if weight > 1e-10:
-            keep_indices.append(indices[index])
-    if len(keep_indices) == len(indices):
-        assert len(indices) == len(weights.tolist())
-        return indices, weights.tolist()
-    else:
-        return _get_indices_and_probabilities(
-            interval_lengths, keep_indices)
+"""
 
 
 class RandomPositionsSampler(OnlineSampler):
@@ -53,7 +53,6 @@ class RandomPositionsSampler(OnlineSampler):
                  reference_sequence,
                  target_path,
                  features,
-                 output_dir,
                  seed=436,
                  validation_holdout=['chr6', 'chr7'],
                  test_holdout=['chr8', 'chr9'],
@@ -61,7 +60,8 @@ class RandomPositionsSampler(OnlineSampler):
                  center_bin_to_predict=200,
                  feature_thresholds=0.5,
                  mode="train",
-                 save_datasets=["validate", "test"]):
+                 save_datasets=[],
+                 output_dir=None):
         super(RandomPositionsSampler, self).__init__(
             reference_sequence,
             target_path,
@@ -73,7 +73,8 @@ class RandomPositionsSampler(OnlineSampler):
             center_bin_to_predict=center_bin_to_predict,
             feature_thresholds=feature_thresholds,
             mode=mode,
-            save_datasets=save_datasets)
+            save_datasets=save_datasets,
+            output_dir=output_dir)
 
         self._sample_from_mode = {}
         self._randcache = {}
@@ -92,11 +93,6 @@ class RandomPositionsSampler(OnlineSampler):
         for mode in self.modes:
             self._update_randcache(mode=mode)
 
-        os.makedirs(output_dir, exist_ok=True)
-        self.output_dir = output_dir
-        self._traindata_logger = _metrics_logger(
-            "train_data.txt", self.output_dir)
-
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
             self.sample_from_intervals.append(
@@ -109,7 +105,7 @@ class RandomPositionsSampler(OnlineSampler):
         select_indices = list(range(n_intervals))
         np.random.shuffle(select_indices)
         n_indices_validate = int(n_intervals * self.validation_holdout)
-        val_indices, val_weights = _get_indices_and_probabilities(
+        val_indices, val_weights = get_indices_and_probabilities(
             self.interval_lengths, select_indices[:n_indices_validate])
         self._sample_from_mode["validate"] = SampleIndices(
             val_indices, val_weights)
@@ -117,23 +113,26 @@ class RandomPositionsSampler(OnlineSampler):
         if self.test_holdout:
             n_indices_test = int(n_intervals * self.test_holdout)
             test_indices_end = n_indices_test + n_indices_validate
-            test_indices, test_weights = _get_indices_and_probabilities(
+            test_indices, test_weights = get_indices_and_probabilities(
                 self.interval_lengths,
                 select_indices[n_indices_validate:test_indices_end])
             self._sample_from_mode["test"] = SampleIndices(
                 test_indices, test_weights)
 
-            tr_indices, tr_weights = _get_indices_and_probabilities(
+            tr_indices, tr_weights = get_indices_and_probabilities(
                 self.interval_lengths, select_indices[test_indices_end:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
         else:
-            tr_indices, tr_weights = _get_indices_and_probabilities(
+            tr_indices, tr_weights = get_indices_and_probabilities(
                 self.interval_lengths, select_indices[n_indices_validate:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
 
     def _partition_genome_by_chromosome(self):
+        """
+        TODO: rename this to "_partition_by_key"?
+        """
         for mode in self.modes:
             self._sample_from_mode[mode] = SampleIndices([], [])
         for index, (chrom, len_chrom) in enumerate(self.reference_sequence.get_chr_lens()):
@@ -143,7 +142,7 @@ class RandomPositionsSampler(OnlineSampler):
             elif self.test_holdout and chrom in self.test_holdout:
                 self._sample_from_mode["test"].indices.append(
                     index)
-            elif '_' not in chrom:
+            elif '_' not in chrom:  # TODO: remove this.
                 self._sample_from_mode["train"].indices.append(
                     index)
 
@@ -151,11 +150,11 @@ class RandomPositionsSampler(OnlineSampler):
                 (chrom,
                  self.sequence_length,
                  len_chrom - self.sequence_length))
-            self.interval_lengths.append(len_chrom)
+            self.interval_lengths.append(len_chrom - 2 * self.sequence_length)
 
         for mode in self.modes:
             sample_indices = self._sample_from_mode[mode].indices
-            indices, weights = _get_indices_and_probabilities(
+            indices, weights = get_indices_and_probabilities(
                 self.interval_lengths, sample_indices)
             self._sample_from_mode[mode] = \
                 self._sample_from_mode[mode]._replace(
@@ -189,22 +188,21 @@ class RandomPositionsSampler(OnlineSampler):
             return None
 
         if retrieved_seq.shape[0] < self.sequence_length:
+            # TODO: remove after investigating this bug.
             print(retrieved_seq.shape, chrom, window_start, window_end, strand)
             return None
 
-        if self.mode in self.save_datasets:
+        if self.mode in self._save_datasets:
             feature_indices = ';'.join(
                 [str(f) for f in np.nonzero(retrieved_targets)[0]])
-            self.save_datasets[self.mode].append(
+            self._save_datasets[self.mode].append(
                 [chrom,
                  window_start,
                  window_end,
                  strand,
                  feature_indices])
-        #feature_indices = ';'.join(
-        #    [str(f) for f in np.nonzero(retrieved_targets)[0]])
-        #._traindata_logger.info(
-        #    f"{chrom}\t{window_start}\t{window_end}\t{strand}\t{feature_indices}")
+            if len(self._save_datasets[self.mode]) > 200000:
+                self.save_dataset_to_file(self.mode)
         return (retrieved_seq, retrieved_targets)
 
     def _update_randcache(self, mode=None):
@@ -256,6 +254,8 @@ class RandomPositionsSampler(OnlineSampler):
             inputs, targets = self.sample(batch_size)
             sequences_and_targets.append((inputs, targets))
         targets_mat = np.vstack([t for (s, t) in sequences_and_targets])
+        if mode in self._save_datasets:
+            self.save_dataset_to_file(mode, close_filehandle=True)
         return sequences_and_targets, targets_mat
 
     def get_dataset_in_batches(self, mode, batch_size, n_samples=None):

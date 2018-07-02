@@ -1,14 +1,16 @@
 """
 This module provides the `PerformanceMetrics` class and supporting
 functionality for tracking and computing model performance.
-
 """
 from collections import defaultdict, namedtuple
 import types
 import logging
 
 import numpy as np
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
 
 
 logger = logging.getLogger("selene")
@@ -21,7 +23,7 @@ metric to some values.
 
 Parameters
 ----------
-fn : types.FunctionTYpe
+fn : types.FunctionType
     A metric.
 data : list(float)
     A list holding the results from applying the metric.
@@ -34,6 +36,71 @@ data : list(float)
     A list holding the results from applying the metric.
 
 """
+
+
+def visualize_roc_aucs(prediction,
+                       target,
+                       output_dir,
+                       style="seaborn-colorblind",
+                       report_gt_feature_n_positives=10,
+                       fig_title="Feature ROC AUCs",
+                       dpi=800,
+                       needs_import=False):
+    if needs_import:
+        import matplotlib
+        matplotlib.use("SVG")
+        import matplotlib.pyplot as plt
+
+    plt.style.use(style)
+    plt.figure()
+    for index, feature_preds in enumerate(prediction.T):
+        feature_targets = target[:, index]
+        if len(np.unique(feature_targets)) > 1 and \
+                np.sum(feature_targets) > report_gt_feature_n_positives:
+            tpr, fpr, _ = roc_curve(feature_targets, feature_preds)
+            plt.plot(fpr, tpr, 'r-', color="black", alpha=0.1, lw=0.8)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    if fig_title:
+        plt.title(fig_title)
+    plt.savefig(os.path.join(output_dir, "roc_aucs.svg"),
+                format="svg",
+                dpi=dpi)
+
+
+def visualize_auprc(prediction,
+                    target,
+                    output_dir,
+                    style="seaborn-colorblind",
+                    report_gt_feature_n_positives=10,
+                    fig_title="Feature AUPRCs",
+                    dpi=800,
+                    needs_import=False):
+    if needs_import:
+        import matplotlib
+        matplotlib.use("SVG")
+        import matplotlib.pyplot as plt
+
+    plt.style.use(style)
+    plt.figure()
+    for index, feature_preds in enumerate(prediction.T):
+        feature_targets = target[:, index]
+        if len(np.unique(feature_targets)) > 1 and \
+                np.sum(feature_targets) > report_gt_feature_n_positives:
+            precision, recall, _ = precision_recall_curve(
+                feature_targets, feature_preds)
+            plt.step(recall, precision, 'r-', color="black", alpha=0.1, lw=0.8)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    if fig_title:
+        plt.title(fig_title)
+    plt.savefig(os.path.join(output_dir, "auprcs.svg"),
+                format="svg",
+                dpi=dpi)
 
 
 def compute_score(prediction, target, metric_fn,

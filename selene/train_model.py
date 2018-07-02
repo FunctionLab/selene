@@ -5,9 +5,10 @@ import logging
 import math
 import os
 import shutil
-from time import strftime, time
+from time import time
 
 import numpy as np
+from pympler import asizeof
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -171,10 +172,7 @@ class TrainModel(object):
             logger.debug("Set modules to use CUDA")
 
         os.makedirs(output_dir, exist_ok=True)
-        current_run_output_dir = os.path.join(
-            output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
-        os.makedirs(current_run_output_dir)
-        self.output_dir = current_run_output_dir
+        self.output_dir = output_dir
 
         initialize_logger(
             os.path.join(self.output_dir, "{0}.log".format(__name__)),
@@ -344,6 +342,7 @@ class TrainModel(object):
                     "state_dict": self.model.state_dict(),
                     "min_loss": min_loss,
                     "optimizer": self.optimizer.state_dict()}, False)
+        self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
     def train(self):
         """
@@ -356,6 +355,7 @@ class TrainModel(object):
         """
         self.model.train()
         self.sampler.set_mode("train")
+
         inputs, targets = self._get_batch()
 
         inputs = torch.Tensor(inputs)

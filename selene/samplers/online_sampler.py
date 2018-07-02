@@ -48,11 +48,17 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     feature_thresholds : float [0.0, 1.0], optional
         Default is 0.5. The `feature_threshold` to pass to the
         `GenomicFeatures` object.
-    mode : {'train', 'validate', 'test'}
+    mode : {'train', 'validate', 'test'}, optional
         Default is `'train'`. The mode to run the sampler in.
-    save_datasets : list(str)
-        Default is `["test"]`. The list of modes for which we should
-        save the sampled data to file.
+    save_datasets : list(str), optional
+        Default is `[]` the empty list. The list of modes for which we should
+        save the sampled data to file (e.g. `["test", "validate"]`).
+    output_dir : str or None, optional
+        Default is None. The path to the directory where we should
+        save sampled examples for a mode. If `save_datasets` is
+        a non-empty list, `output_dir` must be specified. If
+        the path in `output_dir` does not exist it will be created
+        automatically.
 
     Attributes
     ----------
@@ -85,9 +91,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     mode : str
         The current mode that the sampler is running in. Must be one of
         the modes listed in `modes`.
-    save_datasets : list(str)
-        A list of modes for which we should write the sampled data to a
-        file.
 
     Raises
     ------
@@ -120,7 +123,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train",
-                 save_datasets=["test"]):
+                 save_datasets=[],
+                 output_dir=None):
 
         """
         Creates a new `OnlineSampler` object.
@@ -194,9 +198,15 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             target_path, self._features,
             feature_thresholds=feature_thresholds)
 
-        self.save_datasets = {}
+        os.makedirs(output_dir, exist_ok=True)
+
+        self._save_datasets = {}
+        self._save_filehandles = {}
         for mode in save_datasets:
-            self.save_datasets[mode] = []
+            self._save_datasets[mode] = []
+            self._save_filehandles[mode] = open(
+                os.path.join(output_dir, "{0}_data.bed".format(mode)),
+                'w+')
 
     def get_feature_from_index(self, index):
         """
@@ -235,28 +245,27 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         return self.reference_sequence.encoding_to_sequence(encoding)
 
-    # @TODO: Enable saving of training data coordinates intermittently.
-    def save_datasets_to_file(self, output_dir):
+    def save_dataset_to_file(self, mode, close_filehandle=False):
         """
         Save samples for each partition (i.e. train/validate/test) to
         disk.
 
         Parameters
         ----------
-        output_dir : str
-            Path to the output directory where we should save each of
-            the datasets.
-
-        Notes
-        -----
-        This likely only works for validation and test right now.
-        Training data may be too big to store in a list in memory, and
-        cannot yet be written to file intermittently.
-
+        mode : str
+            Must be one of the modes specified in `save_datasets` during
+            sampler initialization.
+        close_filehandle : bool, optional
+            Default is False. `close_filehandle=True` assumes that all
+            data corresponding to the input `mode` has been saved to
+            file and `save_dataset_to_file` will not be called with
+            `mode` again.
         """
-        for mode, samples in self.save_datasets.items():
-            filepath = os.path.join(output_dir, "{0}_data.bed".format(mode))
-            with open(filepath, 'w+') as file_handle:
-                for cols in samples:
-                    line = '\t'.join([str(c) for c in cols])
-                    file_handle.write("{0}\n".format(line))
+        samples = self._save_datasets[mode]
+        file_handle = self._save_filehandles[mode]
+        while len(samples) > 0:
+            cols = samples.pop(0)
+            line = '\t'.join([str(c) for c in cols])
+            file_handle.write("{0}\n".format(line))
+        if close_filehandle:
+            file_handle.close()

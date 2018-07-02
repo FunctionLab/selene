@@ -1,3 +1,6 @@
+"""
+This module provides the BedFileSampler class.
+"""
 import os
 
 import numpy as np
@@ -116,7 +119,6 @@ class BedFileSampler(object):
                 targets.append(tgts.astype(float))
 
         sequences = np.array(sequences)
-        #sequences = np.transpose(sequences, (0, 2, 1))
         if self.targets_avail:
             targets = np.array(targets)
             return (sequences, targets)

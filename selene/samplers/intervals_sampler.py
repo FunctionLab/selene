@@ -9,7 +9,7 @@ import random
 import numpy as np
 
 from .online_sampler import OnlineSampler
-
+from ..utils import get_indices_and_probabilities
 
 logger = logging.getLogger(__name__)
 
@@ -35,42 +35,6 @@ weights : list(float)
     The amount of weight assigned to each sample.
 
 """
-
-
-def _get_indices_and_probabilities(interval_lengths, indices):
-    """
-    Given a list of different interval lengths and the indices of
-    interest in that list, weight the probability that we will sample
-    one of the indices in `indices` based on the interval lengths in
-    that sublist.
-
-    Parameters
-    ----------
-    interval_lengths : list(int)
-        The list of lengths of intervals that we will draw from. This is
-        used to weight the indices proportionally to interval length.
-    indices : list(int)
-        The list of interval length indices to draw from.
-
-    Returns
-    -------
-    indices, weights : tuple(list(int), list(float))
-        Tuple of interval indices to sample from and the corresponding
-        weights of those intervals.
-
-    """
-    select_interval_lens = np.array(interval_lengths)[indices]
-    weights = select_interval_lens / float(np.sum(select_interval_lens))
-
-    keep_indices = []
-    for index, weight in enumerate(weights):
-        if weight > 1e-10:
-            keep_indices.append(indices[index])
-    if len(keep_indices) == len(indices):
-        return indices, weights.tolist()
-    else:
-        return _get_indices_and_probabilities(
-            interval_lengths, keep_indices)
 
 
 # @TODO: Extend this class to work with stranded data.
@@ -251,7 +215,7 @@ class IntervalsSampler(OnlineSampler):
 
         # the first section of indices is used as the validation set
         n_indices_validate = int(n_intervals * self.validation_holdout)
-        val_indices, val_weights = _get_indices_and_probabilities(
+        val_indices, val_weights = get_indices_andprobabilities(
             self.interval_lengths, select_indices[:n_indices_validate])
         self._sample_from_mode["validate"] = SampleIndices(
             val_indices, val_weights)
@@ -261,20 +225,20 @@ class IntervalsSampler(OnlineSampler):
             # test set
             n_indices_test = int(n_intervals * self.test_holdout)
             test_indices_end = n_indices_test + n_indices_validate
-            test_indices, test_weights = _get_indices_and_probabilities(
+            test_indices, test_weights = get_indices_andprobabilities(
                 self.interval_lengths,
                 select_indices[n_indices_validate:test_indices_end])
             self._sample_from_mode["test"] = SampleIndices(
                 test_indices, test_weights)
 
             # remaining indices are for the training set
-            tr_indices, tr_weights = _get_indices_and_probabilities(
+            tr_indices, tr_weights = get_indices_andprobabilities(
                 self.interval_lengths, select_indices[test_indices_end:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
         else:
             # remaining indices are for the training set
-            tr_indices, tr_weights = _get_indices_and_probabilities(
+            tr_indices, tr_weights = get_indices_andprobabilities(
                 self.interval_lengths, select_indices[n_indices_validate:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
@@ -315,7 +279,7 @@ class IntervalsSampler(OnlineSampler):
 
         for mode in self.modes:
             sample_indices = self._sample_from_mode[mode].indices
-            indices, weights = _get_indices_and_probabilities(
+            indices, weights = get_indices_andprobabilities(
                 self.interval_lengths, sample_indices)
             self._sample_from_mode[mode] = \
                 self._sample_from_mode[mode]._replace(
