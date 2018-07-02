@@ -11,6 +11,7 @@ import pyfaidx
 import torch
 from torch.autograd import Variable
 
+from .predict_handlers import AbsDiffScoreHandler
 from .predict_handlers import DiffScoreHandler
 from .predict_handlers import LogitScoreHandler
 from .predict_handlers import WritePredictionsHandler
@@ -263,7 +264,7 @@ class AnalyzeSequences(object):
         The size of the mini-batches to use.
     features : list(str)
         The names of the features that the model is predicting.
-    use_cuda : bool
+    use_cuda : bool, optional
         Default is `False`. Specifies whether to use CUDA or not.
     reference_sequence : class, optional
         Default is `selene.sequences.Genome`. The type of sequence that
@@ -272,12 +273,18 @@ class AnalyzeSequences(object):
 
     Attributes
     ----------
-    model
-    use_cuda
-    sequence_length
-    batch_size
-    features
-    reference_sequence
+    model : torch.nn.Module
+        A sequence-based model that has already been trained.
+    sequence_length : int
+        The length of sequences that the model is expecting.
+    batch_size : int
+        The size of the mini-batches to use.
+    features : list(str)
+        The names of the features that the model is predicting.
+    use_cuda : bool
+        Specifies whether to use CUDA or not.
+    reference_sequence : class
+        The type of sequence on which this analysis will be performed.
 
     """
 
@@ -350,8 +357,9 @@ class AnalyzeSequences(object):
 
         Parameters
         ----------
-        save_data : TODO
-            TODO
+        save_data : list(str)
+            A list of the data files to output. Must input 1 or more of the
+            following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_path_prefix : str
             TODO
         nonfeature_cols : list(str)
@@ -371,6 +379,11 @@ class AnalyzeSequences(object):
             diff_handler = DiffScoreHandler(
                 self.features, nonfeature_cols, filename)
             reporters.append(diff_handler)
+        if "abs_diffs" in save_data:
+            filename = "{0}_abs_diffs.tsv".format(output_path_prefix)
+            abs_diff_handler = AbsDiffScoreHandler(
+                self.features, nonfeature_cols, filename)
+            reporters.append(abs_diff_handler)
         if "logits" in save_data:
             filename = "{0}_logits.tsv".format(output_path_prefix)
             logit_handler = LogitScoreHandler(
@@ -402,7 +415,7 @@ class AnalyzeSequences(object):
         end = int(start + self.sequence_length)
         return str.upper(sequence[start:end])
 
-    def predictions_from_fasta_file(self, input_path, output_path_prefix):
+    def get_predictions_for_fasta_file(self, input_path, output_dir):
         """
         # TODO(DOCUMENTATION): Finish.
 
@@ -418,9 +431,14 @@ class AnalyzeSequences(object):
             `reporters`.
 
         """
+        os.makedirs(output_dir, exist_ok=True)
+
+        _, filename = os.path.split(vcf_file)
+        output_prefix = '.'.join(filename.split('.')[:-1])
+
         reporter = self._initialize_reporters(
             ["predictions"],
-            output_path_prefix,
+            os.path.join(output_dir, output_prefix),
             ["name"],
             mode="prediction")[0]
         fasta_file = pyfaidx.Fasta(input_path)
@@ -521,8 +539,9 @@ class AnalyzeSequences(object):
         ----------
         sequence : str
             TODO
-        save_data : list of str
-            TODO
+        save_data : list(str)
+            A list of the data files to output. Must input 1 or more of the
+            following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_path_prefix : str, optional
             TODO
         mutate_n_bases : int, optional
@@ -571,10 +590,11 @@ class AnalyzeSequences(object):
     def in_silico_mutagenesis_from_file(self,
                                         input_path,
                                         save_data,
-                                        output_path_prefix="ism",
-                                        mutate_n_bases=1):
+                                        output_dir,
+                                        mutate_n_bases=1,
+                                        use_sequence_name=True):
         """
-        TODO
+        Apply _in silico_ mutagenesis to all sequences in a FASTA file.
 
         Please note that we have not parallelized this function yet, so runtime
         increases exponentially when you increase `mutate_n_bases`.
@@ -582,19 +602,31 @@ class AnalyzeSequences(object):
         Parameters
         ----------
         input_path: str
-            TODO
+            The path to the FASTA file of sequences.
         save_data : list(str)
-            TODO
-        output_path_prefix : str, optional
-            TODO
+            A list of the data files to output. Must input 1 or more of the
+            following options: ["abs_diffs", "diffs", "logits", "predictions"].
+        output_dir : str
+            The path to the output directory. Directories in the path will be
+            created if they do not currently exist.
         mutate_n_bases : int, optional
-            TODO
+            Default is 1. The number of bases to mutate at one time in
+            _in silico_ mutagenesis.
+        use_sequence_name : bool, optional.
+            Default is True. If `use_sequence_name`, output files are prefixed
+            by the sequence name/description corresponding to each sequence
+            in the FASTA file. Spaces in the sequence name are replaced with
+            underscores '_'. If not `use_sequence_name`, output files are
+            prefixed with an index :math:`i` (starting with 0) corresponding
+            to the :math:`i`th sequence in the FASTA file.
 
-        Yields
+        Returns
         -------
         None
-            TODO
+            Outputs data files from _in silico_ mutagenesis to `output_dir`.
         """
+        os.makedirs(output_dir, exist_ok=True)
+
         fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str.upper(str(fasta_record))
@@ -613,9 +645,16 @@ class AnalyzeSequences(object):
                 1, *cur_sequence_encoding.shape)
             base_preds = self.predict(base_encoding)
 
+            file_prefix = None
+            if use_sequence_name:
+                file_prefix = os.path.join(
+                    output_dir, fasta_record.name.replace(' ', '_'))
+            else:
+                file_prefix = os.path.join(
+                    output_dir, str(i))
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
-                save_data, "{0}_{1}".format(output_path_prefix, i), ISM_COLS)
+                save_data, file_prefix, ISM_COLS)
             predictions_reporter = reporters[-1]
             predictions_reporter.handle_batch_predictions(
                 base_preds, [["NA", "NA", "NA"]])
@@ -624,7 +663,7 @@ class AnalyzeSequences(object):
                 reporters=reporters)
         fasta_file.close()
 
-    def handle_ref_alt_predictions(self,
+    def _handle_ref_alt_predictions(self,
                                    batch_ref_seqs,
                                    batch_alt_seqs,
                                    batch_ids,
@@ -662,8 +701,7 @@ class AnalyzeSequences(object):
                       ref,
                       chrom,
                       start,
-                      end,
-                      reference_sequence):
+                      end):
         """
         TODO
 
@@ -679,15 +717,13 @@ class AnalyzeSequences(object):
             TODO
         end : TODO
             TODO
-        reference_sequence : TODO
-            TODO
 
         Returns
         -------
         TODO
             TODO
         """
-        sequence = reference_sequence.get_sequence_from_coords(
+        sequence = self.reference_sequence.get_sequence_from_coords(
             chrom, start, end)
 
         alt_encodings = []
@@ -707,8 +743,8 @@ class AnalyzeSequences(object):
             elif len(alt_sequence) < self.sequence_length:
                 alt_sequence = _add_sequence_surrounding_alt(
                     alt_sequence, self.sequence_length,
-                    chrom, start, end, reference_sequence)
-            alt_encoding = reference_sequence.sequence_to_encoding(
+                    chrom, start, end, self.reference_sequence)
+            alt_encoding = self.reference_sequence.sequence_to_encoding(
                 alt_sequence)
             alt_encodings.append(alt_encoding)
         return alt_encodings
@@ -716,7 +752,6 @@ class AnalyzeSequences(object):
     def variant_effect_prediction(self,
                                   vcf_file,
                                   save_data,
-                                  reference_sequence,
                                   output_dir=None):
         """
         TODO
@@ -724,24 +759,30 @@ class AnalyzeSequences(object):
         Parameters
         ----------
         vcf_file : str
-            TODO
+            Path to a VCF file. Must contain the columns
+            [#CHROM, POS, ID, REF, ALT], in order. Column header does not need
+            to be present.
         save_data : list(str)
-            TODO
-        indexed_fasta : str
-            TODO
+            A list of the data files to output. Must input 1 or more of the
+            following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_dir : str or None, optional
-            TODO
+            Path to the output directory. If no path is specified, will save
+            files corresponding to the options in `save_data` to the
+            current working directory.
 
         Returns
         -------
         None
+            Saves all files to `output_dir`.
         """
         variants = read_vcf_file(vcf_file)
 
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
         output_path_prefix = '.'.join(filename.split('.')[:-1])
-        if not output_dir:
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
+        else:
             output_dir = path
         output_path_prefix = os.path.join(output_dir, output_path_prefix)
         reporters = self._initialize_reporters(
@@ -755,30 +796,30 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
-            if not reference_sequence.coords_in_bounds(chrom, start, end):
+            if not self.reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
                 continue
-            ref_encoding = reference_sequence.get_encoding_from_coords(
+            ref_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end)
 
             all_alts = alt.split(',')
             alt_encodings = self._process_alts(
-                all_alts, ref, chrom, start, end, reference_sequence)
+                all_alts, ref, chrom, start, end)
             for a in all_alts:
                 batch_ref_seqs.append(ref_encoding)
                 batch_ids.append((chrom, pos, name, ref, a))
             batch_alt_seqs += alt_encodings
 
             if len(batch_ref_seqs) >= self.batch_size:
-                self.handle_ref_alt_predictions(
+                self._handle_ref_alt_predictions(
                     batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
                 batch_ref_seqs = []
                 batch_alt_seqs = []
                 batch_ids = []
 
         if batch_ref_seqs:
-            self.handle_ref_alt_predictions(
+            self._handle_ref_alt_predictions(
                 batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
 
         for r in reporters:

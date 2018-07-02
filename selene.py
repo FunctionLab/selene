@@ -193,7 +193,7 @@ def execute(operations, config, output_dir):
                                      " found neither.")
             if "prediction" in configs:
                 predict_info = configs["prediction"]
-                analyze_seqs.predictions_from_fasta_file(**predict_info)
+                analyze_seqs.get_predictions_for_fasta_file(**predict_info)
 
 if __name__ == "__main__":
     arguments = docopt(
