@@ -6,9 +6,9 @@ import numpy as np
 from .handler import write_to_file, PredictionsHandler
 
 
-class DiffScoreHandler(PredictionsHandler):
+class AbsDiffScoreHandler(PredictionsHandler):
     """
-    The "diff score" is the difference between `alt` and `ref`
+    The "abs diff score" is the absolute difference between `alt` and `ref`
     predictions.
 
     Attributes
@@ -43,9 +43,9 @@ class DiffScoreHandler(PredictionsHandler):
                  nonfeature_columns,
                  output_path):
         """
-        Constructs a new `DiffScoreHandler` object.
+        Constructs a new `AbsDiffScoreHandler` object.
         """
-        super(DiffScoreHandler, self).__init__()
+        super(AbsDiffScoreHandler, self).__init__()
 
         self.needs_base_pred = True
         self.column_names = nonfeature_columns + features
@@ -93,8 +93,8 @@ class DiffScoreHandler(PredictionsHandler):
             features).
 
         """
-        diffs = baseline_predictions - batch_predictions
-        self.results.append(diffs)
+        absolute_diffs = np.abs(baseline_predictions - batch_predictions)
+        self.results.append(absolute_diffs)
         self.samples.append(batch_ids)
 
     def write_to_file(self):
