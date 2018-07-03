@@ -191,7 +191,6 @@ def read_vcf_file(input_path):
     return variants
 
 
-# TODO: MAKE GENERIC.
 def _add_sequence_surrounding_alt(alt_sequence,
                                   sequence_length,
                                   chrom,
@@ -417,18 +416,19 @@ class AnalyzeSequences(object):
 
     def get_predictions_for_fasta_file(self, input_path, output_dir):
         """
-        # TODO(DOCUMENTATION): Finish.
+        Get model predictions for sequences in a FASTA file.
 
         Parameters
         ----------
         input_path : str
-        output_path_prefix : str
+            Input path to the FASTA file.
+        output_dir : str
+            Output directory to write the model predictions.
 
         Returns
         -------
         None
-            Writes results to files corresponding to each reporter in
-            `reporters`.
+            Writes the output to a file in `output_dir`.
 
         """
         os.makedirs(output_dir, exist_ok=True)
@@ -481,24 +481,34 @@ class AnalyzeSequences(object):
                                       mutations_list,
                                       reporters=[]):
         """
-        # TODO(DOCUMENTATION): Finish.
+        Get the predictions for all specified mutations applied
+        to a given sequence and, if applicable, compute the scores
+        ("abs_diffs", "diffs", "logits") for these mutations.
 
         Parameters
         ----------
         sequence : str
-            TODO
+            The sequence to mutate.
         base_preds : numpy.ndarray
-            TODO
-        mutations_list : list(tuple)
-            TODO
+            The model's prediction for `sequence`.
+        mutations_list : list(list(tuple))
+            The mutations to apply to the sequence. Each element in
+            `mutations_list` is a list of tuples, where each tuple
+            specifies the `int` position in the sequence to mutate and what
+            `str` base to which the position is mutated (e.g. (1, 'A')).
         reporters : list(PredictionsHandler)
-            TODO
+            The list of reporters, where each reporter handles the predictions
+            made for each mutated sequence. Will collect, compute scores
+            (e.g. `AbsDiffScoreHandler` computes the absolute difference
+            between `base_preds` and the predictions for the mutated
+            sequence), and output these as a file at the end.
 
         Returns
         -------
         None
             Writes results to files corresponding to each reporter in
             `reporters`.
+
         """
         current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
             sequence)
@@ -533,25 +543,33 @@ class AnalyzeSequences(object):
                               output_path_prefix="ism",
                               mutate_n_bases=1):
         """
-        # TODO(DOCUMENTATION): Finish.
+        Applies _in silico_ mutagenesis to a sequence.
 
         Parameters
         ----------
         sequence : str
-            TODO
+            The sequence to mutate.
         save_data : list(str)
             A list of the data files to output. Must input 1 or more of the
             following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_path_prefix : str, optional
-            TODO
+            The path to which the data files are written. If directories in
+            the path do not yet exist they will be automatically created.
         mutate_n_bases : int, optional
-            TODO
+            The number of bases to mutate at one time. We recommend leaving
+            this parameter set to `1` at this time, as we have not yet
+            optimized operations for double and triple mutations.
 
         Returns
         -------
         None
-            TODO
+            Writes results to files corresponding to each reporter in
+            `reporters`.
+
         """
+        path_dirs, _ = os.path.split(output_path_prefix)
+        os.makedirs(path_dirs, exists_ok=True)
+
         n = len(sequence)
         if n < self.sequence_length: # Pad string length as necessary.
              diff = (self.sequence_length - n) / 2
@@ -624,6 +642,7 @@ class AnalyzeSequences(object):
         -------
         None
             Outputs data files from _in silico_ mutagenesis to `output_dir`.
+
         """
         os.makedirs(output_dir, exist_ok=True)
 
@@ -683,6 +702,7 @@ class AnalyzeSequences(object):
         Returns
         -------
         None
+
         """
         batch_ref_seqs = np.array(batch_ref_seqs)
         batch_alt_seqs = np.array(batch_alt_seqs)
@@ -722,6 +742,7 @@ class AnalyzeSequences(object):
         -------
         TODO
             TODO
+
         """
         sequence = self.reference_sequence.get_sequence_from_coords(
             chrom, start, end)
@@ -754,7 +775,7 @@ class AnalyzeSequences(object):
                                   save_data,
                                   output_dir=None):
         """
-        TODO
+        Get model predictions and scores for a list of variants.
 
         Parameters
         ----------
@@ -774,6 +795,7 @@ class AnalyzeSequences(object):
         -------
         None
             Saves all files to `output_dir`.
+
         """
         variants = read_vcf_file(vcf_file)
 
