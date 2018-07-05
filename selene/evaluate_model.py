@@ -9,7 +9,6 @@ import torch
 from torch.autograd import Variable
 
 from .utils import initialize_logger
-from .utils import load_features_list
 from .utils import load_model_from_state_dict
 from .utils import PerformanceMetrics
 
@@ -82,7 +81,7 @@ class EvaluateModel(object):
 
         self.sampler = data_sampler
 
-        self.features = load_features_list(features_file)
+        self.features = features
 
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
@@ -91,7 +90,8 @@ class EvaluateModel(object):
             os.path.join(self.output_dir, f"{__name__}.log"),
             verbosity=2)
 
-        if use_cuda:
+        self.use_cuda = use_cuda
+        if self.use_cuda:
             self.model.cuda()
 
         self.batch_size = batch_size
@@ -153,6 +153,9 @@ class EvaluateModel(object):
 
         average_scores = self._metrics.update(
             all_predictions, self._all_test_targets)
+
+        self._metrics.visualize(
+            all_predictions, self._all_test_targets, self.output_dir)
 
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),

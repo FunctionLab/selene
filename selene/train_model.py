@@ -471,6 +471,10 @@ class TrainModel(object):
             test_performance)
 
         average_scores["loss"] = average_loss
+
+        self._test_metrics.visualize(
+            all_predictions, self._all_test_targets, self.output_dir)
+
         return (average_scores, feature_scores_dict)
 
     def _save_checkpoint(self, state, is_best,

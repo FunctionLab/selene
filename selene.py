@@ -156,7 +156,8 @@ def execute(operations, config, output_dir):
                 evaluate_model_info.bind(
                     model=model,
                     criterion=loss,
-                    data_sampler=data_sampler)
+                    data_sampler=data_sampler,
+                    output_dir=output_dir)
                 evaluator = instantiate(evaluate_model_info)
                 evaluator.evaluate()
             elif trainer is not None:
