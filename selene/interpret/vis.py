@@ -3,18 +3,22 @@ This module provides the methods for visualizing different ouputs
 from selene analysis methods.
 
 """
+from collections import defaultdict
+from copy import deepcopy
+import os
 import re
 import warnings
-from copy import deepcopy
 
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib import transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 import matplotlib.patheffects
 from matplotlib.text import TextPath
+from plotly.offline import download_plotlyjs, plot
+import plotly.graph_objs as go
+import seaborn as sns
 
 from selene.sequences import Genome
 
@@ -78,7 +82,7 @@ def _svg_parse(path_string):
         vertices.extend(points.tolist())
     return np.array(vertices), codes
 
-              
+
 for k in _SVG_PATHS.keys():
     _SVG_PATHS[k] = _svg_parse(_SVG_PATHS[k])
 
@@ -464,3 +468,212 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
                       cbar_kws=cbar_kws, cmap=cmap, **kwargs)
     ret.set_yticklabels(labels=ret.get_yticklabels(), rotation=0)
     return ret
+
+
+def load_variant_abs_diff_scores(input_path):
+    """
+    Loads the variant data, labels, and feature names from a diff scores
+    file output from variant effect prediction.
+
+    Parameters
+    ----------
+    input_path : str
+        Path to the input file.
+
+    Returns
+    -------
+    tuple(np.ndarray, list(tuple(str)), list(str))
+        * `tuple[0]` is the matrix of absolute difference scores. The rows
+          are the variants and the columns are the features for which the
+          model makes predictions.
+        * `tuple[1]` is the list of variant labels. Each tuple contains
+          (chrom, pos, name, ref, alt).
+        * `tuple[2]` is the list of features.
+
+    """
+    features = []
+    labels = []
+    diffs = []
+    with open(input_path, 'r') as file_handle:
+        colnames = file_handle.readline()
+        features = colnames.strip().split('\t')[5:]
+        for line in file_handle:
+            cols = line.strip().split('\t')
+            scores = [float(f) for f in cols[5:]]
+            label = tuple(cols[:5])
+            diffs.append(scores)
+            labels.append(label)
+    diffs = np.array(diffs)
+    return (diffs, labels, features)
+
+
+def sort_standard_chrs(chrom):
+    """
+    Returns the value on which the
+    standard chromosomes can be sorted.
+
+    Parameters
+    ----------
+    chrom : str
+        The chromosome
+
+    Returns
+    -------
+    int
+        The value on which to sort
+
+    """
+    chrom = chrom[3:]
+    if chrom.isdigit():
+        return int(chrom)
+    if chrom == 'X':
+        return 23
+    elif chrom == 'Y':
+        return 24
+    elif chrom == 'M':
+        return 25
+    else:  # unknown chr
+        return 26
+
+
+def ordered_variants_indices(labels):
+    """
+    Get the ordered variant labels and indices, where the labels
+    are ordered by chromosome and position.
+
+    Parameters
+    ----------
+    labels : list(tuple(str))
+        The list of variant labels. Each label is a tuple of
+        (chrom, pos, name, ref, alt).
+
+    Returns
+    -------
+    tuple(list(tuple), list(int))
+        The first value is the ordered list of labels. Each label
+        is a tuple of (chrom, pos, ref, alt). The second value
+        is the ordered list of label indices.
+
+    """
+    labels_dict = defaultdict(list)
+    for i, l in enumerate(labels):
+        chrom, pos, name, ref, alt = l
+        pos = int(pos)
+        info = (i, pos, ref, alt)
+        labels_dict[chrom].append(info)
+    for chrom, labels_list in labels_dict.items():
+        labels_list.sort(key=lambda tup: tup[1:])
+    ordered_keys = sorted(labels_dict.keys(),
+                          key=sort_standard_chrs)
+
+    ordered_labels = []
+    ordered_label_indices = []
+    for chrom in ordered_keys:
+        for l in labels_dict[chrom]:
+            index, pos, ref, alt = l
+            ordered_label_indices.append(index)
+            ordered_labels.append((chrom, pos, ref, alt))
+    return (ordered_labels, ordered_label_indices)
+
+
+def label_tuple_to_text(label):
+    """
+    Converts the variant label tuple to a string.
+
+    Parameters
+    ----------
+    label : tuple(str)
+        A tuple of (chrom, pos, ref, alt).
+
+    Returns
+    -------
+    str
+        The text label.
+    """
+    chrom, pos, ref, alt = label
+    text = "{0} {1}, {2}/{3}".format(chrom, pos, ref, alt)
+    return text
+
+
+def variant_abs_diffs_scatter(data,
+                              labels,
+                              features,
+                              output_path,
+                              filter_features=None,
+                              labels_sort_fn=ordered_variants_indices,
+                              top_proportion=None):
+    """
+    Displays each variant's max probability difference across features
+    as a point in a scatter plot. The points in the scatter plot are
+    ordered by the variant chromosome and position by default. Variants can
+    be sorted differently by passing in a new `labels_sort_fn`.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Absolute difference scores for variants across all features that a
+        model predicts. This is the first value in the tuple returned by
+        `load_variant_abs_diff_scores`.
+    labels : list(tuple(str))
+        A list of variant labels. This is the second value in the tuple
+        returned by `load_variant_abs_diff_scores`.
+    features : list(str)
+        A list of the features the model predicts. This is the third value
+        in the tuple returned by `load_variant_abs_diff_scores`.
+    output_path : str
+        Path to output file.
+    filter_features : types.FunctionType or None, optional
+        Default is None. A function that takes in a `list(str)` of features
+        and returns the `list(int)` of feature indices over which we would
+        compute the max(probability difference) for each variant. For example,
+        a user may only want to visualize the max probability difference
+        for TF binding features. If `None`, uses all the features.
+    labels_sort_fn : types.FunctionType, optional
+        Default is `ordered_variants_indices`. A function that takes
+        in a `list(tuple(str))` of labels corresponding to the rows in `data`
+        and returns a `tuple(list(tuple), list(int))`, where the first value
+        is the ordered list of variant labels and the second value is the
+        ordered list of indices for those variant labels. By default,
+        variants are sorted by chromosome and position.
+    top_proportion : [0.0, 1.0] or None, optional
+        Default is None. If `top_proportion` is not None, only displays the
+        variants with a max absolute difference score within the
+        `top_proportion` of scores.
+
+    Returns
+    -------
+
+    """
+    labels_ordered, label_indices = labels_sort_fn(labels)
+    feature_indices = None
+    if filter_features is not None:
+        feature_indices = filter_features(features)
+    else:
+        feature_indices = list(range(len(features)))
+    ordered_data = data[label_indices, feature_indices]
+    variants_max_diff = np.amax(ordered_data, axis=1)
+    if top_proportion:
+        p = np.percentile(variants_max_diff, int(top_proportion * 100))
+        keep = np.where(variants_max_diff >= p)[0]
+        print("{0} variants with max abs diff score above {1} are in the "
+              "{2} percentile.".format(
+                  len(keep), p, int(top_proportion * 100)))
+        variants_max_diff = variants_max_diff[keep]
+        text_labels = []
+        for i, l in enumerate(labels_ordered):
+            if i not in keep:
+                continue
+            text_labels.append(label_tuple_to_text(l))
+    else:
+        text_labels = [label_tuple_to_text(l) for l in labels_ordered]
+    data = [go.Scatter(x=np.arange(len(variants_max_diff)),
+                       y=variants_max_diff,
+                       mode='markers',
+                       text=text_labels)]
+    layout = go.Layout(
+        title="Max probability difference scores")
+    fig = go.Figure(data=data, layout=layout)
+    path, filename = os.path.split(output_path)
+    os.makedirs(path, exist_ok=True)
+    plot(fig, filename=output_path)
+    return fig

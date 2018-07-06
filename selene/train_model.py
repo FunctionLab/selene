@@ -199,6 +199,9 @@ class TrainModel(object):
                 checkpoint["state_dict"], self.model)
 
             self._start_step = checkpoint["step"]
+            if self._start_step >= self.max_step:
+                self.max_step += self._start_step
+
             self._min_loss = checkpoint["min_loss"]
             self.optimizer.load_state_dict(
                 checkpoint["optimizer"])

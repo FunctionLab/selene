@@ -210,7 +210,8 @@ if __name__ == "__main__":
     current_run_output_dir = os.path.join(
         output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
     os.makedirs(current_run_output_dir)
-
+    print("Outputs and logs saved to {0}".format(
+        current_run_output_dir))
     if "lr" not in configs and lr != "None":
         configs["lr"] = float(arguments["--lr"])
     elif "lr" in configs and lr != "None" and "train" in operations:
@@ -219,9 +220,12 @@ if __name__ == "__main__":
               "line value for training.".format(
                   arguments["<config-yml>"], lr))
 
-    # @TODO: allow users to pass in a random seed, optional.
-    # @TODO: Should we force this seed to match the seeds elsewhere?
-    torch.manual_seed(1337)
-    torch.cuda.manual_seed_all(1337)
+    if "random_seed" in configs:
+        seed = configs.pop("random_seed")
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    else:
+        print("Warning: no random seed specified in config file. "
+              "Using a random seed ensures results are reproducible.")
 
     execute(operations, configs, current_run_output_dir)
