@@ -156,7 +156,7 @@ class Genome(Sequence):
             A list of tuples of the chromosome names and lengths.
 
         """
-        return [(k, self.len_chrs[v]) for k in self.get_chrs()]
+        return [(k, self.len_chrs[k]) for k in self.get_chrs()]
 
     def _get_len_chrs(self):
         len_chrs = {}
