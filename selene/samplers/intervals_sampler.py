@@ -86,6 +86,12 @@ class IntervalsSampler(OnlineSampler):
     save_datasets : list of str
         Default is `["test"]`. The list of modes for which we should
         save the sampled data to file.
+    output_dir : str or None, optional
+        Default is None. The path to the directory where we should
+        save sampled examples for a mode. If `save_datasets` is
+        a non-empty list, `output_dir` must be specified. If
+        the path in `output_dir` does not exist it will be created
+        automatically.
 
 
     Attributes
@@ -132,8 +138,6 @@ class IntervalsSampler(OnlineSampler):
     mode : str
         The current mode that the sampler is running in. Must be one of
         the modes listed in `modes`.
-    save_datasets : list(str)
-        A list of modes for which we should save the sampled data.
 
     """
     def __init__(self,
@@ -149,7 +153,8 @@ class IntervalsSampler(OnlineSampler):
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train",
-                 save_datasets=["test"]):
+                 save_datasets=["test"],
+                 output_dir=None):
         """
         Constructs a new `IntervalsSampler` object.
         """
@@ -164,7 +169,8 @@ class IntervalsSampler(OnlineSampler):
             center_bin_to_predict=center_bin_to_predict,
             feature_thresholds=feature_thresholds,
             mode=mode,
-            save_datasets=save_datasets)
+            save_datasets=save_datasets,
+            output_dir=output_dir)
 
         self._sample_from_mode = {}
         self._randcache = {}
@@ -215,7 +221,7 @@ class IntervalsSampler(OnlineSampler):
 
         # the first section of indices is used as the validation set
         n_indices_validate = int(n_intervals * self.validation_holdout)
-        val_indices, val_weights = get_indices_andprobabilities(
+        val_indices, val_weights = get_indices_and_probabilities(
             self.interval_lengths, select_indices[:n_indices_validate])
         self._sample_from_mode["validate"] = SampleIndices(
             val_indices, val_weights)
@@ -225,20 +231,20 @@ class IntervalsSampler(OnlineSampler):
             # test set
             n_indices_test = int(n_intervals * self.test_holdout)
             test_indices_end = n_indices_test + n_indices_validate
-            test_indices, test_weights = get_indices_andprobabilities(
+            test_indices, test_weights = get_indices_and_probabilities(
                 self.interval_lengths,
                 select_indices[n_indices_validate:test_indices_end])
             self._sample_from_mode["test"] = SampleIndices(
                 test_indices, test_weights)
 
             # remaining indices are for the training set
-            tr_indices, tr_weights = get_indices_andprobabilities(
+            tr_indices, tr_weights = get_indices_and_probabilities(
                 self.interval_lengths, select_indices[test_indices_end:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
         else:
             # remaining indices are for the training set
-            tr_indices, tr_weights = get_indices_andprobabilities(
+            tr_indices, tr_weights = get_indices_and_probabilities(
                 self.interval_lengths, select_indices[n_indices_validate:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
@@ -279,7 +285,7 @@ class IntervalsSampler(OnlineSampler):
 
         for mode in self.modes:
             sample_indices = self._sample_from_mode[mode].indices
-            indices, weights = get_indices_andprobabilities(
+            indices, weights = get_indices_and_probabilities(
                 self.interval_lengths, sample_indices)
             self._sample_from_mode[mode] = \
                 self._sample_from_mode[mode]._replace(
@@ -334,10 +340,10 @@ class IntervalsSampler(OnlineSampler):
                         "Sampling again.".format(chrom, position))
             return None
 
-        if self.mode in self.save_datasets:
+        if self.mode in self._save_datasets:
             feature_indices = ';'.join(
                 [str(f) for f in np.nonzero(retrieved_targets)[0]])
-            self.save_datasets[self.mode].append(
+            self._save_datasets[self.mode].append(
                 [chrom,
                  window_start,
                  window_end,
