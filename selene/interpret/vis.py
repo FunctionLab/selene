@@ -463,7 +463,7 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
     if "cmap" in kwargs:
         cmap = kwargs.pop("cmap")
     else:
-        cmap = "Blues_r"
+        cmap = "Blues"
     ret = sns.heatmap(score_matrix, mask=mask, yticklabels=yticklabels,
                       cbar_kws=cbar_kws, cmap=cmap, **kwargs)
     ret.set_yticklabels(labels=ret.get_yticklabels(), rotation=0)

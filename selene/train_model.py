@@ -178,6 +178,8 @@ class TrainModel(object):
             verbosity=logging_verbosity)
 
         self._create_validation_set(n_samples=n_validation_samples)
+        # TODO: Only `selene.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.
+        # So, what should be done to allow more general sampling methods?
         self._validation_metrics = PerformanceMetrics(
             self.sampler.get_feature_from_index,
             report_gt_feature_n_positives=report_gt_feature_n_positives)
@@ -189,7 +191,7 @@ class TrainModel(object):
                 report_gt_feature_n_positives=report_gt_feature_n_positives)
 
         self._start_step = 0
-        self._min_loss = float("inf")
+        self._min_loss = float("inf") # TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.
         if checkpoint_resume is not None:
             checkpoint = torch.load(
                 checkpoint_resume,
@@ -241,13 +243,14 @@ class TrainModel(object):
             self.sampler.get_validation_set(
                 self.batch_size, n_samples=n_samples)
         t_f = time()
+        # TODO: Correct the # of examples and batches so that they reflect the actual #, not estimates.
         logger.info(("{0} s to load {1} validation examples ({2} validation "
                      "batches) to evaluate after each training step.").format(
                       t_f - t_i,
                       len(self._validation_data) * self.batch_size,
                       len(self._validation_data)))
 
-    # TODO: Determine if we really need separate validation and test methods.
+    # TODO: Determine if we can somehow combine testing and validation set creation methods.
     def _create_test_set(self, n_samples=None):
         """
         Generates the set of test examples.
@@ -264,6 +267,7 @@ class TrainModel(object):
             self.sampler.get_test_set(
                 self.batch_size, n_samples=n_samples)
         t_f = time()
+        # TODO: Correct the # of examples and batches so that they reflect the actual #, not estimates.
         logger.info(("{0} s to load {1} test examples ({2} test batches) "
                      "to evaluate after all training steps.").format(
                       t_f - t_i,
@@ -307,11 +311,12 @@ class TrainModel(object):
         for step in range(self._start_step, self.max_steps):
             train_loss = self.train()
 
-            # @TODO: if step and step % ...
-            if step % self.nth_step_report_stats == 0:
+            # TODO: Should we have some way to report training stats without running validation?
+            if step and step % self.nth_step_report_stats == 0:
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
                 self._train_logger.info(train_loss)
+                # TODO: check if "roc_auc" is a key in `valid_scores`?
                 if valid_scores["roc_auc"]:
                     validation_roc_auc = valid_scores["roc_auc"]
                     self._validation_logger.info(
@@ -334,8 +339,12 @@ class TrainModel(object):
                 logger.info(
                     ("[STATS] step={0}: "
                      "Training loss: {1}, validation loss: {2}.").format(
-                        step, train_loss, validation_loss))
+                        step, train_loss, validation_loss)) # Should training loss and validation loss be reported at the same line?
+                # Logging training and validation on same line requires 2 parsers or more complex parser.
+                # Separate logging of train/validate is just a grep for validation/train and then same parser.
 
+            # TODO: Do we want to save a checkpoint at step == 0 (as is the case now)?
+            # Should checkpoint saving occur before validation (if they both occur in the same step) or not?
             if step % self.nth_step_save_checkpoint == 0:
                 self._save_checkpoint({
                     "step": step,
@@ -437,6 +446,7 @@ class TrainModel(object):
         average_scores = self._validation_metrics.update(all_predictions,
                                                          self._all_validation_targets)
 
+        # TODO: This results in validation loss being logged twice. Is that ideal?
         for name, score in average_scores.items():
             logger.debug("[STATS] average {0}: {1}".format(name, score))
             print("[VALIDATE] average {0}: {1}".format(name, score))

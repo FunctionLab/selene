@@ -399,8 +399,8 @@ def _try_to_import(tag_suffix):
             field = pieces[-1]
             candidates = dir(eval(module))
 
-            msg = ("Could not evaluate {0}. " +
-                   "Did you mean {1}? " +
+            msg = ("Could not evaluate {0}. "
+                   "Did you mean {1}? "
                    "Original error was {2}".format(
                        tag_suffix, candidates, str(e)
                    ))
