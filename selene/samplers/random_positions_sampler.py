@@ -1,5 +1,8 @@
 """
 This module provides the RandomPositionsSampler class.
+
+Currently, only works with sequences from `selene.sequences.Genome`.
+
 """
 from collections import namedtuple
 import logging
@@ -45,7 +48,82 @@ class RandomPositionsSampler(OnlineSampler):
     """This sampler randomly selects a position in the genome and queries for
     a sequence centered at that position for input to the model.
 
-    @TODO: possible to generalize to Sequences?
+    TODO: generalize to selene.sequences.Sequence?
+
+    Parameters
+    ----------
+    reference_sequence : selene.sequences.Genome
+        A reference sequence from which to create examples.
+    target_path : str
+        Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
+        coordinates mapped to the genomic features we want to predict.
+    features : list(str)
+        List of distinct features that we aim to predict.
+    seed : int, optional
+        Default is 436. Sets the random seed for sampling.
+    validation_holdout : list(str) or float, optional
+        Default is `['chr6', 'chr7']`. Holdout can be regional or
+        proportional. If regional, expects a list (e.g. `['chrX', 'chrY']`).
+        Regions must match those specified in the first column of the
+        tabix-indexed BED file. If proportional, specify a percentage
+        between (0.0, 1.0). Typically 0.10 or 0.20.
+    test_holdout : list(str) or float, optional
+        Default is `['chr8', 'chr9']`. See documentation for
+        `validation_holdout` for additional information.
+    sequence_length : int, optional
+        Default is 1000. Model is trained on sequences of `sequence_length`
+        where genomic features are annotated to the center regions of
+        these sequences.
+    center_bin_to_predict : int, optional
+        Default is 200. Query the tabix-indexed file for a region of
+        length `center_bin_to_predict`.
+    feature_thresholds : float [0.0, 1.0], optional
+        Default is 0.5. The `feature_threshold` to pass to the
+        `GenomicFeatures` object.
+    mode : {'train', 'validate', 'test'}
+        Default is `'train'`. The mode to run the sampler in.
+    save_datasets : list(str)
+        Default is `["test"]`. The list of modes for which we should
+        save the sampled data to file.
+    output_dir : str or None, optional
+        Default is None. The path to the directory where we should
+        save sampled examples for a mode. If `save_datasets` is
+        a non-empty list, `output_dir` must be specified. If
+        the path in `output_dir` does not exist it will be created
+        automatically.
+
+    Attributes
+    ----------
+    reference_sequence : selene.sequences.Genome
+        The reference sequence that examples are created from.
+    target : selene.targets.Target
+        The `selene.targets.Target` object holding the features that we
+        would like to predict.
+    validation_holdout : list(str) or float
+        The samples to hold out for validating model performance. These
+        can be "regional" or "proportional". If regional, this is a list
+        of region names (e.g. `['chrX', 'chrY']`). These regions must
+        match those specified in the first column of the tabix-indexed
+        BED file. If proportional, this is the fraction of total samples
+        that will be held out.
+    test_holdout : list(str) or float
+        The samples to hold out for testing model performance. See the
+        documentation for `validation_holdout` for more details.
+    sequence_length : int
+        The length of the sequences to  train the model on.
+    bin_radius : int
+        From the center of the sequence, the radius in which to detect
+        a feature annotation in order to include it as a sample's label.
+    surrounding_sequence_radius : int
+        The length of sequence falling outside of the feature detection
+        bin (i.e. `bin_radius`) center, but still within the
+        `sequence_length`.
+    modes : list(str)
+        The list of modes that the sampler can be run in.
+    mode : str
+        The current mode that the sampler is running in. Must be one of
+        the modes listed in `modes`
+        .
     """
 
     def __init__(self,
@@ -129,9 +207,6 @@ class RandomPositionsSampler(OnlineSampler):
                 tr_indices, tr_weights)
 
     def _partition_genome_by_chromosome(self):
-        """
-        TODO: rename this to "_partition_by_key"?
-        """
         for mode in self.modes:
             self._sample_from_mode[mode] = SampleIndices([], [])
         for index, (chrom, len_chrom) in enumerate(self.reference_sequence.get_chr_lens()):
@@ -215,6 +290,29 @@ class RandomPositionsSampler(OnlineSampler):
         self._randcache[mode]["sample_next"] = 0
 
     def sample(self, batch_size=1):
+        """
+        Randomly draws a mini-batch of examples and their corresponding
+        labels.
+
+        Parameters
+        ----------
+        batch_size : int, optional
+            Default is 1. The number of examples to include in the
+            mini-batch.
+
+        Returns
+        -------
+        sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
+            A tuple containing the numeric representation of the
+            sequence examples and their corresponding labels. The
+            shape of `sequences` will be
+            :math:`B \\times L \\times N`, where :math:`B` is
+            `batch_size`, :math:`L` is the sequence length, and
+            :math:`N` is the size of the sequence type's alphabet.
+            The shape of `targets` will be :math:`B \\times F`,
+            where :math:`F` is the number of features.
+
+        """
         sequences = np.zeros((batch_size, self.sequence_length, 4))
         targets = np.zeros((batch_size, self.n_features))
         n_samples_drawn = 0
@@ -245,6 +343,39 @@ class RandomPositionsSampler(OnlineSampler):
         return (sequences, targets)
 
     def get_data_and_targets(self, mode, batch_size, n_samples):
+        """
+        This method fetches a subset of the data from the sampler,
+        divided into batches. This method also allows the user to
+        specify what operating mode to run the sampler in when fetching
+        the data.
+
+        Parameters
+        ----------
+        mode : str
+            The mode to run the sampler in when fetching the samples.
+            See `selene.samplers.IntervalsSampler.modes` for more
+            information.
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int
+            The total number of samples to retrieve.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+        """
         self.set_mode(mode)
         sequences_and_targets = []
 
@@ -258,6 +389,38 @@ class RandomPositionsSampler(OnlineSampler):
         return sequences_and_targets, targets_mat
 
     def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
+        """
+        This method returns a subset of the data for a specified run
+        mode, divided into mini-batches.
+
+        Parameters
+        ----------
+        mode : str
+            The mode to run the sampler in when fetching the samples.
+            See `selene.samplers.IntervalsSampler.modes` for more
+            information.
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of samples to retrieve.
+            If `None`, it will retrieve all data for the selected mode.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            The list is length :math:`S`, where :math:`S =` `n_samples`.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`
+
+        """
         if not n_samples and mode == "validate":
             n_samples = 32000
         if not n_samples and mode == "test":
@@ -265,8 +428,66 @@ class RandomPositionsSampler(OnlineSampler):
         return self.get_data_and_targets(mode, batch_size, n_samples)
 
     def get_validation_set(self, batch_size, n_samples=None):
+        """
+        This method returns a subset of validation data from the
+        sampler, divided into batches.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of validation examples
+            to retrieve. If `None`, all validation data will be
+            retrieved.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+        """
         return self.get_dataset_in_batches(
             "validate", batch_size, n_samples=n_samples)
 
     def get_test_set(self, batch_size, n_samples=None):
+        """
+        This method returns a subset of testing data from the
+        sampler, divided into batches.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of validation examples
+            to retrieve. If `None`, it will retrieve all testing
+            data.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+        """
         return self.get_dataset_in_batches("test", batch_size, n_samples)

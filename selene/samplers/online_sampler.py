@@ -39,11 +39,11 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         Default is `['chr8', 'chr9']`. See documentation for
         `validation_holdout` for additional information.
     sequence_length : int, optional
-        Default is 1001. Model is trained on sequences of `sequence_length`
+        Default is 1000. Model is trained on sequences of `sequence_length`
         where genomic features are annotated to the center regions of
         these sequences.
     center_bin_to_predict : int, optional
-        Default is 201. Query the tabix-indexed file for a region of
+        Default is 200. Query the tabix-indexed file for a region of
         length `center_bin_to_predict`.
     feature_thresholds : float [0.0, 1.0], optional
         Default is 0.5. The `feature_threshold` to pass to the
@@ -70,7 +70,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     validation_holdout : list(str) or float
         The samples to hold out for validating model performance. These
         can be "regional" or "proportional". If regional, this is a list
-        of region names (e.g. `['chrX', 'chrY']`). These Regions must
+        of region names (e.g. `['chrX', 'chrY']`). These regions must
         match those specified in the first column of the tabix-indexed
         BED file. If proportional, this is the fraction of total samples
         that will be held out.
