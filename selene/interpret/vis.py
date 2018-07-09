@@ -475,6 +475,8 @@ def load_variant_abs_diff_scores(input_path):
     Loads the variant data, labels, and feature names from a diff scores
     file output from variant effect prediction.
 
+    TODO: should we move this out of `vis.py`?
+
     Parameters
     ----------
     input_path : str
@@ -536,10 +538,10 @@ def sort_standard_chrs(chrom):
         return 26
 
 
-def ordered_variants_indices(labels):
+def ordered_variants_and_indices(labels):
     """
-    Get the ordered variant labels and indices, where the labels
-    are ordered by chromosome and position.
+    Get the ordered variant labels, where the labels are sorted by chromosome
+    and position, and the indices corresponding to the sort,
 
     Parameters
     ----------
@@ -576,7 +578,7 @@ def ordered_variants_indices(labels):
     return (ordered_labels, ordered_label_indices)
 
 
-def label_tuple_to_text(label):
+def _label_tuple_to_text(label):
     """
     Converts the variant label tuple to a string.
 
@@ -595,13 +597,13 @@ def label_tuple_to_text(label):
     return text
 
 
-def variant_abs_diffs_scatter(data,
-                              labels,
-                              features,
-                              output_path,
-                              filter_features=None,
-                              labels_sort_fn=ordered_variants_indices,
-                              top_proportion=None):
+def variant_diffs_scatter_plot(data,
+                               labels,
+                               features,
+                               output_path,
+                               filter_features=None,
+                               labels_sort_fn=ordered_variants_and_indices,
+                               nth_percentile=None):
     """
     Displays each variant's max probability difference across features
     as a point in a scatter plot. The points in the scatter plot are
@@ -621,7 +623,7 @@ def variant_abs_diffs_scatter(data,
         A list of the features the model predicts. This is the third value
         in the tuple returned by `load_variant_abs_diff_scores`.
     output_path : str
-        Path to output file.
+        Path to output file. Must have '.html' extension.
     filter_features : types.FunctionType or None, optional
         Default is None. A function that takes in a `list(str)` of features
         and returns the `list(int)` of feature indices over which we would
@@ -629,43 +631,43 @@ def variant_abs_diffs_scatter(data,
         a user may only want to visualize the max probability difference
         for TF binding features. If `None`, uses all the features.
     labels_sort_fn : types.FunctionType, optional
-        Default is `ordered_variants_indices`. A function that takes
+        Default is `ordered_variants_and_indices`. A function that takes
         in a `list(tuple(str))` of labels corresponding to the rows in `data`
         and returns a `tuple(list(tuple), list(int))`, where the first value
         is the ordered list of variant labels and the second value is the
         ordered list of indices for those variant labels. By default,
         variants are sorted by chromosome and position.
-    top_proportion : [0.0, 1.0] or None, optional
-        Default is None. If `top_proportion` is not None, only displays the
+    nth_percentile : int [0, 100] or None, optional
+        Default is None. If `nth_percentile` is not None, only displays the
         variants with a max absolute difference score within the
-        `top_proportion` of scores.
+        `nth_percentile` of scores.
 
     Returns
     -------
 
     """
     labels_ordered, label_indices = labels_sort_fn(labels)
+    ordered_data = data[label_indices, :]
+
     feature_indices = None
     if filter_features is not None:
         feature_indices = filter_features(features)
-    else:
-        feature_indices = list(range(len(features)))
-    ordered_data = data[label_indices, feature_indices]
+        ordered_data = data[:, feature_indices]
     variants_max_diff = np.amax(ordered_data, axis=1)
-    if top_proportion:
-        p = np.percentile(variants_max_diff, int(top_proportion * 100))
+    if nth_percentile:
+        p = np.percentile(variants_max_diff, nth_percentile)
         keep = np.where(variants_max_diff >= p)[0]
         print("{0} variants with max abs diff score above {1} are in the "
-              "{2} percentile.".format(
-                  len(keep), p, int(top_proportion * 100)))
+              "{2}th percentile.".format(
+                  len(keep), p, nth_percentile))
         variants_max_diff = variants_max_diff[keep]
         text_labels = []
         for i, l in enumerate(labels_ordered):
             if i not in keep:
                 continue
-            text_labels.append(label_tuple_to_text(l))
+            text_labels.append(_label_tuple_to_text(l))
     else:
-        text_labels = [label_tuple_to_text(l) for l in labels_ordered]
+        text_labels = [_label_tuple_to_text(l) for l in labels_ordered]
     data = [go.Scatter(x=np.arange(len(variants_max_diff)),
                        y=variants_max_diff,
                        mode='markers',

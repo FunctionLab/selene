@@ -126,7 +126,8 @@ def execute(operations, config, output_dir):
                 config["model"], train=True, lr=config["lr"])
 
             sampler_info = configs["sampler"]
-            sampler_info.bind(output_dir=output_dir)
+            if output_dir is not None:
+                sampler_info.bind(output_dir=output_dir)
 
             train_model_info = configs["train_model"]
 
@@ -137,8 +138,9 @@ def execute(operations, config, output_dir):
                 data_sampler=data_sampler,
                 loss_criterion=loss,
                 optimizer_class=optim,
-                optimizer_kwargs=optim_kwargs,
-                output_dir=output_dir)
+                optimizer_kwargs=optim_kwargs)
+            if output_dir is not None:
+                train_model_info.bind(output_dir=output_dir)
 
             trainer = instantiate(train_model_info)
             trainer.train_and_validate()
@@ -156,8 +158,9 @@ def execute(operations, config, output_dir):
                 evaluate_model_info.bind(
                     model=model,
                     criterion=loss,
-                    data_sampler=data_sampler,
-                    output_dir=output_dir)
+                    data_sampler=data_sampler)
+                if output_dir is not None:
+                    evaluate_model_info.bind(output_dir=output_dir)
                 evaluator = instantiate(evaluate_model_info)
                 evaluator.evaluate()
             elif trainer is not None:
@@ -205,13 +208,21 @@ if __name__ == "__main__":
     lr = arguments["--lr"]
 
     operations = configs.pop("ops")
-    output_dir = configs.pop("output_dir")
-    os.makedirs(output_dir, exist_ok=True)
-    current_run_output_dir = os.path.join(
-        output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
-    os.makedirs(current_run_output_dir)
-    print("Outputs and logs saved to {0}".format(
-        current_run_output_dir))
+    current_run_output_dir = None
+    if "output_dir" not in configs:
+        print("No top-level output directory specified. All constructors "
+              "to be initialized (e.g. Sampler, TrainModel) that require "
+              "this parameter must have it specified in their individual "
+              "parameter configuration.")
+    else:
+        output_dir = configs.pop("output_dir")
+        os.makedirs(output_dir, exist_ok=True)
+        current_run_output_dir = os.path.join(
+            output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+        os.makedirs(current_run_output_dir)
+        print("Outputs and logs saved to {0}".format(
+            current_run_output_dir))
+
     if "lr" not in configs and lr != "None":
         configs["lr"] = float(arguments["--lr"])
     elif "lr" in configs and lr != "None" and "train" in operations:
