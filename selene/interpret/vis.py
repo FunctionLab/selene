@@ -671,9 +671,18 @@ def variant_diffs_scatter_plot(data,
     data = [go.Scatter(x=np.arange(len(variants_max_diff)),
                        y=variants_max_diff,
                        mode='markers',
+                       marker = dict(
+                           color = "#39CCCC",
+                           line = dict(width = 1)),
                        text=text_labels)]
     layout = go.Layout(
-        title="Max probability difference scores")
+        title="Max probability difference scores",
+        hovermode="closest",
+        xaxis=dict(
+            title = "Genome coordinates"),
+        yaxis=dict(
+            title = "Absolute difference")
+        )
     fig = go.Figure(data=data, layout=layout)
     path, filename = os.path.split(output_path)
     os.makedirs(path, exist_ok=True)
