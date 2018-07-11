@@ -218,7 +218,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">strftime</span><span class="p">,</span> <span class="n">time</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -227,21 +227,9 @@
 <span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="k">import</span> <span class="n">ReduceLROnPlateau</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">initialize_logger</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">load_model_from_state_dict</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">PerformanceMetrics</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;selene&quot;</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_metrics_logger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">out_filepath</span><span class="p">):</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">file_handle</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_filepath</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)))</span>
-    <span class="n">file_handle</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handle</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">logger</span>
 
 
 <div class="viewcode-block" id="TrainModel"><a class="viewcode-back" href="../../selene.html#selene.TrainModel">[docs]</a><span class="k">class</span> <span class="nc">TrainModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -374,6 +362,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span> <span class="o">=</span> <span class="n">use_cuda</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_parallel</span> <span class="o">=</span> <span class="n">data_parallel</span>
 
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">current_run_output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">output_dir</span><span class="p">,</span> <span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">-%H-%M-%S&quot;</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">current_run_output_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">current_run_output_dir</span>
+
+        <span class="n">initialize_logger</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.log&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)),</span>
+            <span class="n">verbosity</span><span class="o">=</span><span class="n">logging_verbosity</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_parallel</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Wrapped model in DataParallel&quot;</span><span class="p">)</span>
@@ -382,13 +380,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set modules to use CUDA&quot;</span><span class="p">)</span>
-
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
-
-        <span class="n">initialize_logger</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.log&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)),</span>
-            <span class="n">verbosity</span><span class="o">=</span><span class="n">logging_verbosity</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_validation_set</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_validation_samples</span><span class="p">)</span>
         <span class="c1"># TODO: Only `selene.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.</span>
@@ -406,39 +397,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_min_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span> <span class="c1"># TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.</span>
         <span class="k">if</span> <span class="n">checkpoint_resume</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-                <span class="n">checkpoint_resume</span><span class="p">,</span>
-                <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">storage</span><span class="p">)</span>
+            <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint_resume</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">load_model_from_state_dict</span><span class="p">(</span>
-                <span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;step&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_step</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">max_step</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_min_loss</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;min_loss&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span> <span class="o">=</span> <span class="n">checkpoint_resume</span><span class="p">[</span><span class="s2">&quot;step&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_loss</span> <span class="o">=</span> <span class="n">checkpoint_resume</span><span class="p">[</span><span class="s2">&quot;min_loss&quot;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
-                <span class="n">checkpoint</span><span class="p">[</span><span class="s2">&quot;optimizer&quot;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-                            <span class="n">state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+                <span class="n">checkpoint_resume</span><span class="p">[</span><span class="s2">&quot;optimizer&quot;</span><span class="p">])</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                 <span class="p">(</span><span class="s2">&quot;Resuming from checkpoint: step </span><span class="si">{0}</span><span class="s2">, min loss </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_loss</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_train_logger</span> <span class="o">=</span> <span class="n">_metrics_logger</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.train&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span> <span class="o">=</span> <span class="n">_metrics_logger</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.validation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_train_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
-        <span class="c1"># TODO: this makes the assumption that all models will report ROC AUC,</span>
-        <span class="c1"># which is not the case.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;loss</span><span class="se">\t</span><span class="s2">roc_auc&quot;</span><span class="p">)</span>
+        <span class="c1"># TODO: Use standard language for train/validate/test across all of selene.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">losses</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;training&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;validation&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_create_validation_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -486,9 +462,6 @@
                       <span class="n">t_f</span> <span class="o">-</span> <span class="n">t_i</span><span class="p">,</span>
                       <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_data</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
                       <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_test_data</span><span class="p">)))</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;test_targets.npz&quot;</span><span class="p">),</span>
-            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_test_targets</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -523,23 +496,19 @@
             <span class="n">factor</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_steps</span><span class="p">):</span>
             <span class="n">train_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">losses</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_loss</span><span class="p">)</span>
 
+            <span class="c1"># @TODO: if step and step % ...</span>
+            <span class="c1"># TODO: Do we want to compute validation stats at step == 0 (as is the case now)?</span>
             <span class="c1"># TODO: Should we have some way to report training stats without running validation?</span>
-            <span class="k">if</span> <span class="n">step</span> <span class="ow">and</span> <span class="n">step</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nth_step_report_stats</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nth_step_report_stats</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">valid_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
                 <span class="n">validation_loss</span> <span class="o">=</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_train_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">train_loss</span><span class="p">)</span>
-                <span class="c1"># TODO: check if &quot;roc_auc&quot; is a key in `valid_scores`?</span>
-                <span class="k">if</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]:</span>
-                    <span class="n">validation_roc_auc</span> <span class="o">=</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">,</span>
-                                          <span class="n">validation_roc_auc</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">losses</span><span class="p">[</span><span class="s2">&quot;training&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_loss</span><span class="p">)</span> <span class="c1"># TODO: Is the training loss being computed twice?</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">losses</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]:</span> <span class="c1"># TODO: Check if &quot;roc_auc&quot; is even in valid_scores first to avoid key error.</span>
                     <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-                        <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">validation_roc_auc</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="s2">NA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">validation_loss</span><span class="p">))</span>
+                        <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
 
                 <span class="n">is_best</span> <span class="o">=</span> <span class="n">validation_loss</span> <span class="o">&lt;</span> <span class="n">min_loss</span>
                 <span class="n">min_loss</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">,</span> <span class="n">min_loss</span><span class="p">)</span>
@@ -564,8 +533,7 @@
                     <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
                     <span class="s2">&quot;state_dict&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
                     <span class="s2">&quot;min_loss&quot;</span><span class="p">:</span> <span class="n">min_loss</span><span class="p">,</span>
-                    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()},</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">save_dataset_to_file</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">close_filehandle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+                    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()},</span> <span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TrainModel.train"><a class="viewcode-back" href="../../selene.html#selene.TrainModel.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -578,7 +546,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-
         <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_batch</span><span class="p">()</span>
 
         <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
@@ -635,7 +602,6 @@
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
             <span class="n">all_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-
             <span class="n">batch_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="n">all_predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">all_predictions</span><span class="p">)</span>
@@ -683,6 +649,7 @@
 
         <span class="n">average_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">all_predictions</span><span class="p">,</span>
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">_all_test_targets</span><span class="p">)</span>
+
         <span class="n">np</span><span class="o">.</span><span class="n">savez_compressed</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;test_predictions.npz&quot;</span><span class="p">),</span>
             <span class="n">data</span><span class="o">=</span><span class="n">all_predictions</span><span class="p">)</span>
@@ -697,11 +664,16 @@
             <span class="n">test_performance</span><span class="p">)</span>
 
         <span class="n">average_scores</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">average_loss</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_test_metrics</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span>
-            <span class="n">all_predictions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_test_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
-
         <span class="k">return</span> <span class="p">(</span><span class="n">average_scores</span><span class="p">,</span> <span class="n">feature_scores_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TrainModel.write_datasets_to_file"><a class="viewcode-back" href="../../selene.html#selene.TrainModel.write_datasets_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_datasets_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes the sampled datasets to file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">save_datasets_to_file</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">is_best</span><span class="p">,</span>
                          <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

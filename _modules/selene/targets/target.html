@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.utils.utils &mdash; Selene master documentation</title>
+  <title>selene.targets.target &mdash; Selene master documentation</title>
   
 
   
@@ -195,7 +195,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene.utils.utils</li>
+      <li>selene.targets.target</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -210,96 +210,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene.utils.utils</h1><div class="highlight"><pre>
+  <h1>Source code for selene.targets.target</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides utility functions that are not tied to specific</span>
-<span class="sd">classes or concepts, but still perform specific and important roles</span>
-<span class="sd">across many of the packages modules.</span>
+<span class="sd">This module provides the `Target` base class, which defines the</span>
+<span class="sd">interface for target feature classes. Target feature classes are classes</span>
+<span class="sd">which define a way to access a &quot;target feature&quot; such as a label or</span>
+<span class="sd">annotation on an input sequence.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
 
 
-<div class="viewcode-block" id="load_features_list"><a class="viewcode-back" href="../../../utils.html#selene.utils.load_features_list">[docs]</a><span class="k">def</span> <span class="nf">load_features_list</span><span class="p">(</span><span class="n">input_path</span><span class="p">):</span>
+<div class="viewcode-block" id="Target"><a class="viewcode-back" href="../../../targets.html#selene.targets.Target">[docs]</a><span class="k">class</span> <span class="nc">Target</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Reads in a file of distinct feature names line-by-line and returns</span>
-<span class="sd">    these features as a list. Each feature name in the file must occur</span>
-<span class="sd">    on a separate line.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    input_path : str</span>
-<span class="sd">        Path to the features file. Each feature in the input file must</span>
-<span class="sd">        on its own line.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list(str)</span>
-<span class="sd">        The list of features. The features will appear in the list in</span>
-<span class="sd">        the same order they appeared in the file (reading from top to</span>
-<span class="sd">        bottom).</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    A file at &quot;input_features.txt&quot;, for the feature names :math:`YFP`</span>
-<span class="sd">    and :math:`YFG` might look like this:</span>
-<span class="sd">    ::</span>
-<span class="sd">        YFP</span>
-<span class="sd">        YFG</span>
-
-
-<span class="sd">    We can load these features from that file as follows:</span>
-
-<span class="sd">    &gt;&gt;&gt; load_features_list(&quot;input_features.txt&quot;)</span>
-<span class="sd">    [&quot;YFP&quot;, &quot;YFG&quot;]</span>
+<span class="sd">    The abstract base class for all target feature classes.</span>
+<span class="sd">    Target features classes are classes which define a way to access a</span>
+<span class="sd">    &quot;target feature&quot; such as a label or annotation on an input sequence.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_handle</span><span class="p">:</span>
-            <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">features</span></div>
+<div class="viewcode-block" id="Target.get_feature_data"><a class="viewcode-back" href="../../../targets.html#selene.targets.Target.get_feature_data">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the feature data for some coordinate.</span>
 
-
-<div class="viewcode-block" id="initialize_logger"><a class="viewcode-back" href="../../../utils.html#selene.utils.initialize_logger">[docs]</a><span class="k">def</span> <span class="nf">initialize_logger</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Initializes the logger for Selene.</span>
-<span class="sd">    This function can only be called successfully once.</span>
-<span class="sd">    If the logger has already been initialized with handlers,</span>
-<span class="sd">    the function exits. Otherwise, it proceeds to set the</span>
-<span class="sd">    logger configurations.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    output_path : str</span>
-<span class="sd">        The path to the output file where logs will be written.</span>
-
-<span class="sd">    verbosity : int, {2, 1, 0}</span>
-<span class="sd">        Default is 2. The level of logging verbosity to use.</span>
-
-<span class="sd">            * 0 - Only warnings will be logged.</span>
-<span class="sd">            * 1 - Information and warnings will be logged.</span>
-<span class="sd">            * 2 - Debug messages, information, and warnings will all be\</span>
-<span class="sd">                  logged.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;selene&quot;</span><span class="p">)</span>
-    <span class="c1"># check if logger has already been initialized</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">):</span>
-        <span class="k">return</span>
-
-    <span class="k">if</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">verbosity</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-
-    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="n">file_handle</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
-    <span class="n">file_handle</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handle</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

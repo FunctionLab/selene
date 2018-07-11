@@ -214,19 +214,660 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="selene-samplers">
-<h1>selene.samplers<a class="headerlink" href="#selene-samplers" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-selene.samplers">
+<span id="selene-samplers"></span><h1>selene.samplers<a class="headerlink" href="#module-selene.samplers" title="Permalink to this headline">¶</a></h1>
+<p>This module provides classes and methods for sampling labeled data
+examples.</p>
 <div class="section" id="sampler">
 <h2>Sampler<a class="headerlink" href="#sampler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="selene.samplers.Sampler">
+<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">Sampler</code><span class="sig-paren">(</span><em>seed=436</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The base class for sampler currently enforces that all samplers
+have modes for drawing training and validation samples to train a
+model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><strong>modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – A list of the names of the modes that the object may operate in.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – Default is <cite>None</cite>. The current mode that the object is operating in.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first last"><strong>seed</strong> (<em>int</em>) – The value used to seed the random number generator.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="selene.samplers.Sampler.BASE_MODES">
+<code class="descname">BASE_MODES</code><em class="property"> = ('train', 'validate')</em><a class="headerlink" href="#selene.samplers.Sampler.BASE_MODES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The types of modes that the <cite>Sampler</cite> object can run in.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.Sampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method fetches a subset of the data from the sampler,
+divided into batches. This method also allows the user to
+specify what operating mode to run the sampler in when fetching
+the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mode</strong> (<em>str</em>) – The operating mode that the object should run in.</li>
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.Sampler.get_validation_set">
+<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a subset of validation data from the
+sampler, divided into batches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of validation examples
+to retrieve. If <cite>None</cite>, it will retrieve all validation
+data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.Sampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches a mini-batch of the data from the sampler.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_size</strong> (<em>int</em>) – The size of the batch to retrieve.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.Sampler.set_mode">
+<code class="descname">set_mode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.set_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.set_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the sampling mode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<em>str</em>) – The name of the mode to use. It must be one of
+<cite>Sampler.BASE_MODES</cite>.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>mode</cite> is not a valid mode.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="onlinesampler">
 <h2>OnlineSampler<a class="headerlink" href="#onlinesampler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="selene.samplers.OnlineSampler">
+<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">OnlineSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1001, center_bin_to_predict=201, feature_thresholds=0.5, mode='train', save_datasets=['test']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.samplers.sampler.Sampler</span></code></p>
+<p>A sampler in which training/validation/test data is constructed
+from random sampling of the dataset for each batch passed to the
+model. This form of sampling may alleviate the problem of loading an
+extremely large dataset into memory when developing a new model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
+<li><strong>target_path</strong> (<em>str</em>) – Path to tabix-indexed, compressed BED file (<cite>*.bed.gz</cite>) of genomic
+coordinates mapped to the genomic features we want to predict.</li>
+<li><strong>features</strong> (<em>list(str)</em>) – List of distinct features that we aim to predict.</li>
+<li><strong>seed</strong> (<em>int, optional</em>) – Default is 436. Sets the random seed for sampling.</li>
+<li><strong>validation_holdout</strong> (<em>list(str) or float, optional</em>) – Default is <cite>[‘chr6’, ‘chr7’]</cite>. Holdout can be regional or
+proportional. If regional, expects a list (e.g. <cite>[‘X’, ‘Y’]</cite>).
+Regions must match those specified in the first column of the
+tabix-indexed BED file. If proportional, specify a percentage
+between (0.0, 1.0). Typically 0.10 or 0.20.</li>
+<li><strong>test_holdout</strong> (<em>list(str) or float, optional</em>) – Default is <cite>[‘chr8’, ‘chr9’]</cite>. See documentation for
+<cite>validation_holdout</cite> for additional information.</li>
+<li><strong>sequence_length</strong> (<em>int, optional</em>) – Default is 1001. Model is trained on sequences of <cite>sequence_length</cite>
+where genomic features are annotated to the center regions of
+these sequences.</li>
+<li><strong>center_bin_to_predict</strong> (<em>int, optional</em>) – Default is 201. Query the tabix-indexed file for a region of
+length <cite>center_bin_to_predict</cite>.</li>
+<li><strong>feature_thresholds</strong> (<em>float [0.0, 1.0], optional</em>) – Default is 0.5. The <cite>feature_threshold</cite> to pass to the
+<cite>GenomicFeatures</cite> object.</li>
+<li><strong>mode</strong> (<em>{‘train’, ‘validate’, ‘test’}</em>) – Default is <cite>‘train’</cite>. The mode to run the sampler in.</li>
+<li><strong>save_datasets</strong> (<em>list(str)</em>) – Default is <cite>[“test”]</cite>. The list of modes for which we should
+save the sampled data to file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene.sequences.Sequence" title="selene.sequences.Sequence"><em>selene.sequences.Sequence</em></a>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene.targets.Target" title="selene.targets.Target"><em>selene.targets.Target</em></a>) – The <cite>selene.targets.Target</cite> object holding the features that we
+would like to predict.</li>
+<li><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for validating model performance. These
+can be “regional” or “proportional”. If regional, this is a list
+of region names (e.g. <cite>[‘chrX’, ‘chrY’]</cite>). These Regions must
+match those specified in the first column of the tabix-indexed
+BED file. If proportional, this is the fraction of total samples
+that will be held out.</li>
+<li><strong>test_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for testing model performance. See the
+documentation for <cite>validation_holdout</cite> for more details.</li>
+<li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of the sequences to  train the model on.</li>
+<li><strong>bin_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – From the center of the sequence, the radius in which to detect
+a feature annotation in order to include it as a sample’s label.</li>
+<li><strong>surrounding_sequence_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequence falling outside of the feature detection
+bin (i.e. <cite>bin_radius</cite>) center, but still within the
+<cite>sequence_length</cite>.</li>
+<li><strong>modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The list of modes that the sampler can be run in.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The current mode that the sampler is running in. Must be one of
+the modes listed in <cite>modes</cite>.</li>
+<li><strong>save_datasets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – A list of modes for which we should write the sampled data to a
+file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>mode</cite> is not a valid mode.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the parities of <cite>sequence_length</cite> and <cite>center_bin_to_predict</cite>
+are not the same.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>sequence_length</cite> is smaller than <cite>center_bin_to_predict</cite> is.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the types of <cite>validation_holdout</cite> and <cite>test_holdout</cite> are not
+the same.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="selene.samplers.OnlineSampler.STRAND_SIDES">
+<code class="descname">STRAND_SIDES</code><em class="property"> = ('+', '-')</em><a class="headerlink" href="#selene.samplers.OnlineSampler.STRAND_SIDES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the strands that features can be sampled from.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.OnlineSampler.get_feature_from_index">
+<code class="descname">get_feature_from_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_feature_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_feature_from_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the feature corresponding to an index in the feature
+vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – The index of the feature to retrieve the name for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The name of the feature occurring at the specified index.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.OnlineSampler.get_sequence_from_encoding">
+<code class="descname">get_sequence_from_encoding</code><span class="sig-paren">(</span><em>encoding</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_sequence_from_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_sequence_from_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the string sequence from the one-hot encoding
+of the sequence.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>encoding</strong> (<em>numpy.ndarray</em>) – An <span class="math notranslate nohighlight">\(L \times N\)</span> array (where <span class="math notranslate nohighlight">\(L\)</span> is the length
+of the sequence and <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence
+type’s alphabet) containing the one-hot encoding of the
+sequence.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The sequence of <span class="math notranslate nohighlight">\(L\)</span> characters decoded from the input.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.OnlineSampler.save_datasets_to_file">
+<code class="descname">save_datasets_to_file</code><span class="sig-paren">(</span><em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.save_datasets_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.save_datasets_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save samples for each partition (i.e. train/validate/test) to
+disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_dir</strong> (<em>str</em>) – Path to the output directory where we should save each of
+the datasets.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This likely only works for validation and test right now.
+Training data may be too big to store in a list in memory, and
+cannot yet be written to file intermittently.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="intervalssampler">
 <h2>IntervalsSampler<a class="headerlink" href="#intervalssampler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="selene.samplers.IntervalsSampler">
+<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">IntervalsSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, intervals_path, sample_negative=False, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1001, center_bin_to_predict=201, feature_thresholds=0.5, mode='train', save_datasets=['test']</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.samplers.online_sampler.OnlineSampler</span></code></p>
+<p>Draws samples from pre-specified windows in the reference sequence.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
+<li><strong>target_path</strong> (<em>str</em>) – Path to tabix-indexed, compressed BED file (<cite>*.bed.gz</cite>) of genomic
+coordinates mapped to the genomic features we want to predict.</li>
+<li><strong>features</strong> (<em>list(str)</em>) – List of distinct features that we aim to predict.</li>
+<li><strong>intervals_path</strong> (<em>str</em>) – The path to the file that contains the intervals to sample from.
+In this file, each interval should occur on a separate line.</li>
+<li><strong>sample_negative</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. This tells the sampler whether negative
+examples (i.e. with no positive labels) should be drawn when
+generating samples. If <cite>True</cite>, both negative and positive
+samples will be drawn. If <cite>False</cite>, only samples with at least
+one positive label will be drawn.</li>
+<li><strong>seed</strong> (<em>int, optional</em>) – Default is 436. Sets the random seed for sampling.</li>
+<li><strong>validation_holdout</strong> (<em>list(str) or float, optional</em>) – Default is <cite>[‘chr6’, ‘chr7’]</cite>. Holdout can be regional or
+proportional. If regional, expects a list (e.g. <cite>[‘X’, ‘Y’]</cite>).
+Regions must match those specified in the first column of the
+tabix-indexed BED file. If proportional, specify a percentage
+between (0.0, 1.0). Typically 0.10 or 0.20.</li>
+<li><strong>test_holdout</strong> (<em>list(str) or float, optional</em>) – Default is <cite>[‘chr8’, ‘chr9’]</cite>. See documentation for
+<cite>validation_holdout</cite> for additional information.</li>
+<li><strong>sequence_length</strong> (<em>int, optional</em>) – Default is 1001. Model is trained on sequences of <cite>sequence_length</cite>
+where genomic features are annotated to the center regions of
+these sequences.</li>
+<li><strong>center_bin_to_predict</strong> (<em>int, optional</em>) – Default is 201. Query the tabix-indexed file for a region of
+length <cite>center_bin_to_predict</cite>.</li>
+<li><strong>feature_thresholds</strong> (<em>float [0.0, 1.0], optional</em>) –  Default is 0.5. The <cite>feature_threshold</cite> to pass to the
+<cite>GenomicFeatures</cite> object.</li>
+<li><strong>mode</strong> (<em>{‘train’, ‘validate’, ‘test’}</em>) – Default is <cite>‘train’</cite>. The mode to run the sampler in.</li>
+<li><strong>save_datasets</strong> (<em>list of str</em>) – Default is <cite>[“test”]</cite>. The list of modes for which we should
+save the sampled data to file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene.sequences.Sequence" title="selene.sequences.Sequence"><em>selene.sequences.Sequence</em></a>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene.targets.Target" title="selene.targets.Target"><em>selene.targets.Target</em></a>) – The <cite>selene.targets.Target</cite> object holding the features that we
+would like to predict.</li>
+<li><strong>sample_from_intervals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>)</em><em>)</em>) – A list of coordinates that specify the intervals we can draw
+samples from.</li>
+<li><strong>interval_lengths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>)</em>) – A list of the lengths of the intervals that we can draw samples
+from. The probability that we will draw a sample from an
+interval is a function of that interval’s length and the length
+of all other intervals.</li>
+<li><strong>sample_negative</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether negative examples (i.e. with no positive label) should
+be drawn when generating samples. If <cite>True</cite>, both negative and
+positive samples will be drawn. If <cite>False</cite>, only samples with at
+least one positive label will be drawn.</li>
+<li><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for validating model performance. These
+can be “regional” or “proportional”. If regional, this is a list
+of region names (e.g. <cite>[‘chrX’, ‘chrY’]</cite>). These Regions must
+match those specified in the first column of the tabix-indexed
+BED file. If proportional, this is the fraction of total samples
+that will be held out.</li>
+<li><strong>test_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for testing model performance. See the
+documentation for <cite>validation_holdout</cite> for more details.</li>
+<li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of the sequences to  train the model on.</li>
+<li><strong>bin_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – From the center of the sequence, the radius in which to detect
+a feature annotation in order to include it as a sample’s label.</li>
+<li><strong>surrounding_sequence_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequence falling outside of the feature detection
+bin (i.e. <cite>bin_radius</cite>) center, but still within the
+<cite>sequence_length</cite>.</li>
+<li><strong>modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The list of modes that the sampler can be run in.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The current mode that the sampler is running in. Must be one of
+the modes listed in <cite>modes</cite>.</li>
+<li><strong>save_datasets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – A list of modes for which we should save the sampled data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="selene.samplers.IntervalsSampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method fetches a subset of the data from the sampler,
+divided into batches. This method also allows the user to
+specify what operating mode to run the sampler in when fetching
+the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
+See <cite>selene.samplers.IntervalsSampler.modes</cite> for more
+information.</li>
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+as a single matrix with all targets in the same order.
+Note that <cite>sequences_and_targets</cite>’s sequence elements are of
+the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
+elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
+<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
+<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
+<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
+<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.IntervalsSampler.get_dataset_in_batches">
+<code class="descname">get_dataset_in_batches</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler.get_dataset_in_batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler.get_dataset_in_batches" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a subset of the data for a specified run
+mode, divided into mini-batches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
+See <cite>selene.samplers.IntervalsSampler.modes</cite> for more
+information.</li>
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of samples to retrieve.
+If <cite>None</cite>, it will retrieve all data for the selected mode.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+as a single matrix with all targets in the same order.
+Note that <cite>sequences_and_targets</cite>’s sequence elements are of
+the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
+elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
+<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
+<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
+<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
+<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.IntervalsSampler.get_test_set">
+<code class="descname">get_test_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler.get_test_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler.get_test_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a subset of testing data from the
+sampler, divided into batches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of validation examples
+to retrieve. If <cite>None</cite>, it will retrieve all testing
+data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+as a single matrix with all targets in the same order.
+Note that <cite>sequences_and_targets</cite>’s sequence elements are of
+the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
+elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
+<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
+<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
+<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
+<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.IntervalsSampler.get_validation_set">
+<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a subset of validation data from the
+sampler, divided into batches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of validation examples
+to retrieve. If <cite>None</cite>, all validation data will be
+retrieved.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+as a single matrix with all targets in the same order.
+Note that <cite>sequences_and_targets</cite>’s sequence elements are of
+the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
+elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
+<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
+<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
+<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
+<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.IntervalsSampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly draws a mini-batch of examples and their corresponding
+labels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
+sequence examples and their corresponding labels. The
+shape of <cite>sequences</cite> will be
+<span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is
+<cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length, and
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.
+The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
+where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="matfilesampler">
 <h2>MatFileSampler<a class="headerlink" href="#matfilesampler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="selene.samplers.MatFileSampler">
+<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">MatFileSampler</code><span class="sig-paren">(</span><em>training_data_path</em>, <em>validation_data_path</em>, <em>test_data_path=None</em>, <em>seed=436</em>, <em>mode='train'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.samplers.sampler.Sampler</span></code></p>
+<p>A sampler for which the training/validation/test data are loaded
+directly from a <cite>*.mat</cite> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>training_data_path</strong> (<em>str</em>) – Path to the mat file containing the training data.</li>
+<li><strong>validation_data_path</strong> (<em>str</em>) – Path to the mat file containing the validation data.</li>
+<li><strong>test_data_path</strong> (<em>str or None, optional</em>) – Default is <cite>None</cite>. The path to the mat file containing the test
+data. If <cite>None</cite>, no test data will be used.</li>
+<li><strong>seed</strong> (<em>int, optional</em>) – Default is 436. Sets the random seed for sampling.</li>
+<li><strong>mode</strong> (<em>str, optional</em>) – Default is <cite>“train”</cite>.  The mode to run the sampler in.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The list of modes that the sampler can be run in.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The current mode that the sampler is running in. Must be one of
+the modes listed in <cite>modes</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="selene.samplers.MatFileSampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method fetches a subset of the data from the sampler,
+divided into batches. This method also allows the user to
+specify what operating mode to run the sampler in when fetching
+the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
+See <cite>selene.samplers.MatFileSampler.modes</cite> for more
+information.</li>
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+as a single matrix with all targets in the same order.
+Note that <cite>sequences_and_targets</cite>’s sequence elements are of
+the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
+elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
+<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
+<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
+<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
+<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.MatFileSampler.get_validation_set">
+<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns a subset of validation data from the
+sampler, divided into batches.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
+<li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of validation examples
+to retrieve. If <cite>None</cite>, it will retrieve all validation
+data.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+as a single matrix with all targets in the same order.
+Note that <cite>sequences_and_targets</cite>’s sequence elements are of
+the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
+elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
+<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
+<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
+<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
+<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.samplers.MatFileSampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly draws a mini-batch of examples and their corresponding
+labels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
+sequence examples and their corresponding labels. The
+shape of <cite>sequences</cite> will be
+<span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is
+<cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length, and
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.
+The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
+where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 

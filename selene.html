@@ -271,7 +271,7 @@ using <cite>torch.load</cite>.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
 <li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+18a9752 ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
-<li><strong>sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
+<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene.samplers.Sampler" title="selene.samplers.Sampler"><em>selene.samplers.Sampler</em></a>) – The example generator.</li>
 <li><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</li>
 <li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (0.5.0a0+18a9752 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batch to use during training.</li>
@@ -343,6 +343,12 @@ the validation set.</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.TrainModel.write_datasets_to_file">
+<code class="descname">write_datasets_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/train_model.html#TrainModel.write_datasets_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.TrainModel.write_datasets_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the sampled datasets to file.</p>
 </dd></dl>
 
 </dd></dl>

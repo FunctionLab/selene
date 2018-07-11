@@ -275,7 +275,7 @@ predictions. # TODO(DOCUMENTATION): Elaborate.</p>
 <dt id="selene.predict.predict_handlers.DiffScoreHandler">
 <em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">DiffScoreHandler</code><span class="sig-paren">(</span><em>features</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.DiffScoreHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
-<p>The “diff score” is the difference between <cite>alt</cite> and <cite>ref</cite>
+<p>The “diff score” is the absolute difference between <cite>alt</cite> and <cite>ref</cite>
 predictions.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -360,7 +360,7 @@ features).</li>
 <dt id="selene.predict.predict_handlers.LogitScoreHandler">
 <em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">LogitScoreHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.LogitScoreHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
-<p>The logit score handler calculates and records the
+<p>The logit score handler calculates and records the absolute
 difference between <cite>logit(alt)</cite> and <cite>logit(ref)</cite> predictions.
 For reference, if some event occurs with probability <span class="math notranslate nohighlight">\(p\)</span>,
 then the log-odds is the logit of <cite>p</cite>, or</p>

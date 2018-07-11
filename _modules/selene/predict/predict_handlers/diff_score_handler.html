@@ -221,7 +221,7 @@
 
 <div class="viewcode-block" id="DiffScoreHandler"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.DiffScoreHandler">[docs]</a><span class="k">class</span> <span class="nc">DiffScoreHandler</span><span class="p">(</span><span class="n">PredictionsHandler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The &quot;diff score&quot; is the difference between `alt` and `ref`</span>
+<span class="sd">    The &quot;diff score&quot; is the absolute difference between `alt` and `ref`</span>
 <span class="sd">    predictions.</span>
 
 <span class="sd">    Attributes</span>
@@ -306,8 +306,8 @@
 <span class="sd">            features).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">diffs</span> <span class="o">=</span> <span class="n">baseline_predictions</span> <span class="o">-</span> <span class="n">batch_predictions</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
+        <span class="n">absolute_diffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">baseline_predictions</span> <span class="o">-</span> <span class="n">batch_predictions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">absolute_diffs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DiffScoreHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.DiffScoreHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

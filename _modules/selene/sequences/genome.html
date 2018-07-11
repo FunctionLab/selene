@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>selene.sequences.genome &mdash; Selene master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/selene_docs_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Selene
+          
+
+          
+            
+            <img src="../../../_static/selene_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master (0.0.0)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/extending.html">Extending Selene</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../selene.html">selene</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#trainmodel">TrainModel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../interpret.html">selene.interpret</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sequence-logo">sequence_logo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#heatmap">heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ismresult">ISMResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../predict.html">selene.predict</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#write-to-file">write_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.html">selene.samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#sampler">Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#matfilesampler">MatFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene.sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#genome">Genome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#proteome">Proteome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../targets.html">selene.targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#genomicfeatures">GenomicFeatures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-logger">initialize_logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#configuration">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Selene</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>selene.sequences.genome</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for selene.sequences.genome</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides the `Genome` class. This class wraps the indexed</span>
+<span class="sd">FASTA file for an organism&#39;s genomic sequence. It supports retrieving</span>
+<span class="sd">parts of the sequence and converting these parts into their one-hot</span>
+<span class="sd">encodings.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyfaidx</span>
+
+<span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">sequence_to_encoding</span>
+<span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">encoding_to_sequence</span>
+
+
+<span class="k">def</span> <span class="nf">_get_sequence_from_coords</span><span class="p">(</span><span class="n">len_chrs</span><span class="p">,</span> <span class="n">genome_sequence</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span>
+                              <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the genomic sequence at the input coordinates.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    len_chrs : dict</span>
+<span class="sd">        A dictionary mapping chromosome names to lengths.</span>
+<span class="sd">    genome_sequence : function</span>
+<span class="sd">        A closure that extracts a sequence from a genome.</span>
+<span class="sd">    chrom : str</span>
+<span class="sd">        The name of the chromosomes, e.g. &quot;chr1&quot;.</span>
+<span class="sd">    start : int</span>
+<span class="sd">        The 0-based start coordinate of the sequence.</span>
+<span class="sd">    end : int</span>
+<span class="sd">        One past the last coordinate of the sequence.</span>
+<span class="sd">    strand : {&#39;+&#39;, &#39;-&#39;}, optional</span>
+<span class="sd">        Default is &#39;+&#39;. The strand the sequence is located on.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The genomic sequence occurring at the input coordinates.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the input char to `strand` is not one of the specified</span>
+<span class="sd">        choices.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
+            <span class="ow">or</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">or</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">genome_sequence</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Strand must be one of &#39;+&#39; or &#39;-&#39;. Input was </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">strand</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Genome"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome">[docs]</a><span class="k">class</span> <span class="nc">Genome</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class provides access to an organism&#39;s genomic sequence.</span>
+
+<span class="sd">    This class supports retrieving parts of the sequence and converting</span>
+<span class="sd">    these parts into their one-hot encodings. It is essentially a</span>
+<span class="sd">    wrapper class around the `pyfaidx.Fasta` class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_path : str</span>
+<span class="sd">        Path to an indexed FASTA file, that is, a `*.fasta` file with</span>
+<span class="sd">        a corresponding `*.fai` file in the same directory. This file</span>
+<span class="sd">        should contain the target organism&#39;s genome sequence.</span>
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    genome : pyfaidx.Fasta</span>
+<span class="sd">        The FASTA file containing the genome sequence.</span>
+<span class="sd">    chrs : list(str)</span>
+<span class="sd">        The list of chromosome names.</span>
+<span class="sd">    len_chrs : dict</span>
+<span class="sd">        A dictionary mapping the names of each chromosome in the file to</span>
+<span class="sd">        the length of said chromosome.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">BASES_ARR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is an array with the alphabet (i.e. all possible symbols</span>
+<span class="sd">    that may occur in a sequence). We expect that</span>
+<span class="sd">    `INDEX_TO_BASE[i]==BASES_ARR[i]` is `True` for all valid `i`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">BASE_TO_INDEX</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A dictionary mapping members of the alphabet (i.e. all</span>
+<span class="sd">    possible symbols that can occur in a sequence) to integers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">INDEX_TO_BASE</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;T&#39;</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A dictionary mapping integers to members of the alphabet (i.e.</span>
+<span class="sd">    all possible symbols that can occur in a sequence). We expect</span>
+<span class="sd">    that `INDEX_TO_BASE[i]==BASES_ARR[i]` is `True` for all</span>
+<span class="sd">    valid `i`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">COMPLEMENTARY_BASE_DICT</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="s1">&#39;N&#39;</span>
+    <span class="p">}</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A dictionary mapping each base to its complementary base.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">UNK_BASE</span> <span class="o">=</span> <span class="s2">&quot;N&quot;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a base used to represent unknown positions. This is not</span>
+<span class="sd">    the same as a character from outside the sequence&#39;s alphabet. A</span>
+<span class="sd">    character from outside the alphabet is an error. A position with</span>
+<span class="sd">    an unknown base signifies that the position is one of the bases</span>
+<span class="sd">    from the alphabet, but we are uncertain which.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a `Genome` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genome</span> <span class="o">=</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">Fasta</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_len_chrs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Genome.get_chrs"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.get_chrs">[docs]</a>    <span class="k">def</span> <span class="nf">get_chrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the list of chromosome names.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list(str)</span>
+<span class="sd">            A list of the chromosome names.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span></div>
+
+<div class="viewcode-block" id="Genome.get_chr_lens"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.get_chr_lens">[docs]</a>    <span class="k">def</span> <span class="nf">get_chr_lens</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the name and length of each chromosome sequence in the file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list(tuple(str, int))</span>
+<span class="sd">            A list of tuples of the chromosome names and lengths.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_chrs</span><span class="p">()]</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_len_chrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">len_chrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span><span class="p">:</span>
+            <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">chrom</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">len_chrs</span>
+
+    <span class="k">def</span> <span class="nf">_genome_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">chrom</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">seq</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">chrom</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">reverse</span><span class="o">.</span><span class="n">complement</span><span class="o">.</span><span class="n">seq</span>
+
+<div class="viewcode-block" id="Genome.coords_in_bounds"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.coords_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">coords_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the region we want to query is within the bounds of the</span>
+<span class="sd">        queried chromosome.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the chromosomes, e.g. &quot;chr1&quot;.</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based start coordinate of the sequence.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the last coordinate of the sequence.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Whether we can retrieve a sequence from the bounds specified</span>
+<span class="sd">            in the input.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Genome.get_sequence_from_coords"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.get_sequence_from_coords">[docs]</a>    <span class="k">def</span> <span class="nf">get_sequence_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the queried chromosome&#39;s sequence at the input coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the chromosomes, e.g. &quot;chr1&quot;.</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based start coordinate of the sequence.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the 0-based last position in the sequence.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The genomic sequence of length :math:`L` where</span>
+<span class="sd">            :math:`L = end - start`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input char to `strand` is not one of the specified</span>
+<span class="sd">            choices.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_get_sequence_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_genome_sequence</span><span class="p">,</span>
+                                         <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Genome.get_encoding_from_coords"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.get_encoding_from_coords">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoding_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the one-hot encoding of the genomic sequence at the</span>
+<span class="sd">        queried coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the chromosome or region, e.g. &quot;chr1&quot;.</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based start coordinate of the first position in the</span>
+<span class="sd">            sequence.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the 0-based last position in the sequence.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray, dtype=bool</span>
+<span class="sd">            The :math:`L \\times 4` encoding of the sequence, where</span>
+<span class="sd">            :math:`L = end - start`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input char to `strand` is not one of the specified</span>
+<span class="sd">            choices.</span>
+<span class="sd">            (Raised in the call to `self.get_sequence_from_coords`)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sequence_from_coords</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoding</span></div>
+
+<div class="viewcode-block" id="Genome.sequence_to_encoding"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.sequence_to_encoding">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">sequence_to_encoding</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts an input sequence to its one-hot encoding.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sequence : str</span>
+<span class="sd">            A nucleotide sequence of length :math:`L`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.ndarray, dtype=numpy.float32</span>
+<span class="sd">            The :math:`L \\times 4` one-hot encoding of the sequence.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BASE_TO_INDEX</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BASES_ARR</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Genome.encoding_to_sequence"><a class="viewcode-back" href="../../../sequences.html#selene.sequences.Genome.encoding_to_sequence">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encoding_to_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">encoding</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Converts an input one-hot encoding to its DNA sequence.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        encoding : numpy.ndarray, dtype=numpy.float32</span>
+<span class="sd">            An :math:`L \\times 4` one-hot encoding of the sequence,</span>
+<span class="sd">            where :math:`L` is the length of the output sequence.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The sequence of :math:`L` nucleotides decoded from the</span>
+<span class="sd">            input array.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">encoding_to_sequence</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BASES_ARR</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">UNK_BASE</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Selene Contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'master',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+
+
+
+</body>
+</html>
