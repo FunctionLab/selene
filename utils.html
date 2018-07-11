@@ -1,0 +1,638 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>selene.utils &mdash; Selene master documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="selene.targets" href="targets.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Selene
+          
+
+          
+            
+            <img src="_static/selene_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master (0.0.0)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Packages</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#sequence-logo">sequence_logo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#write-to-file">write_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sequences.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sequences.html#genome">Genome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sequences.html#proteome">Proteome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="targets.html">selene.targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="targets.html#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targets.html#genomicfeatures">GenomicFeatures</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#performancemetrics">PerformanceMetrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#initialize-logger">initialize_logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Selene</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>selene.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-selene.utils">
+<span id="selene-utils"></span><h1>selene.utils<a class="headerlink" href="#module-selene.utils" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>utils</cite> module contains classes and methods that provide
+more general utilities that are used across the package. Most of this
+functionality cannot be appropriately confined to just one module, and
+thus is included here.</p>
+<div class="section" id="performancemetrics">
+<h2>PerformanceMetrics<a class="headerlink" href="#performancemetrics" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="selene.utils.PerformanceMetrics">
+<em class="property">class </em><code class="descclassname">selene.utils.</code><code class="descname">PerformanceMetrics</code><span class="sig-paren">(</span><em>get_feature_from_index_fn</em>, <em>report_gt_feature_n_positives=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Tracks and calculates metrics to evaluate how closely a model’s
+predictions match the true values it was designed to predict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>get_feature_from_index_fn</strong> (<em>types.FunctionType</em>) – A function that takes an index (<cite>int</cite>) and returns a feature
+name (<cite>str</cite>).</li>
+<li><strong>report_gt_feature_n_positives</strong> (<em>int, optional</em>) – Default is 10. The minimum number of positive examples for a
+feature in order to compute the score for it.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>skip_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The minimum number of positive examples of a feature that must
+be included in an update for a metric score to be
+calculated for it.</li>
+<li><strong>get_feature_from_index</strong> (<em>types.FunctionType</em>) – A function that takes an index (<cite>int</cite>) and returns a feature
+name (<cite>str</cite>).</li>
+<li><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric objects
+(<cite>Metric</cite>). By default, this contains <cite>“roc_auc”</cite> and
+<cite>“average_precision”</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="selene.utils.PerformanceMetrics.add_metric">
+<code class="descname">add_metric</code><span class="sig-paren">(</span><em>name</em>, <em>metric_fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.add_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.add_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begins tracking of the specified metric.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – The name of the metric.</li>
+<li><strong>metric_fn</strong> (<em>types.FunctionType</em>) – A metric function.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.utils.PerformanceMetrics.remove_metric">
+<code class="descname">remove_metric</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.remove_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.remove_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ends the tracking of the specified metric, and returns the
+previous scores associated with that metric.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) – The name of the metric.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The list of feature-specific scores obtained by previous
+uses of the specified metric.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.utils.PerformanceMetrics.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluates the tracked metrics on a model prediction and its
+target value, and adds this to the metric histories.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>prediction</strong> (<em>numpy.ndarray</em>) – Value predicted by user model.</li>
+<li><strong>target</strong> (<em>numpy.ndarray</em>) – True value that the user model was trying to predict.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A dictionary mapping each metric names (<cite>str</cite>) to the
+average score of that metric across all features
+(<cite>float</cite>).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.utils.PerformanceMetrics.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs ROC and PR curves. Does not support other metrics
+currently.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
+<li><p class="first"><strong>prediction</strong> (<em>numpy.ndarray</em>) – Value predicted by user model.</p>
+</li>
+<li><p class="first"><strong>target</strong> (<em>numpy.ndarray</em>) – True value that the user model was trying to predict.</p>
+</li>
+<li><p class="first"><strong>output_dir</strong> (<em>str</em>) – The path to the directory to output the figures. Directories that
+do not currently exist will be automatically created.</p>
+</li>
+<li><p class="first"><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments to pass to each visualization function. Each
+function accepts the following args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>style <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Default is “seaborn-colorblind”. Specify a style available
+in <cite>matplotlib.pyplot.style.available</cite> to use.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>dpi <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>Default is 800. Specify dots per inch (resolution) of
+the figure.</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Outputs figures to <cite>output_dir</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene.utils.PerformanceMetrics.write_feature_scores_to_file">
+<code class="descname">write_feature_scores_to_file</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.write_feature_scores_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.write_feature_scores_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes each metric’s score for each feature to a specified
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>output_path</strong> (<em>str</em>) – The path to the output file where performance metrics will
+be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dictionary mapping feature names (<cite>str</cite>) to
+sub-dictionaries (<cite>dict</cite>). Each sub-dictionary then maps
+metric names (<cite>str</cite>) to the score for that metric on the
+given feature. If a metric was not evaluated on a given
+feature, the score will be <cite>None</cite>.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="initialize-logger">
+<h2>initialize_logger<a class="headerlink" href="#initialize-logger" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.utils.initialize_logger">
+<code class="descclassname">selene.utils.</code><code class="descname">initialize_logger</code><span class="sig-paren">(</span><em>output_path</em>, <em>verbosity=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/utils.html#initialize_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.initialize_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the logger for Selene.
+This function can only be called successfully once.
+If the logger has already been initialized with handlers,
+the function exits. Otherwise, it proceeds to set the
+logger configurations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last">
+<li><p class="first"><strong>output_path</strong> (<em>str</em>) – The path to the output file where logs will be written.</p>
+</li>
+<li><p class="first"><strong>verbosity</strong> (<em>int, {2, 1, 0}</em>) –</p>
+<p>Default is 2. The level of logging verbosity to use.</p>
+<blockquote>
+<div><ul class="simple">
+<li>0 - Only warnings will be logged.</li>
+<li>1 - Information and warnings will be logged.</li>
+<li>2 - Debug messages, information, and warnings will all be                  logged.</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="load-features-list">
+<h2>load_features_list<a class="headerlink" href="#load-features-list" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.utils.load_features_list">
+<code class="descclassname">selene.utils.</code><code class="descname">load_features_list</code><span class="sig-paren">(</span><em>input_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/utils.html#load_features_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.load_features_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in a file of distinct feature names line-by-line and returns
+these features as a list. Each feature name in the file must occur
+on a separate line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_path</strong> (<em>str</em>) – Path to the features file. Each feature in the input file must
+on its own line.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The list of features. The features will appear in the list in
+the same order they appeared in the file (reading from top to
+bottom).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>A file at “input_features.txt”, for the feature names <span class="math notranslate nohighlight">\(YFP\)</span>
+and <span class="math notranslate nohighlight">\(YFG\)</span> might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">YFP</span>
+<span class="n">YFG</span>
+</pre></div>
+</div>
+<p>We can load these features from that file as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_features_list</span><span class="p">(</span><span class="s2">&quot;input_features.txt&quot;</span><span class="p">)</span>
+<span class="go">[&quot;YFP&quot;, &quot;YFG&quot;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.utils.instantiate">
+<code class="descclassname">selene.utils.</code><code class="descname">instantiate</code><span class="sig-paren">(</span><em>proxy</em>, <em>bindings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/config.html#instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.instantiate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a hierarchy of proxy objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>proxy</strong> (<em>object</em>) – A <cite>_Proxy</cite> object or list/dict/literal. Strings are run through
+<cite>_preprocess</cite>.</li>
+<li><strong>bindings</strong> (<em>dict, optional</em>) – A dictionary mapping previously instantiated <cite>_Proxy</cite> objects
+to their instantiated values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>obj</strong> – The result object from recursively instantiating the object DAG.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.load">
+<code class="descclassname">selene.utils.</code><code class="descname">load</code><span class="sig-paren">(</span><em>stream</em>, <em>environ=None</em>, <em>instantiate=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/config.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a YAML configuration from a string or file-like object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>stream</strong> (<em>str or object</em>) – Either a string containing valid YAML or a file-like object
+supporting the <cite>.read()</cite> interface.</li>
+<li><strong>environ</strong> (<em>dict, optional</em>) – A dictionary used for ${FOO} substitutions in addition to
+environment variables. If a key appears both in <cite>os.environ</cite>
+and this dictionary, the value in this dictionary is used.</li>
+<li><strong>instantiate</strong> (<em>bool, optional</em>) – If <cite>False</cite>, do not actually instantiate the objects but instead
+produce a nested hierarchy of <cite>_Proxy</cite> objects.</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) – Other keyword arguments, all of which are passed to <cite>yaml.load</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>graph</strong> – The dictionary or object (if the top-level element specified
+a Python object to instantiate), or a nested hierarchy of
+<cite>_Proxy</cite> objects.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.load_path">
+<code class="descclassname">selene.utils.</code><code class="descname">load_path</code><span class="sig-paren">(</span><em>path</em>, <em>environ=None</em>, <em>instantiate=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/config.html#load_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.load_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function for loading a YAML configuration from a
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<em>str</em>) – The path to the file to load on disk.</li>
+<li><strong>environ</strong> (<em>dict, optional</em>) – A dictionary used for ${FOO} substitutions in addition to
+environment variables. If a key appears both in <cite>os.environ</cite>
+and this dictionary, the value in this dictionary is used.</li>
+<li><strong>instantiate</strong> (<em>bool, optional</em>) – If <cite>False</cite>, do not actually instantiate the objects but instead
+produce a nested hierarchy of <cite>_Proxy</cite> objects.</li>
+<li><strong>**kwargs</strong> (<em>dict</em>) – Other keyword arguments, all of which are passed to <cite>yaml.load</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>graph</strong> – The dictionary or object (if the top-level element specified
+a Python object to instantiate), or a nested hierarchy of
+<cite>_Proxy</cite> objects.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="targets.html" class="btn btn-neutral" title="selene.targets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Selene Contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'master',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+ 
+
+
+
+</body>
+</html>
