@@ -1,12 +1,11 @@
 """
 This module provides the RandomPositionsSampler class.
 
-Currently, only works with sequences from `selene.sequences.Genome`.
-
+TODO: Currently, only works with sequences from `selene.sequences.Genome`.
+We would like to generalize this to `selene.sequences.Sequence` if possible.
 """
 from collections import namedtuple
 import logging
-import os
 import random
 
 import numpy as np
@@ -20,12 +19,12 @@ logger = logging.getLogger(__name__)
 SampleIndices = namedtuple(
     "SampleIndices", ["indices", "weights"])
 """
+A tuple containing the indices for some samples, and a weight to
+allot to each index when randomly drawing from them.
+
 TODO: this is common to both the intervals sampler and the
 random positions sampler. Can we move this to utils or
 somewhere else?
-
-A tuple containing the indices for some samples, and a weight to
-allot to each index when randomly drawing from them.
 
 Parameters
 ----------
@@ -216,9 +215,6 @@ class RandomPositionsSampler(OnlineSampler):
             elif self.test_holdout and chrom in self.test_holdout:
                 self._sample_from_mode["test"].indices.append(
                     index)
-            elif '_' not in chrom:  # TODO: remove this.
-                self._sample_from_mode["train"].indices.append(
-                    index)
 
             self.sample_from_intervals.append(
                 (chrom,
@@ -263,7 +259,12 @@ class RandomPositionsSampler(OnlineSampler):
 
         if retrieved_seq.shape[0] < self.sequence_length:
             # TODO: remove after investigating this bug.
-            print(retrieved_seq.shape, chrom, window_start, window_end, strand)
+            print("Warning: sequence retrieved for {0}, {1}, {2}, {3} "
+                  "had length less than required sequence length {4}. "
+                  "This bug will be investigated and addressed in the next "
+                  "version of Selene.".format(
+                      chrom, window_start, window_end, strand,
+                      self.sequence_length))
             return None
 
         if self.mode in self._save_datasets:
@@ -387,107 +388,3 @@ class RandomPositionsSampler(OnlineSampler):
         if mode in self._save_datasets:
             self.save_dataset_to_file(mode, close_filehandle=True)
         return sequences_and_targets, targets_mat
-
-    def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
-        """
-        This method returns a subset of the data for a specified run
-        mode, divided into mini-batches.
-
-        Parameters
-        ----------
-        mode : str
-            The mode to run the sampler in when fetching the samples.
-            See `selene.samplers.IntervalsSampler.modes` for more
-            information.
-        batch_size : int
-            The size of the batches to divide the data into.
-        n_samples : int or None, optional
-            Default is `None`. The total number of samples to retrieve.
-            If `None`, it will retrieve all data for the selected mode.
-
-        Returns
-        -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
-            as a single matrix with all targets in the same order.
-            The list is length :math:`S`, where :math:`S =` `n_samples`.
-            Note that `sequences_and_targets`'s sequence elements are of
-            the shape :math:`B \\times L \\times N` and its target
-            elements are of the shape :math:`B \\times F`, where
-            :math:`B` is `batch_size`, :math:`L` is the sequence length,
-            :math:`N` is the size of the sequence type's alphabet, and
-            :math:`F` is the number of features. Further,
-            `target_matrix` is of the shape :math:`S \\times F`
-
-        """
-        if not n_samples and mode == "validate":
-            n_samples = 32000
-        if not n_samples and mode == "test":
-            n_samples = 640000
-        return self.get_data_and_targets(mode, batch_size, n_samples)
-
-    def get_validation_set(self, batch_size, n_samples=None):
-        """
-        This method returns a subset of validation data from the
-        sampler, divided into batches.
-
-        Parameters
-        ----------
-        batch_size : int
-            The size of the batches to divide the data into.
-        n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, all validation data will be
-            retrieved.
-
-        Returns
-        -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
-            as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
-            the shape :math:`B \\times L \\times N` and its target
-            elements are of the shape :math:`B \\times F`, where
-            :math:`B` is `batch_size`, :math:`L` is the sequence length,
-            :math:`N` is the size of the sequence type's alphabet, and
-            :math:`F` is the number of features. Further,
-            `target_matrix` is of the shape :math:`S \\times F`, where
-            :math:`S =` `n_samples`.
-
-        """
-        return self.get_dataset_in_batches(
-            "validate", batch_size, n_samples=n_samples)
-
-    def get_test_set(self, batch_size, n_samples=None):
-        """
-        This method returns a subset of testing data from the
-        sampler, divided into batches.
-
-        Parameters
-        ----------
-        batch_size : int
-            The size of the batches to divide the data into.
-        n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, it will retrieve all testing
-            data.
-
-        Returns
-        -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
-            as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
-            the shape :math:`B \\times L \\times N` and its target
-            elements are of the shape :math:`B \\times F`, where
-            :math:`B` is `batch_size`, :math:`L` is the sequence length,
-            :math:`N` is the size of the sequence type's alphabet, and
-            :math:`F` is the number of features. Further,
-            `target_matrix` is of the shape :math:`S \\times F`, where
-            :math:`S =` `n_samples`.
-
-        """
-        return self.get_dataset_in_batches("test", batch_size, n_samples)

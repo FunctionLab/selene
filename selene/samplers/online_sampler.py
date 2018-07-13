@@ -269,3 +269,116 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             file_handle.write("{0}\n".format(line))
         if close_filehandle:
             file_handle.close()
+
+    def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
+        """
+        This method returns a subset of the data for a specified run
+        mode, divided into mini-batches.
+
+        Parameters
+        ----------
+        mode : str
+            The mode to run the sampler in when fetching the samples.
+            See `selene.samplers.IntervalsSampler.modes` for more
+            information.
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of samples to retrieve.
+            If `None`, it will retrieve 32000 samples if `mode` is validate
+            or 640000 samples if `mode` is test or train.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            The list is length :math:`S`, where :math:`S =` `n_samples`.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`
+
+        """
+        if not n_samples and mode == "validate":
+            n_samples = 32000
+        elif not n_samples:
+            n_samples = 640000
+        return self.get_data_and_targets(mode, batch_size, n_samples)
+
+    def get_validation_set(self, batch_size, n_samples=None):
+        """
+        This method returns a subset of validation data from the
+        sampler, divided into batches.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of validation examples
+            to retrieve. If `None`, 32000 examples are retrieved.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+        """
+        return self.get_dataset_in_batches(
+            "validate", batch_size, n_samples=n_samples)
+
+    def get_test_set(self, batch_size, n_samples=None):
+        """
+        This method returns a subset of testing data from the
+        sampler, divided into batches.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of validation examples
+            to retrieve. If `None`, 640000 examples are retrieved.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+
+        Raises
+        ------
+        ValueError
+            If no test partition of the data was specified during
+            sampler initialization.
+        """
+        if "test" not in self.modes:
+            raise ValueError("No test partition of the data was specified "
+                             "during initialization. Cannot use method "
+                             "`get_test_set`.")
+        return self.get_dataset_in_batches("test", batch_size, n_samples)

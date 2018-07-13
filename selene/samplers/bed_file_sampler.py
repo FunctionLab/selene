@@ -1,8 +1,6 @@
 """
 This module provides the BedFileSampler class.
 """
-import os
-
 import numpy as np
 
 class BedFileSampler(object):
@@ -14,15 +12,54 @@ class BedFileSampler(object):
     filepath : str
         The path to the file to load the data from.
     reference_sequence : selene.sequences.Sequence
+        A reference sequence from which to create examples.
+    n_samples : int
+        Number of lines in the file. (`wc -l <filepath>`)
+    sequence_length : int or None, optional
+        Default is None. If the coordinates of each sample in the BED file
+        already account for the full sequence (that is,
+        `end - start = sequence_length`), there is no need to specify
+        the sequence length. If `sequence_length` is not None, the length
+        of each sample will be checked to determine whether the sample
+        coordinates need to be truncated or expanded to reach the
+        sequence length specified in the model architecture.
     targets_avail : bool, optional
         Default is False. If `targets_avail`, assumes that it is the
-        last column of the `*.bed` file.
-    random_seed : int, optional
-        Default is 436. Sets the random seed for sampling.
-    shuffle_file : bool, optional
-        Default is False. Shuffle the data in the file before
-        sampling from it. All the data is loaded into memory
-        before doing so.
+        last column of the `*.bed` file. The last column should contain
+        the indices, separated by semicolons, of features (classes) found
+        within a given sample's coordinates (e.g. 0;1;45;60). This assumes
+        that we are only looking for the absence/presence of each feature
+        within the interval.
+    n_features : int or None, optional
+        Default is None. If `targets_avail` is True, must specify
+        `n_features`, the total number of features (classes).
+
+    Attributes
+    ----------
+    filepath : str
+        The path to the file to load the data from.
+    reference_sequence : selene.sequences.Sequence
+        A reference sequence from which to create examples.
+    n_samples : int
+        Number of lines in the file. (`wc -l <filepath>`)
+    sequence_length : int or None, optional
+        Default is None. If the coordinates of each sample in the BED file
+        already account for the full sequence (that is,
+        `end - start = sequence_length`), there is no need to specify
+        the sequence length. If `sequence_length` is not None, the length
+        of each sample will be checked to determine whether the sample
+        coordinates need to be truncated or expanded to reach the
+        sequence length specified in the model architecture.
+    targets_avail : bool
+        If `targets_avail`, assumes that it is the last column of the `*.bed`
+        file. The last column should contain the indices, separated by
+        semicolons, of features (classes) found within a given sample's
+        coordinates (e.g. 0;1;45;60). This assumes that we are only looking
+        or the absence/presence of each feature within the interval.
+    n_features : int or None
+        If `targets_avail` is True, must specify
+        `n_features`, the total number of features (classes).
+
     """
 
     def __init__(self,
@@ -31,16 +68,16 @@ class BedFileSampler(object):
                  n_samples,
                  sequence_length=None,
                  targets_avail=False,
-                 n_total_targets=None):
+                 n_features=None):
         """
         Constructs a new `BedFileSampler` object.
         """
         self.filepath = filepath
-        self.file_handle = open(self.filepath, 'r')
+        self._file_handle = open(self.filepath, 'r')
         self.reference_sequence = reference_sequence
         self.sequence_length = sequence_length
         self.targets_avail = targets_avail
-        self.n_total_targets = n_total_targets
+        self.n_features = n_features
         self.n_samples = n_samples
 
     def sample(self, batch_size=1):
@@ -65,18 +102,20 @@ class BedFileSampler(object):
             :math:`N` is the size of the sequence type's alphabet.
             The shape of `targets` will be :math:`B \\times F`,
             where :math:`F` is the number of features.
+
         """
         sequences = []
         targets = None
         if self.targets_avail:
             targets = []
         while len(sequences) < batch_size:
-            line = self.file_handle.readline()
+            line = self._file_handle.readline()
             if not line:
-                # TODO: shuffle file
-                self.file_handle.close()
-                self.file_handle = open(self.filepath, 'r')
-                line = self.file_handle.readline()
+                # TODO: add functionality to shuffle the file if sampler
+                # reaches the end of the file.
+                self._file_handle.close()
+                self._file_handle = open(self.filepath, 'r')
+                line = self._file_handle.readline()
             cols = line.split('\t')
             chrom = cols[0]
             start = int(cols[1])
@@ -113,7 +152,7 @@ class BedFileSampler(object):
 
             sequences.append(sequence)
             if self.targets_avail:
-                tgts = np.zeros((self.n_total_targets))
+                tgts = np.zeros((self.n_features))
                 features = [int(f) for f in features.split(';') if f]
                 tgts[features] = 1
                 targets.append(tgts.astype(float))
@@ -144,6 +183,7 @@ class BedFileSampler(object):
             the shape :math:`B \\times L \\times N`, where :math:`B`
             is `batch_size`, :math:`L` is the sequence length,
             and :math:`N` is the size of the sequence type's alphabet.
+
         """
         if not n_samples:
             n_samples = self.n_samples
@@ -185,6 +225,7 @@ class BedFileSampler(object):
             :math:`F` is the number of features. Further,
             `target_matrix` is of the shape :math:`S \\times F`, where
             :math:`S =` `n_samples`.
+
         """
         if not self.targets_avail:
             raise ValueError(
@@ -205,6 +246,5 @@ class BedFileSampler(object):
         seqs, tgts = self.sample(batch_size=remainder)
         sequences_and_targets.append((seqs, tgts))
         targets_mat.append(tgts)
-        # TODO: should not assume targets are always integers
         targets_mat = np.vstack(targets_mat).astype(int)
         return sequences_and_targets, targets_mat
