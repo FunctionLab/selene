@@ -578,7 +578,7 @@ def ordered_variants_and_indices(labels):
     return (ordered_labels, ordered_label_indices)
 
 
-def _label_tuple_to_text(label):
+def _label_tuple_to_text(label, diff):
     """
     Converts the variant label tuple to a string.
 
@@ -593,7 +593,8 @@ def _label_tuple_to_text(label):
         The text label.
     """
     chrom, pos, ref, alt = label
-    text = "{0} {1}, {2}/{3}".format(chrom, pos, ref, alt)
+    text = "max diff score: {0}<br />{1} {2}, {3}/{4}".format(
+        diff, chrom, pos, ref, alt)
     return text
 
 
@@ -665,16 +666,20 @@ def variant_diffs_scatter_plot(data,
         for i, l in enumerate(labels_ordered):
             if i not in keep:
                 continue
-            text_labels.append(_label_tuple_to_text(l))
+            text_labels.append(l)
+        text_labels = [_label_tuple_to_text(l, d) for l, d in
+                       zip(text_labels, variants_max_diff)]
     else:
-        text_labels = [_label_tuple_to_text(l) for l in labels_ordered]
+        text_labels = [_label_tuple_to_text(l, d) for l, d in
+                       zip(labels_ordered, variants_max_diff)]
     data = [go.Scatter(x=np.arange(len(variants_max_diff)),
                        y=variants_max_diff,
                        mode='markers',
                        marker = dict(
                            color = "#39CCCC",
                            line = dict(width = 1)),
-                       text=text_labels)]
+                       text=text_labels,
+                       hoverinfo="text")]
     layout = go.Layout(
         title="Max probability difference scores",
         hovermode="closest",
