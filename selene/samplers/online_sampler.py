@@ -261,6 +261,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             file and `save_dataset_to_file` will not be called with
             `mode` again.
         """
+        if mode not in self._save_datasets:
+            return
         samples = self._save_datasets[mode]
         file_handle = self._save_filehandles[mode]
         while len(samples) > 0:
