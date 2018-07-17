@@ -1,0 +1,5 @@
+.*.swp
+.git
+Dockerfile
+Jenkinsfile
+selene/targets/tests/files/sorted_aggregate.bed
