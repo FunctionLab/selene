@@ -2,7 +2,6 @@
 This module provides the `AnalyzeSequences` class and supporting
 methods.
 """
-from collections import OrderedDict
 import itertools
 import os
 
@@ -256,7 +255,10 @@ class AnalyzeSequences(object):
     Parameters
     ----------
     model : torch.nn.Module
-        A sequence-based model that has already been trained.
+        A sequence-based model architecture.
+    trained_model_path : str
+        The path to the weights file for a trained sequence-based model.
+        Architecture must match `model`.
     sequence_length : int
         The length of sequences that the model is expecting.
     batch_size : int
@@ -289,7 +291,7 @@ class AnalyzeSequences(object):
 
     def __init__(self,
                  model,
-                 trained_model_file,
+                 trained_model_path,
                  sequence_length,
                  batch_size,
                  features,
@@ -299,7 +301,7 @@ class AnalyzeSequences(object):
         Constructs a new `AnalyzeSequences` object.
         """
         trained_model = torch.load(
-                trained_model_file,
+                trained_model_path,
                 map_location=lambda storage, location: storage)
 
         self.model = load_model_from_state_dict(
@@ -433,7 +435,7 @@ class AnalyzeSequences(object):
         """
         os.makedirs(output_dir, exist_ok=True)
 
-        _, filename = os.path.split(vcf_file)
+        _, filename = os.path.split(input_path)
         output_prefix = '.'.join(filename.split('.')[:-1])
 
         reporter = self._initialize_reporters(

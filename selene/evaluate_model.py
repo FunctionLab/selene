@@ -114,6 +114,7 @@ class EvaluateModel(object):
         Returns
         -------
         str
+            The name of the feature/target at the specified index.
 
         """
         return self.features[index]
@@ -130,6 +131,7 @@ class EvaluateModel(object):
             A dictionary, where keys are the features and the values are
             each a dict of the performance metrics (currently ROC AUC and
             AUPR) reported for each feature the model predicts.
+
         """
         batch_losses = []
         all_predictions = []

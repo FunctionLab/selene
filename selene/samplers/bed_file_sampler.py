@@ -135,13 +135,13 @@ class BedFileSampler(object):
             # can change this to randomly selecting +/- later
             strand_side = '+'
             n = end - start
-            if n < self.sequence_length:
+            if self.sequence_length and n < self.sequence_length:
                 diff = (self.sequence_length - n) / 2
                 pad_l = int(np.floor(diff))
                 pad_r = int(np.ceil(diff))
                 start = start - pad_l
                 end = end + pad_r
-            elif n > self.sequence_length:
+            elif self.sequence_length and n > self.sequence_length:
                 start = int((n - self.sequence_length) // 2)
                 end = int(start + self.sequence_length)
 
