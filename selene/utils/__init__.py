@@ -18,11 +18,20 @@ from .config import instantiate
 from .config_utils import initialize_model
 from .config_utils import execute
 from .config_utils import parse_configs_and_run
+from .non_strand_specific_module import NonStrandSpecific
 
 
-__all__ = ["initialize_logger", "load_features_list",
-           "load_model_from_state_dict", "PerformanceMetrics",
-           "load", "load_path", "instantiate",
+__all__ = ["initialize_logger",
+           "load_features_list",
+           "load_model_from_state_dict",
+           "PerformanceMetrics",
+           "load",
+           "load_path",
+           "instantiate",
            "get_indices_and_probabilities",
-           "visualize_roc_curves", "visualize_precision_recall_curves",
-           "initialize_model", "execute", "parse_configs_and_run"]
+           "visualize_roc_curves",
+           "visualize_precision_recall_curves",
+           "initialize_model",
+           "execute",
+           "parse_configs_and_run",
+           "NonStrandSpecific"]
