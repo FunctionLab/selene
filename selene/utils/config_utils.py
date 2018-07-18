@@ -244,13 +244,14 @@ def parse_configs_and_run(configs,
               "this parameter must have it specified in their individual "
               "parameter configuration.")
     else:
-        output_dir = configs.pop("output_dir")
-        os.makedirs(output_dir, exist_ok=True)
+        current_run_output_dir = configs.pop("output_dir")
+        os.makedirs(current_run_output_dir, exist_ok=True)
+    if create_subdirectory:
         current_run_output_dir = os.path.join(
-            output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+            current_run_output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
         os.makedirs(current_run_output_dir)
-        print("Outputs and logs saved to {0}".format(
-            current_run_output_dir))
+    print("Outputs and logs saved to {0}".format(
+        current_run_output_dir))
 
     if "random_seed" in configs:
         seed = configs.pop("random_seed")

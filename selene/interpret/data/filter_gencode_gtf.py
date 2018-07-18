@@ -1,3 +1,9 @@
+"""
+This is the script used to create the BED files with gencode protein-coding
+genes. Posted here for reproducibility.
+
+TODO: add documentation, switch to docopt.
+"""
 import os
 import sys
 

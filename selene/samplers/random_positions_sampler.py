@@ -81,8 +81,8 @@ class RandomPositionsSampler(OnlineSampler):
         `GenomicFeatures` object.
     mode : {'train', 'validate', 'test'}
         Default is `'train'`. The mode to run the sampler in.
-    save_datasets : list(str)
-        Default is `["test"]`. The list of modes for which we should
+    save_datasets : list(str), optional
+        Default is `['test']`. The list of modes for which we should
         save the sampled data to file.
     output_dir : str or None, optional
         Default is None. The path to the directory where we should
@@ -121,8 +121,8 @@ class RandomPositionsSampler(OnlineSampler):
         The list of modes that the sampler can be run in.
     mode : str
         The current mode that the sampler is running in. Must be one of
-        the modes listed in `modes`
-        .
+        the modes listed in `modes`.
+
     """
 
     def __init__(self,
