@@ -1,6 +1,8 @@
 """
-This module provides the `IntervalsSampler` class and supporting
-methods.
+This module provides the RandomPositionsSampler class.
+
+TODO: Currently, only works with sequences from `selene.sequences.Genome`.
+We would like to generalize this to `selene.sequences.Sequence` if possible.
 """
 from collections import namedtuple
 import logging
@@ -20,6 +22,10 @@ SampleIndices = namedtuple(
 A tuple containing the indices for some samples, and a weight to
 allot to each index when randomly drawing from them.
 
+TODO: this is common to both the intervals sampler and the
+random positions sampler. Can we move this to utils or
+somewhere else?
+
 Parameters
 ----------
 indices : list(int)
@@ -37,34 +43,26 @@ weights : list(float)
 """
 
 
-# @TODO: Extend this class to work with stranded data.
-class IntervalsSampler(OnlineSampler):
-    """
-    Draws samples from pre-specified windows in the reference sequence.
+class RandomPositionsSampler(OnlineSampler):
+    """This sampler randomly selects a position in the genome and queries for
+    a sequence centered at that position for input to the model.
+
+    TODO: generalize to selene.sequences.Sequence?
 
     Parameters
     ----------
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene.sequences.Genome
         A reference sequence from which to create examples.
     target_path : str
         Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
         coordinates mapped to the genomic features we want to predict.
     features : list(str)
         List of distinct features that we aim to predict.
-    intervals_path : str
-        The path to the file that contains the intervals to sample from.
-        In this file, each interval should occur on a separate line.
-    sample_negative : bool, optional
-        Default is `False`. This tells the sampler whether negative
-        examples (i.e. with no positive labels) should be drawn when
-        generating samples. If `True`, both negative and positive
-        samples will be drawn. If `False`, only samples with at least
-        one positive label will be drawn.
     seed : int, optional
         Default is 436. Sets the random seed for sampling.
     validation_holdout : list(str) or float, optional
         Default is `['chr6', 'chr7']`. Holdout can be regional or
-        proportional. If regional, expects a list (e.g. `['X', 'Y']`).
+        proportional. If regional, expects a list (e.g. `['chrX', 'chrY']`).
         Regions must match those specified in the first column of the
         tabix-indexed BED file. If proportional, specify a percentage
         between (0.0, 1.0). Typically 0.10 or 0.20.
@@ -78,13 +76,13 @@ class IntervalsSampler(OnlineSampler):
     center_bin_to_predict : int, optional
         Default is 200. Query the tabix-indexed file for a region of
         length `center_bin_to_predict`.
-    feature_thresholds : float [0.0, 1.0] or None, optional
-         Default is 0.5. The `feature_threshold` to pass to the
+    feature_thresholds : float [0.0, 1.0], optional
+        Default is 0.5. The `feature_threshold` to pass to the
         `GenomicFeatures` object.
     mode : {'train', 'validate', 'test'}
         Default is `'train'`. The mode to run the sampler in.
-    save_datasets : list of str
-        Default is `["test"]`. The list of modes for which we should
+    save_datasets : list(str), optional
+        Default is `['test']`. The list of modes for which we should
         save the sampled data to file.
     output_dir : str or None, optional
         Default is None. The path to the directory where we should
@@ -93,31 +91,17 @@ class IntervalsSampler(OnlineSampler):
         the path in `output_dir` does not exist it will be created
         automatically.
 
-
     Attributes
     ----------
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene.sequences.Genome
         The reference sequence that examples are created from.
     target : selene.targets.Target
         The `selene.targets.Target` object holding the features that we
         would like to predict.
-    sample_from_intervals : list(tuple(str, int, int))
-        A list of coordinates that specify the intervals we can draw
-        samples from.
-    interval_lengths : list(int)
-        A list of the lengths of the intervals that we can draw samples
-        from. The probability that we will draw a sample from an
-        interval is a function of that interval's length and the length
-        of all other intervals.
-    sample_negative : bool
-        Whether negative examples (i.e. with no positive label) should
-        be drawn when generating samples. If `True`, both negative and
-        positive samples will be drawn. If `False`, only samples with at
-        least one positive label will be drawn.
     validation_holdout : list(str) or float
         The samples to hold out for validating model performance. These
         can be "regional" or "proportional". If regional, this is a list
-        of region names (e.g. `['chrX', 'chrY']`). These Regions must
+        of region names (e.g. `['chrX', 'chrY']`). These regions must
         match those specified in the first column of the tabix-indexed
         BED file. If proportional, this is the fraction of total samples
         that will be held out.
@@ -140,12 +124,11 @@ class IntervalsSampler(OnlineSampler):
         the modes listed in `modes`.
 
     """
+
     def __init__(self,
                  reference_sequence,
                  target_path,
                  features,
-                 intervals_path,
-                 sample_negative=False,
                  seed=436,
                  validation_holdout=['chr6', 'chr7'],
                  test_holdout=['chr8', 'chr9'],
@@ -153,12 +136,9 @@ class IntervalsSampler(OnlineSampler):
                  center_bin_to_predict=200,
                  feature_thresholds=0.5,
                  mode="train",
-                 save_datasets=["test"],
+                 save_datasets=[],
                  output_dir=None):
-        """
-        Constructs a new `IntervalsSampler` object.
-        """
-        super(IntervalsSampler, self).__init__(
+        super(RandomPositionsSampler, self).__init__(
             reference_sequence,
             target_path,
             features,
@@ -182,44 +162,24 @@ class IntervalsSampler(OnlineSampler):
         self.interval_lengths = []
 
         if self._holdout_type == "chromosome":
-            self._partition_dataset_chromosome(intervals_path)
+            self._partition_genome_by_chromosome()
         else:
-            self._partition_dataset_proportion(intervals_path)
+            self._partition_genome_by_proportion()
 
         for mode in self.modes:
             self._update_randcache(mode=mode)
 
-        self.sample_negative = sample_negative
-
-    def _partition_dataset_proportion(self, intervals_path):
-        """
-        When holdout sets are created by randomly sampling a proportion
-        of the data, this method is used to divide the data into
-        train/test/validate subsets.
-
-        Parameters
-        ----------
-        intervals_path : str
-            The path to the file that contains the intervals to sample
-            from. In this file, each interval should occur on a separate
-            line.
-
-        """
-        with open(intervals_path, 'r') as file_handle:
-            for line in file_handle:
-                cols = line.strip().split('\t')
-                chrom = cols[0]
-                start = int(cols[1])
-                end = int(cols[2])
-                self.sample_from_intervals.append((chrom, start, end))
-                self.interval_lengths.append(end - start)
+    def _partition_genome_by_proportion(self):
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            self.sample_from_intervals.append(
+                (chrom,
+                 self.sequence_length,
+                 len_chrom - self.sequence_length))
+            self.interval_lengths.append(len_chrom)
         n_intervals = len(self.sample_from_intervals)
 
-        # all indices in the intervals list are shuffled
         select_indices = list(range(n_intervals))
         np.random.shuffle(select_indices)
-
-        # the first section of indices is used as the validation set
         n_indices_validate = int(n_intervals * self.validation_holdout)
         val_indices, val_weights = get_indices_and_probabilities(
             self.interval_lengths, select_indices[:n_indices_validate])
@@ -227,8 +187,6 @@ class IntervalsSampler(OnlineSampler):
             val_indices, val_weights)
 
         if self.test_holdout:
-            # if applicable, the second section of indices is used as the
-            # test set
             n_indices_test = int(n_intervals * self.test_holdout)
             test_indices_end = n_indices_test + n_indices_validate
             test_indices, test_weights = get_indices_and_probabilities(
@@ -237,51 +195,32 @@ class IntervalsSampler(OnlineSampler):
             self._sample_from_mode["test"] = SampleIndices(
                 test_indices, test_weights)
 
-            # remaining indices are for the training set
             tr_indices, tr_weights = get_indices_and_probabilities(
                 self.interval_lengths, select_indices[test_indices_end:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
         else:
-            # remaining indices are for the training set
             tr_indices, tr_weights = get_indices_and_probabilities(
                 self.interval_lengths, select_indices[n_indices_validate:])
             self._sample_from_mode["train"] = SampleIndices(
                 tr_indices, tr_weights)
 
-    def _partition_dataset_chromosome(self, intervals_path):
-        """
-        When holdout sets are created by selecting all samples from a
-        specified region (e.g. a chromosome) this method is used to
-        divide the data into train/test/validate subsets.
-
-        Parameters
-        ----------
-        intervals_path : str
-            The path to the file that contains the intervals to sample
-            from. In this file, each interval should occur on a separate
-            line.
-
-        """
+    def _partition_genome_by_chromosome(self):
         for mode in self.modes:
             self._sample_from_mode[mode] = SampleIndices([], [])
-        with open(intervals_path, 'r') as file_handle:
-            for index, line in enumerate(file_handle):
-                cols = line.strip().split('\t')
-                chrom = cols[0]
-                start = int(cols[1])
-                end = int(cols[2])
-                if chrom in self.validation_holdout:
-                    self._sample_from_mode["validate"].indices.append(
-                        index)
-                elif self.test_holdout and chrom in self.test_holdout:
-                    self._sample_from_mode["test"].indices.append(
-                        index)
-                else:
-                    self._sample_from_mode["train"].indices.append(
-                        index)
-                self.sample_from_intervals.append((chrom, start, end))
-                self.interval_lengths.append(end - start)
+        for index, (chrom, len_chrom) in enumerate(self.reference_sequence.get_chr_lens()):
+            if chrom in self.validation_holdout:
+                self._sample_from_mode["validate"].indices.append(
+                    index)
+            elif self.test_holdout and chrom in self.test_holdout:
+                self._sample_from_mode["test"].indices.append(
+                    index)
+
+            self.sample_from_intervals.append(
+                (chrom,
+                 self.sequence_length,
+                 len_chrom - self.sequence_length))
+            self.interval_lengths.append(len_chrom - 2 * self.sequence_length)
 
         for mode in self.modes:
             sample_indices = self._sample_from_mode[mode].indices
@@ -292,52 +231,40 @@ class IntervalsSampler(OnlineSampler):
                     indices=indices, weights=weights)
 
     def _retrieve(self, chrom, position):
-        """
-        Retrieves samples around a position in the `reference_sequence`.
-
-        Parameters
-        ----------
-        chrom : str
-            The name of the region (e.g. "chrX", "YFP")
-        position : int
-            The position in the query region that we will search around
-            for samples.
-
-        Returns
-        -------
-        retrieved_seq, retrieved_targets : \
-        tuple(numpy.ndarray, list(numpy.ndarray))
-            A tuple containing the numeric representation of the
-            sequence centered at the query position, as well as a list
-            of samples within this region that met the filtering
-            standards.
-
-        """
         bin_start = position - self._start_radius
         bin_end = position + self._end_radius
         retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
-        if not self.sample_negative and np.sum(retrieved_targets) == 0:
-            logger.info("No features found in region surrounding "
-                        "region \"{0}\" position {1}. Sampling again.".format(
-                            chrom, position))
-            return None
-
         window_start = bin_start - self.surrounding_sequence_radius
         window_end = bin_end + self.surrounding_sequence_radius
+        if window_end - window_start < self.sequence_length:
+            print(bin_start, bin_end,
+                  self._start_radius, self._end_radius,
+                  self.surrounding_sequence_radius)
+            return None
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)
         if retrieved_seq.shape[0] == 0:
-            logger.info("Full sequence centered at region \"{0}\" position "
-                        "{1} could not be retrieved. Sampling again.".format(
+            logger.info("Full sequence centered at {0} position {1} "
+                        "could not be retrieved. Sampling again.".format(
                             chrom, position))
             return None
         elif np.sum(retrieved_seq) / float(retrieved_seq.shape[0]) < 0.60:
             logger.info("Over 30% of the bases in the sequence centered "
-                        "at region \"{0}\" position {1} are ambiguous ('N'). "
+                        "at {0} position {1} are ambiguous ('N'). "
                         "Sampling again.".format(chrom, position))
+            return None
+
+        if retrieved_seq.shape[0] < self.sequence_length:
+            # TODO: remove after investigating this bug.
+            print("Warning: sequence retrieved for {0}, {1}, {2}, {3} "
+                  "had length less than required sequence length {4}. "
+                  "This bug will be investigated and addressed in the next "
+                  "version of Selene.".format(
+                      chrom, window_start, window_end, strand,
+                      self.sequence_length))
             return None
 
         if self.mode in self._save_datasets:
@@ -349,27 +276,16 @@ class IntervalsSampler(OnlineSampler):
                  window_end,
                  strand,
                  feature_indices])
+            if len(self._save_datasets[self.mode]) > 200000:
+                self.save_dataset_to_file(self.mode)
         return (retrieved_seq, retrieved_targets)
 
     def _update_randcache(self, mode=None):
-        """
-        Updates the cache of indices of intervals. This allows us
-        to randomly sample from our data without having to use a
-        fixed-point approach or keeping all labels in memory.
-
-        Parameters
-        ----------
-        mode : str or None, optional
-            Default is `None`. The mode that these samples should be
-            used for. See `selene.samplers.IntervalsSampler.modes` for
-            more information.
-
-        """
         if not mode:
             mode = self.mode
         self._randcache[mode]["cache_indices"] = np.random.choice(
             self._sample_from_mode[mode].indices,
-            size=len(self._sample_from_mode[mode].indices),
+            size=200000,
             replace=True,
             p=self._sample_from_mode[mode].weights)
         self._randcache[mode]["sample_next"] = 0
@@ -403,7 +319,7 @@ class IntervalsSampler(OnlineSampler):
         n_samples_drawn = 0
         while n_samples_drawn < batch_size:
             sample_index = self._randcache[self.mode]["sample_next"]
-            if sample_index == len(self._sample_from_mode[self.mode].indices):
+            if sample_index == len(self._randcache[self.mode]["cache_indices"]):
                 self._update_randcache()
                 sample_index = 0
 

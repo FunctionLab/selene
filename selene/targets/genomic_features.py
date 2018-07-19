@@ -210,12 +210,14 @@ class GenomicFeatures(Target):
     features : list(str)
         The non-redundant list of genomic features (i.e. labels)
         that will be predicted.
-    feature_thresholds : float or dict or types.FunctionType
-        A genomic region is determined to be a positive sample if at
-        least one genomic feature peak takes up a proportion of the
-        region greater than or equal to the threshold specified for
-        that feature.
+    feature_thresholds : float or dict or types.FunctionType or None
+        Default is None. A genomic region is determined to be a
+        positive sample if at least one genomic feature peak takes
+        up a proportion of the region greater than or equal to
+        the threshold specified for that feature.
 
+        * `None` - No thresholds specified. All features found in
+        a query region are annotated to that region.
         * `float` - A single threshold applies to all the features\
                     in the dataset.
         * `dict` - A dictionary mapping feature names (`str`) to \
@@ -243,15 +245,18 @@ class GenomicFeatures(Target):
         A dictionary mapping indices (`int`) to feature names (`str`),
         where the index is the position of the feature in the input
         features.
-    feature_thresholds : dict
-        A dictionary mapping feature names (`str`) to thresholds
+    feature_thresholds : dict or None
+
+        * `dict` - A dictionary mapping feature names (`str`) to thresholds
         (`float`), where the threshold is the minimum overlap that a
         feature annotation must have with a query region to be
         considered a positive example of that feature.
+        * `None` - No threshold specifications. Assumes that all features
+        returned by a tabix query are annotated to the query region.
 
     """
 
-    def __init__(self, input_path, features, feature_thresholds):
+    def __init__(self, input_path, features, feature_thresholds=None):
         """
         Constructs a new `GenomicFeatures` object.
         """
@@ -264,8 +269,12 @@ class GenomicFeatures(Target):
 
         self.index_feature_dict = dict(list(enumerate(features)))
 
-        self.feature_thresholds, self._feature_thresholds_vec = \
-            _define_feature_thresholds(feature_thresholds, features)
+        if feature_thresholds is None:
+            self.feature_thresholds = None
+            self._feature_thresholds_vec = None
+        else:
+            self.feature_thresholds, self._feature_thresholds_vec = \
+                _define_feature_thresholds(feature_thresholds, features)
 
     def _query_tabix(self, chrom, start, end):
         """
@@ -351,6 +360,16 @@ class GenomicFeatures(Target):
             return a `numpy.ndarray` of zeros.
 
         """
+        if self._feature_thresholds_vec is None:
+            features = np.zeros((end - start))
+            rows = self._query_tabix(chrom, start, end)
+            if not rows:
+                return features
+            for r in rows:
+                feature = r[3]
+                ix = self.feature_index_map[feature]
+                features[ix] = 1
+            return features
         return _get_feature_data(
             chrom, start, end, self._feature_thresholds_vec,
             self.feature_index_dict, self._query_tabix)

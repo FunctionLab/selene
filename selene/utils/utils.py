@@ -4,7 +4,91 @@ classes or concepts, but still perform specific and important roles
 across many of the packages modules.
 
 """
+from collections import OrderedDict
 import logging
+
+import numpy as np
+import torch
+
+
+def get_indices_and_probabilities(interval_lengths, indices):
+    """
+    Given a list of different interval lengths and the indices of
+    interest in that list, weight the probability that we will sample
+    one of the indices in `indices` based on the interval lengths in
+    that sublist.
+
+    Parameters
+    ----------
+    interval_lengths : list(int)
+        The list of lengths of intervals that we will draw from. This is
+        used to weight the indices proportionally to interval length.
+    indices : list(int)
+        The list of interval length indices to draw from.
+
+    Returns
+    -------
+    indices, weights : tuple(list(int), list(float))
+        Tuple of interval indices to sample from and the corresponding
+        weights of those intervals.
+
+    """
+    select_interval_lens = np.array(interval_lengths)[indices]
+    weights = select_interval_lens / float(np.sum(select_interval_lens))
+
+    keep_indices = []
+    for index, weight in enumerate(weights):
+        if weight > 1e-10:
+            keep_indices.append(indices[index])
+    if len(keep_indices) == len(indices):
+        return indices, weights.tolist()
+    else:
+        return get_indices_and_probabilities(
+            interval_lengths, keep_indices)
+
+
+def load_model_from_state_dict(state_dict, model):
+    """
+    Loads model weights that were saved to a file previously by `torch.save`.
+    This is a helper function to reconcile state dict keys where a model was
+    saved with/without torch.nn.DataParallel and now must be loaded
+    without/with torch.nn.DataParallel.
+
+    Parameters
+    ----------
+    state_dict : collections.OrderedDict
+        The state of the model.
+    model : torch.nn.Module
+        The PyTorch model, a module composed of submodules.
+
+    Returns
+    -------
+    torch.nn.Module
+        The model with weights loaded from the state dict.
+
+    Raises
+    ------
+    ValueError
+        If model state dict keys do not match the keys in `state_dict`.
+
+    """
+    model_keys = model.state_dict().keys()
+    state_dict_keys = state_dict.keys()
+
+    new_state_dict = OrderedDict()
+    for (k1, k2) in zip(model_keys, state_dict_keys):
+        value = state_dict[k2]
+        if k1 == k2:
+            new_state_dict[k2] = value
+        elif ('module' in k1 and k1[7:] == k2) \
+                or ('module' in k2 and k2[7:] == k1):
+            new_state_dict[k1] = value
+        else:
+            raise ValueError("Model state dict keys do not match "
+                             "the keys specified in `state_dict` input. "
+                             "Cannot load state into the model.")
+    model.load_state_dict(new_state_dict)
+    return model
 
 
 def load_features_list(input_path):

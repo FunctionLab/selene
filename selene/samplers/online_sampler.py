@@ -7,6 +7,8 @@ Objects of the class `OnlineSampler`, are samplers which load examples
 from abc import ABCMeta
 import os
 
+import numpy as np
+
 from .sampler import Sampler
 from ..targets import GenomicFeatures
 
@@ -39,20 +41,26 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         Default is `['chr8', 'chr9']`. See documentation for
         `validation_holdout` for additional information.
     sequence_length : int, optional
-        Default is 1001. Model is trained on sequences of `sequence_length`
+        Default is 1000. Model is trained on sequences of `sequence_length`
         where genomic features are annotated to the center regions of
         these sequences.
     center_bin_to_predict : int, optional
-        Default is 201. Query the tabix-indexed file for a region of
+        Default is 200. Query the tabix-indexed file for a region of
         length `center_bin_to_predict`.
     feature_thresholds : float [0.0, 1.0], optional
         Default is 0.5. The `feature_threshold` to pass to the
         `GenomicFeatures` object.
-    mode : {'train', 'validate', 'test'}
+    mode : {'train', 'validate', 'test'}, optional
         Default is `'train'`. The mode to run the sampler in.
-    save_datasets : list(str)
-        Default is `["test"]`. The list of modes for which we should
-        save the sampled data to file.
+    save_datasets : list(str), optional
+        Default is `[]` the empty list. The list of modes for which we should
+        save the sampled data to file (e.g. `["test", "validate"]`).
+    output_dir : str or None, optional
+        Default is None. The path to the directory where we should
+        save sampled examples for a mode. If `save_datasets` is
+        a non-empty list, `output_dir` must be specified. If
+        the path in `output_dir` does not exist it will be created
+        automatically.
 
     Attributes
     ----------
@@ -64,7 +72,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     validation_holdout : list(str) or float
         The samples to hold out for validating model performance. These
         can be "regional" or "proportional". If regional, this is a list
-        of region names (e.g. `['chrX', 'chrY']`). These Regions must
+        of region names (e.g. `['chrX', 'chrY']`). These regions must
         match those specified in the first column of the tabix-indexed
         BED file. If proportional, this is the fraction of total samples
         that will be held out.
@@ -85,9 +93,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     mode : str
         The current mode that the sampler is running in. Must be one of
         the modes listed in `modes`.
-    save_datasets : list(str)
-        A list of modes for which we should write the sampled data to a
-        file.
 
     Raises
     ------
@@ -120,7 +125,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                  center_bin_to_predict=201,
                  feature_thresholds=0.5,
                  mode="train",
-                 save_datasets=["test"]):
+                 save_datasets=[],
+                 output_dir=None):
 
         """
         Creates a new `OnlineSampler` object.
@@ -194,9 +200,15 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             target_path, self._features,
             feature_thresholds=feature_thresholds)
 
-        self.save_datasets = {}
+        os.makedirs(output_dir, exist_ok=True)
+
+        self._save_datasets = {}
+        self._save_filehandles = {}
         for mode in save_datasets:
-            self.save_datasets[mode] = []
+            self._save_datasets[mode] = []
+            self._save_filehandles[mode] = open(
+                os.path.join(output_dir, "{0}_data.bed".format(mode)),
+                'w+')
 
     def get_feature_from_index(self, index):
         """
@@ -235,28 +247,188 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         return self.reference_sequence.encoding_to_sequence(encoding)
 
-    # @TODO: Enable saving of training data coordinates intermittently.
-    def save_datasets_to_file(self, output_dir):
+    def save_dataset_to_file(self, mode, close_filehandle=False):
         """
         Save samples for each partition (i.e. train/validate/test) to
         disk.
 
         Parameters
         ----------
-        output_dir : str
-            Path to the output directory where we should save each of
-            the datasets.
+        mode : str
+            Must be one of the modes specified in `save_datasets` during
+            sampler initialization.
+        close_filehandle : bool, optional
+            Default is False. `close_filehandle=True` assumes that all
+            data corresponding to the input `mode` has been saved to
+            file and `save_dataset_to_file` will not be called with
+            `mode` again.
+        """
+        if mode not in self._save_datasets:
+            return
+        samples = self._save_datasets[mode]
+        file_handle = self._save_filehandles[mode]
+        while len(samples) > 0:
+            cols = samples.pop(0)
+            line = '\t'.join([str(c) for c in cols])
+            file_handle.write("{0}\n".format(line))
+        if close_filehandle:
+            file_handle.close()
 
-        Notes
-        -----
-        This likely only works for validation and test right now.
-        Training data may be too big to store in a list in memory, and
-        cannot yet be written to file intermittently.
+    def get_data_and_targets(self, mode, batch_size, n_samples):
+        """
+        This method fetches a subset of the data from the sampler,
+        divided into batches. This method also allows the user to
+        specify what operating mode to run the sampler in when fetching
+        the data.
+
+        Parameters
+        ----------
+        mode : str
+            The mode to run the sampler in when fetching the samples.
+            See `selene.samplers.IntervalsSampler.modes` for more
+            information.
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int
+            The total number of samples to retrieve.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
 
         """
-        for mode, samples in self.save_datasets.items():
-            filepath = os.path.join(output_dir, "{0}_data.bed".format(mode))
-            with open(filepath, 'w+') as file_handle:
-                for cols in samples:
-                    line = '\t'.join([str(c) for c in cols])
-                    file_handle.write("{0}\n".format(line))
+        self.set_mode(mode)
+        sequences_and_targets = []
+
+        n_batches = int(n_samples / batch_size)
+        for _ in range(n_batches):
+            inputs, targets = self.sample(batch_size)
+            sequences_and_targets.append((inputs, targets))
+        targets_mat = np.vstack([t for (s, t) in sequences_and_targets])
+        if mode in self._save_datasets:
+            self.save_dataset_to_file(mode, close_filehandle=True)
+        return sequences_and_targets, targets_mat
+
+    def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
+        """
+        This method returns a subset of the data for a specified run
+        mode, divided into mini-batches.
+
+        Parameters
+        ----------
+        mode : str
+            The mode to run the sampler in when fetching the samples.
+            See `selene.samplers.IntervalsSampler.modes` for more
+            information.
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of samples to retrieve.
+            If `None`, it will retrieve 32000 samples if `mode` is validate
+            or 640000 samples if `mode` is test or train.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            The list is length :math:`S`, where :math:`S =` `n_samples`.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`
+
+        """
+        if not n_samples and mode == "validate":
+            n_samples = 32000
+        elif not n_samples:
+            n_samples = 640000
+        return self.get_data_and_targets(mode, batch_size, n_samples)
+
+    def get_validation_set(self, batch_size, n_samples=None):
+        """
+        This method returns a subset of validation data from the
+        sampler, divided into batches.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of validation examples
+            to retrieve. If `None`, 32000 examples are retrieved.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+        """
+        return self.get_dataset_in_batches(
+            "validate", batch_size, n_samples=n_samples)
+
+    def get_test_set(self, batch_size, n_samples=None):
+        """
+        This method returns a subset of testing data from the
+        sampler, divided into batches.
+
+        Parameters
+        ----------
+        batch_size : int
+            The size of the batches to divide the data into.
+        n_samples : int or None, optional
+            Default is `None`. The total number of validation examples
+            to retrieve. If `None`, 640000 examples are retrieved.
+
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
+
+
+        Raises
+        ------
+        ValueError
+            If no test partition of the data was specified during
+            sampler initialization.
+        """
+        if "test" not in self.modes:
+            raise ValueError("No test partition of the data was specified "
+                             "during initialization. Cannot use method "
+                             "`get_test_set`.")
+        return self.get_dataset_in_batches("test", batch_size, n_samples)

@@ -1,14 +1,17 @@
 """
 This module provides the `PerformanceMetrics` class and supporting
 functionality for tracking and computing model performance.
-
 """
 from collections import defaultdict, namedtuple
 import types
 import logging
+import os
 
 import numpy as np
-from sklearn.metrics import average_precision_score, roc_auc_score
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve
 
 
 logger = logging.getLogger("selene")
@@ -21,7 +24,7 @@ metric to some values.
 
 Parameters
 ----------
-fn : types.FunctionTYpe
+fn : types.FunctionType
     A metric.
 data : list(float)
     A list holding the results from applying the metric.
@@ -34,6 +37,144 @@ data : list(float)
     A list holding the results from applying the metric.
 
 """
+
+
+def visualize_roc_curves(prediction,
+                       target,
+                       output_dir,
+                       report_gt_feature_n_positives=50,
+                       style="seaborn-colorblind",
+                       fig_title="Feature ROC curves",
+                       dpi=800,
+                       needs_import=False):
+    """
+    Output the ROC curves for each feature predicted by a model
+    as an SVG.
+
+    Parameters
+    ----------
+    prediction : numpy.ndarray
+        Value predicted by user model.
+    target : numpy.ndarray
+        True value that the user model was trying to predict.
+    output_dir : str
+        The path to the directory to output the figures. Directories that
+        do not currently exist will be automatically created.
+    report_gt_feature_n_positives : int, optional
+        Default is 50. Do not visualize an ROC curve for a feature with
+        less than 50 positive examples in `target`.
+    style : str, optional
+        Default is "seaborn-colorblind". Specify a style available in
+        `matplotlib.pyplot.style.available` to use.
+    fig_title : str, optional
+        Default is "Feature ROC curves". Set the figure title.
+    dpi : int, optional
+        Default is 800. Specify dots per inch (resolution) of the figure.
+    needs_import : bool, optional
+        Default is False. Specify whether we need to import
+        `matplotlib.pyplot`.
+
+    Returns
+    -------
+    None
+        Outputs the figure in `output_dir`.
+
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    if needs_import:
+        import matplotlib
+        matplotlib.use("SVG")
+        import matplotlib.pyplot as plt
+
+    plt.style.use(style)
+    plt.figure()
+    for index, feature_preds in enumerate(prediction.T):
+        feature_targets = target[:, index]
+        if len(np.unique(feature_targets)) > 1 and \
+                np.sum(feature_targets) > report_gt_feature_n_positives:
+            fpr, tpr, _ = roc_curve(feature_targets, feature_preds)
+            plt.plot(fpr, tpr, 'r-', color="black", alpha=0.1, lw=0.8)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    if fig_title:
+        plt.title(fig_title)
+    plt.savefig(os.path.join(output_dir, "roc_curves.svg"),
+                format="svg",
+                dpi=dpi)
+
+
+def visualize_precision_recall_curves(
+        prediction,
+        target,
+        output_dir,
+        report_gt_feature_n_positives=50,
+        style="seaborn-colorblind",
+        fig_title="Feature precision-recall curves",
+        dpi=800,
+        needs_import=False):
+    """
+    Output the precision-recall (PR) curves for each feature predicted by
+    a model as an SVG.
+
+    Parameters
+    ----------
+    prediction : numpy.ndarray
+        Value predicted by user model.
+    target : numpy.ndarray
+        True value that the user model was trying to predict.
+    output_dir : str
+        The path to the directory to output the figures. Directories that
+        do not currently exist will be automatically created.
+    report_gt_feature_n_positives : int, optional
+        Default is 50. Do not visualize an PR curve for a feature with
+        less than 50 positive examples in `target`.
+    style : str, optional
+        Default is "seaborn-colorblind". Specify a style available in
+        `matplotlib.pyplot.style.available` to use.
+    fig_title : str, optional
+        Default is "Feature precision-recall curves". Set the figure title.
+    dpi : int, optional
+        Default is 800. Specify dots per inch (resolution) of the figure.
+    needs_import : bool, optional
+        Default is False. Specify whether we need to import
+        `matplotlib.pyplot`.
+
+    Returns
+    -------
+    None
+        Outputs the figure in `output_dir`.
+
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
+    if needs_import:
+        import matplotlib
+        matplotlib.use("SVG")
+        import matplotlib.pyplot as plt
+
+    plt.style.use(style)
+    plt.figure()
+    for index, feature_preds in enumerate(prediction.T):
+        feature_targets = target[:, index]
+        if len(np.unique(feature_targets)) > 1 and \
+                np.sum(feature_targets) > report_gt_feature_n_positives:
+            precision, recall, _ = precision_recall_curve(
+                feature_targets, feature_preds)
+            plt.step(
+                recall, precision, 'r-',
+                color="black", alpha=0.1, lw=0.8, where="post")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    if fig_title:
+        plt.title(fig_title)
+    plt.savefig(os.path.join(output_dir, "precision_recall_curves.svg"),
+                format="svg",
+                dpi=dpi)
 
 
 def compute_score(prediction, target, metric_fn,
@@ -70,8 +211,6 @@ def compute_score(prediction, target, metric_fn,
                 np.sum(feature_targets) > report_gt_feature_n_positives:
             feature_scores[index] = metric_fn(
                 feature_targets, feature_preds)
-        else:
-            print("Did not compute metrics for a feature.")
     valid_feature_scores = [s for s in feature_scores if s >= 0]
     if not valid_feature_scores:
         return None, feature_scores
@@ -217,6 +356,49 @@ class PerformanceMetrics(object):
             metric.data.append(feature_scores)
             metric_scores[name] = avg_score
         return metric_scores
+
+    def visualize(self, prediction, target, output_dir, **kwargs):
+        """
+        Outputs ROC and PR curves. Does not support other metrics
+        currently.
+
+        Parameters
+        ----------
+        prediction : numpy.ndarray
+            Value predicted by user model.
+        target : numpy.ndarray
+            True value that the user model was trying to predict.
+        output_dir : str
+            The path to the directory to output the figures. Directories that
+            do not currently exist will be automatically created.
+        **kwargs : dict
+            Keyword arguments to pass to each visualization function. Each
+            function accepts the following args:
+                * style : str
+                    Default is "seaborn-colorblind". Specify a style available
+                    in `matplotlib.pyplot.style.available` to use.
+                * dpi : int
+                    Default is 800. Specify dots per inch (resolution) of
+                    the figure.
+
+        Returns
+        -------
+        None
+            Outputs figures to `output_dir`.
+        """
+        os.makedirs(output_dir, exist_ok=True)
+        if "roc_auc" in self.metrics:
+            visualize_roc_curves(
+                prediction, target, output_dir,
+                report_gt_feature_n_positives=self.skip_threshold,
+                needs_import=True,
+                **kwargs)
+        if "average_precision" in self.metrics:
+            visualize_precision_recall_curves(
+                prediction, target, output_dir,
+                report_gt_feature_n_positives=self.skip_threshold,
+                needs_import=True,
+                **kwargs)
 
     def write_feature_scores_to_file(self, output_path):
         """

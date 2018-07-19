@@ -2,6 +2,12 @@
 interface for sampling classes. These sampling classes should provide
 a way to query some training/validation/test data for examples.
 
+TODO: Note that there are two samplers in the `selene.samplers` module
+that do not subclass `Sampler`. This is because `Sampler` samples from
+multiple modes (e.g. training, validation) whereas the single-mode
+samplers (`selene.samplers.MatFileSampler` and
+`selene.samplers.BedFileSampler`) do not. Future work will improve the
+organization, design, and naming of these classes.
 """
 import random
 from abc import ABCMeta
@@ -41,8 +47,10 @@ class Sampler(metaclass=ABCMeta):
         """
         self.modes = list(self.BASE_MODES)
         self.mode = None
-        np.random.seed(seed)
-        random.seed(seed + 1)
+        self.seed = seed
+
+        np.random.seed(self.seed)
+        random.seed(self.seed + 1)
 
     def set_mode(self, mode):
         """
@@ -73,8 +81,8 @@ class Sampler(metaclass=ABCMeta):
 
         Parameters
         ----------
-        batch_size : int
-            The size of the batch to retrieve.
+        batch_size : int, optional
+            Default is 1. The size of the batch to retrieve.
 
         """
         raise NotImplementedError()
@@ -109,10 +117,10 @@ class Sampler(metaclass=ABCMeta):
         ----------
         batch_size : int
             The size of the batches to divide the data into.
-        n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, it will retrieve all validation
-            data.
+        n_samples : int, optional
+            Default is None. The total number of validation examples to
+            retrieve. Handling for `n_samples=None` should be done by
+            all classes that subclass `selene.samplers.Sampler`.
 
         """
         raise NotImplementedError()

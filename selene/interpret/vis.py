@@ -3,18 +3,24 @@ This module provides the methods for visualizing different ouputs
 from selene analysis methods.
 
 """
+from collections import defaultdict
+from copy import deepcopy
+import os
 import re
 import warnings
-from copy import deepcopy
 
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib import transforms
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 import matplotlib.patheffects
 from matplotlib.text import TextPath
+import pkg_resources
+from plotly.offline import download_plotlyjs, plot
+import plotly.graph_objs as go
+import seaborn as sns
+import tabix
 
 from selene.sequences import Genome
 
@@ -78,7 +84,7 @@ def _svg_parse(path_string):
         vertices.extend(points.tolist())
     return np.array(vertices), codes
 
-              
+
 for k in _SVG_PATHS.keys():
     _SVG_PATHS[k] = _svg_parse(_SVG_PATHS[k])
 
@@ -464,3 +470,371 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
                       cbar_kws=cbar_kws, cmap=cmap, **kwargs)
     ret.set_yticklabels(labels=ret.get_yticklabels(), rotation=0)
     return ret
+
+
+def load_variant_abs_diff_scores(input_path):
+    """
+    Loads the variant data, labels, and feature names from a diff scores
+    file output from variant effect prediction.
+
+    TODO: should we move this out of `vis.py`?
+
+    Parameters
+    ----------
+    input_path : str
+        Path to the input file.
+
+    Returns
+    -------
+    tuple(np.ndarray, list(tuple(str)), list(str))
+        * `tuple[0]` is the matrix of absolute difference scores. The rows
+          are the variants and the columns are the features for which the
+          model makes predictions.
+        * `tuple[1]` is the list of variant labels. Each tuple contains
+          (chrom, pos, name, ref, alt).
+        * `tuple[2]` is the list of features.
+
+    """
+    features = []
+    labels = []
+    diffs = []
+    with open(input_path, 'r') as file_handle:
+        colnames = file_handle.readline()
+        features = colnames.strip().split('\t')[5:]
+        for line in file_handle:
+            cols = line.strip().split('\t')
+            scores = [float(f) for f in cols[5:]]
+            label = tuple(cols[:5])
+            diffs.append(scores)
+            labels.append(label)
+    diffs = np.array(diffs)
+    return (diffs, labels, features)
+
+
+def sort_standard_chrs(chrom):
+    """
+    Returns the value on which the
+    standard chromosomes can be sorted.
+
+    Parameters
+    ----------
+    chrom : str
+        The chromosome
+
+    Returns
+    -------
+    int
+        The value on which to sort
+
+    """
+    chrom = chrom[3:]
+    if chrom.isdigit():
+        return int(chrom)
+    if chrom == 'X':
+        return 23
+    elif chrom == 'Y':
+        return 24
+    elif chrom == 'M':
+        return 25
+    else:  # unknown chr
+        return 26
+
+
+def ordered_variants_and_indices(labels):
+    """
+    Get the ordered variant labels, where the labels are sorted by chromosome
+    and position, and the indices corresponding to the sort,
+
+    Parameters
+    ----------
+    labels : list(tuple(str))
+        The list of variant labels. Each label is a tuple of
+        (chrom, pos, name, ref, alt).
+
+    Returns
+    -------
+    tuple(list(tuple), list(int))
+        The first value is the ordered list of labels. Each label
+        is a tuple of (chrom, pos, ref, alt). The second value
+        is the ordered list of label indices.
+
+    """
+    labels_dict = defaultdict(list)
+    for i, l in enumerate(labels):
+        chrom, pos, name, ref, alt = l
+        pos = int(pos)
+        info = (i, pos, ref, alt)
+        labels_dict[chrom].append(info)
+    for chrom, labels_list in labels_dict.items():
+        labels_list.sort(key=lambda tup: tup[1:])
+    ordered_keys = sorted(labels_dict.keys(),
+                          key=sort_standard_chrs)
+
+    ordered_labels = []
+    ordered_label_indices = []
+    for chrom in ordered_keys:
+        for l in labels_dict[chrom]:
+            index, pos, ref, alt = l
+            ordered_label_indices.append(index)
+            ordered_labels.append((chrom, pos, ref, alt))
+    return (ordered_labels, ordered_label_indices)
+
+
+def _label_tuple_to_text(label, diff, genes=None):
+    """
+    Converts the variant label tuple to a string.
+
+    Parameters
+    ----------
+    label : tuple(str)
+        A tuple of (chrom, pos, ref, alt).
+    diff : float
+        The max difference score across some or all features in the model.
+    genes : list(str) or None, optional
+        Default is None. If the closest protein-coding `genes` are specified,
+        will display them in the label text.
+
+    Returns
+    -------
+    str
+        The label text.
+
+    """
+    chrom, pos, ref, alt = label
+    if genes is not None:
+        if len(genes) == 0:
+            genes_str = "none found"
+        else:
+            genes_str = ', '.join(genes)
+        text = ("max diff score: {0}<br />{1} {2}, {3}/{4}<br />"
+                "closest protein-coding gene(s): {5}").format(
+            diff, chrom, pos, ref, alt, genes_str)
+    else:
+        text = "max diff score: {0}<br />{1} {2}, {3}/{4}".format(
+            diff, chrom, pos, ref, alt)
+    return text
+
+
+def _variant_closest_genes(label, tabix_fh, chrs_gene_intervals):
+    chrom = label[0]
+    pos = label[1]
+    closest_genes = []
+    try:
+        overlaps = tabix_fh.query(chrom, pos, pos + 1)
+        for o in overlaps:
+            closest_genes.append(o[-1])
+    except tabix.TabixError:
+        pass
+    if len(closest_genes) != 0:
+        return closest_genes
+    gene_intervals = chrs_gene_intervals[chrom]
+    closest = None
+    for (start, end, strand, gene) in gene_intervals:
+        if start < pos and closest and closest == pos - end:
+            closest_genes.append(gene)
+        elif start < pos and (closest is None
+                or closest > pos - end):
+            closest = pos - end
+            closest_genes = [gene]
+        elif start > pos and closest and closest == start - pos:
+            closest_genes.append(gene)
+        elif start > pos and (closest is None
+                or closest > start - pos):
+            closest = start - pos
+            closest_genes = [gene]
+    return closest_genes
+
+
+def _load_chrs_gene_intervals(gene_intervals_bed):
+    chrs_gene_intervals = defaultdict(list)
+    with open(gene_intervals_bed, 'r') as file_handle:
+        for line in file_handle:
+            cols = line.strip().split('\t')
+            chrom = cols[0]
+            start = int(cols[1])
+            end = int(cols[2])
+            strand = cols[3]
+            gene = cols[4]
+            chrs_gene_intervals[chrom].append((start, end, strand, gene))
+    return chrs_gene_intervals
+
+
+def _variants_closest_protein_coding_gene(labels, version="hg38"):
+    gene_intervals_tabix = pkg_resources.resource_filename(
+        "selene",
+        ("interpret/data/gencode_v28_{0}/"
+         "protein_coding_l12_genes.bed.gz").format(version))
+    gene_intervals_bed = pkg_resources.resource_filename(
+        "selene",
+        ("interpret/data/gencode_v28_{0}/"
+         "protein_coding_l12_genes.bed").format(version))
+
+    tabix_fh = tabix.open(gene_intervals_tabix)
+    chrs_gene_intervals = _load_chrs_gene_intervals(gene_intervals_bed)
+
+    labels_gene_information = []
+    for l in labels:
+        labels_gene_information.append(_variant_closest_genes(
+            l, tabix_fh, chrs_gene_intervals))
+
+    return labels_gene_information
+
+
+def variant_diffs_scatter_plot(data,
+                               labels,
+                               features,
+                               output_path,
+                               filter_features=None,
+                               labels_sort_fn=ordered_variants_and_indices,
+                               nth_percentile=None,
+                               hg_reference_version=None,
+                               threshold_line=None):
+    """
+    Displays each variant's max probability difference across features
+    as a point in a scatter plot. The points in the scatter plot are
+    ordered by the variant chromosome and position by default. Variants can
+    be sorted differently by passing in a new `labels_sort_fn`.
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Absolute difference scores for variants across all features that a
+        model predicts. This is the first value in the tuple returned by
+        `load_variant_abs_diff_scores`.
+    labels : list(tuple(str))
+        A list of variant labels. This is the second value in the tuple
+        returned by `load_variant_abs_diff_scores`.
+    features : list(str)
+        A list of the features the model predicts. This is the third value
+        in the tuple returned by `load_variant_abs_diff_scores`.
+    output_path : str
+        Path to output file. Must have '.html' extension.
+    filter_features : types.FunctionType or None, optional
+        Default is None. A function that takes in a `list(str)` of features
+        and returns the `list(int)` of feature indices over which we would
+        compute the max(probability difference) for each variant. For example,
+        a user may only want to visualize the max probability difference
+        for TF binding features. If `None`, uses all the features.
+    labels_sort_fn : types.FunctionType, optional
+        Default is `ordered_variants_and_indices`. A function that takes
+        in a `list(tuple(str))` of labels corresponding to the rows in `data`
+        and returns a `tuple(list(tuple), list(int))`, where the first value
+        is the ordered list of variant labels and the second value is the
+        ordered list of indices for those variant labels. By default,
+        variants are sorted by chromosome and position.
+    nth_percentile : int [0, 100] or None, optional
+        Default is None. If `nth_percentile` is not None, only displays the
+        variants with a max absolute difference score within the
+        `nth_percentile` of scores.
+    hg_reference_version : str {"hg19", "hg38"} or None, optional
+        Default is None. On hover, we can display the gene(s) closest to
+        each variant if `hg_reference_version` is not None, where closest
+        can be a variant within a gene interval (where genes and
+        their coordinates are taken from level 1 & 2 protein-coding genes
+        in gencode v28) or near a gene. In the future, we will allow users
+        to specify their own genome file so that this information can
+        be annotated to variants from other organisms, other genome versions,
+        etc.
+    threshold_line : float or None, optional
+        Default is None. If `threshold_line` is not None, draws a horizontal
+        line at the specified threshold. Helps focus the visual on variants
+        above a certain threshold.
+
+    Returns
+    -------
+    plotly.graph_objs.graph_objs.Figure
+        The generated Plotly figure.
+
+    """
+    labels_ordered, label_indices = labels_sort_fn(labels)
+    variant_closest_genes = None
+    if hg_reference_version is not None:
+        variant_closest_genes = _variants_closest_protein_coding_gene(
+            labels_ordered, version=hg_reference_version)
+    ordered_data = data[label_indices, :]
+
+    feature_indices = None
+    if filter_features is not None:
+        feature_indices = filter_features(features)
+        ordered_data = data[:, feature_indices]
+    variants_max_diff = np.amax(ordered_data, axis=1)
+
+    display_labels = None
+    if nth_percentile:
+        p = np.percentile(variants_max_diff, nth_percentile)
+        keep = np.where(variants_max_diff >= p)[0]
+        print("{0} variants with max abs diff score above {1} are in the "
+              "{2}th percentile.".format(
+                  len(keep), p, nth_percentile))
+        variants_max_diff = variants_max_diff[keep]
+        display_labels = []
+        for i, l in enumerate(labels_ordered):
+            if i not in keep:
+                continue
+            display_labels.append(l)
+    else:
+        display_labels = labels_ordered
+
+    if variant_closest_genes:
+        text_labels = [
+            _label_tuple_to_text(l, d, g) for l, d, g in
+            zip(display_labels, variants_max_diff, variant_closest_genes)]
+    else:
+        text_labels = [_label_tuple_to_text(l, d) for l, d in
+                       zip(display_labels, variants_max_diff)]
+
+    label_x = [' '.join([l[0], str(l[1])]) for l in display_labels]
+    data = [go.Scatter(x=label_x,
+                       #np.arange(len(variants_max_diff)),
+                       y=variants_max_diff,
+                       mode='markers',
+                       marker = dict(
+                           color = "#39CCCC",
+                           line = dict(width = 1)),
+                       text=text_labels,
+                       hoverinfo="text")]
+
+    go_layout = {
+        "title": "Max probability difference scores",
+        "hovermode": "closest",
+        "hoverlabel": {
+                "font": {"size": 16}
+            },
+        "xaxis": {
+            "title": "Genome coordinates",
+            "showticklabels": True,
+            "tickangle": 35,
+            "titlefont": {"family": "Arial, sans-serif",
+                          "size": 16},
+            "nticks": 25,
+            "tickmode": "auto",
+            "automargin": True
+            },
+        "yaxis": {
+            "title": "Absolute difference",
+            "titlefont": {"family": "Arial, sans-serif",
+                          "size": 16}
+            }
+        }
+    if isinstance(threshold_line, float):
+        layout = go.Layout(
+            **go_layout,
+            shapes=[
+                {"type": "line",
+                 "x0": label_x[0],
+                 "y0": threshold_line,
+                 "x1": label_x[-1],
+                 "y1": threshold_line,
+                 "line": {
+                    "color": "rgba(255, 99, 71, 1)",
+                    "width": 2
+                    }
+                }
+            ])
+    else:
+        layout = go.Layout(**go_layout)
+    fig = go.Figure(data=data, layout=layout)
+    path, filename = os.path.split(output_path)
+    os.makedirs(path, exist_ok=True)
+    plot(fig, filename=output_path)
+    return fig

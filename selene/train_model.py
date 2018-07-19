@@ -5,7 +5,7 @@ import logging
 import math
 import os
 import shutil
-from time import strftime, time
+from time import time
 
 import numpy as np
 import torch
@@ -14,9 +14,21 @@ from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from .utils import initialize_logger
+from .utils import load_model_from_state_dict
 from .utils import PerformanceMetrics
 
 logger = logging.getLogger("selene")
+
+
+def _metrics_logger(name, out_filepath):
+    logger = logging.getLogger("{0}".format(name))
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(message)s")
+    file_handle = logging.FileHandler(
+        os.path.join(out_filepath, "{0}.txt".format(name)))
+    file_handle.setFormatter(formatter)
+    logger.addHandler(file_handle)
+    return logger
 
 
 class TrainModel(object):
@@ -149,16 +161,6 @@ class TrainModel(object):
         self.use_cuda = use_cuda
         self.data_parallel = data_parallel
 
-        os.makedirs(output_dir, exist_ok=True)
-        current_run_output_dir = os.path.join(
-            output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
-        os.makedirs(current_run_output_dir)
-        self.output_dir = current_run_output_dir
-
-        initialize_logger(
-            os.path.join(self.output_dir, "{0}.log".format(__name__)),
-            verbosity=logging_verbosity)
-
         if self.data_parallel:
             self.model = nn.DataParallel(model)
             logger.debug("Wrapped model in DataParallel")
@@ -167,6 +169,13 @@ class TrainModel(object):
             self.model.cuda()
             self.criterion.cuda()
             logger.debug("Set modules to use CUDA")
+
+        os.makedirs(output_dir, exist_ok=True)
+        self.output_dir = output_dir
+
+        initialize_logger(
+            os.path.join(self.output_dir, "{0}.log".format(__name__)),
+            verbosity=logging_verbosity)
 
         self._create_validation_set(n_samples=n_validation_samples)
         # TODO: Only `selene.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.
@@ -184,24 +193,39 @@ class TrainModel(object):
         self._start_step = 0
         self._min_loss = float("inf") # TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.
         if checkpoint_resume is not None:
-            checkpoint = torch.load(checkpoint_resume)
-            self.model.load_state_dict(checkpoint["state_dict"])
-            self.model.eval()
+            checkpoint = torch.load(
+                checkpoint_resume,
+                map_location=lambda storage, location: storage)
 
-            self._start_step = checkpoint_resume["step"]
-            self._min_loss = checkpoint_resume["min_loss"]
+            self.model = load_model_from_state_dict(
+                checkpoint["state_dict"], self.model)
+
+            self._start_step = checkpoint["step"]
+            if self._start_step >= self.max_step:
+                self.max_step += self._start_step
+
+            self._min_loss = checkpoint["min_loss"]
             self.optimizer.load_state_dict(
-                checkpoint_resume["optimizer"])
+                checkpoint["optimizer"])
+            if self.use_cuda:
+                for state in self.optimizer.state.values():
+                    for k, v in state.items():
+                        if isinstance(v, torch.Tensor):
+                            state[k] = v.cuda()
 
             logger.info(
                 ("Resuming from checkpoint: step {0}, min loss {1}").format(
                     self._start_step, self._min_loss))
 
-        # TODO: Use standard language for train/validate/test across all of selene.
-        self.losses = {
-            "training": [],
-            "validation": [],
-        }
+        self._train_logger = _metrics_logger(
+                "{0}.train".format(__name__), self.output_dir)
+        self._validation_logger = _metrics_logger(
+                "{0}.validation".format(__name__), self.output_dir)
+
+        self._train_logger.info("loss")
+        # TODO: this makes the assumption that all models will report ROC AUC,
+        # which is not the case.
+        self._validation_logger.info("loss\troc_auc")
 
     def _create_validation_set(self, n_samples=None):
         """
@@ -249,6 +273,9 @@ class TrainModel(object):
                       t_f - t_i,
                       len(self._test_data) * self.batch_size,
                       len(self._test_data)))
+        np.savez_compressed(
+            os.path.join(self.output_dir, "test_targets.npz"),
+            data=self._all_test_targets)
 
     def _get_batch(self):
         """
@@ -283,19 +310,23 @@ class TrainModel(object):
             factor=0.8)
         for step in range(self._start_step, self.max_steps):
             train_loss = self.train()
-            self.losses["training"].append(train_loss)
 
-            # @TODO: if step and step % ...
-            # TODO: Do we want to compute validation stats at step == 0 (as is the case now)?
             # TODO: Should we have some way to report training stats without running validation?
-            if step % self.nth_step_report_stats == 0:
+            if step and step % self.nth_step_report_stats == 0:
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
-                self.losses["training"].append(train_loss) # TODO: Is the training loss being computed twice?
-                self.losses["validation"].append(validation_loss)
-                if valid_scores["roc_auc"]: # TODO: Check if "roc_auc" is even in valid_scores first to avoid key error.
+                self._train_logger.info(train_loss)
+                # TODO: check if "roc_auc" is a key in `valid_scores`?
+                if valid_scores["roc_auc"]:
+                    validation_roc_auc = valid_scores["roc_auc"]
+                    self._validation_logger.info(
+                        "{0}\t{1}".format(validation_loss,
+                                          validation_roc_auc))
                     scheduler.step(
-                        math.ceil(valid_scores["roc_auc"] * 1000.0) / 1000.0)
+                        math.ceil(validation_roc_auc * 1000.0) / 1000.0)
+                else:
+                    self._validation_logger.info("{0}\tNA".format(
+                        validation_loss))
 
                 is_best = validation_loss < min_loss
                 min_loss = min(validation_loss, min_loss)
@@ -321,6 +352,7 @@ class TrainModel(object):
                     "state_dict": self.model.state_dict(),
                     "min_loss": min_loss,
                     "optimizer": self.optimizer.state_dict()}, False)
+        self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
     def train(self):
         """
@@ -333,6 +365,7 @@ class TrainModel(object):
         """
         self.model.train()
         self.sampler.set_mode("train")
+
         inputs, targets = self._get_batch()
 
         inputs = torch.Tensor(inputs)
@@ -389,6 +422,7 @@ class TrainModel(object):
             loss = self.criterion(predictions, targets)
 
             all_predictions.append(predictions.data.cpu().numpy())
+
             batch_losses.append(loss.data[0])
 
         all_predictions = np.vstack(all_predictions)
@@ -436,7 +470,6 @@ class TrainModel(object):
 
         average_scores = self._test_metrics.update(all_predictions,
                                                    self._all_test_targets)
-
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),
             data=all_predictions)
@@ -451,16 +484,11 @@ class TrainModel(object):
             test_performance)
 
         average_scores["loss"] = average_loss
-        return (average_scores, feature_scores_dict)
 
-    def write_datasets_to_file(self):
-        """
-        Writes the sampled datasets to file.
-        """
-        data_dir = os.path.join(
-            self.output_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
-        self.sampler.save_datasets_to_file(data_dir)
+        self._test_metrics.visualize(
+            all_predictions, self._all_test_targets, self.output_dir)
+
+        return (average_scores, feature_scores_dict)
 
     def _save_checkpoint(self, state, is_best,
                          dir_path=None,

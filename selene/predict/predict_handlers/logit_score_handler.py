@@ -9,7 +9,7 @@ from .handler import write_to_file, PredictionsHandler
 
 class LogitScoreHandler(PredictionsHandler):
     """
-    The logit score handler calculates and records the absolute
+    The logit score handler calculates and records the
     difference between `logit(alt)` and `logit(ref)` predictions.
     For reference, if some event occurs with probability :math:`p`,
     then the log-odds is the logit of `p`, or
@@ -106,9 +106,8 @@ class LogitScoreHandler(PredictionsHandler):
             features).
 
         """
-        absolute_logits = np.abs(
-            logit(baseline_predictions) - logit(batch_predictions))
-        self.results.append(absolute_logits)
+        logits = logit(baseline_predictions) - logit(batch_predictions)
+        self.results.append(logits)
         self.samples.append(batch_ids)
 
     def write_to_file(self):
