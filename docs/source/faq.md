@@ -1,5 +1,0 @@
-# Frequently Asked Questions
-
-TODO
-
----
