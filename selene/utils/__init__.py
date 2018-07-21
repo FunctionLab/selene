@@ -19,7 +19,7 @@ from .config_utils import initialize_model
 from .config_utils import execute
 from .config_utils import parse_configs_and_run
 from .non_strand_specific_module import NonStrandSpecific
-
+from .example_model import DeeperDeepSEA
 
 __all__ = ["initialize_logger",
            "load_features_list",
@@ -34,4 +34,5 @@ __all__ = ["initialize_logger",
            "initialize_model",
            "execute",
            "parse_configs_and_run",
-           "NonStrandSpecific"]
+           "NonStrandSpecific",
+           "DeeperDeepSEA"]

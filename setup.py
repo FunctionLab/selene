@@ -48,10 +48,11 @@ setup(name="selene",
         "pandas>=0.20.3",
         "pyfaidx==0.5.3.1",
         "pytabix==0.0.2",
-        "pytorch>=0.2.0",
+        "torch>=0.1.2",
+        "torchvision>=0.1.9",
         "scikit-learn>=0.19.0",
         "scipy>=0.19.1",
         "seaborn>=0.8.1",
         "statsmodels>=0.9.0",
-        "yaml>=0.1.7"
+        "pyyaml>=3.12"
       ])

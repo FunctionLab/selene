@@ -172,8 +172,10 @@ def execute(operations, configs, output_dir):
                 ism_info = configs["in_silico_mutagenesis"]
                 if "input_sequence" in ism_info:
                     analyze_seqs.in_silico_mutagenesis(**ism_info)
-                elif "input_path" in ism_info:
-                    analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)
+                elif "fa_files" in ism_info:
+                    for filepath in ism_info.pop("fa_files"):
+                        analyze_seqs.in_silico_mutagenesis_from_file(
+                            filepath, **ism_info)
                 else:
                     raise ValueError("in silico mutagenesis requires as input "
                                      "the path to the FASTA file ('input_path')"

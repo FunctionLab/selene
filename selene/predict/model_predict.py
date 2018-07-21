@@ -261,16 +261,22 @@ class AnalyzeSequences(object):
         Architecture must match `model`.
     sequence_length : int
         The length of sequences that the model is expecting.
-    batch_size : int
-        The size of the mini-batches to use.
+    batch_size : int, optional
+        Default is 64. The size of the mini-batches to use.
     features : list(str)
         The names of the features that the model is predicting.
     use_cuda : bool, optional
         Default is `False`. Specifies whether to use CUDA or not.
     reference_sequence : class, optional
         Default is `selene.sequences.Genome`. The type of sequence that
-        this analysis will be performed on.
-
+        this analysis will be performed on. Please note that if you need
+        to use variant effect prediction, you cannot only pass in the
+        class--you must pass in the constructed `selene.sequences.Sequence`
+        object with a particular sequence version (e.g. `Genome("hg19.fa")`).
+        This version does NOT have to be the same sequence version that the
+        model was trained on. That is, if the sequences in your variants file
+        are hg19 but your model was trained on hg38 sequences, you should pass
+        in hg19.
 
     Attributes
     ----------
@@ -293,8 +299,8 @@ class AnalyzeSequences(object):
                  model,
                  trained_model_path,
                  sequence_length,
-                 batch_size,
                  features,
+                 batch_size=64,
                  use_cuda=False,
                  reference_sequence=Genome):
         """
@@ -820,6 +826,7 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
+            print(chrom, pos, name, ref, alt, self._start_radius)
             if not self.reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
