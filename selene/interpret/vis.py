@@ -688,7 +688,8 @@ def variant_diffs_scatter_plot(data,
                                labels_sort_fn=ordered_variants_and_indices,
                                nth_percentile=None,
                                hg_reference_version=None,
-                               threshold_line=None):
+                               threshold_line=None,
+                               auto_open=False):
     """
     Displays each variant's max probability difference across features
     as a point in a scatter plot. The points in the scatter plot are
@@ -739,6 +740,9 @@ def variant_diffs_scatter_plot(data,
         Default is None. If `threshold_line` is not None, draws a horizontal
         line at the specified threshold. Helps focus the visual on variants
         above a certain threshold.
+    auto_open : bool, optional
+        Default is False. If `auto_open`, will automatically open a web
+        browser that displays the plotted HTML file.
 
     Returns
     -------
@@ -785,7 +789,6 @@ def variant_diffs_scatter_plot(data,
 
     label_x = [' '.join([l[0], str(l[1])]) for l in display_labels]
     data = [go.Scatter(x=label_x,
-                       #np.arange(len(variants_max_diff)),
                        y=variants_max_diff,
                        mode='markers',
                        marker = dict(
@@ -836,5 +839,5 @@ def variant_diffs_scatter_plot(data,
     fig = go.Figure(data=data, layout=layout)
     path, filename = os.path.split(output_path)
     os.makedirs(path, exist_ok=True)
-    plot(fig, filename=output_path)
+    plot(fig, filename=output_path, auto_open=auto_open)
     return fig

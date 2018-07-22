@@ -826,7 +826,6 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
-            print(chrom, pos, name, ref, alt, self._start_radius)
             if not self.reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
