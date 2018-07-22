@@ -606,9 +606,10 @@ class AnalyzeSequences(object):
             (1, *current_sequence_encoding.shape))
         base_preds = self.predict(base_encoding)
 
-        predictions_reporter = reporters[-1]
-        predictions_reporter.handle_batch_predictions(
-            base_preds, [["NA", "NA", "NA"]])
+        if "predictions" in save_data:
+            predictions_reporter = reporters[-1]
+            predictions_reporter.handle_batch_predictions(
+                base_preds, [["NA", "NA", "NA"]])
 
         self.in_silico_mutagenesis_predict(
             sequence, base_preds, mutated_sequences, reporters=reporters)
@@ -682,9 +683,12 @@ class AnalyzeSequences(object):
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
                 save_data, file_prefix, ISM_COLS)
-            predictions_reporter = reporters[-1]
-            predictions_reporter.handle_batch_predictions(
-                base_preds, [["NA", "NA", "NA"]])
+
+            if "predictions" in save_data:
+                predictions_reporter = reporters[-1]
+                predictions_reporter.handle_batch_predictions(
+                    base_preds, [["NA", "NA", "NA"]])
+
             self.in_silico_mutagenesis_predict(
                 cur_sequence, base_preds, mutated_sequences,
                 reporters=reporters)
