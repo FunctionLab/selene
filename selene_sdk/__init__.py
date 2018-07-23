@@ -3,7 +3,6 @@ This is the main module for Selene.
 """
 __all__ = ["sequences", "targets", "samplers", "utils",
            "predict", "interpret", "__version__"]
-name = "selene"
 
 from .version import __version__
 from .evaluate_model import EvaluateModel

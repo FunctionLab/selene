@@ -3,7 +3,6 @@ This module provides the `PerformanceMetrics` class and supporting
 functionality for tracking and computing model performance.
 """
 from collections import defaultdict, namedtuple
-import types
 import logging
 import os
 
@@ -40,13 +39,12 @@ data : list(float)
 
 
 def visualize_roc_curves(prediction,
-                       target,
-                       output_dir,
-                       report_gt_feature_n_positives=50,
-                       style="seaborn-colorblind",
-                       fig_title="Feature ROC curves",
-                       dpi=800,
-                       needs_import=False):
+                         target,
+                         output_dir,
+                         report_gt_feature_n_positives=50,
+                         style="seaborn-colorblind",
+                         fig_title="Feature ROC curves",
+                         dpi=500):
     """
     Output the ROC curves for each feature predicted by a model
     as an SVG.
@@ -69,10 +67,7 @@ def visualize_roc_curves(prediction,
     fig_title : str, optional
         Default is "Feature ROC curves". Set the figure title.
     dpi : int, optional
-        Default is 800. Specify dots per inch (resolution) of the figure.
-    needs_import : bool, optional
-        Default is False. Specify whether we need to import
-        `matplotlib.pyplot`.
+        Default is 500. Specify dots per inch (resolution) of the figure.
 
     Returns
     -------
@@ -82,10 +77,11 @@ def visualize_roc_curves(prediction,
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    if needs_import:
-        import matplotlib
+    import matplotlib
+    backend = matplotlib.get_backend()
+    if "inline" not in backend:
         matplotlib.use("SVG")
-        import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
 
     plt.style.use(style)
     plt.figure()
@@ -94,7 +90,7 @@ def visualize_roc_curves(prediction,
         if len(np.unique(feature_targets)) > 1 and \
                 np.sum(feature_targets) > report_gt_feature_n_positives:
             fpr, tpr, _ = roc_curve(feature_targets, feature_preds)
-            plt.plot(fpr, tpr, 'r-', color="black", alpha=0.1, lw=0.8)
+            plt.plot(fpr, tpr, 'r-', color="black", alpha=0.3, lw=1)
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
@@ -113,8 +109,7 @@ def visualize_precision_recall_curves(
         report_gt_feature_n_positives=50,
         style="seaborn-colorblind",
         fig_title="Feature precision-recall curves",
-        dpi=800,
-        needs_import=False):
+        dpi=500):
     """
     Output the precision-recall (PR) curves for each feature predicted by
     a model as an SVG.
@@ -137,10 +132,7 @@ def visualize_precision_recall_curves(
     fig_title : str, optional
         Default is "Feature precision-recall curves". Set the figure title.
     dpi : int, optional
-        Default is 800. Specify dots per inch (resolution) of the figure.
-    needs_import : bool, optional
-        Default is False. Specify whether we need to import
-        `matplotlib.pyplot`.
+        Default is 500. Specify dots per inch (resolution) of the figure.
 
     Returns
     -------
@@ -150,10 +142,12 @@ def visualize_precision_recall_curves(
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    if needs_import:
-        import matplotlib
+    # TODO: fix this
+    import matplotlib
+    backend = matplotlib.get_backend()
+    if "inline" not in backend:
         matplotlib.use("SVG")
-        import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
 
     plt.style.use(style)
     plt.figure()
@@ -165,7 +159,7 @@ def visualize_precision_recall_curves(
                 feature_targets, feature_preds)
             plt.step(
                 recall, precision, 'r-',
-                color="black", alpha=0.1, lw=0.8, where="post")
+                color="black", alpha=0.3, lw=1, where="post")
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
     plt.xlabel('Recall')
@@ -391,13 +385,11 @@ class PerformanceMetrics(object):
             visualize_roc_curves(
                 prediction, target, output_dir,
                 report_gt_feature_n_positives=self.skip_threshold,
-                needs_import=True,
                 **kwargs)
         if "average_precision" in self.metrics:
             visualize_precision_recall_curves(
                 prediction, target, output_dir,
                 report_gt_feature_n_positives=self.skip_threshold,
-                needs_import=True,
                 **kwargs)
 
     def write_feature_scores_to_file(self, output_path):
