@@ -32,4 +32,3 @@ dependencies:
     - sphinx-rtd-theme==0.4.0
     - pytabix==0.1
     - torch==0.4.0
-prefix: /data/home/ecofer/anaconda3/envs/selene-cpu

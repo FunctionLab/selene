@@ -6,7 +6,7 @@
 Selene documentation
 ==================================
 
-TODO: Description
+Welcome! This is the documentation for Selene, a PyTorch-based deep learning library for sequence-level data.
 
 .. toctree::
    :glob:
@@ -15,9 +15,7 @@ TODO: Description
 
    overview/installation
    overview/tutorials
-   overview/faq
    overview/extending
-
 
 .. toctree::
    :maxdepth: 1
@@ -26,13 +24,11 @@ TODO: Description
    selene
    interpret
    predict
-   predict.predict_handlers
    samplers
    sequences
    targets
    utils
-
-
+    
 Indices and tables
 ==================
 
