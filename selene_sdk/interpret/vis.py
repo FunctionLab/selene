@@ -22,7 +22,7 @@ import plotly.graph_objs as go
 import seaborn as sns
 import tabix
 
-from selene.sequences import Genome
+from ..sequences import Genome
 
 
 _SVG_PATHS = {'T': "M 0,100 l 100, 0 l 0,-25 l -37.5, 0 l 0,-75 l -25, 0 " +
@@ -431,6 +431,7 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
     **kwargs : dict
         Keyword arguments to pass to `seaborn.heatmap`. Some useful ones
         to remember are:
+
             * cbar_kws - Keyword arguments to forward to the colorbar.
             * yticklabels - Manipulate the tick labels on the y axis.
             * cbar - If `False`, hide the color bar. If `True`, show\
@@ -440,7 +441,7 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
     Returns
     -------
     matplotlib.pyplot.Axes
-        The axese containing the heatmap plot.
+        The axes containing the heatmap plot.
 
     """
     # Note that some things can break if we do not deepcopy.
@@ -487,10 +488,11 @@ def load_variant_abs_diff_scores(input_path):
     Returns
     -------
     tuple(np.ndarray, list(tuple(str)), list(str))
-        * `tuple[0]` is the matrix of absolute difference scores. The rows
-          are the variants and the columns are the features for which the
+
+        * `tuple[0]` is the matrix of absolute difference scores. The rows\
+          are the variants and the columns are the features for which the\
           model makes predictions.
-        * `tuple[1]` is the list of variant labels. Each tuple contains
+        * `tuple[1]` is the list of variant labels. Each tuple contains\
           (chrom, pos, name, ref, alt).
         * `tuple[2]` is the list of features.
 

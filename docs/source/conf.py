@@ -17,7 +17,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import selene
+import selene_sdk
 import sphinx_rtd_theme
 
 # -- General configuration ------------------------------------------------
@@ -78,7 +78,7 @@ author = 'Selene Contributors'
 # built documents.
 #
 # The short X.Y version.
-version = 'master ({0})'.format(selene.__version__)
+version = 'master ({0})'.format(selene_sdk.__version__)
 # The full version, including alpha/beta/rc tags.
 release = 'master'
 

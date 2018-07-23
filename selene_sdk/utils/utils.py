@@ -8,7 +8,6 @@ from collections import OrderedDict
 import logging
 
 import numpy as np
-import torch
 
 
 def get_indices_and_probabilities(interval_lengths, indices):
@@ -28,7 +27,7 @@ def get_indices_and_probabilities(interval_lengths, indices):
 
     Returns
     -------
-    indices, weights : tuple(list(int), list(float))
+    indices, weights : tuple(list(int), list(float)) \
         Tuple of interval indices to sample from and the corresponding
         weights of those intervals.
 
@@ -63,7 +62,7 @@ def load_model_from_state_dict(state_dict, model):
 
     Returns
     -------
-    torch.nn.Module
+    torch.nn.Module \
         The model with weights loaded from the state dict.
 
     Raises
@@ -101,11 +100,11 @@ def load_features_list(input_path):
     ----------
     input_path : str
         Path to the features file. Each feature in the input file must
-        on its own line.
+        be on its own line.
 
     Returns
     -------
-    list(str)
+    list(str) \
         The list of features. The features will appear in the list in
         the same order they appeared in the file (reading from top to
         bottom).

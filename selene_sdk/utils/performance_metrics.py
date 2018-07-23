@@ -368,17 +368,18 @@ class PerformanceMetrics(object):
         **kwargs : dict
             Keyword arguments to pass to each visualization function. Each
             function accepts the following args:
-                * style : str
-                    Default is "seaborn-colorblind". Specify a style available
-                    in `matplotlib.pyplot.style.available` to use.
-                * dpi : int
-                    Default is 800. Specify dots per inch (resolution) of
-                    the figure.
+
+                * style : str - Default is "seaborn-colorblind". Specify a \
+                          style available in \
+                          `matplotlib.pyplot.style.available` to use.
+                * dpi : int - Default is 500. Specify dots per inch \
+                              (resolution) of the figure.
 
         Returns
         -------
         None
             Outputs figures to `output_dir`.
+
         """
         os.makedirs(output_dir, exist_ok=True)
         if "roc_auc" in self.metrics:

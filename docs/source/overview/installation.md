@@ -25,5 +25,3 @@ After downloading the repository, install the dependencies as follows:
 ```
 TODO
 ```
-
----

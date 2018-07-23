@@ -33,10 +33,12 @@ def initialize_model(model_configs, train=True, lr=None):
     model, criterion : tuple(torch.nn.Module, torch.nn._Loss) or \
             model, criterion, optim_class, optim_kwargs : \
                 tuple(torch.nn.Module, torch.nn._Loss, torch.optim, dict)
+
         * `torch.nn.Module` - the model architecture
         * `torch.nn._Loss` - the loss function associated with the model
         * `torch.optim` - the optimizer associated with the model
         * `dict` - the optimizer arguments
+
         The optimizer and its arguments are only returned if `train` is
         True.
 
@@ -206,19 +208,21 @@ def parse_configs_and_run(configs,
     configs : dict
         The dictionary of nested configuration parameters. Will look
         for the following top-level parameters:
-            * `ops`: A list of 1 or more of the values
-            {"train", "evaluate", "analyze"}. The operations specified
-            determine what objects and information we expect to parse
+
+            * `ops`: A list of 1 or more of the values \
+            {"train", "evaluate", "analyze"}. The operations specified\
+            determine what objects and information we expect to parse\
             in order to run these operations. This is required.
-            * `output_dir`: Output directory to use for all the operations.
-            If no `output_dir` is specified, assumes that all constructors
-            that will be initialized (which have their own configurations
-            in `configs`) have their own `output_dir` specified.
+            * `output_dir`: Output directory to use for all the operations.\
+            If no `output_dir` is specified, assumes that all constructors\
+            that will be initialized (which have their own configurations\
+            in `configs`) have their own `output_dir` specified.\
             Optional.
-            * `random_seed`: A random seed set for `torch` and `torch.cuda`
+            * `random_seed`: A random seed set for `torch` and `torch.cuda`\
             for reproducibility. Optional.
-            * `lr`: The learning rate, if one of the operations in the list is
+            * `lr`: The learning rate, if one of the operations in the list is\
             "train".
+
     create_subdirectory : bool, optional
         Default is True. If `create_subdirectory`, will create a directory
         within `output_dir` with the name formatted as "%Y-%m-%d-%H-%M-%S",

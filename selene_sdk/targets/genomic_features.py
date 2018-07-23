@@ -216,8 +216,8 @@ class GenomicFeatures(Target):
         up a proportion of the region greater than or equal to
         the threshold specified for that feature.
 
-        * `None` - No thresholds specified. All features found in
-        a query region are annotated to that region.
+        * `None` - No thresholds specified. All features found in\
+                   a query region are annotated to that region.
         * `float` - A single threshold applies to all the features\
                     in the dataset.
         * `dict` - A dictionary mapping feature names (`str`) to \
@@ -247,11 +247,11 @@ class GenomicFeatures(Target):
         features.
     feature_thresholds : dict or None
 
-        * `dict` - A dictionary mapping feature names (`str`) to thresholds
-        (`float`), where the threshold is the minimum overlap that a
-        feature annotation must have with a query region to be
+        * `dict` - A dictionary mapping feature names (`str`) to thresholds\
+        (`float`), where the threshold is the minimum overlap that a\
+        feature annotation must have with a query region to be\
         considered a positive example of that feature.
-        * `None` - No threshold specifications. Assumes that all features
+        * `None` - No threshold specifications. Assumes that all features\
         returned by a tabix query are annotated to the query region.
 
     """

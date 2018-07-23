@@ -551,7 +551,7 @@ class AnalyzeSequences(object):
                               output_path_prefix="ism",
                               mutate_n_bases=1):
         """
-        Applies _in silico_ mutagenesis to a sequence.
+        Applies *in silico* mutagenesis to a sequence.
 
         Parameters
         ----------
@@ -621,7 +621,7 @@ class AnalyzeSequences(object):
                                         mutate_n_bases=1,
                                         use_sequence_name=True):
         """
-        Apply _in silico_ mutagenesis to all sequences in a FASTA file.
+        Apply *in silico* mutagenesis to all sequences in a FASTA file.
 
         Please note that we have not parallelized this function yet, so runtime
         increases exponentially when you increase `mutate_n_bases`.
@@ -638,7 +638,7 @@ class AnalyzeSequences(object):
             created if they do not currently exist.
         mutate_n_bases : int, optional
             Default is 1. The number of bases to mutate at one time in
-            _in silico_ mutagenesis.
+            *in silico* mutagenesis.
         use_sequence_name : bool, optional.
             Default is True. If `use_sequence_name`, output files are prefixed
             by the sequence name/description corresponding to each sequence
@@ -650,7 +650,7 @@ class AnalyzeSequences(object):
         Returns
         -------
         None
-            Outputs data files from _in silico_ mutagenesis to `output_dir`.
+            Outputs data files from *in silico* mutagenesis to `output_dir`.
 
         """
         os.makedirs(output_dir, exist_ok=True)

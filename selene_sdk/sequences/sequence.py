@@ -90,16 +90,19 @@ def get_reverse_encoding(encoding,
                          base_to_index,
                          complementary_base_dict):
     """
-    # TODO(DOCUMENTATION): What is the documentation for this?
+    The Genome DNA bases encoding is created such that the reverse
+    encoding can be quickly computed.
+
     Parameters
     ----------
-    encoding
-    bases_arr
-    base_to_index
+    encoding : numpy.ndarray
+    bases_arr : list(str)
+    base_to_index : dict
     complementary_base_dict : dict
 
     Returns
     -------
+    numpy.ndarray
 
     """
 
@@ -131,8 +134,8 @@ def reverse_complement_sequence(sequence, complementary_base_dict):
     -------
     str
         The reverse complement of the input sequence.
-    """
 
+    """
     rev_comp_bases = [complementary_base_dict[b] for b in
                       sequence[::-1]]
     return ''.join(rev_comp_bases)

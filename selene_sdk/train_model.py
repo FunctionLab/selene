@@ -117,6 +117,7 @@ class TrainModel(object):
         The directory to save model checkpoints and logs.
     training_loss : list(float)
         The current training loss.
+
     """
 
     def __init__(self,
@@ -285,6 +286,7 @@ class TrainModel(object):
         -------
         tuple(numpy.ndarray, numpy.ndarray)
             A tuple containing the examples and targets.
+
         """
         t_i_sampling = time()
         batch_sequences, batch_targets = self.sampler.sample(
@@ -299,6 +301,7 @@ class TrainModel(object):
     def train_and_validate(self):
         """
         Trains the model and measures validation performance.
+
         """
         logger.info(
             ("[TRAIN] max_steps: {0}, batch_size: {1}").format(
@@ -362,6 +365,7 @@ class TrainModel(object):
         -------
         float
             The training loss.
+
         """
         self.model.train()
         self.sampler.set_mode("train")
@@ -401,6 +405,7 @@ class TrainModel(object):
         -------
         tuple(float, list(numpy.ndarray))
             Returns the average loss, and the list of all predictions.
+
         """
         self.model.eval()
 
@@ -464,6 +469,7 @@ class TrainModel(object):
             A dictionary, where keys are the names of the loss metrics,
             and the values are the average value for that metric over
             the test set.
+
         """
         average_loss, all_predictions = self._evaluate_on_data(
             self._test_data)
@@ -511,6 +517,7 @@ class TrainModel(object):
         Returns
         -------
         None
+
         """
         logger.info("[TRAIN] {0}: Saving model state to file.".format(
             state["step"]))
