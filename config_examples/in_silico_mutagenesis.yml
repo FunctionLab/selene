@@ -23,9 +23,8 @@ in_silico_mutagenesis: {
         /path/to/sequences.fa
     ],
     save_data: ["logits", "predictions"],
+    output_dir: /path/to/output_dir,
     use_sequence_name: False
 }
 random_seed: 1000
-output_dir: /path/to/output_dir
-create_subdirectory: False
 ...

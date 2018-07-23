@@ -6,8 +6,8 @@ Output:
     Saves model to a user-specified output file.
 
 Usage:
-    selene.py <config-yml> [--lr=<lr>]
-    selene.py -h | --help
+    selene_cli.py <config-yml> [--lr=<lr>]
+    selene_cli.py -h | --help
 
 Options:
     -h --help               Show this screen.
@@ -18,9 +18,9 @@ Options:
 """
 from docopt import docopt
 
-from selene.utils import load_path
-from selene.utils import parse_configs_and_run
-from selene import __version__
+from selene_sdk.utils import load_path
+from selene_sdk.utils import parse_configs_and_run
+from selene_sdk import __version__
 
 
 if __name__ == "__main__":
