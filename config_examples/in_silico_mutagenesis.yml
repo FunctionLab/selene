@@ -13,14 +13,19 @@ model: {
 analyze_sequences: !obj:selene.predict.AnalyzeSequences {
     sequence_length: 1000,
     features: !obj:selene.utils.load_features_list {
-        input_path: /path/to/distinct_features.txt 
+        input_path: /path/to/distinct_features.txt
     },
-    trained_model_file: /path/to/trained_model.pth.tar, 
+    trained_model_path: /path/to/trained/model.pth.tar,
     use_cuda: True
 }
-prediction: {
-    input_path: /path/to/sequences.fa,
-    output_path_prefix: /path/to/output_dir/prefix_
+in_silico_mutagenesis: {
+    fa_files: [
+        /path/to/sequences.fa
+    ],
+    save_data: ["logits", "predictions"],
+    use_sequence_name: False
 }
-random_seed: 123
+random_seed: 1000
+output_dir: /path/to/output_dir
+create_subdirectory: False
 ...

@@ -1,0 +1,31 @@
+---
+ops: [evaluate]
+model: {
+    file: /absolute/path/to/model/architecture.py, 
+    class: ModelArchitectureClassName,
+    sequence_length: 1000,
+    n_classes_to_predict: 2,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+sampler: !obj:selene.samplers.MatFileSampler {
+    filepath: /path/to/test.mat, 
+    sequence_key: testxdata,
+    targets_key: testdata,
+    shuffle_file: False
+}
+evaluate_model: !obj:selene.EvaluateModel {
+    batch_size: 64,
+    features:  !obj:selene.utils.load_features_list {
+        input_path: /path/to/distinct_features.txt 
+    },
+    use_cuda: True, 
+    report_gt_feature_n_positives: 50,
+    trained_model_path: /path/to/trained_model.pth.tar
+}
+random_seed: 123
+output_dir: /path/to/output_dir
+create_subdirectory: False
+...

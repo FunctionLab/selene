@@ -87,8 +87,12 @@ def execute(operations, configs, output_dir):
         The list of operations to carry out in _Selene_.
     configs : dict or object
         The loaded configurations from a YAML file.
-    output_dir : str
+    output_dir : str or None
         The path to the directory where all outputs will be saved.
+        If None, this means that an `output_dir` was not specified
+        in the top-level configuration keys. `output_dir` must be
+        specified in each class's individual configuration wherever
+        it is required.
 
     Returns
     -------
@@ -172,15 +176,19 @@ def execute(operations, configs, output_dir):
                 ism_info = configs["in_silico_mutagenesis"]
                 if "input_sequence" in ism_info:
                     analyze_seqs.in_silico_mutagenesis(**ism_info)
+                elif "input_path" in ism_info:
+                    analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)
                 elif "fa_files" in ism_info:
                     for filepath in ism_info.pop("fa_files"):
                         analyze_seqs.in_silico_mutagenesis_from_file(
                             filepath, **ism_info)
                 else:
                     raise ValueError("in silico mutagenesis requires as input "
-                                     "the path to the FASTA file ('input_path')"
-                                     " or a sequences ('input_sequence'), but "
-                                     " found neither.")
+                                     "the path to the FASTA file "
+                                     "('input_path') or a sequence "
+                                     "('input_sequence') or a list of "
+                                     "FASTA files ('fa_files'), but found "
+                                     "neither.")
             if "prediction" in configs:
                 predict_info = configs["prediction"]
                 analyze_seqs.get_predictions_for_fasta_file(**predict_info)
@@ -248,12 +256,14 @@ def parse_configs_and_run(configs,
     else:
         current_run_output_dir = configs.pop("output_dir")
         os.makedirs(current_run_output_dir, exist_ok=True)
-    if create_subdirectory:
-        current_run_output_dir = os.path.join(
-            current_run_output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
-        os.makedirs(current_run_output_dir)
-    print("Outputs and logs saved to {0}".format(
-        current_run_output_dir))
+        if "create_subdirectory" in configs:
+            create_subdirectory = configs["create_subdirectory"]
+        if create_subdirectory:
+            current_run_output_dir = os.path.join(
+                current_run_output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+            os.makedirs(current_run_output_dir)
+        print("Outputs and logs saved to {0}".format(
+            current_run_output_dir))
 
     if "random_seed" in configs:
         seed = configs.pop("random_seed")

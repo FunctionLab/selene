@@ -13,14 +13,20 @@ model: {
 analyze_sequences: !obj:selene.predict.AnalyzeSequences {
     sequence_length: 1000,
     features: !obj:selene.utils.load_features_list {
-        input_path: /path/to/distinct_features.txt 
+        input_path: /path/to/distinct_features.txt
     },
-    trained_model_file: /path/to/trained_model.pth.tar, 
-    use_cuda: True
+    trained_model_path: /path/to/trained/model.pth.tar,
+    reference_sequence: !obj:selene.sequences.Genome {
+        input_path: /path/to/genome/hg.fa
+    }
 }
-prediction: {
-    input_path: /path/to/sequences.fa,
-    output_path_prefix: /path/to/output_dir/prefix_
+variant_effect_prediction: {
+    vcf_files: [
+       /path/to/file1.vcf,
+       /path/to/file2.vcf
+    ], 
+    save_data: [predictions, diffs],
+    output_dir: /path/to/output_dir 
 }
 random_seed: 123
 ...

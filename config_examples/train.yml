@@ -1,0 +1,44 @@
+---
+ops: [train, evaluate]
+model: {
+    file: /absolute/path/to/model/architecture.py, 
+    class: ModelArchitectureClassName,
+    sequence_length: 1000,
+    n_classes_to_predict: 2,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+sampler: !obj:selene.samplers.IntervalsSampler {
+    reference_sequence: !obj:selene.sequences.Genome {
+        input_path: /path/to/genome/hg.fa
+    },
+    features: !obj:selene.utils.load_features_list {
+        input_path: /path/to/distinct_features.txt
+    },
+    target_path: /path/to/tabix/indexed/targets.bed.gz, 
+    intervals_path: /path/to/intervals.txt,
+    test_holdout: [chr8, chr9],
+    validation_holdout: [chr6, chr7],
+    seed: 127,
+    sequence_length: 1000,
+    center_bin_to_predict: 200,
+    feature_thresholds: 0.5,
+    mode: train,
+    sample_negative: True,  # train on samples with no targets present
+    save_datasets: [test]
+}
+train_model: !obj:selene.TrainModel {
+    batch_size: 64,
+    max_steps: 80000,
+    report_stats_every_n_steps: 16000,
+    n_validation_samples: 32000,
+    n_test_samples: 640000,
+    cpu_n_threads: 32,
+    use_cuda: True,
+    data_parallel: True,  # multiple GPUs
+}
+random_seed: 133
+output_dir: /path/to/output_dir
+...
