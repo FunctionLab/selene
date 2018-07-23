@@ -54,5 +54,6 @@ setup(name="selene",
         "scipy>=0.19.1",
         "seaborn>=0.8.1",
         "statsmodels>=0.9.0",
-        "pyyaml>=3.12"
-      ])
+        "pyyaml>=3.12",
+        "plotly>=2.7.0"
+    ])
