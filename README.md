@@ -12,6 +12,8 @@ pip install selene-sdk
 ```
 
 ### Installing selene with [Anaconda](https://www.anaconda.com/download/):
+COMING SOON. Has not been uploaded to conda yet, though we will recommend using Selene with conda once it is up.
+Currently, we recommend installing and running selene (using [selene-cli.py](selene-cli.py)) from the source build for better control over the PyTorch-related dependencies. 
 ```sh
 conda install selene-sdk
 ```
