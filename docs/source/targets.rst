@@ -1,8 +1,8 @@
-selene.targets
+selene_sdk.targets
 ======================
 
-.. automodule:: selene.targets
-.. currentmodule:: selene.targets
+.. automodule:: selene_sdk.targets
+.. currentmodule:: selene_sdk.targets
 
 Target
 ----------------------------

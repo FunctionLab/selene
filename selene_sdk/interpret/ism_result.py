@@ -6,7 +6,7 @@ an *in silico* mutagenesis experiment.
 import numpy as np
 import pandas as pd
 
-from selene.sequences import Genome
+from ..sequences import Genome
 
 
 class ISMResult(object):
@@ -21,10 +21,10 @@ class ISMResult(object):
         mutagenesis experiments.
 
     sequence_type : class, optional
-        Default is `selene.sequences.Genome`. The type of sequence
+        Default is `selene_sdk.sequences.Genome`. The type of sequence
         that the *in silico* mutagenesis results are associated
         with. This should generally be a subclass of
-        `selene.sequences.Sequence`
+        `selene_sdk.sequences.Sequence`
 
     Raises
     ------
@@ -43,7 +43,7 @@ class ISMResult(object):
     """
     def __init__(self, data_frame, sequence_type=Genome):
         """
-        Constructs a new `selene.interpret.ISMResult` object.
+        Constructs a new `selene_sdk.interpret.ISMResult` object.
 
         """
         # Construct the reference sequence.
@@ -98,7 +98,7 @@ class ISMResult(object):
     def sequence_type(self):
         """
         The type of underlying sequence. This should generally be a
-        subclass of `selene.sequences.Sequence`.
+        subclass of `selene_sdk.sequences.Sequence`.
 
         Returns
         -------
@@ -180,7 +180,7 @@ class ISMResult(object):
     @staticmethod
     def from_file(input_path, sequence_type=Genome):
         """
-        Loads a `selene.interpret.ISMResult` from a `pandas.DataFrame`
+        Loads a `selene_sdk.interpret.ISMResult` from a `pandas.DataFrame`
         stored in a file of comma separated values (CSV).
 
         Parameters
@@ -189,14 +189,14 @@ class ISMResult(object):
             A path to the file of comma separated input values.
 
         sequence_type : class, optional
-            Default is `selene.sequences.Genome`. The type of sequence
+            Default is `selene_sdk.sequences.Genome`. The type of sequence
             that the *in silico* mutagenesis results are associated
             with. This should generally be a subclass of
-            `selene.sequences.Sequence`.
+            `selene_sdk.sequences.Sequence`.
 
         Returns
         -------
-        selene.interpret.ISMResult
+        selene_sdk.interpret.ISMResult
             The *in silico* mutagenesis results that were stored in the
             specified input file.
 

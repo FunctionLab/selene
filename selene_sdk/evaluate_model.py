@@ -28,7 +28,7 @@ class EvaluateModel(object):
         The trained model.
     criterion : torch.nn._Loss
         The loss function that was optimized during training.
-    data_sampler : selene.samplers.Sampler
+    data_sampler : selene_sdk.samplers.Sampler
         The example generator.
     features : list(str)
         List of distinct features the model predicts.
@@ -51,7 +51,7 @@ class EvaluateModel(object):
         The trained model.
     criterion : torch.nn._Loss
         The model was trained using this loss function.
-    sampler : selene.samplers.Sampler
+    sampler : selene_sdk.samplers.Sampler
         The example generator.
     features : list(str)
         List of distinct features the model predicts.

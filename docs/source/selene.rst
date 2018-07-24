@@ -1,7 +1,7 @@
-selene
+selene_sdk
 =================================
-.. automodule:: selene
-.. currentmodule:: selene
+.. automodule:: selene_sdk
+.. currentmodule:: selene_sdk
 
 TrainModel
 ---------------------------------

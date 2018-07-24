@@ -1,8 +1,8 @@
-selene.sequences
+selene_sdk.sequences
 ========================
 
-.. automodule:: selene.sequences
-.. currentmodule:: selene.sequences
+.. automodule:: selene_sdk.sequences
+.. currentmodule:: selene_sdk.sequences
 
 Sequence
 -------------------------

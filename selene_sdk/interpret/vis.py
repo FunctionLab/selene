@@ -164,9 +164,9 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
         Default is `None`. The axes to plot on. If left as `None`, a new
         axis will be created.
     sequence_type : class, optional
-        Default is `selene.sequences.Genome`. The type of sequence that
+        Default is `selene_sdk.sequences.Genome`. The type of sequence that
         the *in silico* mutagenesis results are associated with. This
-        should generally be a subclass of `selene.sequences.Sequence`.
+        should generally be a subclass of `selene_sdk.sequences.Sequence`.
     font_properties : matplotlib.font_manager.FontProperties or None, optional
         Default is `None`. A `matplotlib.font_manager.FontProperties`
         object that specifies the properties of the font to use for
@@ -425,9 +425,9 @@ def heatmap(score_matrix, mask=None, sequence_type=Genome, **kwargs):
         alphabet)  containing `True` at positions in the heatmap to
         mask. If `None`, no masking will occur.
     sequence_type : class, optional
-        Default is `selene.sequences.Genome`. The class of sequence that
+        Default is `selene_sdk.sequences.Genome`. The class of sequence that
         the *in silico* mutagenesis results are associated with. This is
-        generally a sub-class of `selene.sequences.Sequence`.
+        generally a sub-class of `selene_sdk.sequences.Sequence`.
     **kwargs : dict
         Keyword arguments to pass to `seaborn.heatmap`. Some useful ones
         to remember are:

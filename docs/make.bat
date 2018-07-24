@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=selene
+set SPHINXPROJ=selene_sdk
 
 if "%1" == "" goto help
 

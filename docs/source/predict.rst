@@ -1,9 +1,9 @@
 
-selene.predict
+selene_sdk.predict
 ======================
 
-.. automodule:: selene.predict
-.. currentmodule:: selene.predict
+.. automodule:: selene_sdk.predict
+.. currentmodule:: selene_sdk.predict
 
 AnalyzeSequences
 ----------------------

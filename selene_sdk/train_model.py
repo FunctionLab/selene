@@ -40,7 +40,7 @@ class TrainModel(object):
     ----------
     model : torch.nn.Module
         The model to train.
-    data_sampler : selene.samplers.Sampler
+    data_sampler : selene_sdk.samplers.Sampler
         The example generator.
     loss_criterion : torch.nn._Loss
         The loss function to optimize.
@@ -63,20 +63,20 @@ class TrainModel(object):
     n_validation_samples : int or None, optional
         Default is `None`. Specify the number of validation samples in the
         validation set. If `n_validation_samples` is `None` and the data sampler
-        used is the `selene.samplers.IntervalsSampler` or
-        `selene.samplers.RandomSampler`, we will retrieve 32000
+        used is the `selene_sdk.samplers.IntervalsSampler` or
+        `selene_sdk.samplers.RandomSampler`, we will retrieve 32000
         validation samples. If `None` and using
-        `selene.samplers.MatFileSampler`, we will use all
+        `selene_sdk.samplers.MatFileSampler`, we will use all
         validation samples in the matrix.
     n_test_samples : int or None, optional
         Default is `None`. Specify the number of test samples in the test set.
         If `n_test_samples` is `None` and the data sampler used is the
-        `selene.samplers.IntervalsSampler`, the size of the test set is
+        `selene_sdk.samplers.IntervalsSampler`, the size of the test set is
         the number of test intervals we can sample from. If
-        `None` and using `selene.samplers.RandomSampler`, the size is
+        `None` and using `selene_sdk.samplers.RandomSampler`, the size is
         :math:`\\frac{N}{20}`, where :math:`N` is the number of possible
         positions in the test partition of the genome. If  `None` and
-        using `selene.samplers.MatFileSampler`, we will use all
+        using `selene_sdk.samplers.MatFileSampler`, we will use all
         test samples in the matrix.
     cpu_n_threads : int, optional
         Default is 32.
@@ -95,7 +95,7 @@ class TrainModel(object):
     ----------
     model : torch.nn.Module
         The model to train.
-    sampler : selene.samplers.Sampler
+    sampler : selene_sdk.samplers.Sampler
         The example generator.
     loss_criterion : torch.nn._Loss
         The loss function to optimize.
@@ -179,7 +179,7 @@ class TrainModel(object):
             verbosity=logging_verbosity)
 
         self._create_validation_set(n_samples=n_validation_samples)
-        # TODO: Only `selene.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.
+        # TODO: Only `selene_sdk.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.
         # So, what should be done to allow more general sampling methods?
         self._validation_metrics = PerformanceMetrics(
             self.sampler.get_feature_from_index,

@@ -1,7 +1,7 @@
-selene.samplers
+selene_sdk.samplers
 =======================
-.. automodule:: selene.samplers
-.. currentmodule:: selene.samplers
+.. automodule:: selene_sdk.samplers
+.. currentmodule:: selene_sdk.samplers
 
 Sampler
 -------------------------
