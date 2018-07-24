@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.samplers &mdash; Selene master documentation</title>
+  <title>selene_sdk.samplers &mdash; Selene master documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="selene.sequences" href="sequences.html" />
-    <link rel="prev" title="selene.predict" href="predict.html" /> 
+    <link rel="next" title="selene_sdk.sequences" href="sequences.html" />
+    <link rel="prev" title="selene_sdk.predict" href="predict.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -100,12 +100,12 @@
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="selene.html">selene_sdk</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene_sdk.interpret</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#sequence-logo">sequence_logo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
@@ -116,11 +116,11 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="predict.html">selene_sdk.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">selene.samplers</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">selene_sdk.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#intervalssampler">IntervalsSampler</a></li>
@@ -129,7 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene_sdk.sequences</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#sequence">Sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#genome">Genome</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#proteome">Proteome</a></li>
@@ -138,12 +138,12 @@
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="targets.html">selene.targets</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="targets.html">selene_sdk.targets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="targets.html#target">Target</a></li>
 <li class="toctree-l2"><a class="reference internal" href="targets.html#genomicfeatures">GenomicFeatures</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">selene_sdk.utils</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
@@ -199,7 +199,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>selene.samplers</li>
+      <li>selene_sdk.samplers</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -218,15 +218,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene.samplers">
-<span id="selene-samplers"></span><h1>selene.samplers<a class="headerlink" href="#module-selene.samplers" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-selene_sdk.samplers">
+<span id="selene-sdk-samplers"></span><h1>selene_sdk.samplers<a class="headerlink" href="#module-selene_sdk.samplers" title="Permalink to this headline">¶</a></h1>
 <p>This module provides classes and methods for sampling labeled data
 examples.</p>
 <div class="section" id="sampler">
 <h2>Sampler<a class="headerlink" href="#sampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.samplers.Sampler">
-<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">Sampler</code><span class="sig-paren">(</span><em>seed=436</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.Sampler">
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">Sampler</code><span class="sig-paren">(</span><em>seed=436</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The base class for sampler currently enforces that all samplers
 have modes for drawing training and validation samples to train a
@@ -247,14 +247,14 @@ model.</p>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="selene.samplers.Sampler.BASE_MODES">
-<code class="descname">BASE_MODES</code><em class="property"> = ('train', 'validate')</em><a class="headerlink" href="#selene.samplers.Sampler.BASE_MODES" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.Sampler.BASE_MODES">
+<code class="descname">BASE_MODES</code><em class="property"> = ('train', 'validate')</em><a class="headerlink" href="#selene_sdk.samplers.Sampler.BASE_MODES" title="Permalink to this definition">¶</a></dt>
 <dd><p>The types of modes that the <cite>Sampler</cite> object can run in.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.Sampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.Sampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches. This method also allows the user to
 specify what operating mode to run the sampler in when fetching
@@ -275,8 +275,8 @@ the data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.Sampler.get_validation_set">
-<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.Sampler.get_validation_set">
+<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a subset of validation data from the
 sampler, divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -296,8 +296,8 @@ all classes that subclass <cite>selene.samplers.Sampler</cite>.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.Sampler.sample">
-<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.Sampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches a mini-batch of the data from the sampler.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -310,8 +310,8 @@ all classes that subclass <cite>selene.samplers.Sampler</cite>.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.Sampler.set_mode">
-<code class="descname">set_mode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/sampler.html#Sampler.set_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.Sampler.set_mode" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.Sampler.set_mode">
+<code class="descname">set_mode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.set_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.set_mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the sampling mode.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -332,9 +332,9 @@ all classes that subclass <cite>selene.samplers.Sampler</cite>.</li>
 <div class="section" id="onlinesampler">
 <h2>OnlineSampler<a class="headerlink" href="#onlinesampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.samplers.OnlineSampler">
-<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">OnlineSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1001, center_bin_to_predict=201, feature_thresholds=0.5, mode='train', save_datasets=[], output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.samplers.sampler.Sampler</span></code></p>
+<dt id="selene_sdk.samplers.OnlineSampler">
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">OnlineSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1001, center_bin_to_predict=201, feature_thresholds=0.5, mode='train', save_datasets=[], output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.sampler.Sampler</span></code></p>
 <p>A sampler in which training/validation/test data is constructed
 from random sampling of the dataset for each batch passed to the
 model. This form of sampling may alleviate the problem of loading an
@@ -375,8 +375,8 @@ automatically.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
-<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene.sequences.Sequence" title="selene.sequences.Sequence"><em>selene.sequences.Sequence</em></a>) – The reference sequence that examples are created from.</li>
-<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene.targets.Target" title="selene.targets.Target"><em>selene.targets.Target</em></a>) – The <cite>selene.targets.Target</cite> object holding the features that we
+<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<em>selene.targets.Target</em>) – The <cite>selene.targets.Target</cite> object holding the features that we
 would like to predict.</li>
 <li><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for validating model performance. These
 can be “regional” or “proportional”. If regional, this is a list
@@ -411,14 +411,14 @@ the same.</li>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="selene.samplers.OnlineSampler.STRAND_SIDES">
-<code class="descname">STRAND_SIDES</code><em class="property"> = ('+', '-')</em><a class="headerlink" href="#selene.samplers.OnlineSampler.STRAND_SIDES" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.STRAND_SIDES">
+<code class="descname">STRAND_SIDES</code><em class="property"> = ('+', '-')</em><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.STRAND_SIDES" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the strands that features can be sampled from.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches. This method also allows the user to
 specify what operating mode to run the sampler in when fetching
@@ -456,8 +456,8 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.get_dataset_in_batches">
-<code class="descname">get_dataset_in_batches</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_dataset_in_batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_dataset_in_batches" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.get_dataset_in_batches">
+<code class="descname">get_dataset_in_batches</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_dataset_in_batches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_dataset_in_batches" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a subset of the data for a specified run
 mode, divided into mini-batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -495,8 +495,8 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.get_feature_from_index">
-<code class="descname">get_feature_from_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_feature_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_feature_from_index" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.get_feature_from_index">
+<code class="descname">get_feature_from_index</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_feature_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_feature_from_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the feature corresponding to an index in the feature
 vector.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -514,8 +514,8 @@ vector.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.get_sequence_from_encoding">
-<code class="descname">get_sequence_from_encoding</code><span class="sig-paren">(</span><em>encoding</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_sequence_from_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_sequence_from_encoding" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.get_sequence_from_encoding">
+<code class="descname">get_sequence_from_encoding</code><span class="sig-paren">(</span><em>encoding</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_sequence_from_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_sequence_from_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the string sequence from the one-hot encoding
 of the sequence.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -536,8 +536,8 @@ sequence.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.get_test_set">
-<code class="descname">get_test_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_test_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_test_set" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.get_test_set">
+<code class="descname">get_test_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_test_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_test_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a subset of testing data from the
 sampler, divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -575,8 +575,8 @@ sampler initialization.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.get_validation_set">
-<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.get_validation_set">
+<code class="descname">get_validation_set</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_validation_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a subset of validation data from the
 sampler, divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -610,8 +610,8 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.OnlineSampler.save_dataset_to_file">
-<code class="descname">save_dataset_to_file</code><span class="sig-paren">(</span><em>mode</em>, <em>close_filehandle=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/online_sampler.html#OnlineSampler.save_dataset_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.OnlineSampler.save_dataset_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.OnlineSampler.save_dataset_to_file">
+<code class="descname">save_dataset_to_file</code><span class="sig-paren">(</span><em>mode</em>, <em>close_filehandle=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.save_dataset_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.save_dataset_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save samples for each partition (i.e. train/validate/test) to
 disk.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -638,9 +638,9 @@ file and <cite>save_dataset_to_file</cite> will not be called with
 <div class="section" id="intervalssampler">
 <h2>IntervalsSampler<a class="headerlink" href="#intervalssampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.samplers.IntervalsSampler">
-<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">IntervalsSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, intervals_path, sample_negative=False, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1000, center_bin_to_predict=200, feature_thresholds=0.5, mode='train', save_datasets=['test'], output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.samplers.online_sampler.OnlineSampler</span></code></p>
+<dt id="selene_sdk.samplers.IntervalsSampler">
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">IntervalsSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, intervals_path, sample_negative=False, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1000, center_bin_to_predict=200, feature_thresholds=0.5, mode='train', save_datasets=['test'], output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/intervals_sampler.html#IntervalsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.IntervalsSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.online_sampler.OnlineSampler</span></code></p>
 <p>Draws samples from pre-specified windows in the reference sequence.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -685,8 +685,8 @@ automatically.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene.sequences.Sequence" title="selene.sequences.Sequence"><em>selene.sequences.Sequence</em></a>) – The reference sequence that examples are created from.</li>
-<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene.targets.Target" title="selene.targets.Target"><em>selene.targets.Target</em></a>) – The <cite>selene.targets.Target</cite> object holding the features that we
+<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<em>selene.targets.Target</em>) – The <cite>selene.targets.Target</cite> object holding the features that we
 would like to predict.</li>
 <li><strong>sample_from_intervals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>)</em><em>)</em>) – A list of coordinates that specify the intervals we can draw
 samples from.</li>
@@ -721,8 +721,8 @@ the modes listed in <cite>modes</cite>.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.samplers.IntervalsSampler.sample">
-<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/intervals_sampler.html#IntervalsSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.IntervalsSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.IntervalsSampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/intervals_sampler.html#IntervalsSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.IntervalsSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly draws a mini-batch of examples and their corresponding
 labels.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -753,9 +753,9 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <div class="section" id="randompositionssampler">
 <h2>RandomPositionsSampler<a class="headerlink" href="#randompositionssampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.samplers.RandomPositionsSampler">
-<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">RandomPositionsSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1000, center_bin_to_predict=200, feature_thresholds=0.5, mode='train', save_datasets=[], output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/random_positions_sampler.html#RandomPositionsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.RandomPositionsSampler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.samplers.online_sampler.OnlineSampler</span></code></p>
+<dt id="selene_sdk.samplers.RandomPositionsSampler">
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">RandomPositionsSampler</code><span class="sig-paren">(</span><em>reference_sequence, target_path, features, seed=436, validation_holdout=['chr6', 'chr7'], test_holdout=['chr8', 'chr9'], sequence_length=1000, center_bin_to_predict=200, feature_thresholds=0.5, mode='train', save_datasets=[], output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/random_positions_sampler.html#RandomPositionsSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.RandomPositionsSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.online_sampler.OnlineSampler</span></code></p>
 <p>This sampler randomly selects a position in the genome and queries for
 a sequence centered at that position for input to the model.</p>
 <p>TODO: generalize to selene.sequences.Sequence?</p>
@@ -795,8 +795,8 @@ automatically.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene.sequences.Genome" title="selene.sequences.Genome"><em>selene.sequences.Genome</em></a>) – The reference sequence that examples are created from.</li>
-<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene.targets.Target" title="selene.targets.Target"><em>selene.targets.Target</em></a>) – The <cite>selene.targets.Target</cite> object holding the features that we
+<li><strong>reference_sequence</strong> (<em>selene.sequences.Genome</em>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<em>selene.targets.Target</em>) – The <cite>selene.targets.Target</cite> object holding the features that we
 would like to predict.</li>
 <li><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for validating model performance. These
 can be “regional” or “proportional”. If regional, this is a list
@@ -821,8 +821,8 @@ the modes listed in <cite>modes</cite>.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.samplers.RandomPositionsSampler.sample">
-<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/random_positions_sampler.html#RandomPositionsSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.RandomPositionsSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.RandomPositionsSampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/random_positions_sampler.html#RandomPositionsSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.RandomPositionsSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly draws a mini-batch of examples and their corresponding
 labels.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -853,8 +853,8 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <div class="section" id="matfilesampler">
 <h2>MatFileSampler<a class="headerlink" href="#matfilesampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.samplers.MatFileSampler">
-<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">MatFileSampler</code><span class="sig-paren">(</span><em>filepath</em>, <em>sequence_key</em>, <em>targets_key=None</em>, <em>random_seed=436</em>, <em>shuffle_file=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.MatFileSampler">
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">MatFileSampler</code><span class="sig-paren">(</span><em>filepath</em>, <em>sequence_key</em>, <em>targets_key=None</em>, <em>random_seed=436</em>, <em>shuffle_file=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/mat_file_sampler.html#MatFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MatFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A sampler for which the dataset is loaded directly from a <cite>*.mat</cite> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -877,8 +877,8 @@ sampling from it.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.samplers.MatFileSampler.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.MatFileSampler.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/mat_file_sampler.html#MatFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MatFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -906,8 +906,8 @@ and <span class="math notranslate nohighlight">\(N\)</span> is the size of the s
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.MatFileSampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.MatFileSampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/mat_file_sampler.html#MatFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MatFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the sequence data and
 targets from the sampler, divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -940,8 +940,8 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.MatFileSampler.sample">
-<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/mat_file_sampler.html#MatFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.MatFileSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.MatFileSampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/mat_file_sampler.html#MatFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MatFileSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws a mini-batch of examples and their corresponding
 labels.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -972,8 +972,8 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <div class="section" id="bedfilesampler">
 <h2>BedFileSampler<a class="headerlink" href="#bedfilesampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.samplers.BedFileSampler">
-<em class="property">class </em><code class="descclassname">selene.samplers.</code><code class="descname">BedFileSampler</code><span class="sig-paren">(</span><em>filepath</em>, <em>reference_sequence</em>, <em>n_samples</em>, <em>sequence_length=None</em>, <em>targets_avail=False</em>, <em>n_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/bed_file_sampler.html#BedFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.BedFileSampler" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.BedFileSampler">
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">BedFileSampler</code><span class="sig-paren">(</span><em>filepath</em>, <em>reference_sequence</em>, <em>n_samples</em>, <em>sequence_length=None</em>, <em>targets_avail=False</em>, <em>n_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/bed_file_sampler.html#BedFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.BedFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A sampler for which the dataset is loaded directly from a <cite>*.bed</cite> file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1004,7 +1004,7 @@ within the interval.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
 <li><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file to load the data from.</li>
-<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene.sequences.Sequence" title="selene.sequences.Sequence"><em>selene.sequences.Sequence</em></a>) – A reference sequence from which to create examples.</li>
+<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
 <li><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</li>
 <li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If the coordinates of each sample in the BED file
 already account for the full sequence (that is,
@@ -1026,8 +1026,8 @@ or the absence/presence of each feature within the interval.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.samplers.BedFileSampler.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/bed_file_sampler.html#BedFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.BedFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.BedFileSampler.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/bed_file_sampler.html#BedFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.BedFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1055,8 +1055,8 @@ and <span class="math notranslate nohighlight">\(N\)</span> is the size of the s
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.BedFileSampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/bed_file_sampler.html#BedFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.BedFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.BedFileSampler.get_data_and_targets">
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/bed_file_sampler.html#BedFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.BedFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the sequence data and
 targets from the sampler, divided into batches.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1089,8 +1089,8 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.samplers.BedFileSampler.sample">
-<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/samplers/bed_file_sampler.html#BedFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.samplers.BedFileSampler.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.samplers.BedFileSampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/bed_file_sampler.html#BedFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.BedFileSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws a mini-batch of examples and their corresponding
 labels.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1128,10 +1128,10 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="sequences.html" class="btn btn-neutral float-right" title="selene.sequences" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="sequences.html" class="btn btn-neutral float-right" title="selene_sdk.sequences" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="predict.html" class="btn btn-neutral" title="selene.predict" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="predict.html" class="btn btn-neutral" title="selene_sdk.predict" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

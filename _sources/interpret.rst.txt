@@ -1,10 +1,10 @@
 .. role:: hidden
     :class: hidden-section
 
-selene.interpret
+selene_sdk.interpret
 ========================
-.. automodule:: selene.interpret
-.. currentmodule:: selene.interpret
+.. automodule:: selene_sdk.interpret
+.. currentmodule:: selene_sdk.interpret
 
 sequence_logo
 ------------------------

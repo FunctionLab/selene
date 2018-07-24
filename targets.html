@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.targets &mdash; Selene master documentation</title>
+  <title>selene_sdk.targets &mdash; Selene master documentation</title>
   
 
   
@@ -30,8 +30,8 @@
   <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="selene.utils" href="utils.html" />
-    <link rel="prev" title="selene.sequences" href="sequences.html" /> 
+    <link rel="next" title="selene_sdk.utils" href="utils.html" />
+    <link rel="prev" title="selene_sdk.sequences" href="sequences.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -100,12 +100,12 @@
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="selene.html">selene_sdk</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene_sdk.interpret</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#sequence-logo">sequence_logo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
@@ -116,11 +116,11 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="predict.html">selene_sdk.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="samplers.html">selene_sdk.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
@@ -129,7 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene_sdk.sequences</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#sequence">Sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#genome">Genome</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#proteome">Proteome</a></li>
@@ -138,12 +138,12 @@
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">selene.targets</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">selene_sdk.targets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#target">Target</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#genomicfeatures">GenomicFeatures</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">selene_sdk.utils</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
@@ -199,7 +199,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>selene.targets</li>
+      <li>selene_sdk.targets</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -218,23 +218,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene.targets">
-<span id="selene-targets"></span><h1>selene.targets<a class="headerlink" href="#module-selene.targets" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-selene_sdk.targets">
+<span id="selene-sdk-targets"></span><h1>selene_sdk.targets<a class="headerlink" href="#module-selene_sdk.targets" title="Permalink to this headline">¶</a></h1>
 <p>This module contains classes and methods for target feature classes.
 These are classes which define a way to access a “target feature” such
 as a label or annotation on an input sequence.</p>
 <div class="section" id="target">
 <h2>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.targets.Target">
-<em class="property">class </em><code class="descclassname">selene.targets.</code><code class="descname">Target</code><a class="reference internal" href="_modules/selene/targets/target.html#Target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.Target" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.targets.Target">
+<em class="property">class </em><code class="descclassname">selene_sdk.targets.</code><code class="descname">Target</code><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for all target feature classes.
 Target features classes are classes which define a way to access a
 “target feature” such as a label or annotation on an input sequence.</p>
 <dl class="method">
-<dt id="selene.targets.Target.get_feature_data">
-<code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/targets/target.html#Target.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.Target.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.targets.Target.get_feature_data">
+<code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target.get_feature_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the feature data for some coordinate.</p>
 </dd></dl>
 
@@ -244,9 +244,9 @@ Target features classes are classes which define a way to access a
 <div class="section" id="genomicfeatures">
 <h2>GenomicFeatures<a class="headerlink" href="#genomicfeatures" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.targets.GenomicFeatures">
-<em class="property">class </em><code class="descclassname">selene.targets.</code><code class="descname">GenomicFeatures</code><span class="sig-paren">(</span><em>input_path</em>, <em>features</em>, <em>feature_thresholds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.targets.target.Target</span></code></p>
+<dt id="selene_sdk.targets.GenomicFeatures">
+<em class="property">class </em><code class="descclassname">selene_sdk.targets.</code><code class="descname">GenomicFeatures</code><span class="sig-paren">(</span><em>input_path</em>, <em>features</em>, <em>feature_thresholds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.targets.target.Target</span></code></p>
 <p>Stores the dataset specifying sequence regions and features.
 Accepts a tabix-indexed <cite>*.bed</cite> file with the following columns,
 in order:</p>
@@ -260,26 +260,22 @@ addition columns following the five shown above will be ignored.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>input_path</strong> (<em>str</em>) – Path to the tabix-indexed dataset. Note that for the file to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_path</strong> (<em>str</em>) – Path to the tabix-indexed dataset. Note that for the file to
 be tabix-indexed, it must have been compressed with <cite>bgzip</cite>.
 Thus, <cite>input_path</cite> should be a <cite>*.gz</cite> file with a
-corresponding <cite>*.tbi</cite> file in the same directory.</p>
-</li>
-<li><p class="first"><strong>features</strong> (<em>list(str)</em>) – The non-redundant list of genomic features (i.e. labels)
-that will be predicted.</p>
-</li>
-<li><p class="first"><strong>feature_thresholds</strong> (<em>float or dict or types.FunctionType or None</em>) – Default is None. A genomic region is determined to be a
+corresponding <cite>*.tbi</cite> file in the same directory.</li>
+<li><strong>features</strong> (<em>list(str)</em>) – The non-redundant list of genomic features (i.e. labels)
+that will be predicted.</li>
+<li><strong>feature_thresholds</strong> (<em>float or dict or types.FunctionType or None</em>) – Default is None. A genomic region is determined to be a
 positive sample if at least one genomic feature peak takes
 up a proportion of the region greater than or equal to
-the threshold specified for that feature.</p>
-<ul class="simple">
-<li><cite>None</cite> - No thresholds specified. All features found in</li>
+the threshold specified for that feature.<ul>
+<li><cite>None</cite> - No thresholds specified. All features found in                   a query region are annotated to that region.</li>
+<li><cite>float</cite> - A single threshold applies to all the features                    in the dataset.</li>
+<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to                  threshold values (<cite>float</cite>), which thereby assigns                 different thresholds to different features. If a                 feature’s threshold is not specified in this                  dictionary, then we assume that a key <cite>“default”</cite>                 exists in the dictionary that has the default                  threshold value we should assign to the feature                  name that is absent from the dictionary keys.</li>
+<li><cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</li>
 </ul>
-<p>a query region are annotated to that region.
-* <cite>float</cite> - A single threshold applies to all the features                    in the dataset.
-* <cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to                  threshold values (<cite>float</cite>), which thereby assigns                 different thresholds to different features. If a                 feature’s threshold is not specified in this                  dictionary, then we assume that a key <cite>“default”</cite>                 exists in the dictionary that has the default                  threshold value we should assign to the feature                  name that is absent from the dictionary keys.
-* <cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</p>
 </li>
 </ul>
 </td>
@@ -293,13 +289,9 @@ where the index is the position of the feature in <cite>features</cite>.</li>
 where the index is the position of the feature in the input
 features.</li>
 <li><strong>feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – <ul>
-<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds</li>
+<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds        (<cite>float</cite>), where the threshold is the minimum overlap that a        feature annotation must have with a query region to be        considered a positive example of that feature.</li>
+<li><cite>None</cite> - No threshold specifications. Assumes that all features        returned by a tabix query are annotated to the query region.</li>
 </ul>
-<p>(<cite>float</cite>), where the threshold is the minimum overlap that a
-feature annotation must have with a query region to be
-considered a positive example of that feature.
-* <cite>None</cite> - No threshold specifications. Assumes that all features
-returned by a tabix query are annotated to the query region.</p>
 </li>
 </ul>
 </td>
@@ -307,8 +299,8 @@ returned by a tabix query are annotated to the query region.</p>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.targets.GenomicFeatures.get_feature_data">
-<code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.targets.GenomicFeatures.get_feature_data">
+<code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>For a sequence of length <span class="math notranslate nohighlight">\(L = end - start\)</span>, return the
 features’ one-hot encoding corresponding to that region. For
 instance, for <cite>n_features</cite>, each position in that sequence will
@@ -341,8 +333,8 @@ return a <cite>numpy.ndarray</cite> of zeros.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.targets.GenomicFeatures.is_positive">
-<code class="descname">is_positive</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/targets/genomic_features.html#GenomicFeatures.is_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.GenomicFeatures.is_positive" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.targets.GenomicFeatures.is_positive">
+<code class="descname">is_positive</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.is_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.is_positive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines whether the query the <cite>chrom</cite> queried contains any
 genomic features within the <span class="math notranslate nohighlight">\([start, end)\)</span> region. If so,
 the query is considered positive.</p>
@@ -384,10 +376,10 @@ in the queried region and return <cite>False</cite>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="utils.html" class="btn btn-neutral float-right" title="selene.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="selene_sdk.utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="sequences.html" class="btn btn-neutral" title="selene.sequences" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="sequences.html" class="btn btn-neutral" title="selene_sdk.sequences" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

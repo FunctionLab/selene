@@ -1,8 +1,8 @@
-selene.utils
+selene_sdk.utils
 ====================
 
-.. automodule:: selene.utils
-.. currentmodule:: selene.utils
+.. automodule:: selene_sdk.utils
+.. currentmodule:: selene_sdk.utils
 
 NonStrandSpecific
 -----------------

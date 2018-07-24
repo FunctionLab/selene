@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene &mdash; Selene master documentation</title>
+  <title>selene_sdk &mdash; Selene master documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="selene.interpret" href="interpret.html" />
+    <link rel="next" title="selene_sdk.interpret" href="interpret.html" />
     <link rel="prev" title="Extending Selene" href="overview/extending.html" /> 
 
   
@@ -100,12 +100,12 @@
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">selene</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">selene_sdk</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#trainmodel">TrainModel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="interpret.html">selene_sdk.interpret</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#sequence-logo">sequence_logo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
@@ -116,11 +116,11 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="predict.html">selene_sdk.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="samplers.html">selene_sdk.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
@@ -129,7 +129,7 @@
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="sequences.html">selene_sdk.sequences</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#sequence">Sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#genome">Genome</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#proteome">Proteome</a></li>
@@ -138,12 +138,12 @@
 <li class="toctree-l2"><a class="reference internal" href="sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="targets.html">selene.targets</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="targets.html">selene_sdk.targets</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="targets.html#target">Target</a></li>
 <li class="toctree-l2"><a class="reference internal" href="targets.html#genomicfeatures">GenomicFeatures</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">selene_sdk.utils</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
@@ -199,7 +199,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>selene</li>
+      <li>selene_sdk</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -218,14 +218,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene">
-<span id="selene"></span><h1>selene<a class="headerlink" href="#module-selene" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-selene_sdk">
+<span id="selene-sdk"></span><h1>selene_sdk<a class="headerlink" href="#module-selene_sdk" title="Permalink to this headline">¶</a></h1>
 <p>This is the main module for Selene.</p>
 <div class="section" id="trainmodel">
 <h2>TrainModel<a class="headerlink" href="#trainmodel" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.TrainModel">
-<em class="property">class </em><code class="descclassname">selene.</code><code class="descname">TrainModel</code><span class="sig-paren">(</span><em>model</em>, <em>data_sampler</em>, <em>loss_criterion</em>, <em>optimizer_class</em>, <em>optimizer_kwargs</em>, <em>batch_size</em>, <em>max_steps</em>, <em>report_stats_every_n_steps</em>, <em>output_dir</em>, <em>save_checkpoint_every_n_steps=1000</em>, <em>report_gt_feature_n_positives=10</em>, <em>n_validation_samples=None</em>, <em>n_test_samples=None</em>, <em>cpu_n_threads=32</em>, <em>use_cuda=False</em>, <em>data_parallel=False</em>, <em>logging_verbosity=2</em>, <em>checkpoint_resume=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/train_model.html#TrainModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.TrainModel" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.TrainModel">
+<em class="property">class </em><code class="descclassname">selene_sdk.</code><code class="descname">TrainModel</code><span class="sig-paren">(</span><em>model</em>, <em>data_sampler</em>, <em>loss_criterion</em>, <em>optimizer_class</em>, <em>optimizer_kwargs</em>, <em>batch_size</em>, <em>max_steps</em>, <em>report_stats_every_n_steps</em>, <em>output_dir</em>, <em>save_checkpoint_every_n_steps=1000</em>, <em>report_gt_feature_n_positives=10</em>, <em>n_validation_samples=None</em>, <em>n_test_samples=None</em>, <em>cpu_n_threads=32</em>, <em>use_cuda=False</em>, <em>data_parallel=False</em>, <em>logging_verbosity=2</em>, <em>checkpoint_resume=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class ties together the various objects and methods needed to
 train and validate a model.</p>
@@ -274,10 +274,10 @@ using <cite>torch.load</cite>.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
-<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene.samplers.Sampler" title="selene.samplers.Sampler"><em>selene.samplers.Sampler</em></a>) – The example generator.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
+<li><strong>sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
 <li><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</li>
-<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
+<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batch to use during training.</li>
 <li><strong>max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</li>
 <li><strong>nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to report summary statistics.</li>
@@ -292,8 +292,8 @@ using <cite>torch.load</cite>.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.TrainModel.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/train_model.html#TrainModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.TrainModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.TrainModel.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures the model test performance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -310,8 +310,8 @@ the test set.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.TrainModel.train">
-<code class="descname">train</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/train_model.html#TrainModel.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.TrainModel.train" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.TrainModel.train">
+<code class="descname">train</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model on a batch of data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -326,14 +326,14 @@ the test set.</td>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.TrainModel.train_and_validate">
-<code class="descname">train_and_validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/train_model.html#TrainModel.train_and_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.TrainModel.train_and_validate" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.TrainModel.train_and_validate">
+<code class="descname">train_and_validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train_and_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.train_and_validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model and measures validation performance.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.TrainModel.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/train_model.html#TrainModel.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.TrainModel.validate" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.TrainModel.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures model validation performance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -355,8 +355,8 @@ the validation set.</td>
 <div class="section" id="evaluatemodel">
 <h2>EvaluateModel<a class="headerlink" href="#evaluatemodel" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.EvaluateModel">
-<em class="property">class </em><code class="descclassname">selene.</code><code class="descname">EvaluateModel</code><span class="sig-paren">(</span><em>model</em>, <em>criterion</em>, <em>data_sampler</em>, <em>features</em>, <em>trained_model_path</em>, <em>output_dir</em>, <em>batch_size=64</em>, <em>n_test_samples=None</em>, <em>report_gt_feature_n_positives=10</em>, <em>use_cuda=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/evaluate_model.html#EvaluateModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.EvaluateModel" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.EvaluateModel">
+<em class="property">class </em><code class="descclassname">selene_sdk.</code><code class="descname">EvaluateModel</code><span class="sig-paren">(</span><em>model</em>, <em>criterion</em>, <em>data_sampler</em>, <em>features</em>, <em>trained_model_path</em>, <em>output_dir</em>, <em>batch_size=64</em>, <em>n_test_samples=None</em>, <em>report_gt_feature_n_positives=10</em>, <em>use_cuda=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Evaluate model on a test set of sequences with known targets.</p>
 <p>TODO: include a data_parallel parameter?</p>
@@ -380,9 +380,9 @@ Should be a power of 2.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
 <li><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</li>
-<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene.samplers.Sampler" title="selene.samplers.Sampler"><em>selene.samplers.Sampler</em></a>) – The example generator.</li>
+<li><strong>sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
 <li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The batch size to process examples. Should be a power of 2.</li>
 </ul>
@@ -391,8 +391,8 @@ Should be a power of 2.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.EvaluateModel.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/evaluate_model.html#EvaluateModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.EvaluateModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.EvaluateModel.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Passes all samples retrieved from the sampler to the model in
 batches and returns the predictions. Also reports the model’s
 performance on these examples.</p>
@@ -423,7 +423,7 @@ AUPR) reported for each feature the model predicts.</td>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="interpret.html" class="btn btn-neutral float-right" title="selene.interpret" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="interpret.html" class="btn btn-neutral float-right" title="selene_sdk.interpret" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="overview/extending.html" class="btn btn-neutral" title="Extending Selene" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
