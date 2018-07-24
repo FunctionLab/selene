@@ -21,7 +21,8 @@ First, download the latest commits from the source repository:
 ```
 git clone https://github.com/FunctionLab/selene
 ```
-After downloading the repository, install the dependencies as follows:
-```
-TODO
+
+If you plan on working in the `selene` repository directly, we recommend setting up a conda environment using `selene-cpu.yml` or `selene-gpu.yml` and activating it. Please also build the Cython files by running
+```sh
+python setup.py build_ext --inplace
 ```

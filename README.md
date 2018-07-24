@@ -6,22 +6,30 @@ You have found *selene*, a Python library and command line interface for trainin
 
 ## Installation
 
-Installing selene with [Anaconda](https://www.anaconda.com/download/):
-@TODO: Add line on installation via anaconda.
+### Installing selene with pip:
+```sh
+pip install selene-sdk
+```
 
-Installing selene with pip:
-@TODO: Add line on installation via pip.
+### Installing selene with [Anaconda](https://www.anaconda.com/download/):
+```sh
+conda install selene-sdk
+```
 
-Installing selene from source:
-@TODO: Add line on installation from source.
-
+### Installing selene from source:
+```sh
+git clone git@github.com:FunctionLab/selene
+```
+If you plan on working in the `selene` repository directly, we recommend setting up a conda environment using `selene-cpu.yml` or `selene-gpu.yml` and activating it. Please also build the Cython files by running
+```sh
+python setup.py build_ext --inplace
+```
 
 ## Tutorials and examples
 
-Tutorials for selene are available [here](https://selene.flatironinstitute.org/tutorials/).
-We recommend starting with [this tutorial](https://selene.flatironinstitute.org/tutorials/getting_started_with_selene.html).
+Tutorials for selene are available [here](https://github.com/FunctionLab/selene/tree/master/tutorials).
 
 ## Documentation
 
-The documentation for selene is available [here](https://selene.flatironinstitute.org/docs/).
+The documentation for selene is available [here](https://selene.flatironinstitute.org/).
 
