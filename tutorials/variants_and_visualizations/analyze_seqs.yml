@@ -1,0 +1,41 @@
+---
+ops: [analyze]
+model: {
+    # TODO: please update this with the absolute path to the model file
+    file: /mnt/home/kchen/Documents/selene-examples/case1_training_example/data/deeperdeepsea.py, 
+    class: DeeperDeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 919,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+analyze_sequences: !obj:selene.predict.AnalyzeSequences {
+    sequence_length: 1000,
+    features: !obj:selene.utils.load_features_list {
+        input_path: ./deepsea_features.txt
+    },
+    trained_model_path: ./0611_deeperdeepsea.pth.tar,
+    use_cuda: True,
+    reference_sequence: !obj:selene.sequences.Genome {
+        input_path: hg19.fasta
+    }
+}
+in_silico_mutagenesis: {
+    fa_files: [
+        regulatory_mutations.fa 
+    ],
+    save_data: ["logits"],
+    use_sequence_name: True,
+    output_dir: ./regulatory_mutations_output
+}
+variant_effect_prediction: {
+    vcf_files: [
+        25k_example_variants.vcf
+    ],
+    save_data: ["abs_diffs"],
+    output_dir: ./example_variants_output
+}
+random_seed: 1000
+...
