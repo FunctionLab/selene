@@ -10,3 +10,10 @@ TrainModel
     :members:
     :show-inheritance:
 
+EvaluateModel
+---------------------------------
+
+.. autoclass:: EvaluateModel
+    :members:
+    :show-inheritance:
+

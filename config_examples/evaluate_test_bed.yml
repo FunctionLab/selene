@@ -1,0 +1,34 @@
+---
+ops: [evaluate]
+model: {
+    file: /absolute/path/to/model/architecture.py, 
+    class: ModelArchitectureClassName,
+    sequence_length: 1000,
+    n_classes_to_predict: 2,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+sampler: !obj:selene_sdk.samplers.BedFileSampler {
+    filepath: /path/to/file.bed,  # generated from selene_sdk training (`test_data.bed`) 
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+        input_path: /path/to/genome/hg.fa
+    },
+    n_samples: n_samples_in_file,  # wc -l file.bed
+    targets_avail: True,
+    sequence_length: 1000,
+    n_features: 2  # should match `n_classes_to_predict` in `model`
+}
+evaluate_model: !obj:selene_sdk.EvaluateModel {
+    batch_size: 64,
+    features:  !obj:selene_sdk.utils.load_features_list {
+        input_path: /path/to/distinct_features.txt
+    },
+    trained_model_path: /path/to/trained_model.pth.tar,
+    use_cuda: True, 
+    report_gt_feature_n_positives: 50,
+    output_dir: /path/to/output_dir
+}
+random_seed: 1337
+...

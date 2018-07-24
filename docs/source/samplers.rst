@@ -24,6 +24,13 @@ IntervalsSampler
     :members:
     :show-inheritance:
 
+RandomPositionsSampler
+----------------------------
+
+.. autoclass:: RandomPositionsSampler
+    :members:
+    :show-inheritance:
+
 MatFileSampler
 ----------------------------
 
@@ -31,4 +38,10 @@ MatFileSampler
     :members:
     :show-inheritance:
 
+BedFileSampler
+----------------------------
+
+.. autoclass:: BedFileSampler
+    :members:
+    :show-inheritance:
 
