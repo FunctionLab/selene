@@ -90,15 +90,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">selene.interpret</a><ul>
@@ -106,26 +110,23 @@
 <li class="toctree-l2"><a class="reference internal" href="#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
@@ -143,9 +144,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -536,6 +540,147 @@ position, where <span class="math notranslate nohighlight">\(L\)</span> is the l
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If an unsupported <cite>base_scaling</cite> or <cite>position_scaling</cite> is
 entered.</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="load-variant-abs-diff-scores">
+<h2>load_variant_abs_diff_scores<a class="headerlink" href="#load-variant-abs-diff-scores" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.interpret.load_variant_abs_diff_scores">
+<code class="descclassname">selene.interpret.</code><code class="descname">load_variant_abs_diff_scores</code><span class="sig-paren">(</span><em>input_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/interpret/vis.html#load_variant_abs_diff_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.interpret.load_variant_abs_diff_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the variant data, labels, and feature names from a diff scores
+file output from variant effect prediction.</p>
+<p>TODO: should we move this out of <cite>vis.py</cite>?</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input_path</strong> (<em>str</em>) – Path to the input file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><ul class="simple">
+<li><cite>tuple[0]</cite> is the matrix of absolute difference scores. The rows
+are the variants and the columns are the features for which the
+model makes predictions.</li>
+<li><cite>tuple[1]</cite> is the list of variant labels. Each tuple contains
+(chrom, pos, name, ref, alt).</li>
+<li><cite>tuple[2]</cite> is the list of features.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(np.ndarray, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>))</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="variant-diffs-scatter-plot">
+<h2>variant_diffs_scatter_plot<a class="headerlink" href="#variant-diffs-scatter-plot" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.interpret.variant_diffs_scatter_plot">
+<code class="descclassname">selene.interpret.</code><code class="descname">variant_diffs_scatter_plot</code><span class="sig-paren">(</span><em>data</em>, <em>labels</em>, <em>features</em>, <em>output_path</em>, <em>filter_features=None</em>, <em>labels_sort_fn=&lt;function ordered_variants_and_indices&gt;</em>, <em>nth_percentile=None</em>, <em>hg_reference_version=None</em>, <em>threshold_line=None</em>, <em>auto_open=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/interpret/vis.html#variant_diffs_scatter_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.interpret.variant_diffs_scatter_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays each variant’s max probability difference across features
+as a point in a scatter plot. The points in the scatter plot are
+ordered by the variant chromosome and position by default. Variants can
+be sorted differently by passing in a new <cite>labels_sort_fn</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.ndarray</em>) – Absolute difference scores for variants across all features that a
+model predicts. This is the first value in the tuple returned by
+<cite>load_variant_abs_diff_scores</cite>.</li>
+<li><strong>labels</strong> (<em>list(tuple(str))</em>) – A list of variant labels. This is the second value in the tuple
+returned by <cite>load_variant_abs_diff_scores</cite>.</li>
+<li><strong>features</strong> (<em>list(str)</em>) – A list of the features the model predicts. This is the third value
+in the tuple returned by <cite>load_variant_abs_diff_scores</cite>.</li>
+<li><strong>output_path</strong> (<em>str</em>) – Path to output file. Must have ‘.html’ extension.</li>
+<li><strong>filter_features</strong> (<em>types.FunctionType or None, optional</em>) – Default is None. A function that takes in a <cite>list(str)</cite> of features
+and returns the <cite>list(int)</cite> of feature indices over which we would
+compute the max(probability difference) for each variant. For example,
+a user may only want to visualize the max probability difference
+for TF binding features. If <cite>None</cite>, uses all the features.</li>
+<li><strong>labels_sort_fn</strong> (<em>types.FunctionType, optional</em>) – Default is <cite>ordered_variants_and_indices</cite>. A function that takes
+in a <cite>list(tuple(str))</cite> of labels corresponding to the rows in <cite>data</cite>
+and returns a <cite>tuple(list(tuple), list(int))</cite>, where the first value
+is the ordered list of variant labels and the second value is the
+ordered list of indices for those variant labels. By default,
+variants are sorted by chromosome and position.</li>
+<li><strong>nth_percentile</strong> (<em>int [0, 100] or None, optional</em>) – Default is None. If <cite>nth_percentile</cite> is not None, only displays the
+variants with a max absolute difference score within the
+<cite>nth_percentile</cite> of scores.</li>
+<li><strong>hg_reference_version</strong> (<em>str {“hg19”, “hg38”} or None, optional</em>) – Default is None. On hover, we can display the gene(s) closest to
+each variant if <cite>hg_reference_version</cite> is not None, where closest
+can be a variant within a gene interval (where genes and
+their coordinates are taken from level 1 &amp; 2 protein-coding genes
+in gencode v28) or near a gene. In the future, we will allow users
+to specify their own genome file so that this information can
+be annotated to variants from other organisms, other genome versions,
+etc.</li>
+<li><strong>threshold_line</strong> (<em>float or None, optional</em>) – Default is None. If <cite>threshold_line</cite> is not None, draws a horizontal
+line at the specified threshold. Helps focus the visual on variants
+above a certain threshold.</li>
+<li><strong>auto_open</strong> (<em>bool, optional</em>) – Default is False. If <cite>auto_open</cite>, will automatically open a web
+browser that displays the plotted HTML file.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The generated Plotly figure.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">plotly.graph_objs.graph_objs.Figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="ordered-variants-and-indices">
+<h2>ordered_variants_and_indices<a class="headerlink" href="#ordered-variants-and-indices" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.interpret.ordered_variants_and_indices">
+<code class="descclassname">selene.interpret.</code><code class="descname">ordered_variants_and_indices</code><span class="sig-paren">(</span><em>labels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/interpret/vis.html#ordered_variants_and_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.interpret.ordered_variants_and_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ordered variant labels, where the labels are sorted by chromosome
+and position, and the indices corresponding to the sort,</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>labels</strong> (<em>list(tuple(str))</em>) – The list of variant labels. Each label is a tuple of
+(chrom, pos, name, ref, alt).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The first value is the ordered list of labels. Each label
+is a tuple of (chrom, pos, ref, alt). The second value
+is the ordered list of label indices.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>))</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="sort-standard-chrs">
+<h2>sort_standard_chrs<a class="headerlink" href="#sort-standard-chrs" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.interpret.sort_standard_chrs">
+<code class="descclassname">selene.interpret.</code><code class="descname">sort_standard_chrs</code><span class="sig-paren">(</span><em>chrom</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/interpret/vis.html#sort_standard_chrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.interpret.sort_standard_chrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value on which the
+standard chromosomes can be sorted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>chrom</strong> (<em>str</em>) – The chromosome</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The value on which to sort</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
 </tr>
 </tbody>
 </table>

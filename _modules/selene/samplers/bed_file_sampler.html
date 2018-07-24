@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.samplers.mat_file_sampler &mdash; Selene master documentation</title>
+  <title>selene.samplers.bed_file_sampler &mdash; Selene master documentation</title>
   
 
   
@@ -199,7 +199,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene.samplers.mat_file_sampler</li>
+      <li>selene.samplers.bed_file_sampler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -214,108 +214,90 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene.samplers.mat_file_sampler</h1><div class="highlight"><pre>
+  <h1>Source code for selene.samplers.bed_file_sampler</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides the `MatFileSampler` class and its supporting</span>
-<span class="sd">methods.</span>
+<span class="sd">This module provides the BedFileSampler class.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.io</span>
 
-
-<span class="k">def</span> <span class="nf">load_mat_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">sequence_key</span><span class="p">,</span> <span class="n">targets_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BedFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.BedFileSampler">[docs]</a><span class="k">class</span> <span class="nc">BedFileSampler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Loads data from a `*.mat` file or a `*.h5` file.</span>
+<span class="sd">    A sampler for which the dataset is loaded directly from a `*.bed` file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    filepath : str</span>
 <span class="sd">        The path to the file to load the data from.</span>
-<span class="sd">    sequence_key : str</span>
-<span class="sd">        The key for the sequences data matrix.</span>
-<span class="sd">    targets_key : str, optional</span>
-<span class="sd">        Default is None. The key for the targets data matrix.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    sequences, targets : tuple(numpy.ndarray, numpy.ndarray)</span>
-<span class="sd">        A tuple containing the numeric representation of the</span>
-<span class="sd">        sequence examples and their corresponding labels.</span>
-<span class="sd">        If no `targets_key` is specified, `targets` returned</span>
-<span class="sd">        is None. The shape of `sequences` will be</span>
-<span class="sd">        :math:`S \\times N \\times L`, where :math:`S` is</span>
-<span class="sd">        the total number of samples, :math:`N` is the</span>
-<span class="sd">        size of the sequence type&#39;s alphabet, and :math:`L`</span>
-<span class="sd">        is the sequence length.</span>
-<span class="sd">        The shape of `targets` will be :math:`S \\times F`,</span>
-<span class="sd">        where :math:`F` is the number of features.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>  <span class="c1"># see if we can load the file using scipy first</span>
-        <span class="n">mat</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">targets_key</span><span class="p">:</span>
-            <span class="n">targets</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">targets_key</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="n">sequence_key</span><span class="p">],</span> <span class="n">targets</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">mat</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">sequences</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">sequence_key</span><span class="p">][()]</span>
-        <span class="n">targets</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">targets_key</span><span class="p">:</span>
-            <span class="n">targets</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">targets_key</span><span class="p">][()]</span>
-        <span class="n">mat</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="MatFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.MatFileSampler">[docs]</a><span class="k">class</span> <span class="nc">MatFileSampler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A sampler for which the dataset is loaded directly from a `*.mat` file.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    filepath : str</span>
-<span class="sd">        The path to the file to load the data from.</span>
-<span class="sd">    sequence_key : str</span>
-<span class="sd">        The key for the sequences data matrix.</span>
-<span class="sd">    targets_key : str, optional</span>
-<span class="sd">        Default is None. The key for the targets data matrix.</span>
-<span class="sd">    random_seed : int, optional</span>
-<span class="sd">        Default is 436. Sets the random seed for sampling.</span>
-<span class="sd">    shuffle_file : bool, optional</span>
-<span class="sd">        Default is True. Shuffle the data in the matrix before</span>
-<span class="sd">        sampling from it.</span>
+<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">        A reference sequence from which to create examples.</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        Number of lines in the file. (`wc -l &lt;filepath&gt;`)</span>
+<span class="sd">    sequence_length : int or None, optional</span>
+<span class="sd">        Default is None. If the coordinates of each sample in the BED file</span>
+<span class="sd">        already account for the full sequence (that is,</span>
+<span class="sd">        `end - start = sequence_length`), there is no need to specify</span>
+<span class="sd">        the sequence length. If `sequence_length` is not None, the length</span>
+<span class="sd">        of each sample will be checked to determine whether the sample</span>
+<span class="sd">        coordinates need to be truncated or expanded to reach the</span>
+<span class="sd">        sequence length specified in the model architecture.</span>
+<span class="sd">    targets_avail : bool, optional</span>
+<span class="sd">        Default is False. If `targets_avail`, assumes that it is the</span>
+<span class="sd">        last column of the `*.bed` file. The last column should contain</span>
+<span class="sd">        the indices, separated by semicolons, of features (classes) found</span>
+<span class="sd">        within a given sample&#39;s coordinates (e.g. 0;1;45;60). This assumes</span>
+<span class="sd">        that we are only looking for the absence/presence of each feature</span>
+<span class="sd">        within the interval.</span>
+<span class="sd">    n_features : int or None, optional</span>
+<span class="sd">        Default is None. If `targets_avail` is True, must specify</span>
+<span class="sd">        `n_features`, the total number of features (classes).</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
+<span class="sd">    filepath : str</span>
+<span class="sd">        The path to the file to load the data from.</span>
+<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">        A reference sequence from which to create examples.</span>
 <span class="sd">    n_samples : int</span>
-<span class="sd">        The number of samples in the data matrix.</span>
+<span class="sd">        Number of lines in the file. (`wc -l &lt;filepath&gt;`)</span>
+<span class="sd">    sequence_length : int or None, optional</span>
+<span class="sd">        Default is None. If the coordinates of each sample in the BED file</span>
+<span class="sd">        already account for the full sequence (that is,</span>
+<span class="sd">        `end - start = sequence_length`), there is no need to specify</span>
+<span class="sd">        the sequence length. If `sequence_length` is not None, the length</span>
+<span class="sd">        of each sample will be checked to determine whether the sample</span>
+<span class="sd">        coordinates need to be truncated or expanded to reach the</span>
+<span class="sd">        sequence length specified in the model architecture.</span>
+<span class="sd">    targets_avail : bool</span>
+<span class="sd">        If `targets_avail`, assumes that it is the last column of the `*.bed`</span>
+<span class="sd">        file. The last column should contain the indices, separated by</span>
+<span class="sd">        semicolons, of features (classes) found within a given sample&#39;s</span>
+<span class="sd">        coordinates (e.g. 0;1;45;60). This assumes that we are only looking</span>
+<span class="sd">        or the absence/presence of each feature within the interval.</span>
+<span class="sd">    n_features : int or None</span>
+<span class="sd">        If `targets_avail` is True, must specify</span>
+<span class="sd">        `n_features`, the total number of features (classes).</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">filepath</span><span class="p">,</span>
-                 <span class="n">sequence_key</span><span class="p">,</span>
-                 <span class="n">targets_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">random_seed</span><span class="o">=</span><span class="mi">436</span><span class="p">,</span>
-                 <span class="n">shuffle_file</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">reference_sequence</span><span class="p">,</span>
+                 <span class="n">n_samples</span><span class="p">,</span>
+                 <span class="n">sequence_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">targets_avail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">n_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a new `MatFileSampler` object.</span>
+<span class="sd">        Constructs a new `BedFileSampler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sequences_mat</span><span class="p">,</span> <span class="n">targets_mat</span> <span class="o">=</span> <span class="n">load_mat_file</span><span class="p">(</span>
-            <span class="n">filepath</span><span class="p">,</span> <span class="n">sequence_key</span><span class="p">,</span> <span class="n">targets_key</span><span class="o">=</span><span class="n">targets_key</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span> <span class="o">=</span> <span class="n">sequences_mat</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="o">=</span> <span class="n">targets_mat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">filepath</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span> <span class="o">=</span> <span class="n">reference_sequence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="n">sequence_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targets_avail</span> <span class="o">=</span> <span class="n">targets_avail</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="n">n_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="n">n_samples</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span> <span class="o">=</span> <span class="n">shuffle_file</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">)</span>
-
-<div class="viewcode-block" id="MatFileSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.MatFileSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="BedFileSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.BedFileSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draws a mini-batch of examples and their corresponding</span>
 <span class="sd">        labels.</span>
@@ -337,26 +319,68 @@
 <span class="sd">            :math:`N` is the size of the sequence type&#39;s alphabet.</span>
 <span class="sd">            The shape of `targets` will be :math:`B \\times F`,</span>
 <span class="sd">            where :math:`F` is the number of features.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sample_up_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">+</span> <span class="n">batch_size</span>
-        <span class="n">use_indices</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">sample_up_to</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">use_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">[:</span><span class="n">batch_size</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">use_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span><span class="p">:</span><span class="n">sample_up_to</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">+=</span> <span class="n">batch_size</span>
 
-        <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="p">[</span><span class="n">use_indices</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span><span class="p">[</span><span class="n">use_indices</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_avail</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="c1"># TODO: add functionality to shuffle the file if sampler</span>
+                <span class="c1"># reaches the end of the file.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">chrom</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">strand_side</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">strand_side</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_avail</span><span class="p">:</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">strand_side</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="c1"># if strand_side is None, assume strandedness does not matter.</span>
+            <span class="c1"># can change this to randomly selecting +/- later</span>
+            <span class="n">strand_side</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">pad_l</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+                <span class="n">pad_r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">start</span> <span class="o">-</span> <span class="n">pad_l</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">end</span> <span class="o">+</span> <span class="n">pad_r</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
+
+            <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
+                <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand_side</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sequence</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_avail</span><span class="p">:</span>
+                <span class="n">tgts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="p">]</span>
+                <span class="n">tgts</span><span class="p">[</span><span class="n">features</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+
+        <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sequences</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_avail</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sequences</span><span class="p">,</span></div>
 
-<div class="viewcode-block" id="MatFileSampler.get_data"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.MatFileSampler.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BedFileSampler.get_data"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.BedFileSampler.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method fetches a subset of the data from the sampler,</span>
 <span class="sd">        divided into batches.</span>
@@ -376,6 +400,7 @@
 <span class="sd">            the shape :math:`B \\times L \\times N`, where :math:`B`</span>
 <span class="sd">            is `batch_size`, :math:`L` is the sequence length,</span>
 <span class="sd">            and :math:`N` is the size of the sequence type&#39;s alphabet.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">n_samples</span><span class="p">:</span>
             <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
@@ -391,7 +416,7 @@
         <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seqs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sequences</span></div>
 
-<div class="viewcode-block" id="MatFileSampler.get_data_and_targets"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.MatFileSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BedFileSampler.get_data_and_targets"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.BedFileSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method fetches a subset of the sequence data and</span>
 <span class="sd">        targets from the sampler, divided into batches.</span>
@@ -417,11 +442,12 @@
 <span class="sd">            :math:`F` is the number of features. Further,</span>
 <span class="sd">            `target_matrix` is of the shape :math:`S \\times F`, where</span>
 <span class="sd">            :math:`S =` `n_samples`.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_avail</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;No targets matrix was specified during sampler &quot;</span>
-                <span class="s2">&quot;initialization. Please use `get_data` instead.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;No targets are specified in the *.bed file. &quot;</span>
+                <span class="s2">&quot;Please use `get_data` instead.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">n_samples</span><span class="p">:</span>
             <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
         <span class="n">sequences_and_targets</span> <span class="o">=</span> <span class="p">[]</span>
@@ -437,7 +463,6 @@
         <span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">remainder</span><span class="p">)</span>
         <span class="n">sequences_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
         <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
-        <span class="c1"># TODO: should not assume targets are always integers</span>
         <span class="n">targets_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">targets_mat</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sequences_and_targets</span><span class="p">,</span> <span class="n">targets_mat</span></div></div>
 </pre></div>

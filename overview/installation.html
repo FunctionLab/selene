@@ -90,15 +90,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../interpret.html">selene.interpret</a><ul>
@@ -106,26 +110,23 @@
 <li class="toctree-l2"><a class="reference internal" href="../interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../sequences.html">selene.sequences</a><ul>
@@ -143,9 +144,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -216,8 +220,31 @@
             
   <div class="section" id="installation">
 <span id="installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>TODO</p>
-<hr class="docutils" />
+<p>Selene can be installed with <a class="reference external" href="https://pypi.org/project/pip/">pip</a>.
+To install with pip, simply type the following commands into the terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
+</pre></div>
+</div>
+<div class="section" id="installing-with-anaconda">
+<span id="installing-with-anaconda"></span><h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
+<p>Selene can be installed with <a class="reference external" href="https://www.anaconda.com/download/">conda</a> as well.
+To install with conda, use the following command in your terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-from-source">
+<span id="installing-from-source"></span><h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
+<p>Selene can also be installed from source.
+First, download the latest commits from the source repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">FunctionLab</span><span class="o">/</span><span class="n">selene</span>
+</pre></div>
+</div>
+<p>If you plan on working in the <code class="docutils literal notranslate"><span class="pre">selene</span></code> repository directly, we recommend setting up a conda environment using <code class="docutils literal notranslate"><span class="pre">selene-cpu.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">selene-gpu.yml</span></code> and activating it. Please also build the Cython files by running</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
+</pre></div>
+</div>
+</div>
 </div>
 
 

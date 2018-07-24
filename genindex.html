@@ -89,15 +89,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
@@ -105,26 +109,23 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
@@ -142,9 +143,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -226,6 +230,7 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -271,6 +276,8 @@
         <li><a href="sequences.html#selene.sequences.Sequence.BASES_ARR">(selene.sequences.Sequence attribute)</a>
 </li>
       </ul></li>
+      <li><a href="samplers.html#selene.samplers.BedFileSampler">BedFileSampler (class in selene.samplers)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -313,7 +320,15 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="selene.html#selene.TrainModel.evaluate">evaluate() (selene.TrainModel method)</a>
+      <li><a href="selene.html#selene.EvaluateModel.evaluate">evaluate() (selene.EvaluateModel method)</a>
+
+      <ul>
+        <li><a href="selene.html#selene.TrainModel.evaluate">(selene.TrainModel method)</a>
+</li>
+      </ul></li>
+      <li><a href="selene.html#selene.EvaluateModel">EvaluateModel (class in selene)</a>
+</li>
+      <li><a href="utils.html#selene.utils.execute">execute() (in module selene.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -337,15 +352,23 @@
 </li>
       <li><a href="sequences.html#selene.sequences.Genome.get_chrs">get_chrs() (selene.sequences.Genome method)</a>
 </li>
-      <li><a href="samplers.html#selene.samplers.IntervalsSampler.get_data_and_targets">get_data_and_targets() (selene.samplers.IntervalsSampler method)</a>
+      <li><a href="samplers.html#selene.samplers.BedFileSampler.get_data">get_data() (selene.samplers.BedFileSampler method)</a>
+
+      <ul>
+        <li><a href="samplers.html#selene.samplers.MatFileSampler.get_data">(selene.samplers.MatFileSampler method)</a>
+</li>
+      </ul></li>
+      <li><a href="samplers.html#selene.samplers.BedFileSampler.get_data_and_targets">get_data_and_targets() (selene.samplers.BedFileSampler method)</a>
 
       <ul>
         <li><a href="samplers.html#selene.samplers.MatFileSampler.get_data_and_targets">(selene.samplers.MatFileSampler method)</a>
 </li>
+        <li><a href="samplers.html#selene.samplers.OnlineSampler.get_data_and_targets">(selene.samplers.OnlineSampler method)</a>
+</li>
         <li><a href="samplers.html#selene.samplers.Sampler.get_data_and_targets">(selene.samplers.Sampler method)</a>
 </li>
       </ul></li>
-      <li><a href="samplers.html#selene.samplers.IntervalsSampler.get_dataset_in_batches">get_dataset_in_batches() (selene.samplers.IntervalsSampler method)</a>
+      <li><a href="samplers.html#selene.samplers.OnlineSampler.get_dataset_in_batches">get_dataset_in_batches() (selene.samplers.OnlineSampler method)</a>
 </li>
       <li><a href="sequences.html#selene.sequences.Genome.get_encoding_from_coords">get_encoding_from_coords() (selene.sequences.Genome method)</a>
 
@@ -365,6 +388,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="samplers.html#selene.samplers.OnlineSampler.get_feature_from_index">get_feature_from_index() (selene.samplers.OnlineSampler method)</a>
 </li>
+      <li><a href="utils.html#selene.utils.get_indices_and_probabilities">get_indices_and_probabilities() (in module selene.utils)</a>
+</li>
+      <li><a href="predict.html#selene.predict.AnalyzeSequences.get_predictions_for_fasta_file">get_predictions_for_fasta_file() (selene.predict.AnalyzeSequences method)</a>
+</li>
       <li><a href="sequences.html#selene.sequences.Proteome.get_prot_lens">get_prot_lens() (selene.sequences.Proteome method)</a>
 </li>
       <li><a href="sequences.html#selene.sequences.Proteome.get_prots">get_prots() (selene.sequences.Proteome method)</a>
@@ -383,13 +410,11 @@
       </ul></li>
       <li><a href="samplers.html#selene.samplers.OnlineSampler.get_sequence_from_encoding">get_sequence_from_encoding() (selene.samplers.OnlineSampler method)</a>
 </li>
-      <li><a href="samplers.html#selene.samplers.IntervalsSampler.get_test_set">get_test_set() (selene.samplers.IntervalsSampler method)</a>
+      <li><a href="samplers.html#selene.samplers.OnlineSampler.get_test_set">get_test_set() (selene.samplers.OnlineSampler method)</a>
 </li>
-      <li><a href="samplers.html#selene.samplers.IntervalsSampler.get_validation_set">get_validation_set() (selene.samplers.IntervalsSampler method)</a>
+      <li><a href="samplers.html#selene.samplers.OnlineSampler.get_validation_set">get_validation_set() (selene.samplers.OnlineSampler method)</a>
 
       <ul>
-        <li><a href="samplers.html#selene.samplers.MatFileSampler.get_validation_set">(selene.samplers.MatFileSampler method)</a>
-</li>
         <li><a href="samplers.html#selene.samplers.Sampler.get_validation_set">(selene.samplers.Sampler method)</a>
 </li>
       </ul></li>
@@ -411,6 +436,8 @@
         <li><a href="predict.predict_handlers.html#selene.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions">(selene.predict.predict_handlers.WriteRefAltHandler method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="predict.predict_handlers.html#selene.predict.predict_handlers.DiffScoreHandler.handle_NA">handle_NA() (selene.predict.predict_handlers.DiffScoreHandler method)</a>
 
       <ul>
@@ -423,10 +450,6 @@
         <li><a href="predict.predict_handlers.html#selene.predict.predict_handlers.WriteRefAltHandler.handle_NA">(selene.predict.predict_handlers.WriteRefAltHandler method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="predict.html#selene.predict.AnalyzeSequences.handle_ref_alt_predictions">handle_ref_alt_predictions() (selene.predict.AnalyzeSequences method)</a>
-</li>
       <li><a href="interpret.html#selene.interpret.heatmap">heatmap() (in module selene.interpret)</a>
 </li>
   </ul></td>
@@ -453,6 +476,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="utils.html#selene.utils.initialize_logger">initialize_logger() (in module selene.utils)</a>
 </li>
+      <li><a href="utils.html#selene.utils.initialize_model">initialize_model() (in module selene.utils)</a>
+</li>
       <li><a href="utils.html#selene.utils.instantiate">instantiate() (in module selene.utils)</a>
 </li>
       <li><a href="samplers.html#selene.samplers.IntervalsSampler">IntervalsSampler (class in selene.samplers)</a>
@@ -471,9 +496,13 @@
 </li>
       <li><a href="utils.html#selene.utils.load_features_list">load_features_list() (in module selene.utils)</a>
 </li>
+      <li><a href="utils.html#selene.utils.load_model_from_state_dict">load_model_from_state_dict() (in module selene.utils)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="utils.html#selene.utils.load_path">load_path() (in module selene.utils)</a>
+</li>
+      <li><a href="interpret.html#selene.interpret.load_variant_abs_diff_scores">load_variant_abs_diff_scores() (in module selene.interpret)</a>
 </li>
       <li><a href="predict.predict_handlers.html#selene.predict.predict_handlers.LogitScoreHandler">LogitScoreHandler (class in selene.predict.predict_handlers)</a>
 </li>
@@ -488,10 +517,22 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="utils.html#selene.utils.NonStrandSpecific">NonStrandSpecific (class in selene.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="samplers.html#selene.samplers.OnlineSampler">OnlineSampler (class in selene.samplers)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="interpret.html#selene.interpret.ordered_variants_and_indices">ordered_variants_and_indices() (in module selene.interpret)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -499,12 +540,14 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="utils.html#selene.utils.PerformanceMetrics">PerformanceMetrics (class in selene.utils)</a>
+      <li><a href="utils.html#selene.utils.parse_configs_and_run">parse_configs_and_run() (in module selene.utils)</a>
 </li>
-      <li><a href="predict.html#selene.predict.AnalyzeSequences.predict">predict() (selene.predict.AnalyzeSequences method)</a>
+      <li><a href="utils.html#selene.utils.PerformanceMetrics">PerformanceMetrics (class in selene.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="predict.html#selene.predict.AnalyzeSequences.predict">predict() (selene.predict.AnalyzeSequences method)</a>
+</li>
       <li><a href="predict.predict_handlers.html#selene.predict.predict_handlers.PredictionsHandler">PredictionsHandler (class in selene.predict.predict_handlers)</a>
 </li>
       <li><a href="sequences.html#selene.sequences.Proteome">Proteome (class in selene.sequences)</a>
@@ -515,6 +558,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="samplers.html#selene.samplers.RandomPositionsSampler">RandomPositionsSampler (class in selene.samplers)</a>
+</li>
       <li><a href="interpret.html#selene.interpret.ISMResult.reference_sequence">reference_sequence (selene.interpret.ISMResult attribute)</a>
 </li>
   </ul></td>
@@ -529,17 +574,21 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="samplers.html#selene.samplers.IntervalsSampler.sample">sample() (selene.samplers.IntervalsSampler method)</a>
+      <li><a href="samplers.html#selene.samplers.BedFileSampler.sample">sample() (selene.samplers.BedFileSampler method)</a>
 
       <ul>
+        <li><a href="samplers.html#selene.samplers.IntervalsSampler.sample">(selene.samplers.IntervalsSampler method)</a>
+</li>
         <li><a href="samplers.html#selene.samplers.MatFileSampler.sample">(selene.samplers.MatFileSampler method)</a>
+</li>
+        <li><a href="samplers.html#selene.samplers.RandomPositionsSampler.sample">(selene.samplers.RandomPositionsSampler method)</a>
 </li>
         <li><a href="samplers.html#selene.samplers.Sampler.sample">(selene.samplers.Sampler method)</a>
 </li>
       </ul></li>
       <li><a href="samplers.html#selene.samplers.Sampler">Sampler (class in selene.samplers)</a>
 </li>
-      <li><a href="samplers.html#selene.samplers.OnlineSampler.save_datasets_to_file">save_datasets_to_file() (selene.samplers.OnlineSampler method)</a>
+      <li><a href="samplers.html#selene.samplers.OnlineSampler.save_dataset_to_file">save_dataset_to_file() (selene.samplers.OnlineSampler method)</a>
 </li>
       <li><a href="selene.html#module-selene">selene (module)</a>
 </li>
@@ -551,10 +600,10 @@
 </li>
       <li><a href="samplers.html#module-selene.samplers">selene.samplers (module)</a>
 </li>
-      <li><a href="sequences.html#module-selene.sequences">selene.sequences (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="sequences.html#module-selene.sequences">selene.sequences (module)</a>
+</li>
       <li><a href="targets.html#module-selene.targets">selene.targets (module)</a>
 </li>
       <li><a href="utils.html#module-selene.utils">selene.utils (module)</a>
@@ -576,6 +625,8 @@
       <li><a href="interpret.html#selene.interpret.ISMResult.sequence_type">sequence_type (selene.interpret.ISMResult attribute)</a>
 </li>
       <li><a href="samplers.html#selene.samplers.Sampler.set_mode">set_mode() (selene.samplers.Sampler method)</a>
+</li>
+      <li><a href="interpret.html#selene.interpret.sort_standard_chrs">sort_standard_chrs() (in module selene.interpret)</a>
 </li>
       <li><a href="samplers.html#selene.samplers.OnlineSampler.STRAND_SIDES">STRAND_SIDES (selene.samplers.OnlineSampler attribute)</a>
 </li>
@@ -621,9 +672,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="selene.html#selene.TrainModel.validate">validate() (selene.TrainModel method)</a>
 </li>
+      <li><a href="interpret.html#selene.interpret.variant_diffs_scatter_plot">variant_diffs_scatter_plot() (in module selene.interpret)</a>
+</li>
+      <li><a href="predict.html#selene.predict.AnalyzeSequences.variant_effect_prediction">variant_effect_prediction() (selene.predict.AnalyzeSequences method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="predict.html#selene.predict.AnalyzeSequences.variant_effect_prediction">variant_effect_prediction() (selene.predict.AnalyzeSequences method)</a>
+      <li><a href="utils.html#selene.utils.PerformanceMetrics.visualize">visualize() (selene.utils.PerformanceMetrics method)</a>
+</li>
+      <li><a href="utils.html#selene.utils.visualize_precision_recall_curves">visualize_precision_recall_curves() (in module selene.utils)</a>
+</li>
+      <li><a href="utils.html#selene.utils.visualize_roc_curves">visualize_roc_curves() (in module selene.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -631,8 +690,6 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="selene.html#selene.TrainModel.write_datasets_to_file">write_datasets_to_file() (selene.TrainModel method)</a>
-</li>
       <li><a href="utils.html#selene.utils.PerformanceMetrics.write_feature_scores_to_file">write_feature_scores_to_file() (selene.utils.PerformanceMetrics method)</a>
 </li>
       <li><a href="predict.predict_handlers.html#selene.predict.predict_handlers.write_to_file">write_to_file() (in module selene.predict.predict_handlers)</a>

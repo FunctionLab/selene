@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="selene.predict.predict_handlers" href="predict.predict_handlers.html" />
+    <link rel="next" title="selene.samplers" href="samplers.html" />
     <link rel="prev" title="selene.interpret" href="interpret.html" /> 
 
   
@@ -90,15 +90,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
@@ -106,26 +110,23 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
@@ -143,9 +144,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -222,59 +226,61 @@ predictions with models that have already been trained.</p>
 <h2>AnalyzeSequences<a class="headerlink" href="#analyzesequences" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene.predict.AnalyzeSequences">
-<em class="property">class </em><code class="descclassname">selene.predict.</code><code class="descname">AnalyzeSequences</code><span class="sig-paren">(</span><em>model</em>, <em>sequence_length</em>, <em>batch_size</em>, <em>features</em>, <em>use_cuda=False</em>, <em>sequence_type=&lt;class 'selene.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene.predict.</code><code class="descname">AnalyzeSequences</code><span class="sig-paren">(</span><em>model</em>, <em>trained_model_path</em>, <em>sequence_length</em>, <em>features</em>, <em>batch_size=64</em>, <em>use_cuda=False</em>, <em>reference_sequence=&lt;class 'selene.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Score sequences and their variants using the predictions made
 by a trained model.</p>
-<blockquote>
-<div>Parameters</div></blockquote>
-<dl class="docutils">
-<dt>model <span class="classifier-delimiter">:</span> <span class="classifier">torch.nn.Module</span></dt>
-<dd>A sequence-based model that has already been trained.</dd>
-<dt>sequence_length <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>The length of sequences that the model is expecting.</dd>
-<dt>batch_size <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd>The size of the mini-batches to use.</dd>
-<dt>features <span class="classifier-delimiter">:</span> <span class="classifier">list(str)</span></dt>
-<dd>The names of the features that the model is predicting.</dd>
-<dt>use_cuda <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd>Default is <cite>False</cite>. Specifies whether to use CUDA or not.</dd>
-<dt>sequence_type <span class="classifier-delimiter">:</span> <span class="classifier">class, optional</span></dt>
-<dd>Default is <cite>selene.sequences.Genome</cite>. The type of sequence that
-this analysis will be performed on.</dd>
-</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> – </li>
-<li><strong>use_cuda</strong> – </li>
-<li><strong>sequence_length</strong> – </li>
-<li><strong>batch_size</strong> – </li>
-<li><strong>features</strong> – </li>
-<li><strong>sequence_type</strong> – </li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> (<em>torch.nn.Module</em>) – A sequence-based model architecture.</li>
+<li><strong>trained_model_path</strong> (<em>str</em>) – The path to the weights file for a trained sequence-based model.
+Architecture must match <cite>model</cite>.</li>
+<li><strong>sequence_length</strong> (<em>int</em>) – The length of sequences that the model is expecting.</li>
+<li><strong>batch_size</strong> (<em>int, optional</em>) – Default is 64. The size of the mini-batches to use.</li>
+<li><strong>features</strong> (<em>list(str)</em>) – The names of the features that the model is predicting.</li>
+<li><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specifies whether to use CUDA or not.</li>
+<li><strong>reference_sequence</strong> (<em>class, optional</em>) – Default is <cite>selene.sequences.Genome</cite>. The type of sequence that
+this analysis will be performed on. Please note that if you need
+to use variant effect prediction, you cannot only pass in the
+class–you must pass in the constructed <cite>selene.sequences.Sequence</cite>
+object with a particular sequence version (e.g. <cite>Genome(“hg19.fa”)</cite>).
+This version does NOT have to be the same sequence version that the
+model was trained on. That is, if the sequences in your variants file
+are hg19 but your model was trained on hg38 sequences, you should pass
+in hg19.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</li>
+<li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequences that the model is expecting.</li>
+<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batches to use.</li>
+<li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</li>
+<li><strong>use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Specifies whether to use CUDA or not.</li>
+<li><strong>reference_sequence</strong> (<em>class</em>) – The type of sequence on which this analysis will be performed.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.predict.AnalyzeSequences.handle_ref_alt_predictions">
-<code class="descname">handle_ref_alt_predictions</code><span class="sig-paren">(</span><em>batch_ref_seqs</em>, <em>batch_alt_seqs</em>, <em>batch_ids</em>, <em>reporters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.handle_ref_alt_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.handle_ref_alt_predictions" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<dt id="selene.predict.AnalyzeSequences.get_predictions_for_fasta_file">
+<code class="descname">get_predictions_for_fasta_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get model predictions for sequences in a FASTA file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>batch_ref_seqs</strong> (<em>list(np.ndarray)</em>) – TODO</li>
-<li><strong>batch_alt_seqs</strong> (<em>list(np.ndarray)</em>) – TODO</li>
-<li><strong>reporters</strong> (<em>list(PredictionsHandler)</em>) – TODO</li>
+<li><strong>input_path</strong> (<em>str</em>) – Input path to the FASTA file.</li>
+<li><strong>output_dir</strong> (<em>str</em>) – Output directory to write the model predictions.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Writes the output to a file in <cite>output_dir</cite>.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
@@ -287,20 +293,25 @@ this analysis will be performed on.</dd>
 <dl class="method">
 <dt id="selene.predict.AnalyzeSequences.in_silico_mutagenesis">
 <code class="descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em>sequence</em>, <em>save_data</em>, <em>output_path_prefix='ism'</em>, <em>mutate_n_bases=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
-<dd><p># TODO(DOCUMENTATION): Finish.</p>
+<dd><p>Applies _in <a href="#id3"><span class="problematic" id="id4">silico_</span></a> mutagenesis to a sequence.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sequence</strong> (<em>str</em>) – TODO</li>
-<li><strong>save_data</strong> (<em>list of str</em>) – TODO</li>
-<li><strong>output_path_prefix</strong> (<em>str, optional</em>) – TODO</li>
-<li><strong>mutate_n_bases</strong> (<em>int, optional</em>) – TODO</li>
+<li><strong>sequence</strong> (<em>str</em>) – The sequence to mutate.</li>
+<li><strong>save_data</strong> (<em>list(str)</em>) – A list of the data files to output. Must input 1 or more of the
+following options: [“abs_diffs”, “diffs”, “logits”, “predictions”].</li>
+<li><strong>output_path_prefix</strong> (<em>str, optional</em>) – The path to which the data files are written. If directories in
+the path do not yet exist they will be automatically created.</li>
+<li><strong>mutate_n_bases</strong> (<em>int, optional</em>) – The number of bases to mutate at one time. We recommend leaving
+this parameter set to <cite>1</cite> at this time, as we have not yet
+optimized operations for double and triple mutations.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">TODO</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Writes results to files corresponding to each reporter in
+<cite>reporters</cite>.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
@@ -312,8 +323,8 @@ this analysis will be performed on.</dd>
 
 <dl class="method">
 <dt id="selene.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">
-<code class="descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>save_data</em>, <em>output_path_prefix='ism'</em>, <em>mutate_n_bases=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<code class="descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>save_data</em>, <em>output_dir</em>, <em>mutate_n_bases=1</em>, <em>use_sequence_name=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply _in <a href="#id5"><span class="problematic" id="id6">silico_</span></a> mutagenesis to all sequences in a FASTA file.</p>
 <p>Please note that we have not parallelized this function yet, so runtime
 increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -321,14 +332,26 @@ increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>input_path</strong> (<em>str</em>) – TODO</li>
-<li><strong>save_data</strong> (<em>list(str)</em>) – TODO</li>
-<li><strong>output_path_prefix</strong> (<em>str, optional</em>) – TODO</li>
-<li><strong>mutate_n_bases</strong> (<em>int, optional</em>) – TODO</li>
+<li><strong>input_path</strong> (<em>str</em>) – The path to the FASTA file of sequences.</li>
+<li><strong>save_data</strong> (<em>list(str)</em>) – A list of the data files to output. Must input 1 or more of the
+following options: [“abs_diffs”, “diffs”, “logits”, “predictions”].</li>
+<li><strong>output_dir</strong> (<em>str</em>) – The path to the output directory. Directories in the path will be
+created if they do not currently exist.</li>
+<li><strong>mutate_n_bases</strong> (<em>int, optional</em>) – Default is 1. The number of bases to mutate at one time in
+_in <a href="#id7"><span class="problematic" id="id8">silico_</span></a> mutagenesis.</li>
+<li><strong>use_sequence_name</strong> (<em>bool, optional.</em>) – Default is True. If <cite>use_sequence_name</cite>, output files are prefixed
+by the sequence name/description corresponding to each sequence
+in the FASTA file. Spaces in the sequence name are replaced with
+underscores ‘_’. If not <cite>use_sequence_name</cite>, output files are
+prefixed with an index <span class="math notranslate nohighlight">\(i\)</span> (starting with 0) corresponding
+to the :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>i`th sequence in the FASTA file.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>None</em> – TODO</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Outputs data files from _in <a href="#id9"><span class="problematic" id="id10">silico_</span></a> mutagenesis to <cite>output_dir</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -338,16 +361,25 @@ increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
 <dl class="method">
 <dt id="selene.predict.AnalyzeSequences.in_silico_mutagenesis_predict">
 <code class="descname">in_silico_mutagenesis_predict</code><span class="sig-paren">(</span><em>sequence</em>, <em>base_preds</em>, <em>mutations_list</em>, <em>reporters=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.in_silico_mutagenesis_predict" title="Permalink to this definition">¶</a></dt>
-<dd><p># TODO(DOCUMENTATION): Finish.</p>
+<dd><p>Get the predictions for all specified mutations applied
+to a given sequence and, if applicable, compute the scores
+(“abs_diffs”, “diffs”, “logits”) for these mutations.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sequence</strong> (<em>str</em>) – TODO</li>
-<li><strong>base_preds</strong> (<em>numpy.ndarray</em>) – TODO</li>
-<li><strong>mutations_list</strong> (<em>list(tuple)</em>) – TODO</li>
-<li><strong>reporters</strong> (<em>list(PredictionsHandler)</em>) – TODO</li>
+<li><strong>sequence</strong> (<em>str</em>) – The sequence to mutate.</li>
+<li><strong>base_preds</strong> (<em>numpy.ndarray</em>) – The model’s prediction for <cite>sequence</cite>.</li>
+<li><strong>mutations_list</strong> (<em>list(list(tuple))</em>) – The mutations to apply to the sequence. Each element in
+<cite>mutations_list</cite> is a list of tuples, where each tuple
+specifies the <cite>int</cite> position in the sequence to mutate and what
+<cite>str</cite> base to which the position is mutated (e.g. (1, ‘A’)).</li>
+<li><strong>reporters</strong> (<em>list(PredictionsHandler)</em>) – The list of reporters, where each reporter handles the predictions
+made for each mutated sequence. Will collect, compute scores
+(e.g. <cite>AbsDiffScoreHandler</cite> computes the absolute difference
+between <cite>base_preds</cite> and the predictions for the mutated
+sequence), and output these as a file at the end.</li>
 </ul>
 </td>
 </tr>
@@ -365,14 +397,17 @@ increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
 <dl class="method">
 <dt id="selene.predict.AnalyzeSequences.predict">
 <code class="descname">predict</code><span class="sig-paren">(</span><em>batch_sequences</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p># TODO(DOCUMENTATION): Finish.</p>
+<dd><p>Return model predictions for a batch of sequences.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_sequences</strong> (<em>numpy.ndarray</em>) – # TODO(DOCUMENTATION): Finish.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_sequences</strong> (<em>numpy.ndarray</em>) – <cite>batch_sequences</cite> has the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span>,
+where <span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
+<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"># TODO(DOCUMENTATION): Finish.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The model predictions of shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where <span class="math notranslate nohighlight">\(F\)</span>
+is the number of features (classes) the model predicts.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a></td>
 </tr>
@@ -382,21 +417,25 @@ increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
 
 <dl class="method">
 <dt id="selene.predict.AnalyzeSequences.variant_effect_prediction">
-<code class="descname">variant_effect_prediction</code><span class="sig-paren">(</span><em>vcf_file</em>, <em>save_data</em>, <em>indexed_fasta</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO</p>
+<code class="descname">variant_effect_prediction</code><span class="sig-paren">(</span><em>vcf_file</em>, <em>save_data</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get model predictions and scores for a list of variants.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>vcf_file</strong> (<em>str</em>) – TODO</li>
-<li><strong>save_data</strong> (<em>list(str)</em>) – TODO</li>
-<li><strong>indexed_fasta</strong> (<em>str</em>) – TODO</li>
-<li><strong>output_dir</strong> (<em>str or None, optional</em>) – TODO</li>
+<li><strong>vcf_file</strong> (<em>str</em>) – Path to a VCF file. Must contain the columns
+[#CHROM, POS, ID, REF, ALT], in order. Column header does not need
+to be present.</li>
+<li><strong>save_data</strong> (<em>list(str)</em>) – A list of the data files to output. Must input 1 or more of the
+following options: [“abs_diffs”, “diffs”, “logits”, “predictions”].</li>
+<li><strong>output_dir</strong> (<em>str or None, optional</em>) – Path to the output directory. If no path is specified, will save
+files corresponding to the options in <cite>save_data</cite> to the
+current working directory.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Saves all files to <cite>output_dir</cite>.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
@@ -419,7 +458,7 @@ increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="predict.predict_handlers.html" class="btn btn-neutral float-right" title="selene.predict.predict_handlers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="samplers.html" class="btn btn-neutral float-right" title="selene.samplers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="interpret.html" class="btn btn-neutral" title="selene.interpret" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

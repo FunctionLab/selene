@@ -90,15 +90,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
@@ -106,26 +110,23 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
@@ -143,9 +144,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -241,7 +245,7 @@ Target features classes are classes which define a way to access a
 <h2>GenomicFeatures<a class="headerlink" href="#genomicfeatures" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene.targets.GenomicFeatures">
-<em class="property">class </em><code class="descclassname">selene.targets.</code><code class="descname">GenomicFeatures</code><span class="sig-paren">(</span><em>input_path</em>, <em>features</em>, <em>feature_thresholds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene.targets.</code><code class="descname">GenomicFeatures</code><span class="sig-paren">(</span><em>input_path</em>, <em>features</em>, <em>feature_thresholds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.targets.target.Target</span></code></p>
 <p>Stores the dataset specifying sequence regions and features.
 Accepts a tabix-indexed <cite>*.bed</cite> file with the following columns,
@@ -256,21 +260,26 @@ addition columns following the five shown above will be ignored.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>input_path</strong> (<em>str</em>) – Path to the tabix-indexed dataset. Note that for the file to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
+<li><p class="first"><strong>input_path</strong> (<em>str</em>) – Path to the tabix-indexed dataset. Note that for the file to
 be tabix-indexed, it must have been compressed with <cite>bgzip</cite>.
 Thus, <cite>input_path</cite> should be a <cite>*.gz</cite> file with a
-corresponding <cite>*.tbi</cite> file in the same directory.</li>
-<li><strong>features</strong> (<em>list(str)</em>) – The non-redundant list of genomic features (i.e. labels)
-that will be predicted.</li>
-<li><strong>feature_thresholds</strong> (<em>float or dict or types.FunctionType</em>) – A genomic region is determined to be a positive sample if at
-least one genomic feature peak takes up a proportion of the
-region greater than or equal to the threshold specified for
-that feature.<ul>
-<li><cite>float</cite> - A single threshold applies to all the features                    in the dataset.</li>
-<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to                  threshold values (<cite>float</cite>), which thereby assigns                 different thresholds to different features. If a                 feature’s threshold is not specified in this                  dictionary, then we assume that a key <cite>“default”</cite>                 exists in the dictionary that has the default                  threshold value we should assign to the feature                  name that is absent from the dictionary keys.</li>
-<li><cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</li>
+corresponding <cite>*.tbi</cite> file in the same directory.</p>
+</li>
+<li><p class="first"><strong>features</strong> (<em>list(str)</em>) – The non-redundant list of genomic features (i.e. labels)
+that will be predicted.</p>
+</li>
+<li><p class="first"><strong>feature_thresholds</strong> (<em>float or dict or types.FunctionType or None</em>) – Default is None. A genomic region is determined to be a
+positive sample if at least one genomic feature peak takes
+up a proportion of the region greater than or equal to
+the threshold specified for that feature.</p>
+<ul class="simple">
+<li><cite>None</cite> - No thresholds specified. All features found in</li>
 </ul>
+<p>a query region are annotated to that region.
+* <cite>float</cite> - A single threshold applies to all the features                    in the dataset.
+* <cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to                  threshold values (<cite>float</cite>), which thereby assigns                 different thresholds to different features. If a                 feature’s threshold is not specified in this                  dictionary, then we assume that a key <cite>“default”</cite>                 exists in the dictionary that has the default                  threshold value we should assign to the feature                  name that is absent from the dictionary keys.
+* <cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</p>
 </li>
 </ul>
 </td>
@@ -283,10 +292,15 @@ where the index is the position of the feature in <cite>features</cite>.</li>
 <li><strong>index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
 where the index is the position of the feature in the input
 features.</li>
-<li><strong>feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to thresholds
-(<cite>float</cite>), where the threshold is the minimum overlap that a
+<li><strong>feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – <ul>
+<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds</li>
+</ul>
+<p>(<cite>float</cite>), where the threshold is the minimum overlap that a
 feature annotation must have with a query region to be
-considered a positive example of that feature.</li>
+considered a positive example of that feature.
+* <cite>None</cite> - No threshold specifications. Assumes that all features
+returned by a tabix query are annotated to the query region.</p>
+</li>
 </ul>
 </td>
 </tr>

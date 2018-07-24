@@ -89,15 +89,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="interpret.html">selene.interpret</a><ul>
@@ -105,26 +109,23 @@
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">selene.sequences</a><ul>
@@ -142,9 +143,12 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -219,6 +223,38 @@
 more general utilities that are used across the package. Most of this
 functionality cannot be appropriately confined to just one module, and
 thus is included here.</p>
+<div class="section" id="nonstrandspecific">
+<h2>NonStrandSpecific<a class="headerlink" href="#nonstrandspecific" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="selene.utils.NonStrandSpecific">
+<em class="property">class </em><code class="descclassname">selene.utils.</code><code class="descname">NonStrandSpecific</code><span class="sig-paren">(</span><em>model</em>, <em>mode='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/non_strand_specific_module.html#NonStrandSpecific"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.NonStrandSpecific" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>A torch.nn.Module that wraps a user-specified model architecture if the
+architecture does not need to account for sequence strand-specificity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> (<em>torch.nn.Module</em>) – The user-specified model architecture.</li>
+<li><strong>mode</strong> (<em>{‘mean’, ‘max’}, optional</em>) – Default is ‘mean’. NonStrandSpecific will pass the input and the
+reverse-complement of the input into <cite>model</cite>. The mode specifies
+whether we should output the mean or max of the predictions as
+the non-strand specific prediction.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
+<li><strong>mode</strong> (<em>{'mean'</em><em>, </em><em>'max'}</em>) – How to handle outputting a non-strand specific prediction.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="performancemetrics">
 <h2>PerformanceMetrics<a class="headerlink" href="#performancemetrics" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -319,6 +355,55 @@ average score of that metric across all features
 </dd></dl>
 
 <dl class="method">
+<dt id="selene.utils.PerformanceMetrics.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Outputs ROC and PR curves. Does not support other metrics
+currently.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
+<li><p class="first"><strong>prediction</strong> (<em>numpy.ndarray</em>) – Value predicted by user model.</p>
+</li>
+<li><p class="first"><strong>target</strong> (<em>numpy.ndarray</em>) – True value that the user model was trying to predict.</p>
+</li>
+<li><p class="first"><strong>output_dir</strong> (<em>str</em>) – The path to the directory to output the figures. Directories that
+do not currently exist will be automatically created.</p>
+</li>
+<li><p class="first"><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments to pass to each visualization function. Each
+function accepts the following args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="first docutils">
+<dt>style <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>Default is “seaborn-colorblind”. Specify a style available
+in <cite>matplotlib.pyplot.style.available</cite> to use.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>dpi <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>Default is 800. Specify dots per inch (resolution) of
+the figure.</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Outputs figures to <cite>output_dir</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="selene.utils.PerformanceMetrics.write_feature_scores_to_file">
 <code class="descname">write_feature_scores_to_file</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#PerformanceMetrics.write_feature_scores_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.PerformanceMetrics.write_feature_scores_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes each metric’s score for each feature to a specified
@@ -342,6 +427,76 @@ feature, the score will be <cite>None</cite>.</td>
 </table>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.visualize_roc_curves">
+<code class="descclassname">selene.utils.</code><code class="descname">visualize_roc_curves</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>report_gt_feature_n_positives=50</em>, <em>style='seaborn-colorblind'</em>, <em>fig_title='Feature ROC curves'</em>, <em>dpi=800</em>, <em>needs_import=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#visualize_roc_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.visualize_roc_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output the ROC curves for each feature predicted by a model
+as an SVG.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>prediction</strong> (<em>numpy.ndarray</em>) – Value predicted by user model.</li>
+<li><strong>target</strong> (<em>numpy.ndarray</em>) – True value that the user model was trying to predict.</li>
+<li><strong>output_dir</strong> (<em>str</em>) – The path to the directory to output the figures. Directories that
+do not currently exist will be automatically created.</li>
+<li><strong>report_gt_feature_n_positives</strong> (<em>int, optional</em>) – Default is 50. Do not visualize an ROC curve for a feature with
+less than 50 positive examples in <cite>target</cite>.</li>
+<li><strong>style</strong> (<em>str, optional</em>) – Default is “seaborn-colorblind”. Specify a style available in
+<cite>matplotlib.pyplot.style.available</cite> to use.</li>
+<li><strong>fig_title</strong> (<em>str, optional</em>) – Default is “Feature ROC curves”. Set the figure title.</li>
+<li><strong>dpi</strong> (<em>int, optional</em>) – Default is 800. Specify dots per inch (resolution) of the figure.</li>
+<li><strong>needs_import</strong> (<em>bool, optional</em>) – Default is False. Specify whether we need to import
+<cite>matplotlib.pyplot</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Outputs the figure in <cite>output_dir</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.visualize_precision_recall_curves">
+<code class="descclassname">selene.utils.</code><code class="descname">visualize_precision_recall_curves</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>report_gt_feature_n_positives=50</em>, <em>style='seaborn-colorblind'</em>, <em>fig_title='Feature precision-recall curves'</em>, <em>dpi=800</em>, <em>needs_import=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/performance_metrics.html#visualize_precision_recall_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.visualize_precision_recall_curves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output the precision-recall (PR) curves for each feature predicted by
+a model as an SVG.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>prediction</strong> (<em>numpy.ndarray</em>) – Value predicted by user model.</li>
+<li><strong>target</strong> (<em>numpy.ndarray</em>) – True value that the user model was trying to predict.</li>
+<li><strong>output_dir</strong> (<em>str</em>) – The path to the directory to output the figures. Directories that
+do not currently exist will be automatically created.</li>
+<li><strong>report_gt_feature_n_positives</strong> (<em>int, optional</em>) – Default is 50. Do not visualize an PR curve for a feature with
+less than 50 positive examples in <cite>target</cite>.</li>
+<li><strong>style</strong> (<em>str, optional</em>) – Default is “seaborn-colorblind”. Specify a style available in
+<cite>matplotlib.pyplot.style.available</cite> to use.</li>
+<li><strong>fig_title</strong> (<em>str, optional</em>) – Default is “Feature precision-recall curves”. Set the figure title.</li>
+<li><strong>dpi</strong> (<em>int, optional</em>) – Default is 800. Specify dots per inch (resolution) of the figure.</li>
+<li><strong>needs_import</strong> (<em>bool, optional</em>) – Default is False. Specify whether we need to import
+<cite>matplotlib.pyplot</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Outputs the figure in <cite>output_dir</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -415,6 +570,71 @@ and <span class="math notranslate nohighlight">\(YFG\)</span> might look like th
 <span class="go">[&quot;YFP&quot;, &quot;YFG&quot;]</span>
 </pre></div>
 </div>
+</dd></dl>
+
+</div>
+<div class="section" id="load-model-from-state-dict">
+<h2>load_model_from_state_dict<a class="headerlink" href="#load-model-from-state-dict" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.utils.load_model_from_state_dict">
+<code class="descclassname">selene.utils.</code><code class="descname">load_model_from_state_dict</code><span class="sig-paren">(</span><em>state_dict</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/utils.html#load_model_from_state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.load_model_from_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads model weights that were saved to a file previously by <cite>torch.save</cite>.
+This is a helper function to reconcile state dict keys where a model was
+saved with/without torch.nn.DataParallel and now must be loaded
+without/with torch.nn.DataParallel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>state_dict</strong> (<em>collections.OrderedDict</em>) – The state of the model.</li>
+<li><strong>model</strong> (<em>torch.nn.Module</em>) – The PyTorch model, a module composed of submodules.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The model with weights loaded from the state dict.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))">torch.nn.Module</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If model state dict keys do not match the keys in <cite>state_dict</cite>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="get-indices-and-probabilities">
+<h2>get_indices_and_probabilities<a class="headerlink" href="#get-indices-and-probabilities" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene.utils.get_indices_and_probabilities">
+<code class="descclassname">selene.utils.</code><code class="descname">get_indices_and_probabilities</code><span class="sig-paren">(</span><em>interval_lengths</em>, <em>indices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/utils.html#get_indices_and_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.get_indices_and_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of different interval lengths and the indices of
+interest in that list, weight the probability that we will sample
+one of the indices in <cite>indices</cite> based on the interval lengths in
+that sublist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>interval_lengths</strong> (<em>list(int)</em>) – The list of lengths of intervals that we will draw from. This is
+used to weight the indices proportionally to interval length.</li>
+<li><strong>indices</strong> (<em>list(int)</em>) – The list of interval length indices to draw from.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>indices, weights</strong> – Tuple of interval indices to sample from and the corresponding
+weights of those intervals.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>))</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -514,6 +734,127 @@ a Python object to instantiate), or a nested hierarchy of
 </table>
 <p class="rubric">Notes</p>
 <p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.initialize_model">
+<code class="descclassname">selene.utils.</code><code class="descname">initialize_model</code><span class="sig-paren">(</span><em>model_configs</em>, <em>train=True</em>, <em>lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/config_utils.html#initialize_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.initialize_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize model (and associated criterion, optimizer)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model_configs</strong> (<em>dict</em>) – Model-specific configuration</li>
+<li><strong>train</strong> (<em>bool, optional</em>) – Default is True. If <cite>train</cite>, returns the user-specified optimizer
+and optimizer class that can be found within the input model file.</li>
+<li><strong>lr</strong> (<em>float or None, optional</em>) – If <cite>train</cite>, a learning rate must be specified. Otherwise, None.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p><strong>model, criterion</strong> –</p>
+<ul class="simple">
+<li><cite>torch.nn.Module</cite> - the model architecture</li>
+<li><cite>torch.nn._Loss</cite> - the loss function associated with the model</li>
+<li><cite>torch.optim</cite> - the optimizer associated with the model</li>
+<li><cite>dict</cite> - the optimizer arguments</li>
+</ul>
+<p>The optimizer and its arguments are only returned if <cite>train</cite> is
+True.</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+b9e89cf ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.execute">
+<code class="descclassname">selene.utils.</code><code class="descname">execute</code><span class="sig-paren">(</span><em>operations</em>, <em>configs</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/config_utils.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute operations in _Selene_.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>operations</strong> (<em>list(str)</em>) – The list of operations to carry out in _Selene_.</li>
+<li><strong>configs</strong> (<em>dict or object</em>) – The loaded configurations from a YAML file.</li>
+<li><strong>output_dir</strong> (<em>str</em>) – The path to the directory where all outputs will be saved.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Executes the operations listed and outputs any files
+to the dirs specified in each operation’s configuration.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If an expected key in configuration is missing.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="selene.utils.parse_configs_and_run">
+<code class="descclassname">selene.utils.</code><code class="descname">parse_configs_and_run</code><span class="sig-paren">(</span><em>configs</em>, <em>create_subdirectory=True</em>, <em>lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/utils/config_utils.html#parse_configs_and_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.utils.parse_configs_and_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to parse the configuration YAML file and run each operation
+specified.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
+<li><p class="first"><strong>configs</strong> (<em>dict</em>) – The dictionary of nested configuration parameters. Will look
+for the following top-level parameters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><cite>ops</cite>: A list of 1 or more of the values</li>
+</ul>
+<p>{“train”, “evaluate”, “analyze”}. The operations specified
+determine what objects and information we expect to parse
+in order to run these operations. This is required.
+* <cite>output_dir</cite>: Output directory to use for all the operations.
+If no <cite>output_dir</cite> is specified, assumes that all constructors
+that will be initialized (which have their own configurations
+in <cite>configs</cite>) have their own <cite>output_dir</cite> specified.
+Optional.
+* <cite>random_seed</cite>: A random seed set for <cite>torch</cite> and <cite>torch.cuda</cite>
+for reproducibility. Optional.
+* <cite>lr</cite>: The learning rate, if one of the operations in the list is
+“train”.</p>
+</div></blockquote>
+</li>
+<li><p class="first"><strong>create_subdirectory</strong> (<em>bool, optional</em>) – Default is True. If <cite>create_subdirectory</cite>, will create a directory
+within <cite>output_dir</cite> with the name formatted as “%Y-%m-%d-%H-%M-%S”,
+the date/time this method was run.</p>
+</li>
+<li><p class="first"><strong>lr</strong> (<em>float or None, optional</em>) – Default is None. If “lr” (learning rate) is already specified as a
+top-level key in <cite>configs</cite>, there is no need to set <cite>lr</cite> to a value
+unless you want to override the value in <cite>configs</cite>. Otherwise,
+set <cite>lr</cite> to the desired learning rate if “train” is one of the
+operations to be executed.</p>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Executes the operations listed and outputs any files
+to the dirs specified in each operation’s configuration.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

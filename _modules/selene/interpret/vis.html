@@ -88,15 +88,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../interpret.html">selene.interpret</a><ul>
@@ -104,26 +108,23 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../../../samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene.sequences</a><ul>
@@ -141,9 +142,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -216,18 +220,24 @@
 <span class="sd">from selene analysis methods.</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">transforms</span>
 <span class="kn">from</span> <span class="nn">matplotlib.path</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="k">import</span> <span class="n">PathPatch</span>
 <span class="kn">import</span> <span class="nn">matplotlib.patheffects</span>
 <span class="kn">from</span> <span class="nn">matplotlib.text</span> <span class="k">import</span> <span class="n">TextPath</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">from</span> <span class="nn">plotly.offline</span> <span class="k">import</span> <span class="n">download_plotlyjs</span><span class="p">,</span> <span class="n">plot</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">tabix</span>
 
 <span class="kn">from</span> <span class="nn">selene.sequences</span> <span class="k">import</span> <span class="n">Genome</span>
 
@@ -291,7 +301,7 @@
         <span class="n">vertices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertices</span><span class="p">),</span> <span class="n">codes</span>
 
-              
+
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_SVG_PATHS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
     <span class="n">_SVG_PATHS</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_svg_parse</span><span class="p">(</span><span class="n">_SVG_PATHS</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 
@@ -677,6 +687,377 @@
                       <span class="n">cbar_kws</span><span class="o">=</span><span class="n">cbar_kws</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">ret</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">ret</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="load_variant_abs_diff_scores"><a class="viewcode-back" href="../../../interpret.html#selene.interpret.load_variant_abs_diff_scores">[docs]</a><span class="k">def</span> <span class="nf">load_variant_abs_diff_scores</span><span class="p">(</span><span class="n">input_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads the variant data, labels, and feature names from a diff scores</span>
+<span class="sd">    file output from variant effect prediction.</span>
+
+<span class="sd">    TODO: should we move this out of `vis.py`?</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_path : str</span>
+<span class="sd">        Path to the input file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple(np.ndarray, list(tuple(str)), list(str))</span>
+<span class="sd">        * `tuple[0]` is the matrix of absolute difference scores. The rows</span>
+<span class="sd">          are the variants and the columns are the features for which the</span>
+<span class="sd">          model makes predictions.</span>
+<span class="sd">        * `tuple[1]` is the list of variant labels. Each tuple contains</span>
+<span class="sd">          (chrom, pos, name, ref, alt).</span>
+<span class="sd">        * `tuple[2]` is the list of features.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">diffs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="n">file_handle</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">colnames</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">5</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_handle</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">[</span><span class="mi">5</span><span class="p">:]]</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cols</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+            <span class="n">diffs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">diffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">diffs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">diffs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sort_standard_chrs"><a class="viewcode-back" href="../../../interpret.html#selene.interpret.sort_standard_chrs">[docs]</a><span class="k">def</span> <span class="nf">sort_standard_chrs</span><span class="p">(</span><span class="n">chrom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the value on which the</span>
+<span class="sd">    standard chromosomes can be sorted.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chrom : str</span>
+<span class="sd">        The chromosome</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        The value on which to sort</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chrom</span> <span class="o">=</span> <span class="n">chrom</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">chrom</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chrom</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">23</span>
+    <span class="k">elif</span> <span class="n">chrom</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">24</span>
+    <span class="k">elif</span> <span class="n">chrom</span> <span class="o">==</span> <span class="s1">&#39;M&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">25</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># unknown chr</span>
+        <span class="k">return</span> <span class="mi">26</span></div>
+
+
+<div class="viewcode-block" id="ordered_variants_and_indices"><a class="viewcode-back" href="../../../interpret.html#selene.interpret.ordered_variants_and_indices">[docs]</a><span class="k">def</span> <span class="nf">ordered_variants_and_indices</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the ordered variant labels, where the labels are sorted by chromosome</span>
+<span class="sd">    and position, and the indices corresponding to the sort,</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : list(tuple(str))</span>
+<span class="sd">        The list of variant labels. Each label is a tuple of</span>
+<span class="sd">        (chrom, pos, name, ref, alt).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple(list(tuple), list(int))</span>
+<span class="sd">        The first value is the ordered list of labels. Each label</span>
+<span class="sd">        is a tuple of (chrom, pos, ref, alt). The second value</span>
+<span class="sd">        is the ordered list of label indices.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+        <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">)</span>
+        <span class="n">labels_dict</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">labels_list</span> <span class="ow">in</span> <span class="n">labels_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">labels_list</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">ordered_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">labels_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+                          <span class="n">key</span><span class="o">=</span><span class="n">sort_standard_chrs</span><span class="p">)</span>
+
+    <span class="n">ordered_labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ordered_label_indices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">ordered_keys</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels_dict</span><span class="p">[</span><span class="n">chrom</span><span class="p">]:</span>
+            <span class="n">index</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">l</span>
+            <span class="n">ordered_label_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">ordered_labels</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">ordered_labels</span><span class="p">,</span> <span class="n">ordered_label_indices</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_label_tuple_to_text</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">genes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the variant label tuple to a string.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : tuple(str)</span>
+<span class="sd">        A tuple of (chrom, pos, ref, alt).</span>
+<span class="sd">    diff : float</span>
+<span class="sd">        The max difference score across some or all features in the model.</span>
+<span class="sd">    genes : list(str) or None, optional</span>
+<span class="sd">        Default is None. If the closest protein-coding `genes` are specified,</span>
+<span class="sd">        will display them in the label text.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The label text.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">label</span>
+    <span class="k">if</span> <span class="n">genes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">genes_str</span> <span class="o">=</span> <span class="s2">&quot;none found&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">genes_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;max diff score: </span><span class="si">{0}</span><span class="s2">&lt;br /&gt;</span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">/</span><span class="si">{4}</span><span class="s2">&lt;br /&gt;&quot;</span>
+                <span class="s2">&quot;closest protein-coding gene(s): </span><span class="si">{5}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">diff</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">genes_str</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;max diff score: </span><span class="si">{0}</span><span class="s2">&lt;br /&gt;</span><span class="si">{1}</span><span class="s2"> </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">/</span><span class="si">{4}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">diff</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span>
+
+
+<span class="k">def</span> <span class="nf">_variant_closest_genes</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">tabix_fh</span><span class="p">,</span> <span class="n">chrs_gene_intervals</span><span class="p">):</span>
+    <span class="n">chrom</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">closest_genes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">overlaps</span> <span class="o">=</span> <span class="n">tabix_fh</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">overlaps</span><span class="p">:</span>
+            <span class="n">closest_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">except</span> <span class="n">tabix</span><span class="o">.</span><span class="n">TabixError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">closest_genes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">closest_genes</span>
+    <span class="n">gene_intervals</span> <span class="o">=</span> <span class="n">chrs_gene_intervals</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
+    <span class="n">closest</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="n">gene</span><span class="p">)</span> <span class="ow">in</span> <span class="n">gene_intervals</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">pos</span> <span class="ow">and</span> <span class="n">closest</span> <span class="ow">and</span> <span class="n">closest</span> <span class="o">==</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">end</span><span class="p">:</span>
+            <span class="n">closest_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gene</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">pos</span> <span class="ow">and</span> <span class="p">(</span><span class="n">closest</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">closest</span> <span class="o">&gt;</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">end</span><span class="p">):</span>
+            <span class="n">closest</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">end</span>
+            <span class="n">closest_genes</span> <span class="o">=</span> <span class="p">[</span><span class="n">gene</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">pos</span> <span class="ow">and</span> <span class="n">closest</span> <span class="ow">and</span> <span class="n">closest</span> <span class="o">==</span> <span class="n">start</span> <span class="o">-</span> <span class="n">pos</span><span class="p">:</span>
+            <span class="n">closest_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gene</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">pos</span> <span class="ow">and</span> <span class="p">(</span><span class="n">closest</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">closest</span> <span class="o">&gt;</span> <span class="n">start</span> <span class="o">-</span> <span class="n">pos</span><span class="p">):</span>
+            <span class="n">closest</span> <span class="o">=</span> <span class="n">start</span> <span class="o">-</span> <span class="n">pos</span>
+            <span class="n">closest_genes</span> <span class="o">=</span> <span class="p">[</span><span class="n">gene</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">closest_genes</span>
+
+
+<span class="k">def</span> <span class="nf">_load_chrs_gene_intervals</span><span class="p">(</span><span class="n">gene_intervals_bed</span><span class="p">):</span>
+    <span class="n">chrs_gene_intervals</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">gene_intervals_bed</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_handle</span><span class="p">:</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">chrom</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">strand</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">gene</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="n">chrs_gene_intervals</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="n">gene</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">chrs_gene_intervals</span>
+
+
+<span class="k">def</span> <span class="nf">_variants_closest_protein_coding_gene</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;hg38&quot;</span><span class="p">):</span>
+    <span class="n">gene_intervals_tabix</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+        <span class="s2">&quot;selene&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s2">&quot;interpret/data/gencode_v28_</span><span class="si">{0}</span><span class="s2">/&quot;</span>
+         <span class="s2">&quot;protein_coding_l12_genes.bed.gz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
+    <span class="n">gene_intervals_bed</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+        <span class="s2">&quot;selene&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s2">&quot;interpret/data/gencode_v28_</span><span class="si">{0}</span><span class="s2">/&quot;</span>
+         <span class="s2">&quot;protein_coding_l12_genes.bed&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
+
+    <span class="n">tabix_fh</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">gene_intervals_tabix</span><span class="p">)</span>
+    <span class="n">chrs_gene_intervals</span> <span class="o">=</span> <span class="n">_load_chrs_gene_intervals</span><span class="p">(</span><span class="n">gene_intervals_bed</span><span class="p">)</span>
+
+    <span class="n">labels_gene_information</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+        <span class="n">labels_gene_information</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_variant_closest_genes</span><span class="p">(</span>
+            <span class="n">l</span><span class="p">,</span> <span class="n">tabix_fh</span><span class="p">,</span> <span class="n">chrs_gene_intervals</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">labels_gene_information</span>
+
+
+<div class="viewcode-block" id="variant_diffs_scatter_plot"><a class="viewcode-back" href="../../../interpret.html#selene.interpret.variant_diffs_scatter_plot">[docs]</a><span class="k">def</span> <span class="nf">variant_diffs_scatter_plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
+                               <span class="n">labels</span><span class="p">,</span>
+                               <span class="n">features</span><span class="p">,</span>
+                               <span class="n">output_path</span><span class="p">,</span>
+                               <span class="n">filter_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">labels_sort_fn</span><span class="o">=</span><span class="n">ordered_variants_and_indices</span><span class="p">,</span>
+                               <span class="n">nth_percentile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">hg_reference_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">threshold_line</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                               <span class="n">auto_open</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Displays each variant&#39;s max probability difference across features</span>
+<span class="sd">    as a point in a scatter plot. The points in the scatter plot are</span>
+<span class="sd">    ordered by the variant chromosome and position by default. Variants can</span>
+<span class="sd">    be sorted differently by passing in a new `labels_sort_fn`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : np.ndarray</span>
+<span class="sd">        Absolute difference scores for variants across all features that a</span>
+<span class="sd">        model predicts. This is the first value in the tuple returned by</span>
+<span class="sd">        `load_variant_abs_diff_scores`.</span>
+<span class="sd">    labels : list(tuple(str))</span>
+<span class="sd">        A list of variant labels. This is the second value in the tuple</span>
+<span class="sd">        returned by `load_variant_abs_diff_scores`.</span>
+<span class="sd">    features : list(str)</span>
+<span class="sd">        A list of the features the model predicts. This is the third value</span>
+<span class="sd">        in the tuple returned by `load_variant_abs_diff_scores`.</span>
+<span class="sd">    output_path : str</span>
+<span class="sd">        Path to output file. Must have &#39;.html&#39; extension.</span>
+<span class="sd">    filter_features : types.FunctionType or None, optional</span>
+<span class="sd">        Default is None. A function that takes in a `list(str)` of features</span>
+<span class="sd">        and returns the `list(int)` of feature indices over which we would</span>
+<span class="sd">        compute the max(probability difference) for each variant. For example,</span>
+<span class="sd">        a user may only want to visualize the max probability difference</span>
+<span class="sd">        for TF binding features. If `None`, uses all the features.</span>
+<span class="sd">    labels_sort_fn : types.FunctionType, optional</span>
+<span class="sd">        Default is `ordered_variants_and_indices`. A function that takes</span>
+<span class="sd">        in a `list(tuple(str))` of labels corresponding to the rows in `data`</span>
+<span class="sd">        and returns a `tuple(list(tuple), list(int))`, where the first value</span>
+<span class="sd">        is the ordered list of variant labels and the second value is the</span>
+<span class="sd">        ordered list of indices for those variant labels. By default,</span>
+<span class="sd">        variants are sorted by chromosome and position.</span>
+<span class="sd">    nth_percentile : int [0, 100] or None, optional</span>
+<span class="sd">        Default is None. If `nth_percentile` is not None, only displays the</span>
+<span class="sd">        variants with a max absolute difference score within the</span>
+<span class="sd">        `nth_percentile` of scores.</span>
+<span class="sd">    hg_reference_version : str {&quot;hg19&quot;, &quot;hg38&quot;} or None, optional</span>
+<span class="sd">        Default is None. On hover, we can display the gene(s) closest to</span>
+<span class="sd">        each variant if `hg_reference_version` is not None, where closest</span>
+<span class="sd">        can be a variant within a gene interval (where genes and</span>
+<span class="sd">        their coordinates are taken from level 1 &amp; 2 protein-coding genes</span>
+<span class="sd">        in gencode v28) or near a gene. In the future, we will allow users</span>
+<span class="sd">        to specify their own genome file so that this information can</span>
+<span class="sd">        be annotated to variants from other organisms, other genome versions,</span>
+<span class="sd">        etc.</span>
+<span class="sd">    threshold_line : float or None, optional</span>
+<span class="sd">        Default is None. If `threshold_line` is not None, draws a horizontal</span>
+<span class="sd">        line at the specified threshold. Helps focus the visual on variants</span>
+<span class="sd">        above a certain threshold.</span>
+<span class="sd">    auto_open : bool, optional</span>
+<span class="sd">        Default is False. If `auto_open`, will automatically open a web</span>
+<span class="sd">        browser that displays the plotted HTML file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    plotly.graph_objs.graph_objs.Figure</span>
+<span class="sd">        The generated Plotly figure.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">labels_ordered</span><span class="p">,</span> <span class="n">label_indices</span> <span class="o">=</span> <span class="n">labels_sort_fn</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">variant_closest_genes</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">hg_reference_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">variant_closest_genes</span> <span class="o">=</span> <span class="n">_variants_closest_protein_coding_gene</span><span class="p">(</span>
+            <span class="n">labels_ordered</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">hg_reference_version</span><span class="p">)</span>
+    <span class="n">ordered_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">label_indices</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="n">feature_indices</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">filter_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">feature_indices</span> <span class="o">=</span> <span class="n">filter_features</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="n">ordered_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">feature_indices</span><span class="p">]</span>
+    <span class="n">variants_max_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">ordered_data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">display_labels</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">nth_percentile</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">variants_max_diff</span><span class="p">,</span> <span class="n">nth_percentile</span><span class="p">)</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">variants_max_diff</span> <span class="o">&gt;=</span> <span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> variants with max abs diff score above </span><span class="si">{1}</span><span class="s2"> are in the &quot;</span>
+              <span class="s2">&quot;</span><span class="si">{2}</span><span class="s2">th percentile.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                  <span class="nb">len</span><span class="p">(</span><span class="n">keep</span><span class="p">),</span> <span class="n">p</span><span class="p">,</span> <span class="n">nth_percentile</span><span class="p">))</span>
+        <span class="n">variants_max_diff</span> <span class="o">=</span> <span class="n">variants_max_diff</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+        <span class="n">display_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels_ordered</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">display_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">display_labels</span> <span class="o">=</span> <span class="n">labels_ordered</span>
+
+    <span class="k">if</span> <span class="n">variant_closest_genes</span><span class="p">:</span>
+        <span class="n">text_labels</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_label_tuple_to_text</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">display_labels</span><span class="p">,</span> <span class="n">variants_max_diff</span><span class="p">,</span> <span class="n">variant_closest_genes</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">text_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">_label_tuple_to_text</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span>
+                       <span class="nb">zip</span><span class="p">(</span><span class="n">display_labels</span><span class="p">,</span> <span class="n">variants_max_diff</span><span class="p">)]</span>
+
+    <span class="n">label_x</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">display_labels</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">label_x</span><span class="p">,</span>
+                       <span class="n">y</span><span class="o">=</span><span class="n">variants_max_diff</span><span class="p">,</span>
+                       <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;markers&#39;</span><span class="p">,</span>
+                       <span class="n">marker</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                           <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#39CCCC&quot;</span><span class="p">,</span>
+                           <span class="n">line</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">width</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)),</span>
+                       <span class="n">text</span><span class="o">=</span><span class="n">text_labels</span><span class="p">,</span>
+                       <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">)]</span>
+
+    <span class="n">go_layout</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Max probability difference scores&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hovermode&quot;</span><span class="p">:</span> <span class="s2">&quot;closest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;hoverlabel&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;font&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
+            <span class="p">},</span>
+        <span class="s2">&quot;xaxis&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Genome coordinates&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;showticklabels&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;tickangle&quot;</span><span class="p">:</span> <span class="mi">35</span><span class="p">,</span>
+            <span class="s2">&quot;titlefont&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;family&quot;</span><span class="p">:</span> <span class="s2">&quot;Arial, sans-serif&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">},</span>
+            <span class="s2">&quot;nticks&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+            <span class="s2">&quot;tickmode&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;automargin&quot;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">},</span>
+        <span class="s2">&quot;yaxis&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Absolute difference&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;titlefont&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;family&quot;</span><span class="p">:</span> <span class="s2">&quot;Arial, sans-serif&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">threshold_line</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="o">**</span><span class="n">go_layout</span><span class="p">,</span>
+            <span class="n">shapes</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;line&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;x0&quot;</span><span class="p">:</span> <span class="n">label_x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                 <span class="s2">&quot;y0&quot;</span><span class="p">:</span> <span class="n">threshold_line</span><span class="p">,</span>
+                 <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="n">label_x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                 <span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="n">threshold_line</span><span class="p">,</span>
+                 <span class="s2">&quot;line&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;rgba(255, 99, 71, 1)&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="mi">2</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="o">**</span><span class="n">go_layout</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">)</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plot</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">output_path</span><span class="p">,</span> <span class="n">auto_open</span><span class="o">=</span><span class="n">auto_open</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
 </pre></div>
 
            </div>

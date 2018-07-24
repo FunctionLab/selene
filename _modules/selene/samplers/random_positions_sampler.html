@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.samplers.intervals_sampler &mdash; Selene master documentation</title>
+  <title>selene.samplers.random_positions_sampler &mdash; Selene master documentation</title>
   
 
   
@@ -199,7 +199,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene.samplers.intervals_sampler</li>
+      <li>selene.samplers.random_positions_sampler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -214,10 +214,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene.samplers.intervals_sampler</h1><div class="highlight"><pre>
+  <h1>Source code for selene.samplers.random_positions_sampler</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides the `IntervalsSampler` class and supporting</span>
-<span class="sd">methods.</span>
+<span class="sd">This module provides the RandomPositionsSampler class.</span>
+
+<span class="sd">TODO: Currently, only works with sequences from `selene.sequences.Genome`.</span>
+<span class="sd">We would like to generalize this to `selene.sequences.Sequence` if possible.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -237,6 +239,10 @@
 <span class="sd">A tuple containing the indices for some samples, and a weight to</span>
 <span class="sd">allot to each index when randomly drawing from them.</span>
 
+<span class="sd">TODO: this is common to both the intervals sampler and the</span>
+<span class="sd">random positions sampler. Can we move this to utils or</span>
+<span class="sd">somewhere else?</span>
+
 <span class="sd">Parameters</span>
 <span class="sd">----------</span>
 <span class="sd">indices : list(int)</span>
@@ -254,34 +260,26 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<span class="c1"># @TODO: Extend this class to work with stranded data.</span>
-<div class="viewcode-block" id="IntervalsSampler"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.IntervalsSampler">[docs]</a><span class="k">class</span> <span class="nc">IntervalsSampler</span><span class="p">(</span><span class="n">OnlineSampler</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Draws samples from pre-specified windows in the reference sequence.</span>
+<div class="viewcode-block" id="RandomPositionsSampler"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.RandomPositionsSampler">[docs]</a><span class="k">class</span> <span class="nc">RandomPositionsSampler</span><span class="p">(</span><span class="n">OnlineSampler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This sampler randomly selects a position in the genome and queries for</span>
+<span class="sd">    a sequence centered at that position for input to the model.</span>
+
+<span class="sd">    TODO: generalize to selene.sequences.Sequence?</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">    reference_sequence : selene.sequences.Genome</span>
 <span class="sd">        A reference sequence from which to create examples.</span>
 <span class="sd">    target_path : str</span>
 <span class="sd">        Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic</span>
 <span class="sd">        coordinates mapped to the genomic features we want to predict.</span>
 <span class="sd">    features : list(str)</span>
 <span class="sd">        List of distinct features that we aim to predict.</span>
-<span class="sd">    intervals_path : str</span>
-<span class="sd">        The path to the file that contains the intervals to sample from.</span>
-<span class="sd">        In this file, each interval should occur on a separate line.</span>
-<span class="sd">    sample_negative : bool, optional</span>
-<span class="sd">        Default is `False`. This tells the sampler whether negative</span>
-<span class="sd">        examples (i.e. with no positive labels) should be drawn when</span>
-<span class="sd">        generating samples. If `True`, both negative and positive</span>
-<span class="sd">        samples will be drawn. If `False`, only samples with at least</span>
-<span class="sd">        one positive label will be drawn.</span>
 <span class="sd">    seed : int, optional</span>
 <span class="sd">        Default is 436. Sets the random seed for sampling.</span>
 <span class="sd">    validation_holdout : list(str) or float, optional</span>
 <span class="sd">        Default is `[&#39;chr6&#39;, &#39;chr7&#39;]`. Holdout can be regional or</span>
-<span class="sd">        proportional. If regional, expects a list (e.g. `[&#39;X&#39;, &#39;Y&#39;]`).</span>
+<span class="sd">        proportional. If regional, expects a list (e.g. `[&#39;chrX&#39;, &#39;chrY&#39;]`).</span>
 <span class="sd">        Regions must match those specified in the first column of the</span>
 <span class="sd">        tabix-indexed BED file. If proportional, specify a percentage</span>
 <span class="sd">        between (0.0, 1.0). Typically 0.10 or 0.20.</span>
@@ -295,13 +293,13 @@
 <span class="sd">    center_bin_to_predict : int, optional</span>
 <span class="sd">        Default is 200. Query the tabix-indexed file for a region of</span>
 <span class="sd">        length `center_bin_to_predict`.</span>
-<span class="sd">    feature_thresholds : float [0.0, 1.0] or None, optional</span>
-<span class="sd">         Default is 0.5. The `feature_threshold` to pass to the</span>
+<span class="sd">    feature_thresholds : float [0.0, 1.0], optional</span>
+<span class="sd">        Default is 0.5. The `feature_threshold` to pass to the</span>
 <span class="sd">        `GenomicFeatures` object.</span>
 <span class="sd">    mode : {&#39;train&#39;, &#39;validate&#39;, &#39;test&#39;}</span>
 <span class="sd">        Default is `&#39;train&#39;`. The mode to run the sampler in.</span>
-<span class="sd">    save_datasets : list of str</span>
-<span class="sd">        Default is `[&quot;test&quot;]`. The list of modes for which we should</span>
+<span class="sd">    save_datasets : list(str), optional</span>
+<span class="sd">        Default is `[&#39;test&#39;]`. The list of modes for which we should</span>
 <span class="sd">        save the sampled data to file.</span>
 <span class="sd">    output_dir : str or None, optional</span>
 <span class="sd">        Default is None. The path to the directory where we should</span>
@@ -310,31 +308,17 @@
 <span class="sd">        the path in `output_dir` does not exist it will be created</span>
 <span class="sd">        automatically.</span>
 
-
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">    reference_sequence : selene.sequences.Genome</span>
 <span class="sd">        The reference sequence that examples are created from.</span>
 <span class="sd">    target : selene.targets.Target</span>
 <span class="sd">        The `selene.targets.Target` object holding the features that we</span>
 <span class="sd">        would like to predict.</span>
-<span class="sd">    sample_from_intervals : list(tuple(str, int, int))</span>
-<span class="sd">        A list of coordinates that specify the intervals we can draw</span>
-<span class="sd">        samples from.</span>
-<span class="sd">    interval_lengths : list(int)</span>
-<span class="sd">        A list of the lengths of the intervals that we can draw samples</span>
-<span class="sd">        from. The probability that we will draw a sample from an</span>
-<span class="sd">        interval is a function of that interval&#39;s length and the length</span>
-<span class="sd">        of all other intervals.</span>
-<span class="sd">    sample_negative : bool</span>
-<span class="sd">        Whether negative examples (i.e. with no positive label) should</span>
-<span class="sd">        be drawn when generating samples. If `True`, both negative and</span>
-<span class="sd">        positive samples will be drawn. If `False`, only samples with at</span>
-<span class="sd">        least one positive label will be drawn.</span>
 <span class="sd">    validation_holdout : list(str) or float</span>
 <span class="sd">        The samples to hold out for validating model performance. These</span>
 <span class="sd">        can be &quot;regional&quot; or &quot;proportional&quot;. If regional, this is a list</span>
-<span class="sd">        of region names (e.g. `[&#39;chrX&#39;, &#39;chrY&#39;]`). These Regions must</span>
+<span class="sd">        of region names (e.g. `[&#39;chrX&#39;, &#39;chrY&#39;]`). These regions must</span>
 <span class="sd">        match those specified in the first column of the tabix-indexed</span>
 <span class="sd">        BED file. If proportional, this is the fraction of total samples</span>
 <span class="sd">        that will be held out.</span>
@@ -357,12 +341,11 @@
 <span class="sd">        the modes listed in `modes`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">reference_sequence</span><span class="p">,</span>
                  <span class="n">target_path</span><span class="p">,</span>
                  <span class="n">features</span><span class="p">,</span>
-                 <span class="n">intervals_path</span><span class="p">,</span>
-                 <span class="n">sample_negative</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">seed</span><span class="o">=</span><span class="mi">436</span><span class="p">,</span>
                  <span class="n">validation_holdout</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr6&#39;</span><span class="p">,</span> <span class="s1">&#39;chr7&#39;</span><span class="p">],</span>
                  <span class="n">test_holdout</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;chr8&#39;</span><span class="p">,</span> <span class="s1">&#39;chr9&#39;</span><span class="p">],</span>
@@ -370,12 +353,9 @@
                  <span class="n">center_bin_to_predict</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
                  <span class="n">feature_thresholds</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                  <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">,</span>
-                 <span class="n">save_datasets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span>
+                 <span class="n">save_datasets</span><span class="o">=</span><span class="p">[],</span>
                  <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a new `IntervalsSampler` object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">IntervalsSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RandomPositionsSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">reference_sequence</span><span class="p">,</span>
             <span class="n">target_path</span><span class="p">,</span>
             <span class="n">features</span><span class="p">,</span>
@@ -399,44 +379,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_holdout_type</span> <span class="o">==</span> <span class="s2">&quot;chromosome&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_partition_dataset_chromosome</span><span class="p">(</span><span class="n">intervals_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_chromosome</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_partition_dataset_proportion</span><span class="p">(</span><span class="n">intervals_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_proportion</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_negative</span> <span class="o">=</span> <span class="n">sample_negative</span>
-
-    <span class="k">def</span> <span class="nf">_partition_dataset_proportion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals_path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        When holdout sets are created by randomly sampling a proportion</span>
-<span class="sd">        of the data, this method is used to divide the data into</span>
-<span class="sd">        train/test/validate subsets.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        intervals_path : str</span>
-<span class="sd">            The path to the file that contains the intervals to sample</span>
-<span class="sd">            from. In this file, each interval should occur on a separate</span>
-<span class="sd">            line.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">intervals_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">file_handle</span><span class="p">:</span>
-                <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">chrom</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_partition_genome_by_proportion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">len_chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_chr_lens</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">chrom</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
+                 <span class="n">len_chrom</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">len_chrom</span><span class="p">)</span>
         <span class="n">n_intervals</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="p">)</span>
 
-        <span class="c1"># all indices in the intervals list are shuffled</span>
         <span class="n">select_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_intervals</span><span class="p">))</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">select_indices</span><span class="p">)</span>
-
-        <span class="c1"># the first section of indices is used as the validation set</span>
         <span class="n">n_indices_validate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_intervals</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_holdout</span><span class="p">)</span>
         <span class="n">val_indices</span><span class="p">,</span> <span class="n">val_weights</span> <span class="o">=</span> <span class="n">get_indices_and_probabilities</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="p">,</span> <span class="n">select_indices</span><span class="p">[:</span><span class="n">n_indices_validate</span><span class="p">])</span>
@@ -444,8 +404,6 @@
             <span class="n">val_indices</span><span class="p">,</span> <span class="n">val_weights</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span><span class="p">:</span>
-            <span class="c1"># if applicable, the second section of indices is used as the</span>
-            <span class="c1"># test set</span>
             <span class="n">n_indices_test</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_intervals</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span><span class="p">)</span>
             <span class="n">test_indices_end</span> <span class="o">=</span> <span class="n">n_indices_test</span> <span class="o">+</span> <span class="n">n_indices_validate</span>
             <span class="n">test_indices</span><span class="p">,</span> <span class="n">test_weights</span> <span class="o">=</span> <span class="n">get_indices_and_probabilities</span><span class="p">(</span>
@@ -454,51 +412,32 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SampleIndices</span><span class="p">(</span>
                 <span class="n">test_indices</span><span class="p">,</span> <span class="n">test_weights</span><span class="p">)</span>
 
-            <span class="c1"># remaining indices are for the training set</span>
             <span class="n">tr_indices</span><span class="p">,</span> <span class="n">tr_weights</span> <span class="o">=</span> <span class="n">get_indices_and_probabilities</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="p">,</span> <span class="n">select_indices</span><span class="p">[</span><span class="n">test_indices_end</span><span class="p">:])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SampleIndices</span><span class="p">(</span>
                 <span class="n">tr_indices</span><span class="p">,</span> <span class="n">tr_weights</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># remaining indices are for the training set</span>
             <span class="n">tr_indices</span><span class="p">,</span> <span class="n">tr_weights</span> <span class="o">=</span> <span class="n">get_indices_and_probabilities</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="p">,</span> <span class="n">select_indices</span><span class="p">[</span><span class="n">n_indices_validate</span><span class="p">:])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SampleIndices</span><span class="p">(</span>
                 <span class="n">tr_indices</span><span class="p">,</span> <span class="n">tr_weights</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_partition_dataset_chromosome</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intervals_path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        When holdout sets are created by selecting all samples from a</span>
-<span class="sd">        specified region (e.g. a chromosome) this method is used to</span>
-<span class="sd">        divide the data into train/test/validate subsets.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        intervals_path : str</span>
-<span class="sd">            The path to the file that contains the intervals to sample</span>
-<span class="sd">            from. In this file, each interval should occur on a separate</span>
-<span class="sd">            line.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_partition_genome_by_chromosome</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">SampleIndices</span><span class="p">([],</span> <span class="p">[])</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">intervals_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_handle</span><span class="p">):</span>
-                <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">chrom</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_holdout</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;validate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">index</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span> <span class="ow">and</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">index</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">index</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">len_chrom</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_chr_lens</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_holdout</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;validate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span> <span class="ow">and</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_holdout</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">index</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">chrom</span><span class="p">,</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
+                 <span class="n">len_chrom</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">len_chrom</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
             <span class="n">sample_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span>
@@ -509,52 +448,40 @@
                     <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieves samples around a position in the `reference_sequence`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        chrom : str</span>
-<span class="sd">            The name of the region (e.g. &quot;chrX&quot;, &quot;YFP&quot;)</span>
-<span class="sd">        position : int</span>
-<span class="sd">            The position in the query region that we will search around</span>
-<span class="sd">            for samples.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        retrieved_seq, retrieved_targets : \</span>
-<span class="sd">        tuple(numpy.ndarray, list(numpy.ndarray))</span>
-<span class="sd">            A tuple containing the numeric representation of the</span>
-<span class="sd">            sequence centered at the query position, as well as a list</span>
-<span class="sd">            of samples within this region that met the filtering</span>
-<span class="sd">            standards.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">bin_start</span> <span class="o">=</span> <span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span>
         <span class="n">bin_end</span> <span class="o">=</span> <span class="n">position</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span>
         <span class="n">retrieved_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">get_feature_data</span><span class="p">(</span>
             <span class="n">chrom</span><span class="p">,</span> <span class="n">bin_start</span><span class="p">,</span> <span class="n">bin_end</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_negative</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">retrieved_targets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No features found in region surrounding &quot;</span>
-                        <span class="s2">&quot;region </span><span class="se">\&quot;</span><span class="si">{0}</span><span class="se">\&quot;</span><span class="s2"> position </span><span class="si">{1}</span><span class="s2">. Sampling again.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">))</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
         <span class="n">window_start</span> <span class="o">=</span> <span class="n">bin_start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span>
         <span class="n">window_end</span> <span class="o">=</span> <span class="n">bin_end</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span>
+        <span class="k">if</span> <span class="n">window_end</span> <span class="o">-</span> <span class="n">window_start</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">bin_start</span><span class="p">,</span> <span class="n">bin_end</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="n">strand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRAND_SIDES</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="n">retrieved_seq</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
                 <span class="n">chrom</span><span class="p">,</span> <span class="n">window_start</span><span class="p">,</span> <span class="n">window_end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">retrieved_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Full sequence centered at region </span><span class="se">\&quot;</span><span class="si">{0}</span><span class="se">\&quot;</span><span class="s2"> position &quot;</span>
-                        <span class="s2">&quot;</span><span class="si">{1}</span><span class="s2"> could not be retrieved. Sampling again.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Full sequence centered at </span><span class="si">{0}</span><span class="s2"> position </span><span class="si">{1}</span><span class="s2"> &quot;</span>
+                        <span class="s2">&quot;could not be retrieved. Sampling again.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">retrieved_seq</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">retrieved_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.60</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Over 30</span><span class="si">% o</span><span class="s2">f the bases in the sequence centered &quot;</span>
-                        <span class="s2">&quot;at region </span><span class="se">\&quot;</span><span class="si">{0}</span><span class="se">\&quot;</span><span class="s2"> position </span><span class="si">{1}</span><span class="s2"> are ambiguous (&#39;N&#39;). &quot;</span>
+                        <span class="s2">&quot;at </span><span class="si">{0}</span><span class="s2"> position </span><span class="si">{1}</span><span class="s2"> are ambiguous (&#39;N&#39;). &quot;</span>
                         <span class="s2">&quot;Sampling again.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">retrieved_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="c1"># TODO: remove after investigating this bug.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: sequence retrieved for </span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2"> &quot;</span>
+                  <span class="s2">&quot;had length less than required sequence length </span><span class="si">{4}</span><span class="s2">. &quot;</span>
+                  <span class="s2">&quot;This bug will be investigated and addressed in the next &quot;</span>
+                  <span class="s2">&quot;version of Selene.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                      <span class="n">chrom</span><span class="p">,</span> <span class="n">window_start</span><span class="p">,</span> <span class="n">window_end</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">:</span>
@@ -566,32 +493,21 @@
                  <span class="n">window_end</span><span class="p">,</span>
                  <span class="n">strand</span><span class="p">,</span>
                  <span class="n">feature_indices</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">200000</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_dataset_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">retrieved_seq</span><span class="p">,</span> <span class="n">retrieved_targets</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_update_randcache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Updates the cache of indices of intervals. This allows us</span>
-<span class="sd">        to randomly sample from our data without having to use a</span>
-<span class="sd">        fixed-point approach or keeping all labels in memory.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        mode : str or None, optional</span>
-<span class="sd">            Default is `None`. The mode that these samples should be</span>
-<span class="sd">            used for. See `selene.samplers.IntervalsSampler.modes` for</span>
-<span class="sd">            more information.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">mode</span><span class="p">:</span>
             <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="p">),</span>
+            <span class="n">size</span><span class="o">=</span><span class="mi">200000</span><span class="p">,</span>
             <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="IntervalsSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.IntervalsSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomPositionsSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene.samplers.RandomPositionsSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Randomly draws a mini-batch of examples and their corresponding</span>
 <span class="sd">        labels.</span>
@@ -620,7 +536,7 @@
         <span class="n">n_samples_drawn</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">n_samples_drawn</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
             <span class="n">sample_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">sample_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">indices</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">sample_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">]):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">()</span>
                 <span class="n">sample_index</span> <span class="o">=</span> <span class="mi">0</span>
 

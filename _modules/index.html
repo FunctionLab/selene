@@ -88,15 +88,19 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../overview/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview/installation.html#installing-from-source">Installing from source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../overview/faq.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../selene.html">selene</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../interpret.html">selene.interpret</a><ul>
@@ -104,26 +108,23 @@
 <li class="toctree-l2"><a class="reference internal" href="../interpret.html#heatmap">heatmap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../interpret.html#ismresult">ISMResult</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../predict.html">selene.predict</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../predict.predict_handlers.html">selene.predict.predict_handlers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#predictionshandler">PredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#diffscorehandler">DiffScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#logitscorehandler">LogitScoreHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#writepredictionshandler">WritePredictionsHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#writerefalthandler">WriteRefAltHandler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../predict.predict_handlers.html#write-to-file">write_to_file</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../samplers.html">selene.samplers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#sampler">Sampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../samplers.html#matfilesampler">MatFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../samplers.html#bedfilesampler">BedFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../sequences.html">selene.sequences</a><ul>
@@ -141,9 +142,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utils.html">selene.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#performancemetrics">PerformanceMetrics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#initialize-logger">initialize_logger</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
@@ -209,7 +213,8 @@
            <div itemprop="articleBody">
             
   <h1>All modules for which code is available</h1>
-<ul><li><a href="selene/interpret/ism_result.html">selene.interpret.ism_result</a></li>
+<ul><li><a href="selene/evaluate_model.html">selene.evaluate_model</a></li>
+<li><a href="selene/interpret/ism_result.html">selene.interpret.ism_result</a></li>
 <li><a href="selene/interpret/vis.html">selene.interpret.vis</a></li>
 <li><a href="selene/predict/model_predict.html">selene.predict.model_predict</a></li>
 <li><a href="selene/predict/predict_handlers/diff_score_handler.html">selene.predict.predict_handlers.diff_score_handler</a></li>
@@ -217,9 +222,11 @@
 <li><a href="selene/predict/predict_handlers/logit_score_handler.html">selene.predict.predict_handlers.logit_score_handler</a></li>
 <li><a href="selene/predict/predict_handlers/write_predictions_handler.html">selene.predict.predict_handlers.write_predictions_handler</a></li>
 <li><a href="selene/predict/predict_handlers/write_ref_alt_handler.html">selene.predict.predict_handlers.write_ref_alt_handler</a></li>
+<li><a href="selene/samplers/bed_file_sampler.html">selene.samplers.bed_file_sampler</a></li>
 <li><a href="selene/samplers/intervals_sampler.html">selene.samplers.intervals_sampler</a></li>
 <li><a href="selene/samplers/mat_file_sampler.html">selene.samplers.mat_file_sampler</a></li>
 <li><a href="selene/samplers/online_sampler.html">selene.samplers.online_sampler</a></li>
+<li><a href="selene/samplers/random_positions_sampler.html">selene.samplers.random_positions_sampler</a></li>
 <li><a href="selene/samplers/sampler.html">selene.samplers.sampler</a></li>
 <li><a href="selene/sequences/genome.html">selene.sequences.genome</a></li>
 <li><a href="selene/sequences/proteome.html">selene.sequences.proteome</a></li>
@@ -228,6 +235,8 @@
 <li><a href="selene/targets/target.html">selene.targets.target</a></li>
 <li><a href="selene/train_model.html">selene.train_model</a></li>
 <li><a href="selene/utils/config.html">selene.utils.config</a></li>
+<li><a href="selene/utils/config_utils.html">selene.utils.config_utils</a></li>
+<li><a href="selene/utils/non_strand_specific_module.html">selene.utils.non_strand_specific_module</a></li>
 <li><a href="selene/utils/performance_metrics.html">selene.utils.performance_metrics</a></li>
 <li><a href="selene/utils/utils.html">selene.utils.utils</a></li>
 </ul>
