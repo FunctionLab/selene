@@ -1,0 +1,49 @@
+---
+ops: [train, evaluate]
+model: {
+    # TODO: update this line with the absolute path to the file.
+    file: /absolute/path/to/selene/tutorials/quickstart_training/deeperdeepsea.py,
+    class: DeeperDeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 1,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+sampler: !obj:selene.samplers.IntervalsSampler {
+    reference_sequence: !obj:selene.sequences.Genome {
+        input_path: ./hg19.fasta
+    },
+    features: !obj:selene.utils.load_features_list {
+        input_path: ./distinct_features.txt
+    },
+    target_path: ./sorted_GM12878_CTCF.bed.gz,
+    intervals_path: ./deepsea_TF_intervals.txt,
+    seed: 127,
+    # A positive example is an 1000bp sequence with at least 1 class/feature annotated to it.
+    # A negative sample has no classes/features annotated to the sequence.
+    sample_negative: True,
+    test_holdout: [chr8, chr9],
+    validation_holdout: [chr6, chr7],
+    sequence_length: 1000,
+    center_bin_to_predict: 200,
+    # The feature must take up 50% of the bin (200bp) for it to be considered
+    # a feature annotated to that sequence.
+    feature_thresholds: 0.5,
+    mode: train,
+    save_datasets: [test]
+}
+train_model: !obj:selene.TrainModel {
+    batch_size: 64,
+    max_steps: 16000,  # update this value for longer training
+    report_stats_every_n_steps: 2000,
+    n_validation_samples: 32000,
+    n_test_samples: 120000,
+    cpu_n_threads: 32,
+    use_cuda: True  # TODO: update this if CUDA is not on your machine
+}
+output_dir: ./training_outputs
+random_seed: 1447
+create_subdirectory: False
+...
