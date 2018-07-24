@@ -2,7 +2,7 @@
 ops: [analyze]
 model: {
     # TODO: please update this with the absolute path to the model file
-    file: /mnt/home/kchen/Documents/selene-examples/case1_training_example/data/deeperdeepsea.py, 
+    file: /full/path/to/deeperdeepsea.py 
     class: DeeperDeepSEA,
     sequence_length: 1000,
     n_classes_to_predict: 919,
@@ -11,14 +11,14 @@ model: {
         mode: mean
     }
 }
-analyze_sequences: !obj:selene.predict.AnalyzeSequences {
+analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     sequence_length: 1000,
-    features: !obj:selene.utils.load_features_list {
+    features: !obj:selene_sdk.utils.load_features_list {
         input_path: ./deepsea_features.txt
     },
     trained_model_path: ./0611_deeperdeepsea.pth.tar,
-    use_cuda: True,
-    reference_sequence: !obj:selene.sequences.Genome {
+    use_cuda: True,  # TODO: update if CUDA is not enabled on your machine.
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
         input_path: hg19.fasta
     }
 }

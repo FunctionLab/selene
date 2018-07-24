@@ -10,11 +10,11 @@ model: {
         mode: mean
     }
 }
-sampler: !obj:selene.samplers.IntervalsSampler {
-    reference_sequence: !obj:selene.sequences.Genome {
+sampler: !obj:selene_sdk.samplers.IntervalsSampler {
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
         input_path: /path/to/genome/hg.fa
     },
-    features: !obj:selene.utils.load_features_list {
+    features: !obj:selene_sdk.utils.load_features_list {
         input_path: /path/to/distinct_features.txt
     },
     target_path: /path/to/tabix/indexed/targets.bed.gz, 
@@ -29,7 +29,7 @@ sampler: !obj:selene.samplers.IntervalsSampler {
     sample_negative: True,  # train on samples with no targets present
     save_datasets: [test]
 }
-train_model: !obj:selene.TrainModel {
+train_model: !obj:selene_sdk.TrainModel {
     batch_size: 64,
     max_steps: 80000,
     report_stats_every_n_steps: 16000,

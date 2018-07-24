@@ -243,9 +243,9 @@ def parse_configs_and_run(configs,
     """
     operations = configs.pop("ops")
 
-    if "lr" not in configs and lr != "None":
+    if "train" in operations and "lr" not in configs and lr != "None":
         configs["lr"] = float(lr)
-    elif "lr" in configs and lr != "None" and "train" in operations:
+    elif "train" in operations and "lr" in configs and lr != "None":
         print("Warning: learning rate specified in both the "
               "configuration dict and this method's `lr` parameter. "
               "Using the `lr` value input to `parse_configs_and_run` "

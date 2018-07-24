@@ -2,7 +2,7 @@
 ops: [train, evaluate]
 model: {
     # TODO: update this line with the absolute path to the file.
-    file: /absolute/path/to/selene_sdk/tutorials/quickstart_training/deeperdeepsea.py,
+    file: /absolute/path/to/selene_sdk/tutorials/getting_started_with_selene/deeperdeepsea.py,
     class: DeeperDeepSEA,
     sequence_length: 1000,
     n_classes_to_predict: 1,

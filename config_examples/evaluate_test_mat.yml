@@ -10,15 +10,15 @@ model: {
         mode: mean
     }
 }
-sampler: !obj:selene.samplers.MatFileSampler {
+sampler: !obj:selene_sdk.samplers.MatFileSampler {
     filepath: /path/to/test.mat, 
     sequence_key: testxdata,
     targets_key: testdata,
     shuffle_file: False
 }
-evaluate_model: !obj:selene.EvaluateModel {
+evaluate_model: !obj:selene_sdk.EvaluateModel {
     batch_size: 64,
-    features:  !obj:selene.utils.load_features_list {
+    features:  !obj:selene_sdk.utils.load_features_list {
         input_path: /path/to/distinct_features.txt 
     },
     use_cuda: True, 
