@@ -22,7 +22,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
     Parameters
     ----------
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
         A reference sequence from which to create examples.
     target_path : str
         Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
@@ -64,10 +64,10 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
     Attributes
     ----------
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
         The reference sequence that examples are created from.
-    target : selene.targets.Target
-        The `selene.targets.Target` object holding the features that we
+    target : selene_sdk.targets.Target
+        The `selene_sdk.targets.Target` object holding the features that we
         would like to predict.
     validation_holdout : list(str) or float
         The samples to hold out for validating model performance. These
@@ -285,7 +285,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         ----------
         mode : str
             The mode to run the sampler in when fetching the samples.
-            See `selene.samplers.IntervalsSampler.modes` for more
+            See `selene_sdk.samplers.IntervalsSampler.modes` for more
             information.
         batch_size : int
             The size of the batches to divide the data into.
@@ -329,7 +329,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         ----------
         mode : str
             The mode to run the sampler in when fetching the samples.
-            See `selene.samplers.IntervalsSampler.modes` for more
+            See `selene_sdk.samplers.IntervalsSampler.modes` for more
             information.
         batch_size : int
             The size of the batches to divide the data into.

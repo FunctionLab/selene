@@ -44,7 +44,7 @@ class IntervalsSampler(OnlineSampler):
 
     Parameters
     ----------
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
         A reference sequence from which to create examples.
     target_path : str
         Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
@@ -96,10 +96,10 @@ class IntervalsSampler(OnlineSampler):
 
     Attributes
     ----------
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
         The reference sequence that examples are created from.
-    target : selene.targets.Target
-        The `selene.targets.Target` object holding the features that we
+    target : selene_sdk.targets.Target
+        The `selene_sdk.targets.Target` object holding the features that we
         would like to predict.
     sample_from_intervals : list(tuple(str, int, int))
         A list of coordinates that specify the intervals we can draw
@@ -361,7 +361,7 @@ class IntervalsSampler(OnlineSampler):
         ----------
         mode : str or None, optional
             Default is `None`. The mode that these samples should be
-            used for. See `selene.samplers.IntervalsSampler.modes` for
+            used for. See `selene_sdk.samplers.IntervalsSampler.modes` for
             more information.
 
         """

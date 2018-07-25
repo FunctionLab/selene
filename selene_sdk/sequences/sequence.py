@@ -65,7 +65,7 @@ def encoding_to_sequence(encoding, bases_arr, unk_base):
         to the correct columns for those bases in the encoding.
     unk_base : str
         The base corresponding to the "unknown" character in this
-        encoding. See `selene.sequences.Sequence.UNK_BASE` for more
+        encoding. See `selene_sdk.sequences.Sequence.UNK_BASE` for more
         information.
 
     Returns

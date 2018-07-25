@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from selene.sequences.genome import _get_sequence_from_coords
-from selene.sequences.sequence import sequence_to_encoding, \
+from selene_sdk.sequences.genome import _get_sequence_from_coords
+from selene_sdk.sequences.sequence import sequence_to_encoding, \
     encoding_to_sequence
 
 

@@ -44,7 +44,7 @@ def in_silico_mutagenesis_sequences(sequence,
         mutations evaluated, e.g. `mutate_n_bases = 2` considers all
         pairs of SNPs.
     reference_sequence : class, optional
-        Default is `selene.sequences.Genome`. The type of sequence
+        Default is `selene_sdk.sequences.Genome`. The type of sequence
         that has been passed in.
 
     Returns
@@ -124,7 +124,7 @@ def mutate_sequence(encoding,
         mutate and the base to which to mutate that position in the
         sequence.
     reference_sequence : class, optional
-        Default is `selene.sequences.Genome`. A reference sequence
+        Default is `selene_sdk.sequences.Genome`. A reference sequence
         from which to retrieve smaller sequences..
 
     Returns
@@ -206,7 +206,7 @@ def _add_sequence_surrounding_alt(alt_sequence,
     chrom : str
     ref_start : int
     ref_end : int
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
 
     Returns
     -------
@@ -268,10 +268,10 @@ class AnalyzeSequences(object):
     use_cuda : bool, optional
         Default is `False`. Specifies whether to use CUDA or not.
     reference_sequence : class, optional
-        Default is `selene.sequences.Genome`. The type of sequence that
+        Default is `selene_sdk.sequences.Genome`. The type of sequence that
         this analysis will be performed on. Please note that if you need
         to use variant effect prediction, you cannot only pass in the
-        class--you must pass in the constructed `selene.sequences.Sequence`
+        class--you must pass in the constructed `selene_sdk.sequences.Sequence`
         object with a particular sequence version (e.g. `Genome("hg19.fa")`).
         This version does NOT have to be the same sequence version that the
         model was trained on. That is, if the sequences in your variants file

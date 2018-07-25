@@ -663,11 +663,11 @@ def _load_chrs_gene_intervals(gene_intervals_bed):
 
 def _variants_closest_protein_coding_gene(labels, version="hg38"):
     gene_intervals_tabix = pkg_resources.resource_filename(
-        "selene",
+        "selene_sdk",
         ("interpret/data/gencode_v28_{0}/"
          "protein_coding_l12_genes.bed.gz").format(version))
     gene_intervals_bed = pkg_resources.resource_filename(
-        "selene",
+        "selene_sdk",
         ("interpret/data/gencode_v28_{0}/"
          "protein_coding_l12_genes.bed").format(version))
 

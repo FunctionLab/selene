@@ -2,11 +2,11 @@
 interface for sampling classes. These sampling classes should provide
 a way to query some training/validation/test data for examples.
 
-TODO: Note that there are two samplers in the `selene.samplers` module
+TODO: Note that there are two samplers in the `selene_sdk.samplers` module
 that do not subclass `Sampler`. This is because `Sampler` samples from
 multiple modes (e.g. training, validation) whereas the single-mode
-samplers (`selene.samplers.MatFileSampler` and
-`selene.samplers.BedFileSampler`) do not. Future work will improve the
+samplers (`selene_sdk.samplers.MatFileSampler` and
+`selene_sdk.samplers.BedFileSampler`) do not. Future work will improve the
 organization, design, and naming of these classes.
 """
 import random
@@ -120,7 +120,7 @@ class Sampler(metaclass=ABCMeta):
         n_samples : int, optional
             Default is None. The total number of validation examples to
             retrieve. Handling for `n_samples=None` should be done by
-            all classes that subclass `selene.samplers.Sampler`.
+            all classes that subclass `selene_sdk.samplers.Sampler`.
 
         """
         raise NotImplementedError()

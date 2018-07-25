@@ -11,7 +11,7 @@ class BedFileSampler(object):
     ----------
     filepath : str
         The path to the file to load the data from.
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
         A reference sequence from which to create examples.
     n_samples : int
         Number of lines in the file. (`wc -l <filepath>`)
@@ -38,7 +38,7 @@ class BedFileSampler(object):
     ----------
     filepath : str
         The path to the file to load the data from.
-    reference_sequence : selene.sequences.Sequence
+    reference_sequence : selene_sdk.sequences.Sequence
         A reference sequence from which to create examples.
     n_samples : int
         Number of lines in the file. (`wc -l <filepath>`)

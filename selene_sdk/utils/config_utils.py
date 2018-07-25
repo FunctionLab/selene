@@ -65,7 +65,7 @@ def initialize_model(model_configs, train=True, lr=None):
     model = model_class(sequence_length, n_classes)
 
     if model_configs["non_strand_specific"]["use_module"]:
-        from selene.utils import NonStrandSpecific
+        from selene_sdk.utils import NonStrandSpecific
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"]["mode"])
 

@@ -1,6 +1,6 @@
 import unittest
 
-from selene.predict.model_predict import in_silico_mutagenesis_sequences
+from selene_sdk.predict.model_predict import in_silico_mutagenesis_sequences
 
 class TestModelPredict(unittest.TestCase):
 

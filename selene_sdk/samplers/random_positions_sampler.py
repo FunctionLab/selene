@@ -1,8 +1,8 @@
 """
 This module provides the RandomPositionsSampler class.
 
-TODO: Currently, only works with sequences from `selene.sequences.Genome`.
-We would like to generalize this to `selene.sequences.Sequence` if possible.
+TODO: Currently, only works with sequences from `selene_sdk.sequences.Genome`.
+We would like to generalize this to `selene_sdk.sequences.Sequence` if possible.
 """
 from collections import namedtuple
 import logging
@@ -47,11 +47,11 @@ class RandomPositionsSampler(OnlineSampler):
     """This sampler randomly selects a position in the genome and queries for
     a sequence centered at that position for input to the model.
 
-    TODO: generalize to selene.sequences.Sequence?
+    TODO: generalize to selene_sdk.sequences.Sequence?
 
     Parameters
     ----------
-    reference_sequence : selene.sequences.Genome
+    reference_sequence : selene_sdk.sequences.Genome
         A reference sequence from which to create examples.
     target_path : str
         Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
@@ -93,10 +93,10 @@ class RandomPositionsSampler(OnlineSampler):
 
     Attributes
     ----------
-    reference_sequence : selene.sequences.Genome
+    reference_sequence : selene_sdk.sequences.Genome
         The reference sequence that examples are created from.
-    target : selene.targets.Target
-        The `selene.targets.Target` object holding the features that we
+    target : selene_sdk.targets.Target
+        The `selene_sdk.targets.Target` object holding the features that we
         would like to predict.
     validation_holdout : list(str) or float
         The samples to hold out for validating model performance. These

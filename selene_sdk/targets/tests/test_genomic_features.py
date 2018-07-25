@@ -3,8 +3,8 @@ import unittest
 
 import numpy as np
 
-from selene.targets import GenomicFeatures
-from selene.targets.genomic_features import _any_positive_rows, \
+from selene_sdk.targets import GenomicFeatures
+from selene_sdk.targets.genomic_features import _any_positive_rows, \
     _is_positive_row, _get_feature_data
 
 
@@ -198,7 +198,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test_GenomicFeatures_single_threshold(self):
         data_path = os.path.join(
-            "selene", "targets", "tests",
+            "selene_sdk", "targets", "tests",
             "files", "sorted_aggregate.bed.gz")
         query_features = GenomicFeatures(
             data_path, self.features, 0.50)
@@ -211,7 +211,7 @@ class TestGenomicFeatures(unittest.TestCase):
 
     def test_GenomicFeatures_diff_thresholds(self):
         data_path = os.path.join(
-            "selene", "targets", "tests",
+            "selene_sdk", "targets", "tests",
             "files", "sorted_aggregate.bed.gz")
         query_features = GenomicFeatures(
             data_path, self.features,
@@ -235,7 +235,7 @@ class TestGenomicFeatures(unittest.TestCase):
                 return 0.50
 
         data_path = os.path.join(
-            "selene", "targets", "tests",
+            "selene_sdk", "targets", "tests",
             "files", "sorted_aggregate.bed.gz")
         query_features = GenomicFeatures(
             data_path, self.features, _feature_thresholds)
