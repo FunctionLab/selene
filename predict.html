@@ -242,10 +242,10 @@ Architecture must match <cite>model</cite>.</li>
 <li><strong>batch_size</strong> (<em>int, optional</em>) – Default is 64. The size of the mini-batches to use.</li>
 <li><strong>features</strong> (<em>list(str)</em>) – The names of the features that the model is predicting.</li>
 <li><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specifies whether to use CUDA or not.</li>
-<li><strong>reference_sequence</strong> (<em>class, optional</em>) – Default is <cite>selene.sequences.Genome</cite>. The type of sequence that
+<li><strong>reference_sequence</strong> (<em>class, optional</em>) – Default is <cite>selene_sdk.sequences.Genome</cite>. The type of sequence that
 this analysis will be performed on. Please note that if you need
 to use variant effect prediction, you cannot only pass in the
-class–you must pass in the constructed <cite>selene.sequences.Sequence</cite>
+class–you must pass in the constructed <cite>selene_sdk.sequences.Sequence</cite>
 object with a particular sequence version (e.g. <cite>Genome(“hg19.fa”)</cite>).
 This version does NOT have to be the same sequence version that the
 model was trained on. That is, if the sequences in your variants file
@@ -255,7 +255,7 @@ in hg19.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+0262fd0 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</li>
 <li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequences that the model is expecting.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batches to use.</li>
 <li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</li>
@@ -409,7 +409,7 @@ where <span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_siz
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The model predictions of shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where <span class="math notranslate nohighlight">\(F\)</span>
 is the number of features (classes) the model predicts.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a></td>
 </tr>
 </tbody>
 </table>

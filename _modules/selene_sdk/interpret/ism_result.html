@@ -223,7 +223,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">selene.sequences</span> <span class="k">import</span> <span class="n">Genome</span>
+<span class="kn">from</span> <span class="nn">..sequences</span> <span class="k">import</span> <span class="n">Genome</span>
 
 
 <div class="viewcode-block" id="ISMResult"><a class="viewcode-back" href="../../../interpret.html#selene_sdk.interpret.ISMResult">[docs]</a><span class="k">class</span> <span class="nc">ISMResult</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -238,10 +238,10 @@
 <span class="sd">        mutagenesis experiments.</span>
 
 <span class="sd">    sequence_type : class, optional</span>
-<span class="sd">        Default is `selene.sequences.Genome`. The type of sequence</span>
+<span class="sd">        Default is `selene_sdk.sequences.Genome`. The type of sequence</span>
 <span class="sd">        that the *in silico* mutagenesis results are associated</span>
 <span class="sd">        with. This should generally be a subclass of</span>
-<span class="sd">        `selene.sequences.Sequence`</span>
+<span class="sd">        `selene_sdk.sequences.Sequence`</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -260,7 +260,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">sequence_type</span><span class="o">=</span><span class="n">Genome</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a new `selene.interpret.ISMResult` object.</span>
+<span class="sd">        Constructs a new `selene_sdk.interpret.ISMResult` object.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Construct the reference sequence.</span>
@@ -315,7 +315,7 @@
     <span class="k">def</span> <span class="nf">sequence_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The type of underlying sequence. This should generally be a</span>
-<span class="sd">        subclass of `selene.sequences.Sequence`.</span>
+<span class="sd">        subclass of `selene_sdk.sequences.Sequence`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -397,7 +397,7 @@
 <div class="viewcode-block" id="ISMResult.from_file"><a class="viewcode-back" href="../../../interpret.html#selene_sdk.interpret.ISMResult.from_file">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">sequence_type</span><span class="o">=</span><span class="n">Genome</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Loads a `selene.interpret.ISMResult` from a `pandas.DataFrame`</span>
+<span class="sd">        Loads a `selene_sdk.interpret.ISMResult` from a `pandas.DataFrame`</span>
 <span class="sd">        stored in a file of comma separated values (CSV).</span>
 
 <span class="sd">        Parameters</span>
@@ -406,14 +406,14 @@
 <span class="sd">            A path to the file of comma separated input values.</span>
 
 <span class="sd">        sequence_type : class, optional</span>
-<span class="sd">            Default is `selene.sequences.Genome`. The type of sequence</span>
+<span class="sd">            Default is `selene_sdk.sequences.Genome`. The type of sequence</span>
 <span class="sd">            that the *in silico* mutagenesis results are associated</span>
 <span class="sd">            with. This should generally be a subclass of</span>
-<span class="sd">            `selene.sequences.Sequence`.</span>
+<span class="sd">            `selene_sdk.sequences.Sequence`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        selene.interpret.ISMResult</span>
+<span class="sd">        selene_sdk.interpret.ISMResult</span>
 <span class="sd">            The *in silico* mutagenesis results that were stored in the</span>
 <span class="sd">            specified input file.</span>
 

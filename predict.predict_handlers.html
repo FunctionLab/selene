@@ -216,15 +216,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene.predict.predict_handlers">
-<span id="selene-predict-predict-handlers"></span><h1>selene.predict.predict_handlers<a class="headerlink" href="#module-selene.predict.predict_handlers" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-selene_sdk.predict.predict_handlers">
+<span id="selene-predict-predict-handlers"></span><h1>selene.predict.predict_handlers<a class="headerlink" href="#module-selene_sdk.predict.predict_handlers" title="Permalink to this headline">¶</a></h1>
 <p>This module provides the classes and methods for prediction handlers,
 which generally are used for logging and saving outputs from models.</p>
 <div class="section" id="predictionshandler">
 <h2>PredictionsHandler<a class="headerlink" href="#predictionshandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.predict.predict_handlers.PredictionsHandler">
-<em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">PredictionsHandler</code><a class="reference internal" href="_modules/selene/predict/predict_handlers/handler.html#PredictionsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.PredictionsHandler" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.PredictionsHandler">
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">PredictionsHandler</code><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for handlers, which “handle” model
 predictions. # TODO(DOCUMENTATION): Elaborate.</p>
@@ -243,8 +243,8 @@ predictions. # TODO(DOCUMENTATION): Elaborate.</p>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.predict.predict_handlers.PredictionsHandler.handle_NA">
-<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>row_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/handler.html#PredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.PredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA">
+<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>row_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle rows without data that we still want to write to file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -257,14 +257,14 @@ predictions. # TODO(DOCUMENTATION): Elaborate.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.PredictionsHandler.handle_batch_predictions">
-<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/handler.html#PredictionsHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.PredictionsHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.PredictionsHandler.handle_batch_predictions">
+<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Must be able to handle a batch of model predictions.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.PredictionsHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/handler.html#PredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.PredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file">
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes accumulated handler results to file.</p>
 </dd></dl>
 
@@ -274,9 +274,9 @@ predictions. # TODO(DOCUMENTATION): Elaborate.</p>
 <div class="section" id="diffscorehandler">
 <h2>DiffScoreHandler<a class="headerlink" href="#diffscorehandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.predict.predict_handlers.DiffScoreHandler">
-<em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">DiffScoreHandler</code><span class="sig-paren">(</span><em>features</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.DiffScoreHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
+<dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler">
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">DiffScoreHandler</code><span class="sig-paren">(</span><em>features</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>The “diff score” is the difference between <cite>alt</cite> and <cite>ref</cite>
 predictions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -305,8 +305,8 @@ which the features data corresponds.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.predict.predict_handlers.DiffScoreHandler.handle_NA">
-<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.DiffScoreHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler.handle_NA">
+<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -319,8 +319,8 @@ which the features data corresponds.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.DiffScoreHandler.handle_batch_predictions">
-<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>baseline_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.DiffScoreHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler.handle_batch_predictions">
+<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>baseline_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p># TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -348,8 +348,8 @@ features).</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.DiffScoreHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.DiffScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file">
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -359,9 +359,9 @@ features).</li>
 <div class="section" id="logitscorehandler">
 <h2>LogitScoreHandler<a class="headerlink" href="#logitscorehandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.predict.predict_handlers.LogitScoreHandler">
-<em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">LogitScoreHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.LogitScoreHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
+<dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler">
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">LogitScoreHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>The logit score handler calculates and records the
 difference between <cite>logit(alt)</cite> and <cite>logit(ref)</cite> predictions.
 For reference, if some event occurs with probability <span class="math notranslate nohighlight">\(p\)</span>,
@@ -396,8 +396,8 @@ which the features data corresponds.</li>
 </table>
 <p class="rubric">Notes</p>
 <dl class="method">
-<dt id="selene.predict.predict_handlers.LogitScoreHandler.handle_NA">
-<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.LogitScoreHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_NA">
+<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -410,8 +410,8 @@ which the features data corresponds.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions">
-<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>baseline_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions">
+<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>baseline_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p># TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -439,8 +439,8 @@ features).</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.LogitScoreHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.LogitScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler.write_to_file">
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -450,9 +450,9 @@ features).</li>
 <div class="section" id="writepredictionshandler">
 <h2>WritePredictionsHandler<a class="headerlink" href="#writepredictionshandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.predict.predict_handlers.WritePredictionsHandler">
-<em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">WritePredictionsHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WritePredictionsHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
+<dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler">
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">WritePredictionsHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>Collects batches of model predictions and writes all of them
 to file at the end.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -471,8 +471,8 @@ which the features data corresponds.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.predict.predict_handlers.WritePredictionsHandler.handle_NA">
-<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WritePredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_NA">
+<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -485,8 +485,8 @@ which the features data corresponds.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions">
-<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions">
+<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -509,8 +509,8 @@ sequence.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.WritePredictionsHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WritePredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file">
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -520,9 +520,9 @@ sequence.</li>
 <div class="section" id="writerefalthandler">
 <h2>WriteRefAltHandler<a class="headerlink" href="#writerefalthandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="selene.predict.predict_handlers.WriteRefAltHandler">
-<em class="property">class </em><code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">WriteRefAltHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>out_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WriteRefAltHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
+<dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler">
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">WriteRefAltHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>out_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>Used during variant effect prediction. This handler records the
 predicted values for the reference and alternate sequences, and
 stores these values in two separate files.</p>
@@ -552,8 +552,8 @@ the file names.</li>
 </tbody>
 </table>
 <dl class="method">
-<dt id="selene.predict.predict_handlers.WriteRefAltHandler.handle_NA">
-<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WriteRefAltHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_NA">
+<code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -566,8 +566,8 @@ the file names.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions">
-<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>base_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions">
+<code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>base_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -595,8 +595,8 @@ features).</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="selene.predict.predict_handlers.WriteRefAltHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.WriteRefAltHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file">
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -606,8 +606,8 @@ features).</li>
 <div class="section" id="write-to-file">
 <h2>write_to_file<a class="headerlink" href="#write-to-file" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="selene.predict.predict_handlers.write_to_file">
-<code class="descclassname">selene.predict.predict_handlers.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>data_across_features</em>, <em>info_cols</em>, <em>column_names</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene/predict/predict_handlers/handler.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene.predict.predict_handlers.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dt id="selene_sdk.predict.predict_handlers.write_to_file">
+<code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>data_across_features</em>, <em>info_cols</em>, <em>column_names</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write samples with valid predictions/scores to a tab-delimited file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

@@ -261,7 +261,7 @@
 <span class="sd">        mutations evaluated, e.g. `mutate_n_bases = 2` considers all</span>
 <span class="sd">        pairs of SNPs.</span>
 <span class="sd">    reference_sequence : class, optional</span>
-<span class="sd">        Default is `selene.sequences.Genome`. The type of sequence</span>
+<span class="sd">        Default is `selene_sdk.sequences.Genome`. The type of sequence</span>
 <span class="sd">        that has been passed in.</span>
 
 <span class="sd">    Returns</span>
@@ -341,7 +341,7 @@
 <span class="sd">        mutate and the base to which to mutate that position in the</span>
 <span class="sd">        sequence.</span>
 <span class="sd">    reference_sequence : class, optional</span>
-<span class="sd">        Default is `selene.sequences.Genome`. A reference sequence</span>
+<span class="sd">        Default is `selene_sdk.sequences.Genome`. A reference sequence</span>
 <span class="sd">        from which to retrieve smaller sequences..</span>
 
 <span class="sd">    Returns</span>
@@ -423,7 +423,7 @@
 <span class="sd">    chrom : str</span>
 <span class="sd">    ref_start : int</span>
 <span class="sd">    ref_end : int</span>
-<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Sequence</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -485,10 +485,10 @@
 <span class="sd">    use_cuda : bool, optional</span>
 <span class="sd">        Default is `False`. Specifies whether to use CUDA or not.</span>
 <span class="sd">    reference_sequence : class, optional</span>
-<span class="sd">        Default is `selene.sequences.Genome`. The type of sequence that</span>
+<span class="sd">        Default is `selene_sdk.sequences.Genome`. The type of sequence that</span>
 <span class="sd">        this analysis will be performed on. Please note that if you need</span>
 <span class="sd">        to use variant effect prediction, you cannot only pass in the</span>
-<span class="sd">        class--you must pass in the constructed `selene.sequences.Sequence`</span>
+<span class="sd">        class--you must pass in the constructed `selene_sdk.sequences.Sequence`</span>
 <span class="sd">        object with a particular sequence version (e.g. `Genome(&quot;hg19.fa&quot;)`).</span>
 <span class="sd">        This version does NOT have to be the same sequence version that the</span>
 <span class="sd">        model was trained on. That is, if the sequences in your variants file</span>

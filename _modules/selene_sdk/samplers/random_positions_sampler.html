@@ -218,8 +218,8 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module provides the RandomPositionsSampler class.</span>
 
-<span class="sd">TODO: Currently, only works with sequences from `selene.sequences.Genome`.</span>
-<span class="sd">We would like to generalize this to `selene.sequences.Sequence` if possible.</span>
+<span class="sd">TODO: Currently, only works with sequences from `selene_sdk.sequences.Genome`.</span>
+<span class="sd">We would like to generalize this to `selene_sdk.sequences.Sequence` if possible.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -264,11 +264,11 @@
     <span class="sd">&quot;&quot;&quot;This sampler randomly selects a position in the genome and queries for</span>
 <span class="sd">    a sequence centered at that position for input to the model.</span>
 
-<span class="sd">    TODO: generalize to selene.sequences.Sequence?</span>
+<span class="sd">    TODO: generalize to selene_sdk.sequences.Sequence?</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reference_sequence : selene.sequences.Genome</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Genome</span>
 <span class="sd">        A reference sequence from which to create examples.</span>
 <span class="sd">    target_path : str</span>
 <span class="sd">        Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic</span>
@@ -310,10 +310,10 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reference_sequence : selene.sequences.Genome</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Genome</span>
 <span class="sd">        The reference sequence that examples are created from.</span>
-<span class="sd">    target : selene.targets.Target</span>
-<span class="sd">        The `selene.targets.Target` object holding the features that we</span>
+<span class="sd">    target : selene_sdk.targets.Target</span>
+<span class="sd">        The `selene_sdk.targets.Target` object holding the features that we</span>
 <span class="sd">        would like to predict.</span>
 <span class="sd">    validation_holdout : list(str) or float</span>
 <span class="sd">        The samples to hold out for validating model performance. These</span>

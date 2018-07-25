@@ -287,7 +287,7 @@ sampler, divided into batches.</p>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
 <li><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of validation examples to
 retrieve. Handling for <cite>n_samples=None</cite> should be done by
-all classes that subclass <cite>selene.samplers.Sampler</cite>.</li>
+all classes that subclass <cite>selene_sdk.samplers.Sampler</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -344,7 +344,7 @@ extremely large dataset into memory when developing a new model.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
+<li><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
 <li><strong>target_path</strong> (<em>str</em>) – Path to tabix-indexed, compressed BED file (<cite>*.bed.gz</cite>) of genomic
 coordinates mapped to the genomic features we want to predict.</li>
 <li><strong>features</strong> (<em>list(str)</em>) – List of distinct features that we aim to predict.</li>
@@ -375,8 +375,8 @@ automatically.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – The reference sequence that examples are created from.</li>
-<li><strong>target</strong> (<em>selene.targets.Target</em>) – The <cite>selene.targets.Target</cite> object holding the features that we
+<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.Sequence"><em>selene_sdk.sequences.Sequence</em></a>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene_sdk.targets.Target" title="selene_sdk.targets.Target"><em>selene_sdk.targets.Target</em></a>) – The <cite>selene_sdk.targets.Target</cite> object holding the features that we
 would like to predict.</li>
 <li><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for validating model performance. These
 can be “regional” or “proportional”. If regional, this is a list
@@ -429,7 +429,7 @@ the data.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
-See <cite>selene.samplers.IntervalsSampler.modes</cite> for more
+See <cite>selene_sdk.samplers.IntervalsSampler.modes</cite> for more
 information.</li>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
 <li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
@@ -448,7 +448,7 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -466,7 +466,7 @@ mode, divided into mini-batches.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
-See <cite>selene.samplers.IntervalsSampler.modes</cite> for more
+See <cite>selene_sdk.samplers.IntervalsSampler.modes</cite> for more
 information.</li>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
 <li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of samples to retrieve.
@@ -487,7 +487,7 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -563,7 +563,7 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If no test partition of the data was specified during
@@ -602,7 +602,7 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -647,7 +647,7 @@ file and <cite>save_dataset_to_file</cite> will not be called with
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
+<li><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
 <li><strong>target_path</strong> (<em>str</em>) – Path to tabix-indexed, compressed BED file (<cite>*.bed.gz</cite>) of genomic
 coordinates mapped to the genomic features we want to predict.</li>
 <li><strong>features</strong> (<em>list(str)</em>) – List of distinct features that we aim to predict.</li>
@@ -685,8 +685,8 @@ automatically.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – The reference sequence that examples are created from.</li>
-<li><strong>target</strong> (<em>selene.targets.Target</em>) – The <cite>selene.targets.Target</cite> object holding the features that we
+<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.Sequence"><em>selene_sdk.sequences.Sequence</em></a>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene_sdk.targets.Target" title="selene_sdk.targets.Target"><em>selene_sdk.targets.Target</em></a>) – The <cite>selene_sdk.targets.Target</cite> object holding the features that we
 would like to predict.</li>
 <li><strong>sample_from_intervals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>)</em><em>)</em>) – A list of coordinates that specify the intervals we can draw
 samples from.</li>
@@ -741,7 +741,7 @@ shape of <cite>sequences</cite> will be
 The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
 where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -758,13 +758,13 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.online_sampler.OnlineSampler</span></code></p>
 <p>This sampler randomly selects a position in the genome and queries for
 a sequence centered at that position for input to the model.</p>
-<p>TODO: generalize to selene.sequences.Sequence?</p>
+<p>TODO: generalize to selene_sdk.sequences.Sequence?</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Genome</em>) – A reference sequence from which to create examples.</li>
+<li><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Genome</em>) – A reference sequence from which to create examples.</li>
 <li><strong>target_path</strong> (<em>str</em>) – Path to tabix-indexed, compressed BED file (<cite>*.bed.gz</cite>) of genomic
 coordinates mapped to the genomic features we want to predict.</li>
 <li><strong>features</strong> (<em>list(str)</em>) – List of distinct features that we aim to predict.</li>
@@ -795,8 +795,8 @@ automatically.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Genome</em>) – The reference sequence that examples are created from.</li>
-<li><strong>target</strong> (<em>selene.targets.Target</em>) – The <cite>selene.targets.Target</cite> object holding the features that we
+<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Genome" title="selene_sdk.sequences.Genome"><em>selene_sdk.sequences.Genome</em></a>) – The reference sequence that examples are created from.</li>
+<li><strong>target</strong> (<a class="reference internal" href="targets.html#selene_sdk.targets.Target" title="selene_sdk.targets.Target"><em>selene_sdk.targets.Target</em></a>) – The <cite>selene_sdk.targets.Target</cite> object holding the features that we
 would like to predict.</li>
 <li><strong>validation_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – The samples to hold out for validating model performance. These
 can be “regional” or “proportional”. If regional, this is a list
@@ -841,7 +841,7 @@ shape of <cite>sequences</cite> will be
 The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
 where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -932,7 +932,7 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -960,7 +960,7 @@ shape of <cite>sequences</cite> will be
 The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
 where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -982,7 +982,7 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>filepath</strong> (<em>str</em>) – The path to the file to load the data from.</li>
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
+<li><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
 <li><strong>n_samples</strong> (<em>int</em>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</li>
 <li><strong>sequence_length</strong> (<em>int or None, optional</em>) – Default is None. If the coordinates of each sample in the BED file
 already account for the full sequence (that is,
@@ -1004,7 +1004,7 @@ within the interval.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
 <li><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file to load the data from.</li>
-<li><strong>reference_sequence</strong> (<em>selene.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
+<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.Sequence"><em>selene_sdk.sequences.Sequence</em></a>) – A reference sequence from which to create examples.</li>
 <li><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</li>
 <li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If the coordinates of each sample in the BED file
 already account for the full sequence (that is,
@@ -1081,7 +1081,7 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -1109,7 +1109,7 @@ shape of <cite>sequences</cite> will be
 The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
 where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>)</td>
 </tr>
 </tbody>
 </table>

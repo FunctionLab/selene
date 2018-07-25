@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.predict.predict_handlers.handler &mdash; Selene master documentation</title>
+  <title>selene_sdk.predict.predict_handlers.handler &mdash; Selene master documentation</title>
   
 
   
@@ -199,7 +199,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene.predict.predict_handlers.handler</li>
+      <li>selene_sdk.predict.predict_handlers.handler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -214,7 +214,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene.predict.predict_handlers.handler</h1><div class="highlight"><pre>
+  <h1>Source code for selene_sdk.predict.predict_handlers.handler</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This class is the abstract base class for all handlers, i.e. objects</span>
 <span class="sd">that &quot;handle&quot; model predictions.</span>
@@ -224,7 +224,7 @@
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
 
 
-<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span> <span class="n">info_cols</span><span class="p">,</span> <span class="n">column_names</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span> <span class="n">info_cols</span><span class="p">,</span> <span class="n">column_names</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Write samples with valid predictions/scores to a tab-delimited file.</span>
 
@@ -304,7 +304,7 @@
     <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{:.2e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probabilities</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="PredictionsHandler"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.PredictionsHandler">[docs]</a><span class="k">class</span> <span class="nc">PredictionsHandler</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+<div class="viewcode-block" id="PredictionsHandler"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler">[docs]</a><span class="k">class</span> <span class="nc">PredictionsHandler</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The abstract base class for handlers, which &quot;handle&quot; model</span>
 <span class="sd">    predictions. # TODO(DOCUMENTATION): Elaborate.</span>
@@ -327,7 +327,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="PredictionsHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.PredictionsHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="PredictionsHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handle rows without data that we still want to write to file.</span>
 
@@ -339,14 +339,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_ids</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PredictionsHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.PredictionsHandler.handle_batch_predictions">[docs]</a>    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="PredictionsHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_batch_predictions">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">handle_batch_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Must be able to handle a batch of model predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="PredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.PredictionsHandler.write_to_file">[docs]</a>    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="PredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes accumulated handler results to file.</span>

@@ -1,8 +1,8 @@
 selene.predict.predict\_handlers
 ===========================================
 
-.. automodule:: selene.predict.predict_handlers
-.. currentmodule:: selene.predict.predict_handlers
+.. automodule:: selene_sdk.predict.predict_handlers
+.. currentmodule:: selene_sdk.predict.predict_handlers
 
 PredictionsHandler
 ----------------------------------------

@@ -257,7 +257,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    model : torch.nn.Module</span>
 <span class="sd">        The model to train.</span>
-<span class="sd">    data_sampler : selene.samplers.Sampler</span>
+<span class="sd">    data_sampler : selene_sdk.samplers.Sampler</span>
 <span class="sd">        The example generator.</span>
 <span class="sd">    loss_criterion : torch.nn._Loss</span>
 <span class="sd">        The loss function to optimize.</span>
@@ -280,20 +280,20 @@
 <span class="sd">    n_validation_samples : int or None, optional</span>
 <span class="sd">        Default is `None`. Specify the number of validation samples in the</span>
 <span class="sd">        validation set. If `n_validation_samples` is `None` and the data sampler</span>
-<span class="sd">        used is the `selene.samplers.IntervalsSampler` or</span>
-<span class="sd">        `selene.samplers.RandomSampler`, we will retrieve 32000</span>
+<span class="sd">        used is the `selene_sdk.samplers.IntervalsSampler` or</span>
+<span class="sd">        `selene_sdk.samplers.RandomSampler`, we will retrieve 32000</span>
 <span class="sd">        validation samples. If `None` and using</span>
-<span class="sd">        `selene.samplers.MatFileSampler`, we will use all</span>
+<span class="sd">        `selene_sdk.samplers.MatFileSampler`, we will use all</span>
 <span class="sd">        validation samples in the matrix.</span>
 <span class="sd">    n_test_samples : int or None, optional</span>
 <span class="sd">        Default is `None`. Specify the number of test samples in the test set.</span>
 <span class="sd">        If `n_test_samples` is `None` and the data sampler used is the</span>
-<span class="sd">        `selene.samplers.IntervalsSampler`, the size of the test set is</span>
+<span class="sd">        `selene_sdk.samplers.IntervalsSampler`, the size of the test set is</span>
 <span class="sd">        the number of test intervals we can sample from. If</span>
-<span class="sd">        `None` and using `selene.samplers.RandomSampler`, the size is</span>
+<span class="sd">        `None` and using `selene_sdk.samplers.RandomSampler`, the size is</span>
 <span class="sd">        :math:`\\frac{N}{20}`, where :math:`N` is the number of possible</span>
 <span class="sd">        positions in the test partition of the genome. If  `None` and</span>
-<span class="sd">        using `selene.samplers.MatFileSampler`, we will use all</span>
+<span class="sd">        using `selene_sdk.samplers.MatFileSampler`, we will use all</span>
 <span class="sd">        test samples in the matrix.</span>
 <span class="sd">    cpu_n_threads : int, optional</span>
 <span class="sd">        Default is 32.</span>
@@ -312,7 +312,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    model : torch.nn.Module</span>
 <span class="sd">        The model to train.</span>
-<span class="sd">    sampler : selene.samplers.Sampler</span>
+<span class="sd">    sampler : selene_sdk.samplers.Sampler</span>
 <span class="sd">        The example generator.</span>
 <span class="sd">    loss_criterion : torch.nn._Loss</span>
 <span class="sd">        The loss function to optimize.</span>
@@ -396,7 +396,7 @@
             <span class="n">verbosity</span><span class="o">=</span><span class="n">logging_verbosity</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_validation_set</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_validation_samples</span><span class="p">)</span>
-        <span class="c1"># TODO: Only `selene.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.</span>
+        <span class="c1"># TODO: Only `selene_sdk.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.</span>
         <span class="c1"># So, what should be done to allow more general sampling methods?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validation_metrics</span> <span class="o">=</span> <span class="n">PerformanceMetrics</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_feature_from_index</span><span class="p">,</span>

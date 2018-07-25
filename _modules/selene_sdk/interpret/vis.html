@@ -381,9 +381,9 @@
 <span class="sd">        Default is `None`. The axes to plot on. If left as `None`, a new</span>
 <span class="sd">        axis will be created.</span>
 <span class="sd">    sequence_type : class, optional</span>
-<span class="sd">        Default is `selene.sequences.Genome`. The type of sequence that</span>
+<span class="sd">        Default is `selene_sdk.sequences.Genome`. The type of sequence that</span>
 <span class="sd">        the *in silico* mutagenesis results are associated with. This</span>
-<span class="sd">        should generally be a subclass of `selene.sequences.Sequence`.</span>
+<span class="sd">        should generally be a subclass of `selene_sdk.sequences.Sequence`.</span>
 <span class="sd">    font_properties : matplotlib.font_manager.FontProperties or None, optional</span>
 <span class="sd">        Default is `None`. A `matplotlib.font_manager.FontProperties`</span>
 <span class="sd">        object that specifies the properties of the font to use for</span>
@@ -642,9 +642,9 @@
 <span class="sd">        alphabet)  containing `True` at positions in the heatmap to</span>
 <span class="sd">        mask. If `None`, no masking will occur.</span>
 <span class="sd">    sequence_type : class, optional</span>
-<span class="sd">        Default is `selene.sequences.Genome`. The class of sequence that</span>
+<span class="sd">        Default is `selene_sdk.sequences.Genome`. The class of sequence that</span>
 <span class="sd">        the *in silico* mutagenesis results are associated with. This is</span>
-<span class="sd">        generally a sub-class of `selene.sequences.Sequence`.</span>
+<span class="sd">        generally a sub-class of `selene_sdk.sequences.Sequence`.</span>
 <span class="sd">    **kwargs : dict</span>
 <span class="sd">        Keyword arguments to pass to `seaborn.heatmap`. Some useful ones</span>
 <span class="sd">        to remember are:</span>
@@ -880,11 +880,11 @@
 
 <span class="k">def</span> <span class="nf">_variants_closest_protein_coding_gene</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;hg38&quot;</span><span class="p">):</span>
     <span class="n">gene_intervals_tabix</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
-        <span class="s2">&quot;selene&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;selene_sdk&quot;</span><span class="p">,</span>
         <span class="p">(</span><span class="s2">&quot;interpret/data/gencode_v28_</span><span class="si">{0}</span><span class="s2">/&quot;</span>
          <span class="s2">&quot;protein_coding_l12_genes.bed.gz&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
     <span class="n">gene_intervals_bed</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
-        <span class="s2">&quot;selene&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;selene_sdk&quot;</span><span class="p">,</span>
         <span class="p">(</span><span class="s2">&quot;interpret/data/gencode_v28_</span><span class="si">{0}</span><span class="s2">/&quot;</span>
          <span class="s2">&quot;protein_coding_l12_genes.bed&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">))</span>
 

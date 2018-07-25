@@ -235,7 +235,7 @@ train and validate a model.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>model</strong> (<em>torch.nn.Module</em>) – The model to train.</li>
-<li><strong>data_sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
+<li><strong>data_sampler</strong> (<em>selene_sdk.samplers.Sampler</em>) – The example generator.</li>
 <li><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</li>
 <li><strong>optimizer_class</strong> (<em>torch.optim.Optimizer</em>) – The optimizer to minimize loss with.</li>
 <li><strong>optimizer_kwargs</strong> (<em>dict</em>) – The dictionary of keyword arguments to pass to the optimizer’s
@@ -248,19 +248,19 @@ constructor.</li>
 <cite>report_stats_every_n_steps</cite></li>
 <li><strong>n_validation_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of validation samples in the
 validation set. If <cite>n_validation_samples</cite> is <cite>None</cite> and the data sampler
-used is the <cite>selene.samplers.IntervalsSampler</cite> or
-<cite>selene.samplers.RandomSampler</cite>, we will retrieve 32000
+used is the <cite>selene_sdk.samplers.IntervalsSampler</cite> or
+<cite>selene_sdk.samplers.RandomSampler</cite>, we will retrieve 32000
 validation samples. If <cite>None</cite> and using
-<cite>selene.samplers.MatFileSampler</cite>, we will use all
+<cite>selene_sdk.samplers.MatFileSampler</cite>, we will use all
 validation samples in the matrix.</li>
 <li><strong>n_test_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of test samples in the test set.
 If <cite>n_test_samples</cite> is <cite>None</cite> and the data sampler used is the
-<cite>selene.samplers.IntervalsSampler</cite>, the size of the test set is
+<cite>selene_sdk.samplers.IntervalsSampler</cite>, the size of the test set is
 the number of test intervals we can sample from. If
-<cite>None</cite> and using <cite>selene.samplers.RandomSampler</cite>, the size is
+<cite>None</cite> and using <cite>selene_sdk.samplers.RandomSampler</cite>, the size is
 <span class="math notranslate nohighlight">\(\frac{N}{20}\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the number of possible
 positions in the test partition of the genome. If  <cite>None</cite> and
-using <cite>selene.samplers.MatFileSampler</cite>, we will use all
+using <cite>selene_sdk.samplers.MatFileSampler</cite>, we will use all
 test samples in the matrix.</li>
 <li><strong>cpu_n_threads</strong> (<em>int, optional</em>) – Default is 32.</li>
 <li><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether CUDA is available for torch
@@ -274,10 +274,10 @@ using <cite>torch.load</cite>.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
-<li><strong>sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+0262fd0 ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
+<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</li>
 <li><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</li>
-<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
+<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (0.5.0a0+0262fd0 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batch to use during training.</li>
 <li><strong>max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</li>
 <li><strong>nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to report summary statistics.</li>
@@ -367,7 +367,7 @@ the validation set.</td>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>model</strong> (<em>torch.nn.Module</em>) – The trained model.</li>
 <li><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The loss function that was optimized during training.</li>
-<li><strong>data_sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
+<li><strong>data_sampler</strong> (<em>selene_sdk.samplers.Sampler</em>) – The example generator.</li>
 <li><strong>features</strong> (<em>list(str)</em>) – List of distinct features the model predicts.</li>
 <li><strong>trained_model_path</strong> (<em>str</em>) – Path to the trained model file, saved using <cite>torch.save</cite>.</li>
 <li><strong>output_dir</strong> (<em>str</em>) – The output directory in which to save model evaluation and logs.</li>
@@ -380,9 +380,9 @@ Should be a power of 2.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+9bf72b2 ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (0.5.0a0+0262fd0 ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
 <li><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</li>
-<li><strong>sampler</strong> (<em>selene.samplers.Sampler</em>) – The example generator.</li>
+<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</li>
 <li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The batch size to process examples. Should be a power of 2.</li>
 </ul>

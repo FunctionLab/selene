@@ -239,7 +239,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Sequence</span>
 <span class="sd">        A reference sequence from which to create examples.</span>
 <span class="sd">    target_path : str</span>
 <span class="sd">        Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic</span>
@@ -281,10 +281,10 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    reference_sequence : selene.sequences.Sequence</span>
+<span class="sd">    reference_sequence : selene_sdk.sequences.Sequence</span>
 <span class="sd">        The reference sequence that examples are created from.</span>
-<span class="sd">    target : selene.targets.Target</span>
-<span class="sd">        The `selene.targets.Target` object holding the features that we</span>
+<span class="sd">    target : selene_sdk.targets.Target</span>
+<span class="sd">        The `selene_sdk.targets.Target` object holding the features that we</span>
 <span class="sd">        would like to predict.</span>
 <span class="sd">    validation_holdout : list(str) or float</span>
 <span class="sd">        The samples to hold out for validating model performance. These</span>
@@ -502,7 +502,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        mode : str</span>
 <span class="sd">            The mode to run the sampler in when fetching the samples.</span>
-<span class="sd">            See `selene.samplers.IntervalsSampler.modes` for more</span>
+<span class="sd">            See `selene_sdk.samplers.IntervalsSampler.modes` for more</span>
 <span class="sd">            information.</span>
 <span class="sd">        batch_size : int</span>
 <span class="sd">            The size of the batches to divide the data into.</span>
@@ -546,7 +546,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        mode : str</span>
 <span class="sd">            The mode to run the sampler in when fetching the samples.</span>
-<span class="sd">            See `selene.samplers.IntervalsSampler.modes` for more</span>
+<span class="sd">            See `selene_sdk.samplers.IntervalsSampler.modes` for more</span>
 <span class="sd">            information.</span>
 <span class="sd">        batch_size : int</span>
 <span class="sd">            The size of the batches to divide the data into.</span>

@@ -254,9 +254,9 @@ characters.</p>
 <li><p class="first"><strong>ax</strong> (<em>matplotlib.pyplot.Axes or None, optional</em>) – Default is <cite>None</cite>. The axes to plot on. If left as <cite>None</cite>, a new
 axis will be created.</p>
 </li>
-<li><p class="first"><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene.sequences.Genome</cite>. The type of sequence that
+<li><p class="first"><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene_sdk.sequences.Genome</cite>. The type of sequence that
 the <em>in silico</em> mutagenesis results are associated with. This
-should generally be a subclass of <cite>selene.sequences.Sequence</cite>.</p>
+should generally be a subclass of <cite>selene_sdk.sequences.Sequence</cite>.</p>
 </li>
 <li><p class="first"><strong>font_properties</strong> (<em>matplotlib.font_manager.FontProperties or None, optional</em>) – Default is <cite>None</cite>. A <cite>matplotlib.font_manager.FontProperties</cite>
 object that specifies the properties of the font to use for
@@ -321,9 +321,9 @@ is the length of the sequence, and <span class="math notranslate nohighlight">\(
 alphabet)  containing <cite>True</cite> at positions in the heatmap to
 mask. If <cite>None</cite>, no masking will occur.</p>
 </li>
-<li><p class="first"><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene.sequences.Genome</cite>. The class of sequence that
+<li><p class="first"><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene_sdk.sequences.Genome</cite>. The class of sequence that
 the <em>in silico</em> mutagenesis results are associated with. This is
-generally a sub-class of <cite>selene.sequences.Sequence</cite>.</p>
+generally a sub-class of <cite>selene_sdk.sequences.Sequence</cite>.</p>
 </li>
 <li><p class="first"><strong>**kwargs</strong> (<em>dict</em>) – Keyword arguments to pass to <cite>seaborn.heatmap</cite>. Some useful ones
 to remember are:</p>
@@ -354,7 +354,7 @@ to remember are:</p>
 <h2>ISMResult<a class="headerlink" href="#ismresult" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.interpret.ISMResult">
-<em class="property">class </em><code class="descclassname">selene_sdk.interpret.</code><code class="descname">ISMResult</code><span class="sig-paren">(</span><em>data_frame</em>, <em>sequence_type=&lt;class 'selene.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.interpret.</code><code class="descname">ISMResult</code><span class="sig-paren">(</span><em>data_frame</em>, <em>sequence_type=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object storing the results of an <em>in silico</em> mutagenesis
 experiment.</p>
@@ -365,10 +365,10 @@ experiment.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>data_frame</strong> (<em>pandas.DataFrame</em>) – The data frame with the results from the <em>in silico</em>
 mutagenesis experiments.</li>
-<li><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene.sequences.Genome</cite>. The type of sequence
+<li><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene_sdk.sequences.Genome</cite>. The type of sequence
 that the <em>in silico</em> mutagenesis results are associated
 with. This should generally be a subclass of
-<cite>selene.sequences.Sequence</cite></li>
+<cite>selene_sdk.sequences.Sequence</cite></li>
 </ul>
 </td>
 </tr>
@@ -386,8 +386,8 @@ at every position.</li>
 </table>
 <dl class="staticmethod">
 <dt id="selene_sdk.interpret.ISMResult.from_file">
-<em class="property">static </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>sequence_type=&lt;class 'selene.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult.from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads a <cite>selene.interpret.ISMResult</cite> from a <cite>pandas.DataFrame</cite>
+<em class="property">static </em><code class="descname">from_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>sequence_type=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a <cite>selene_sdk.interpret.ISMResult</cite> from a <cite>pandas.DataFrame</cite>
 stored in a file of comma separated values (CSV).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -395,10 +395,10 @@ stored in a file of comma separated values (CSV).</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>input_path</strong> (<em>str</em>) – A path to the file of comma separated input values.</li>
-<li><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene.sequences.Genome</cite>. The type of sequence
+<li><strong>sequence_type</strong> (<em>class, optional</em>) – Default is <cite>selene_sdk.sequences.Genome</cite>. The type of sequence
 that the <em>in silico</em> mutagenesis results are associated
 with. This should generally be a subclass of
-<cite>selene.sequences.Sequence</cite>.</li>
+<cite>selene_sdk.sequences.Sequence</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -406,7 +406,7 @@ with. This should generally be a subclass of
 specified input file.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">selene.interpret.ISMResult</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#selene_sdk.interpret.ISMResult" title="selene_sdk.interpret.ISMResult">selene_sdk.interpret.ISMResult</a></p>
 </td>
 </tr>
 </tbody>
@@ -442,7 +442,7 @@ of <cite>sequence_type</cite>) that holds the results from the
 feature. The elements will be of type <cite>dtype</cite>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the input data frame contains a base not included in the
@@ -475,7 +475,7 @@ string of characters.</td>
 <dt id="selene_sdk.interpret.ISMResult.sequence_type">
 <code class="descname">sequence_type</code><a class="headerlink" href="#selene_sdk.interpret.ISMResult.sequence_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of underlying sequence. This should generally be a
-subclass of <cite>selene.sequences.Sequence</cite>.</p>
+subclass of <cite>selene_sdk.sequences.Sequence</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -534,7 +534,7 @@ position, where <span class="math notranslate nohighlight">\(L\)</span> is the l
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The transformed score matrix.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.14)">numpy.ndarray</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If an unsupported <cite>base_scaling</cite> or <cite>position_scaling</cite> is

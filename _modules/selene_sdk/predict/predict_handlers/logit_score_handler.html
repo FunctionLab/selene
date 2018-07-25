@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene.predict.predict_handlers.write_ref_alt_handler &mdash; Selene master documentation</title>
+  <title>selene_sdk.predict.predict_handlers.logit_score_handler &mdash; Selene master documentation</title>
   
 
   
@@ -199,7 +199,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene.predict.predict_handlers.write_ref_alt_handler</li>
+      <li>selene_sdk.predict.predict_handlers.logit_score_handler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -214,74 +214,94 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene.predict.predict_handlers.write_ref_alt_handler</h1><div class="highlight"><pre>
+  <h1>Source code for selene_sdk.predict.predict_handlers.logit_score_handler</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">TODO</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">.handler</span> <span class="k">import</span> <span class="n">PredictionsHandler</span>
-<span class="kn">from</span> <span class="nn">.write_predictions_handler</span> <span class="k">import</span> <span class="n">WritePredictionsHandler</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">logit</span>
+
+<span class="kn">from</span> <span class="nn">.handler</span> <span class="k">import</span> <span class="n">write_to_file</span><span class="p">,</span> <span class="n">PredictionsHandler</span>
 
 
-<div class="viewcode-block" id="WriteRefAltHandler"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.WriteRefAltHandler">[docs]</a><span class="k">class</span> <span class="nc">WriteRefAltHandler</span><span class="p">(</span><span class="n">PredictionsHandler</span><span class="p">):</span>
+<div class="viewcode-block" id="LogitScoreHandler"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.LogitScoreHandler">[docs]</a><span class="k">class</span> <span class="nc">LogitScoreHandler</span><span class="p">(</span><span class="n">PredictionsHandler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Used during variant effect prediction. This handler records the</span>
-<span class="sd">    predicted values for the reference and alternate sequences, and</span>
-<span class="sd">    stores these values in two separate files.</span>
+<span class="sd">    The logit score handler calculates and records the</span>
+<span class="sd">    difference between `logit(alt)` and `logit(ref)` predictions.</span>
+<span class="sd">    For reference, if some event occurs with probability :math:`p`,</span>
+<span class="sd">    then the log-odds is the logit of `p`, or</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\mathrm{logit}(p) = \\log\\left(\\frac{p}{1 - p}\\right) =</span>
+<span class="sd">        \\log(p) - \\log(1 - p)</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    needs_base_pred : bool</span>
 <span class="sd">        # TODO</span>
-<span class="sd">    ref_writer : # TODO</span>
+<span class="sd">    column_names : list(str)</span>
 <span class="sd">        # TODO</span>
-<span class="sd">    alt_writer : # TODO</span>
+<span class="sd">    results : list # TODO</span>
+<span class="sd">        # TODO</span>
+<span class="sd">    samples : list # TODO</span>
+<span class="sd">        # TODO</span>
+<span class="sd">    NA_samples : list # TODO</span>
+<span class="sd">        # TODO</span>
+<span class="sd">    output_path : str</span>
 <span class="sd">        # TODO</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    features_list : list(str)</span>
+<span class="sd">    features_list : list of str</span>
 <span class="sd">        List of sequence-level features, in the same order that the</span>
 <span class="sd">        model will return its predictions.</span>
-<span class="sd">    nonfeature_columns : list(str)</span>
-<span class="sd">        Columns in the file that help to identify the input sequence</span>
-<span class="sd">        to which the features data corresponds.</span>
-<span class="sd">    out_filename : str</span>
-<span class="sd">        Path to the file where the reference and alternate sequences&#39;</span>
-<span class="sd">        predictions are written. To distinguish between these two</span>
-<span class="sd">        files, `.ref` and `.alt` will be used as the suffixes for</span>
-<span class="sd">        the file names.</span>
+<span class="sd">    nonfeature_columns : list of str</span>
+<span class="sd">        Columns in the file that help to identify the input sequence to</span>
+<span class="sd">        which the features data corresponds.</span>
+<span class="sd">    output_path : str</span>
+<span class="sd">        Path to the file where the logit scores will be written.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">features_list</span><span class="p">,</span>
+                 <span class="n">nonfeature_columns</span><span class="p">,</span>
+                 <span class="n">output_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a new `WriteRefAltHandler` object.</span>
+<span class="sd">        Constructs a new `LogitScoreHandler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">WriteRefAltHandler</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LogitScoreHandler</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span> <span class="o">=</span> <span class="n">WritePredictionsHandler</span><span class="p">(</span>
-            <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.ref&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_filename</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span> <span class="o">=</span> <span class="n">WritePredictionsHandler</span><span class="p">(</span>
-            <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.alt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_filename</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="n">nonfeature_columns</span> <span class="o">+</span> <span class="n">features_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span>
 
-<div class="viewcode-block" id="WriteRefAltHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.WriteRefAltHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="LogitScoreHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        TODO</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        batch_ids : TODO</span>
-<span class="sd">            TODO</span>
+<span class="sd">        batch_ids : # TODO</span>
+<span class="sd">            # TODO</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span><span class="o">.</span><span class="n">handle_NA</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">handle_NA</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="WriteRefAltHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions">[docs]</a>    <span class="k">def</span> <span class="nf">handle_batch_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="LogitScoreHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions">[docs]</a>    <span class="k">def</span> <span class="nf">handle_batch_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                  <span class="n">batch_predictions</span><span class="p">,</span>
                                  <span class="n">batch_ids</span><span class="p">,</span>
-                                 <span class="n">base_predictions</span><span class="p">):</span>
+                                 <span class="n">baseline_predictions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO</span>
+<span class="sd">        # TODO</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -301,18 +321,22 @@
 <span class="sd">            matrix of shape :math:`B \\times N` (where :math:`B` is</span>
 <span class="sd">            the size of the mini-batch, and :math:`N` is the number of</span>
 <span class="sd">            features).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span>
-            <span class="n">base_predictions</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span>
-            <span class="n">batch_predictions</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="WriteRefAltHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene.predict.predict_handlers.WriteRefAltHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">logit</span><span class="p">(</span><span class="n">baseline_predictions</span><span class="p">)</span> <span class="o">-</span> <span class="n">logit</span><span class="p">(</span><span class="n">batch_predictions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogitScoreHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.LogitScoreHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span>
+        <span class="n">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

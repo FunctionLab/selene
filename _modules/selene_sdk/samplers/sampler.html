@@ -219,11 +219,11 @@
 <span class="sd">interface for sampling classes. These sampling classes should provide</span>
 <span class="sd">a way to query some training/validation/test data for examples.</span>
 
-<span class="sd">TODO: Note that there are two samplers in the `selene.samplers` module</span>
+<span class="sd">TODO: Note that there are two samplers in the `selene_sdk.samplers` module</span>
 <span class="sd">that do not subclass `Sampler`. This is because `Sampler` samples from</span>
 <span class="sd">multiple modes (e.g. training, validation) whereas the single-mode</span>
-<span class="sd">samplers (`selene.samplers.MatFileSampler` and</span>
-<span class="sd">`selene.samplers.BedFileSampler`) do not. Future work will improve the</span>
+<span class="sd">samplers (`selene_sdk.samplers.MatFileSampler` and</span>
+<span class="sd">`selene_sdk.samplers.BedFileSampler`) do not. Future work will improve the</span>
 <span class="sd">organization, design, and naming of these classes.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">random</span>
@@ -337,7 +337,7 @@
 <span class="sd">        n_samples : int, optional</span>
 <span class="sd">            Default is None. The total number of validation examples to</span>
 <span class="sd">            retrieve. Handling for `n_samples=None` should be done by</span>
-<span class="sd">            all classes that subclass `selene.samplers.Sampler`.</span>
+<span class="sd">            all classes that subclass `selene_sdk.samplers.Sampler`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
