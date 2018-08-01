@@ -6,6 +6,8 @@ import h5py
 import numpy as np
 import scipy.io
 
+from .file_sampler import FileSampler
+
 
 def load_mat_file(filepath, sequence_key, targets_key=None):
     """
@@ -50,7 +52,7 @@ def load_mat_file(filepath, sequence_key, targets_key=None):
         return (sequences, targets)
 
 
-class MatFileSampler(object):
+class MatFileSampler(FileSampler):
     """
     A sampler for which the dataset is loaded directly from a `*.mat` file.
 
@@ -83,6 +85,7 @@ class MatFileSampler(object):
         """
         Constructs a new `MatFileSampler` object.
         """
+        super(MatFileSampler, self).__init__()
         sequences_mat, targets_mat = load_mat_file(
             filepath, sequence_key, targets_key=targets_key)
         self._sample_seqs = sequences_mat
