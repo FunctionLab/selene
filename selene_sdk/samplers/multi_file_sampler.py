@@ -1,51 +1,64 @@
-"""This module provides the `Sampler` base class, which defines the
-interface for sampling classes. These sampling classes should provide
-a way to query some training/validation/test data for examples.
-
-TODO: Note that there are two samplers in the `selene_sdk.samplers` module
-that do not subclass `Sampler`. This is because `Sampler` samples from
-multiple modes (e.g. training, validation) whereas the single-mode
-samplers (`selene_sdk.samplers.MatFileSampler` and
-`selene_sdk.samplers.BedFileSampler`) do not. Future work will improve the
-organization, design, and naming of these classes.
 """
-from abc import ABCMeta
-from abc import abstractmethod
+This module provides the `MultiFileSampler` class, which uses a
+FileSampler for each mode of sampling (train, test, validation).
+The MultiFileSampler is therefore a subclass of Sampler.
+"""
+
+from .sampler import Sampler
 
 
-class Sampler(metaclass=ABCMeta):
+class MultiFileSampler(Sampler):
     """
-    The base class for sampler currently enforces that all samplers
-    have modes for drawing training and validation samples to train a
-    model.
-
     Attributes
     ----------
-    modes : list(str)
-        A list of the names of the modes that the object may operate in.
-    mode : str or None
-        Default is `None`. The current mode that the object is operating in.
+    train_sampler : selene_sdk.samplers.file_samplers.FileSampler
+        Load your training data as a `FileSampler` before passing it
+        into the `MultiFileSampler` constructor.
+    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler
+        The validation dataset file sampler.
+    features : list(str)
+        The list of features the model should predict
+    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
+        Default is None. The test file sampler is optional.
 
     Parameters
     ----------
-    seed : int
-        The value used to seed the random number generator.
+    modes : list(str)
+        At minimum, ["train", "validate"]. List may also include "test" if
+        the test data was supplied.
+    train_sampler : selene_sdk.samplers.file_samplers.FileSampler
+        Load your training data as a `FileSampler` before passing it
+        into the `MultiFileSampler` constructor.
+    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler
+        The validation dataset file sampler.
+    features : list(str)
+        The list of features the model should predict
+    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
+        Default is None. The test file sampler is optional.
 
     """
 
-    BASE_MODES = ("train", "validate")
-    """
-    The types of modes that the `Sampler` object can run in.
-    """
-
-    def __init__(self, features):
+    def __init__(self,
+                 train_sampler,
+                 validate_sampler,
+                 features,
+                 test_sampler=None):
         """
-        Constructs a new `Sampler` object.
+        Constructs a new `MultiFileSampler` object.
         """
-        self.modes = list(self.BASE_MODES)
-        self.mode = None
+        self.samplers = {
+            "train": train_sampler,
+            "validate": validate_sampler
+        }
 
         self.features = features
+        self._index_to_feature = {
+            i: f for (i, f) in enumerate(features)
+        }
+
+        if self.test_sampler is not None:
+            self.modes.append("test")
+            self.samplers["test"] = test_sampler
 
     def set_mode(self, mode):
         """
@@ -55,7 +68,8 @@ class Sampler(metaclass=ABCMeta):
         ----------
         mode : str
             The name of the mode to use. It must be one of
-            `Sampler.BASE_MODES`.
+            `Sampler.BASE_MODES` ("train", "validate") or "test" if
+            the test data is supplied.
 
         Raises
         ------
@@ -69,7 +83,6 @@ class Sampler(metaclass=ABCMeta):
                 "{1}".format(mode, self.modes))
         self.mode = mode
 
-    @abstractmethod
     def get_feature_from_index(self, index):
         """
         Returns the feature corresponding to an index in the feature
@@ -85,9 +98,8 @@ class Sampler(metaclass=ABCMeta):
         str
             The name of the feature occurring at the specified index.
         """
-        raise NotImplementedError()
+        return self._index_to_feature[index]
 
-    @abstractmethod
     def sample(self, batch_size=1):
         """
         Fetches a mini-batch of the data from the sampler.
@@ -98,9 +110,8 @@ class Sampler(metaclass=ABCMeta):
             Default is 1. The size of the batch to retrieve.
 
         """
-        raise NotImplementedError()
+        return self.samplers[self.mode].sample(batch_size)
 
-    @abstractmethod
     def get_data_and_targets(self, mode, batch_size, n_samples):
         """
         This method fetches a subset of the data from the sampler,
@@ -118,9 +129,9 @@ class Sampler(metaclass=ABCMeta):
             The total number of samples to retrieve.
 
         """
-        raise NotImplementedError()
+        return self.samplers[mode].get_data_and_targets(
+            batch_size, n_samples)
 
-    @abstractmethod
     def get_validation_set(self, batch_size, n_samples=None):
         """
         This method returns a subset of validation data from the
@@ -136,9 +147,9 @@ class Sampler(metaclass=ABCMeta):
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
         """
-        raise NotImplementedError()
+        return self.samplers["validate"].get_data(
+            batch_size, n_samples)
 
-    @abstractmethod
     def get_test_set(self, batch_size, n_samples=None):
         """
         This method returns a subset of testing data from the
@@ -174,9 +185,9 @@ class Sampler(metaclass=ABCMeta):
             If no test partition of the data was specified during
             sampler initialization.
         """
-        raise NotImplementedError()
+        return self.samplers["test"].get_data(
+            batch_size, n_samples)
 
-    @abstractmethod
     def save_dataset_to_file(self, mode, close_filehandle=True):
         """
         Save samples for each partition (i.e. train/validate/test) to
@@ -193,4 +204,4 @@ class Sampler(metaclass=ABCMeta):
             file and `save_dataset_to_file` will not be called with
             `mode` again.
         """
-        raise NotImplementedError()
+        return None

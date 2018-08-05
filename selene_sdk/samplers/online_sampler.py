@@ -6,6 +6,7 @@ Objects of the class `OnlineSampler`, are samplers which load examples
 """
 from abc import ABCMeta
 import os
+import random
 
 import numpy as np
 
@@ -131,7 +132,10 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         Creates a new `OnlineSampler` object.
         """
-        super(OnlineSampler, self).__init__(seed=seed)
+        super(OnlineSampler, self).__init__()
+
+        np.random.seed(self.seed)
+        random.seed(self.seed + 1)
 
         if (sequence_length + center_bin_to_predict) % 2 != 0:
             raise ValueError(
