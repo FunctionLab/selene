@@ -2,8 +2,6 @@ import numpy as np
 from setuptools import find_packages
 from setuptools import setup
 
-from selene_sdk import __version__
-
 
 try:
     from Cython.Distutils.extension import Extension
@@ -30,7 +28,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
-      version=__version__,
+      version="0.0.0",
       description=("framework for developing sequence-level "
                    "deep learning networks"),
       packages=find_packages(),
@@ -50,14 +48,14 @@ setup(name="selene-sdk",
         "matplotlib",
         "numpy",
         "pandas",
+        "plotly",
         "pyfaidx",
         "pytabix",
-        "torch",
-        "torchvision",
+        "pyyaml",
         "scikit-learn",
         "scipy",
         "seaborn",
         "statsmodels",
-        "pyyaml",
-        "plotly"
+        "torch",
+        "torchvision"
     ])
