@@ -87,7 +87,8 @@ class EvaluateModel(object):
         os.makedirs(output_dir, exist_ok=True)
 
         initialize_logger(
-            os.path.join(self.output_dir, f"{__name__}.log"),
+            os.path.join(self.output_dir, "{0}.log".format(
+                __name__)),
             verbosity=2)
 
         self.use_cuda = use_cuda
@@ -168,9 +169,11 @@ class EvaluateModel(object):
             data=self._all_test_targets)
 
         loss = np.average(batch_losses)
-        logger.debug(f"[STATS] average loss: {loss}")
+        logger.debug("[STATS] average loss: {0}".format(
+            loss))
         for name, score in average_scores.items():
-            logger.debug(f"[STATS] average {name}: {score}")
+            logger.debug("[STATS] average {0}: {1}".format(
+                name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")
