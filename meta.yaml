@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/FunctionLab/selene/archive/{{ data['version'] }}.tar.gz
-  sha256: a3c29fa5b59bbb3b0e3ae694a8f64d92948dad4f89aa985ea12087e16e94a9f3 
+  sha256: 58853367a6fd6fdd67c3f93592f3d691432cb4fff440cac43b15ac94b15f2eed
 
 build:
   number: 0
