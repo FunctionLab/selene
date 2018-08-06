@@ -52,8 +52,8 @@ class NonStrandSpecific(Module):
         self.model = model
 
         if mode != "mean" and mode != "max":
-            raise ValueError(f"Mode should be one of 'mean' or 'max' but was"
-                             "{mode!r}.")
+            raise ValueError("Mode should be one of 'mean' or 'max' but was"
+                             "{0}.".format(mode))
         self.mode = mode
 
     def forward(self, input):
