@@ -3,10 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-selene_sdk documentation
+Selene documentation
 ==================================
 
 Welcome! This is the documentation for Selene, a PyTorch-based deep learning library for sequence-level data.
+The Github repository is located `here <https://github.com/FunctionLab/selene>`_.
 
 .. toctree::
    :glob:
