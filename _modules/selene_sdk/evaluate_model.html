@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                master (0.0.0)
+                master (0.0.1)
               </div>
             
           
@@ -304,7 +304,8 @@
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">initialize_logger</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;</span><span class="si">{__name__}</span><span class="s2">.log&quot;</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.log&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="vm">__name__</span><span class="p">)),</span>
             <span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span> <span class="o">=</span> <span class="n">use_cuda</span>
@@ -385,9 +386,11 @@
             <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_test_targets</span><span class="p">)</span>
 
         <span class="n">loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">batch_losses</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;[STATS] average loss: </span><span class="si">{loss}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[STATS] average loss: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">loss</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">average_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;[STATS] average </span><span class="si">{name}</span><span class="s2">: </span><span class="si">{score}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[STATS] average </span><span class="si">{0}</span><span class="s2">: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span>
 
         <span class="n">test_performance</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;test_performance.txt&quot;</span><span class="p">)</span>
