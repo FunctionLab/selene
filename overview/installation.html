@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tutorials" href="tutorials.html" />
-    <link rel="prev" title="selene_sdk documentation" href="../index.html" /> 
+    <link rel="prev" title="Selene documentation" href="../index.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -92,6 +92,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-with-pip">Installing with pip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
 </ul>
 </li>
@@ -220,16 +221,21 @@
             
   <div class="section" id="installation">
 <span id="installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>We recommend that users either clone and build the repository or install Selene through conda. This is because there is less control over PyTorch dependencies with pip.</p>
+<div class="section" id="installing-with-anaconda">
+<span id="installing-with-anaconda"></span><h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
+<p>We are in the process of uploading Selene to <a class="reference external" href="https://bioconda.github.io/">Bioconda</a>, a channel for the <a class="reference external" href="https://www.anaconda.com/download/">conda</a> package manager.</p>
+<p>It should be uploaded within the next week. If you’d like to be notified when it is available, please send me an e-mail at <a class="reference external" href="mailto:kchen&#37;&#52;&#48;flatironinstitute&#46;org">kchen<span>&#64;</span>flatironinstitute<span>&#46;</span>org</a>. Thanks for your patience!</p>
+<p>To install with conda, use the following command in your terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">bioconda</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-with-pip">
+<span id="installing-with-pip"></span><h2>Installing with pip<a class="headerlink" href="#installing-with-pip" title="Permalink to this headline">¶</a></h2>
 <p>Selene can be installed with <a class="reference external" href="https://pypi.org/project/pip/">pip</a>.
 To install with pip, simply type the following commands into the terminal:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
-</pre></div>
-</div>
-<div class="section" id="installing-with-anaconda">
-<span id="installing-with-anaconda"></span><h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
-<p>Selene can be installed with <a class="reference external" href="https://www.anaconda.com/download/">conda</a> as well.
-To install with conda, use the following command in your terminal:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
 </pre></div>
 </div>
 </div>
@@ -237,13 +243,20 @@ To install with conda, use the following command in your terminal:</p>
 <span id="installing-from-source"></span><h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
 <p>Selene can also be installed from source.
 First, download the latest commits from the source repository:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">FunctionLab</span><span class="o">/</span><span class="n">selene</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">FunctionLab</span><span class="o">/</span><span class="n">selene</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
-<p>If you plan on working in the <code class="docutils literal notranslate"><span class="pre">selene</span></code> repository directly, we recommend setting up a conda environment using <code class="docutils literal notranslate"><span class="pre">selene-cpu.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">selene-gpu.yml</span></code> and activating it. Please also build the Cython files by running</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script requires NumPy. Please make sure you have this already installed.</p>
+<p>If you plan on working in the <code class="docutils literal notranslate"><span class="pre">selene</span></code> repository directly, we recommend <a class="reference external" href="https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file">setting up a conda environment</a> using <code class="docutils literal notranslate"><span class="pre">selene-cpu.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">selene-gpu.yml</span></code> (if CUDA is enabled on your machine) and activating it.</p>
+<p>Selene contains some Cython files. You can build these by running</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
 </pre></div>
 </div>
+<p>Otherwise, if you would like to locally install Selene, you can run</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py install
+</pre></div>
+</div>
+<p>Please install <code class="docutils literal notranslate"><span class="pre">docopt</span></code> before running the command-line script <code class="docutils literal notranslate"><span class="pre">selene_cli.py</span></code> provided in the repository.</p>
 </div>
 </div>
 
@@ -258,7 +271,7 @@ First, download the latest commits from the source repository:</p>
         <a href="tutorials.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral" title="selene_sdk documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral" title="Selene documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
