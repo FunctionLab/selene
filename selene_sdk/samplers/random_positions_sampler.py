@@ -124,7 +124,6 @@ class RandomPositionsSampler(OnlineSampler):
         the modes listed in `modes`.
 
     """
-
     def __init__(self,
                  reference_sequence,
                  target_path,

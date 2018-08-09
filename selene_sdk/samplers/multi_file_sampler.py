@@ -36,8 +36,14 @@ class MultiFileSampler(Sampler):
     test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
         Default is None. The test file sampler is optional.
 
-    """
+    Attributes
+    ----------
+    modes : list(str)
+        A list of the names of the modes that the object may operate in.
+    mode : str or None
+        Default is `None`. The current mode that the object is operating in.
 
+    """
     def __init__(self,
                  train_sampler,
                  validate_sampler,
@@ -46,19 +52,20 @@ class MultiFileSampler(Sampler):
         """
         Constructs a new `MultiFileSampler` object.
         """
-        self.samplers = {
+        super(MultiFileSampler, self).__init__(features)
+
+        self._samplers = {
             "train": train_sampler,
             "validate": validate_sampler
         }
 
-        self.features = features
         self._index_to_feature = {
             i: f for (i, f) in enumerate(features)
         }
 
-        if self.test_sampler is not None:
+        if test_sampler is not None:
             self.modes.append("test")
-            self.samplers["test"] = test_sampler
+            self._samplers["test"] = test_sampler
 
     def set_mode(self, mode):
         """
@@ -97,6 +104,7 @@ class MultiFileSampler(Sampler):
         -------
         str
             The name of the feature occurring at the specified index.
+
         """
         return self._index_to_feature[index]
 
@@ -110,7 +118,7 @@ class MultiFileSampler(Sampler):
             Default is 1. The size of the batch to retrieve.
 
         """
-        return self.samplers[self.mode].sample(batch_size)
+        return self._samplers[self.mode].sample(batch_size)
 
     def get_data_and_targets(self, mode, batch_size, n_samples):
         """
@@ -129,7 +137,7 @@ class MultiFileSampler(Sampler):
             The total number of samples to retrieve.
 
         """
-        return self.samplers[mode].get_data_and_targets(
+        return self._samplers[mode].get_data_and_targets(
             batch_size, n_samples)
 
     def get_validation_set(self, batch_size, n_samples=None):
@@ -147,7 +155,7 @@ class MultiFileSampler(Sampler):
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
         """
-        return self.samplers["validate"].get_data(
+        return self._samplers["validate"].get_data(
             batch_size, n_samples)
 
     def get_test_set(self, batch_size, n_samples=None):
@@ -178,20 +186,23 @@ class MultiFileSampler(Sampler):
             `target_matrix` is of the shape :math:`S \\times F`, where
             :math:`S =` `n_samples`.
 
-
         Raises
         ------
         ValueError
             If no test partition of the data was specified during
             sampler initialization.
         """
-        return self.samplers["test"].get_data(
+        return self._samplers["test"].get_data(
             batch_size, n_samples)
 
-    def save_dataset_to_file(self, mode, close_filehandle=True):
+    def save_dataset_to_file(self, mode, close_filehandle=False):
         """
-        Save samples for each partition (i.e. train/validate/test) to
-        disk.
+        We implement this function in this class only because the
+        TrainModel class calls this method. In the future, we will
+        likely remove this method or implement a different way
+        of "saving the data" for file samplers. For example, we
+        may only output the row numbers sampled so that users may
+        reproduce exactly what order the data was sampled.
 
         Parameters
         ----------

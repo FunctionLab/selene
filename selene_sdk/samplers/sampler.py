@@ -1,13 +1,6 @@
 """This module provides the `Sampler` base class, which defines the
 interface for sampling classes. These sampling classes should provide
 a way to query some training/validation/test data for examples.
-
-TODO: Note that there are two samplers in the `selene_sdk.samplers` module
-that do not subclass `Sampler`. This is because `Sampler` samples from
-multiple modes (e.g. training, validation) whereas the single-mode
-samplers (`selene_sdk.samplers.MatFileSampler` and
-`selene_sdk.samplers.BedFileSampler`) do not. Future work will improve the
-organization, design, and naming of these classes.
 """
 from abc import ABCMeta
 from abc import abstractmethod
@@ -26,13 +19,7 @@ class Sampler(metaclass=ABCMeta):
     mode : str or None
         Default is `None`. The current mode that the object is operating in.
 
-    Parameters
-    ----------
-    seed : int
-        The value used to seed the random number generator.
-
     """
-
     BASE_MODES = ("train", "validate")
     """
     The types of modes that the `Sampler` object can run in.
@@ -45,7 +32,7 @@ class Sampler(metaclass=ABCMeta):
         self.modes = list(self.BASE_MODES)
         self.mode = None
 
-        self.features = features
+        self._features = features
 
     def set_mode(self, mode):
         """
@@ -84,6 +71,7 @@ class Sampler(metaclass=ABCMeta):
         -------
         str
             The name of the feature occurring at the specified index.
+
         """
         raise NotImplementedError()
 
@@ -167,17 +155,17 @@ class Sampler(metaclass=ABCMeta):
             `target_matrix` is of the shape :math:`S \\times F`, where
             :math:`S =` `n_samples`.
 
-
         Raises
         ------
         ValueError
             If no test partition of the data was specified during
             sampler initialization.
+
         """
         raise NotImplementedError()
 
     @abstractmethod
-    def save_dataset_to_file(self, mode, close_filehandle=True):
+    def save_dataset_to_file(self, mode, close_filehandle=False):
         """
         Save samples for each partition (i.e. train/validate/test) to
         disk.
@@ -192,5 +180,6 @@ class Sampler(metaclass=ABCMeta):
             data corresponding to the input `mode` has been saved to
             file and `save_dataset_to_file` will not be called with
             `mode` again.
+
         """
         raise NotImplementedError()

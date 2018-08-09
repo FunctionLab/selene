@@ -109,7 +109,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         the same.
 
     """
-    # @TODO: Is there a compelling reason why STRAND_SIDES should be here?
     STRAND_SIDES = ('+', '-')
     """
     Defines the strands that features can be sampled from.
@@ -132,8 +131,9 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         Creates a new `OnlineSampler` object.
         """
-        super(OnlineSampler, self).__init__()
+        super(OnlineSampler, self).__init__(features)
 
+        self.seed = seed
         np.random.seed(self.seed)
         random.seed(self.seed + 1)
 
@@ -197,7 +197,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         self.reference_sequence = reference_sequence
 
-        self._features = features
         self.n_features = len(self._features)
 
         self.target = GenomicFeatures(

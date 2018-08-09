@@ -93,7 +93,6 @@ class IntervalsSampler(OnlineSampler):
         the path in `output_dir` does not exist it will be created
         automatically.
 
-
     Attributes
     ----------
     reference_sequence : selene_sdk.sequences.Sequence
@@ -349,6 +348,8 @@ class IntervalsSampler(OnlineSampler):
                  window_end,
                  strand,
                  feature_indices])
+            if len(self._save_datasets[self.mode]) > 200000:
+                self.save_dataset_to_file(self.mode)
         return (retrieved_seq, retrieved_targets)
 
     def _update_randcache(self, mode=None):
