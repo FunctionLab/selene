@@ -66,9 +66,9 @@ class MatFileSampler(FileSampler):
         Default is None. The key for the targets data matrix.
     random_seed : int, optional
         Default is 436. Sets the random seed for sampling.
-    shuffle_file : bool, optional
-        Default is True. Shuffle the data in the matrix before
-        sampling from it.
+    shuffle : bool, optional
+        Default is True. Shuffle the order of the samples in the matrix
+        before sampling from it.
 
     Attributes
     ----------
@@ -81,7 +81,7 @@ class MatFileSampler(FileSampler):
                  sequence_key,
                  targets_key=None,
                  random_seed=436,
-                 shuffle_file=True):
+                 shuffle=True):
         """
         Constructs a new `MatFileSampler` object.
         """
@@ -97,7 +97,7 @@ class MatFileSampler(FileSampler):
             self.n_samples).tolist()
         self._sample_next = 0
 
-        self._shuffle = shuffle_file
+        self._shuffle = shuffle
         if self._shuffle:
             np.random.shuffle(self._sample_indices)
 

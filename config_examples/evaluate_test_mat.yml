@@ -10,7 +10,7 @@ model: {
         mode: mean
     }
 }
-sampler: !obj:selene_sdk.samplers.MatFileSampler {
+sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
     filepath: /path/to/test.mat, 
     sequence_key: testxdata,
     targets_key: testdata,

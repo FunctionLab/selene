@@ -9,23 +9,13 @@ from .sampler import Sampler
 
 class MultiFileSampler(Sampler):
     """
+    This sampler contains individual file samplers for each mode.
+    The file samplers parse .bed/.mat files that correspond to
+    training, validation, and testing and MultiFileSampler calls on
+    the correct file sampler to draw samples for a given mode.
+
     Attributes
     ----------
-    train_sampler : selene_sdk.samplers.file_samplers.FileSampler
-        Load your training data as a `FileSampler` before passing it
-        into the `MultiFileSampler` constructor.
-    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler
-        The validation dataset file sampler.
-    features : list(str)
-        The list of features the model should predict
-    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
-        Default is None. The test file sampler is optional.
-
-    Parameters
-    ----------
-    modes : list(str)
-        At minimum, ["train", "validate"]. List may also include "test" if
-        the test data was supplied.
     train_sampler : selene_sdk.samplers.file_samplers.FileSampler
         Load your training data as a `FileSampler` before passing it
         into the `MultiFileSampler` constructor.
