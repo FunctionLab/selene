@@ -42,14 +42,15 @@ def load_mat_file(filepath, sequence_key, targets_key=None):
         if targets_key:
             targets = mat[targets_key]
         return (mat[sequence_key], targets)
-    except ValueError:
+    except (NotImplementedError, ValueError):
         mat = h5py.File(filepath, 'r')
         sequences = mat[sequence_key][()]
         targets = None
         if targets_key:
             targets = mat[targets_key][()]
         mat.close()
-        return (sequences, targets)
+        sequences = np.transpose(sequences, (2, 1, 0))
+        return (sequences, targets.T)
 
 
 class MatFileSampler(FileSampler):

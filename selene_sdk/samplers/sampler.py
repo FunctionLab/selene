@@ -4,6 +4,8 @@ a way to query some training/validation/test data for examples.
 """
 from abc import ABCMeta
 from abc import abstractmethod
+from collections import defaultdict
+import os
 
 
 class Sampler(metaclass=ABCMeta):
@@ -12,12 +14,25 @@ class Sampler(metaclass=ABCMeta):
     have modes for drawing training and validation samples to train a
     model.
 
+    Parameters
+    ----------
+    features : list(str)
+        The list of features (classes) the model predicts.
+    save_datasets : list(str), optional
+        Default is `[]` the empty list. The list of modes for which we should
+        save sampled data to file (1 or more of ['train', 'validate', 'test']).
+    output_dir : str or None, optional
+        Default is None. Path to the output directory. Used if we save
+        any of the data sampled. If `save_datasets` is non-empty,
+        `output_dir` must be a valid path. If the directory does not
+        yet exist, it will be created for you.
+
     Attributes
     ----------
     modes : list(str)
         A list of the names of the modes that the object may operate in.
     mode : str or None
-        Default is `None`. The current mode that the object is operating in.
+        The current mode that the object is operating in.
 
     """
     BASE_MODES = ("train", "validate")
@@ -25,7 +40,7 @@ class Sampler(metaclass=ABCMeta):
     The types of modes that the `Sampler` object can run in.
     """
 
-    def __init__(self, features):
+    def __init__(self, features, save_datasets=[], output_dir=None):
         """
         Constructs a new `Sampler` object.
         """
@@ -33,6 +48,11 @@ class Sampler(metaclass=ABCMeta):
         self.mode = None
 
         self._features = features
+        self._save_datasets = defaultdict(list)
+
+        self._output_dir = output_dir
+        if output_dir is not None:
+            os.makedirs(output_dir, exist_ok=True)
 
     def set_mode(self, mode):
         """

@@ -25,6 +25,15 @@ class MultiFileSampler(Sampler):
         The list of features the model should predict
     test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
         Default is None. The test file sampler is optional.
+    save_datasets : list(str), optional
+        Default is None. Currently, we are only including these parameters
+        so that `MultiFileSampler` is consistent with `Sampler`. The save
+        dataset functionality for MultiFileSampler has not been defined
+        yet.
+    output_dir : str or None, optional
+        Default is None. Used if the sampler has any data or logging
+        statements to save to file. Currently not useful for
+        `MultiFileSampler`.
 
     Attributes
     ----------
@@ -38,11 +47,16 @@ class MultiFileSampler(Sampler):
                  train_sampler,
                  validate_sampler,
                  features,
-                 test_sampler=None):
+                 test_sampler=None,
+                 save_datasets=[],
+                 output_dir=None):
         """
         Constructs a new `MultiFileSampler` object.
         """
-        super(MultiFileSampler, self).__init__(features)
+        super(MultiFileSampler, self).__init__(
+            features,
+            save_datasets=save_datasets,
+            output_dir=output_dir)
 
         self._samplers = {
             "train": train_sampler,
@@ -145,7 +159,7 @@ class MultiFileSampler(Sampler):
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
         """
-        return self._samplers["validate"].get_data(
+        return self._samplers["validate"].get_data_and_targets(
             batch_size, n_samples)
 
     def get_test_set(self, batch_size, n_samples=None):
@@ -182,7 +196,7 @@ class MultiFileSampler(Sampler):
             If no test partition of the data was specified during
             sampler initialization.
         """
-        return self._samplers["test"].get_data(
+        return self._samplers["test"].get_data_and_targets(
             batch_size, n_samples)
 
     def save_dataset_to_file(self, mode, close_filehandle=False):

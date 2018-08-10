@@ -131,7 +131,10 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         Creates a new `OnlineSampler` object.
         """
-        super(OnlineSampler, self).__init__(features)
+        super(OnlineSampler, self).__init__(
+            features,
+            save_datasets=save_datasets,
+            output_dir=output_dir)
 
         self.seed = seed
         np.random.seed(self.seed)
@@ -203,12 +206,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             target_path, self._features,
             feature_thresholds=feature_thresholds)
 
-        os.makedirs(output_dir, exist_ok=True)
-
-        self._save_datasets = {}
         self._save_filehandles = {}
         for mode in save_datasets:
-            self._save_datasets[mode] = []
             self._save_filehandles[mode] = open(
                 os.path.join(output_dir, "{0}_data.bed".format(mode)),
                 'w+')
