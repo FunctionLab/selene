@@ -124,8 +124,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#matfilesampler">MatFileSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene_sdk.sequences</a><ul>
@@ -286,7 +290,6 @@
         <span class="kn">from</span> <span class="nn">selene_sdk.utils</span> <span class="k">import</span> <span class="n">NonStrandSpecific</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">NonStrandSpecific</span><span class="p">(</span>
             <span class="n">model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;non_strand_specific&quot;</span><span class="p">][</span><span class="s2">&quot;mode&quot;</span><span class="p">])</span>
-
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">criterion</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">train</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">optim_class</span><span class="p">,</span> <span class="n">optim_kwargs</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_optimizer</span><span class="p">(</span><span class="n">lr</span><span class="p">)</span>

@@ -124,8 +124,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../samplers.html#intervalssampler">IntervalsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../samplers.html#matfilesampler">MatFileSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../sequences.html">selene_sdk.sequences</a><ul>
@@ -292,7 +296,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span>
 
-        <span class="n">trained_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">trained_model_path</span><span class="p">)</span>
+        <span class="n">trained_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">trained_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">storage</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">load_model_from_state_dict</span><span class="p">(</span>
             <span class="n">trained_model</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>

@@ -31,17 +31,9 @@ RandomPositionsSampler
     :members:
     :show-inheritance:
 
-MatFileSampler
+MultiFileSampler
 ----------------------------
 
-.. autoclass:: MatFileSampler
+.. autoclass:: MultiFileSampler
     :members:
     :show-inheritance:
-
-BedFileSampler
-----------------------------
-
-.. autoclass:: BedFileSampler
-    :members:
-    :show-inheritance:
-

@@ -124,8 +124,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#matfilesampler">MatFileSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene_sdk.sequences</a><ul>
@@ -224,6 +228,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABCMeta</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -326,7 +331,6 @@
 <span class="sd">        the same.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># @TODO: Is there a compelling reason why STRAND_SIDES should be here?</span>
     <span class="n">STRAND_SIDES</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Defines the strands that features can be sampled from.</span>
@@ -349,7 +353,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new `OnlineSampler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">OnlineSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OnlineSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">features</span><span class="p">,</span>
+            <span class="n">save_datasets</span><span class="o">=</span><span class="n">save_datasets</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">sequence_length</span> <span class="o">+</span> <span class="n">center_bin_to_predict</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -411,19 +422,14 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span> <span class="o">=</span> <span class="n">reference_sequence</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">GenomicFeatures</span><span class="p">(</span>
             <span class="n">target_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span>
             <span class="n">feature_thresholds</span><span class="o">=</span><span class="n">feature_thresholds</span><span class="p">)</span>
 
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">save_datasets</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_data.bed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">)),</span>
                 <span class="s1">&#39;w+&#39;</span><span class="p">)</span>

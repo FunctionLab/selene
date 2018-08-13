@@ -124,8 +124,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#matfilesampler">MatFileSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene_sdk.sequences</a><ul>
@@ -310,7 +314,6 @@
 <span class="sd">        a non-empty list, `output_dir` must be specified. If</span>
 <span class="sd">        the path in `output_dir` does not exist it will be created</span>
 <span class="sd">        automatically.</span>
-
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -567,6 +570,8 @@
                  <span class="n">window_end</span><span class="p">,</span>
                  <span class="n">strand</span><span class="p">,</span>
                  <span class="n">feature_indices</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">200000</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_dataset_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">retrieved_seq</span><span class="p">,</span> <span class="n">retrieved_targets</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_update_randcache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

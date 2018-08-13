@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.samplers.mat_file_sampler &mdash; Selene master documentation</title>
+  <title>selene_sdk.samplers.file_samplers.mat_file_sampler &mdash; Selene master documentation</title>
   
 
   
@@ -24,15 +24,15 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/selene_docs_theme.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  <link rel="stylesheet" href="../../../../_static/css/selene_docs_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
-  <script src="../../../_static/js/modernizr.min.js"></script>
+  <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -48,12 +48,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> Selene
+            <a href="../../../../index.html" class="icon icon-home"> Selene
           
 
           
             
-            <img src="../../../_static/selene_logo.png" class="logo" alt="Logo"/>
+            <img src="../../../../_static/selene_logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +68,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -88,68 +88,72 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-with-pip">Installing with pip</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-from-source">Installing from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/installation.html#installing-with-pip">Installing with pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/installation.html#installing-from-source">Installing from source</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/extending.html">Extending Selene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/extending.html">Extending Selene</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../selene.html">selene_sdk</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#trainmodel">TrainModel</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#evaluatemodel">EvaluateModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../selene.html">selene_sdk</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../selene.html#evaluatemodel">EvaluateModel</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../interpret.html">selene_sdk.interpret</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sequence-logo">sequence_logo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#heatmap">heatmap</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ismresult">ISMResult</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../interpret.html">selene_sdk.interpret</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#sequence-logo">sequence_logo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#heatmap">heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#ismresult">ISMResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../predict.html">selene_sdk.predict</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../predict.html">selene_sdk.predict</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../samplers.html">selene_sdk.samplers</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#sampler">Sampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#matfilesampler">MatFileSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../samplers.html">selene_sdk.samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#sampler">Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#onlinesampler">OnlineSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene_sdk.sequences</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence">Sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#genome">Genome</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#proteome">Proteome</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../targets.html">selene_sdk.targets</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#target">Target</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#genomicfeatures">GenomicFeatures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sequences.html">selene_sdk.sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#genome">Genome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#proteome">Proteome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">selene_sdk.utils</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-logger">initialize_logger</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-features-list">load_features_list</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#configuration">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../targets.html">selene_sdk.targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../targets.html#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../targets.html#genomicfeatures">GenomicFeatures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">selene_sdk.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#initialize-logger">initialize_logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#configuration">Configuration</a></li>
 </ul>
 </li>
 </ul>
@@ -167,7 +171,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">Selene</a>
+          <a href="../../../../index.html">Selene</a>
         
       </nav>
 
@@ -196,11 +200,11 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene_sdk.samplers.mat_file_sampler</li>
+      <li>selene_sdk.samplers.file_samplers.mat_file_sampler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -215,7 +219,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene_sdk.samplers.mat_file_sampler</h1><div class="highlight"><pre>
+  <h1>Source code for selene_sdk.samplers.file_samplers.mat_file_sampler</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module provides the `MatFileSampler` class and its supporting</span>
 <span class="sd">methods.</span>
@@ -223,6 +227,8 @@
 <span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.io</span>
+
+<span class="kn">from</span> <span class="nn">.file_sampler</span> <span class="k">import</span> <span class="n">FileSampler</span>
 
 
 <span class="k">def</span> <span class="nf">load_mat_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">sequence_key</span><span class="p">,</span> <span class="n">targets_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -258,17 +264,18 @@
         <span class="k">if</span> <span class="n">targets_key</span><span class="p">:</span>
             <span class="n">targets</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">targets_key</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="n">sequence_key</span><span class="p">],</span> <span class="n">targets</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
         <span class="n">mat</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="n">sequences</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">sequence_key</span><span class="p">][()]</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">targets_key</span><span class="p">:</span>
             <span class="n">targets</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">targets_key</span><span class="p">][()]</span>
         <span class="n">mat</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MatFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MatFileSampler">[docs]</a><span class="k">class</span> <span class="nc">MatFileSampler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MatFileSampler"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler">[docs]</a><span class="k">class</span> <span class="nc">MatFileSampler</span><span class="p">(</span><span class="n">FileSampler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A sampler for which the dataset is loaded directly from a `*.mat` file.</span>
 
@@ -282,9 +289,9 @@
 <span class="sd">        Default is None. The key for the targets data matrix.</span>
 <span class="sd">    random_seed : int, optional</span>
 <span class="sd">        Default is 436. Sets the random seed for sampling.</span>
-<span class="sd">    shuffle_file : bool, optional</span>
-<span class="sd">        Default is True. Shuffle the data in the matrix before</span>
-<span class="sd">        sampling from it.</span>
+<span class="sd">    shuffle : bool, optional</span>
+<span class="sd">        Default is True. Shuffle the order of the samples in the matrix</span>
+<span class="sd">        before sampling from it.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -297,10 +304,11 @@
                  <span class="n">sequence_key</span><span class="p">,</span>
                  <span class="n">targets_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">random_seed</span><span class="o">=</span><span class="mi">436</span><span class="p">,</span>
-                 <span class="n">shuffle_file</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `MatFileSampler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatFileSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="n">sequences_mat</span><span class="p">,</span> <span class="n">targets_mat</span> <span class="o">=</span> <span class="n">load_mat_file</span><span class="p">(</span>
             <span class="n">filepath</span><span class="p">,</span> <span class="n">sequence_key</span><span class="p">,</span> <span class="n">targets_key</span><span class="o">=</span><span class="n">targets_key</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span> <span class="o">=</span> <span class="n">sequences_mat</span>
@@ -312,11 +320,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span> <span class="o">=</span> <span class="n">shuffle_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MatFileSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MatFileSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="MatFileSampler.sample"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draws a mini-batch of examples and their corresponding</span>
 <span class="sd">        labels.</span>
@@ -357,7 +365,7 @@
             <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sequences</span><span class="p">,</span></div>
 
-<div class="viewcode-block" id="MatFileSampler.get_data"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MatFileSampler.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MatFileSampler.get_data"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method fetches a subset of the data from the sampler,</span>
 <span class="sd">        divided into batches.</span>
@@ -392,7 +400,7 @@
         <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seqs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sequences</span></div>
 
-<div class="viewcode-block" id="MatFileSampler.get_data_and_targets"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MatFileSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MatFileSampler.get_data_and_targets"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method fetches a subset of the sequence data and</span>
 <span class="sd">        targets from the sampler, divided into batches.</span>
@@ -474,7 +482,7 @@
 
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
+            URL_ROOT:'../../../../',
             VERSION:'master',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
@@ -483,14 +491,14 @@
             SOURCELINK_SUFFIX: '.txt'
         };
     </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
       <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {

@@ -125,8 +125,12 @@
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#onlinesampler">OnlineSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#intervalssampler">IntervalsSampler</a></li>
 <li class="toctree-l2"><a class="reference internal" href="samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="samplers.html#matfilesampler">MatFileSampler</a></li>
-<li class="toctree-l2"><a class="reference internal" href="samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="sequences.html">selene_sdk.sequences</a><ul>
@@ -277,7 +281,7 @@
         <li><a href="sequences.html#selene_sdk.sequences.Sequence.BASES_ARR">(selene_sdk.sequences.Sequence attribute)</a>
 </li>
       </ul></li>
-      <li><a href="samplers.html#selene_sdk.samplers.BedFileSampler">BedFileSampler (class in selene_sdk.samplers)</a>
+      <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.BedFileSampler">BedFileSampler (class in selene_sdk.samplers.file_samplers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -353,20 +357,22 @@
 </li>
       <li><a href="sequences.html#selene_sdk.sequences.Genome.get_chrs">get_chrs() (selene_sdk.sequences.Genome method)</a>
 </li>
-      <li><a href="samplers.html#selene_sdk.samplers.BedFileSampler.get_data">get_data() (selene_sdk.samplers.BedFileSampler method)</a>
+      <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.BedFileSampler.get_data">get_data() (selene_sdk.samplers.file_samplers.BedFileSampler method)</a>
 
       <ul>
-        <li><a href="samplers.html#selene_sdk.samplers.MatFileSampler.get_data">(selene_sdk.samplers.MatFileSampler method)</a>
+        <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.get_data">(selene_sdk.samplers.file_samplers.MatFileSampler method)</a>
 </li>
       </ul></li>
-      <li><a href="samplers.html#selene_sdk.samplers.BedFileSampler.get_data_and_targets">get_data_and_targets() (selene_sdk.samplers.BedFileSampler method)</a>
+      <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.BedFileSampler.get_data_and_targets">get_data_and_targets() (selene_sdk.samplers.file_samplers.BedFileSampler method)</a>
 
       <ul>
-        <li><a href="samplers.html#selene_sdk.samplers.MatFileSampler.get_data_and_targets">(selene_sdk.samplers.MatFileSampler method)</a>
+        <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.get_data_and_targets">(selene_sdk.samplers.MultiFileSampler method)</a>
 </li>
         <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_data_and_targets">(selene_sdk.samplers.OnlineSampler method)</a>
 </li>
         <li><a href="samplers.html#selene_sdk.samplers.Sampler.get_data_and_targets">(selene_sdk.samplers.Sampler method)</a>
+</li>
+        <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets">(selene_sdk.samplers.file_samplers.MatFileSampler method)</a>
 </li>
       </ul></li>
       <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_dataset_in_batches">get_dataset_in_batches() (selene_sdk.samplers.OnlineSampler method)</a>
@@ -385,10 +391,16 @@
         <li><a href="targets.html#selene_sdk.targets.Target.get_feature_data">(selene_sdk.targets.Target method)</a>
 </li>
       </ul></li>
+      <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.get_feature_from_index">get_feature_from_index() (selene_sdk.samplers.MultiFileSampler method)</a>
+
+      <ul>
+        <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_feature_from_index">(selene_sdk.samplers.OnlineSampler method)</a>
+</li>
+        <li><a href="samplers.html#selene_sdk.samplers.Sampler.get_feature_from_index">(selene_sdk.samplers.Sampler method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_feature_from_index">get_feature_from_index() (selene_sdk.samplers.OnlineSampler method)</a>
-</li>
       <li><a href="utils.html#selene_sdk.utils.get_indices_and_probabilities">get_indices_and_probabilities() (in module selene_sdk.utils)</a>
 </li>
       <li><a href="predict.html#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">get_predictions_for_fasta_file() (selene_sdk.predict.AnalyzeSequences method)</a>
@@ -411,11 +423,19 @@
       </ul></li>
       <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_sequence_from_encoding">get_sequence_from_encoding() (selene_sdk.samplers.OnlineSampler method)</a>
 </li>
-      <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_test_set">get_test_set() (selene_sdk.samplers.OnlineSampler method)</a>
-</li>
-      <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_validation_set">get_validation_set() (selene_sdk.samplers.OnlineSampler method)</a>
+      <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.get_test_set">get_test_set() (selene_sdk.samplers.MultiFileSampler method)</a>
 
       <ul>
+        <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_test_set">(selene_sdk.samplers.OnlineSampler method)</a>
+</li>
+        <li><a href="samplers.html#selene_sdk.samplers.Sampler.get_test_set">(selene_sdk.samplers.Sampler method)</a>
+</li>
+      </ul></li>
+      <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.get_validation_set">get_validation_set() (selene_sdk.samplers.MultiFileSampler method)</a>
+
+      <ul>
+        <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.get_validation_set">(selene_sdk.samplers.OnlineSampler method)</a>
+</li>
         <li><a href="samplers.html#selene_sdk.samplers.Sampler.get_validation_set">(selene_sdk.samplers.Sampler method)</a>
 </li>
       </ul></li>
@@ -513,7 +533,11 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="samplers.html#selene_sdk.samplers.MatFileSampler">MatFileSampler (class in selene_sdk.samplers)</a>
+      <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler">MatFileSampler (class in selene_sdk.samplers.file_samplers)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler">MultiFileSampler (class in selene_sdk.samplers)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -575,22 +599,30 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="samplers.html#selene_sdk.samplers.BedFileSampler.sample">sample() (selene_sdk.samplers.BedFileSampler method)</a>
+      <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.BedFileSampler.sample">sample() (selene_sdk.samplers.file_samplers.BedFileSampler method)</a>
 
       <ul>
         <li><a href="samplers.html#selene_sdk.samplers.IntervalsSampler.sample">(selene_sdk.samplers.IntervalsSampler method)</a>
 </li>
-        <li><a href="samplers.html#selene_sdk.samplers.MatFileSampler.sample">(selene_sdk.samplers.MatFileSampler method)</a>
+        <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.sample">(selene_sdk.samplers.MultiFileSampler method)</a>
 </li>
         <li><a href="samplers.html#selene_sdk.samplers.RandomPositionsSampler.sample">(selene_sdk.samplers.RandomPositionsSampler method)</a>
 </li>
         <li><a href="samplers.html#selene_sdk.samplers.Sampler.sample">(selene_sdk.samplers.Sampler method)</a>
 </li>
+        <li><a href="samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.sample">(selene_sdk.samplers.file_samplers.MatFileSampler method)</a>
+</li>
       </ul></li>
       <li><a href="samplers.html#selene_sdk.samplers.Sampler">Sampler (class in selene_sdk.samplers)</a>
 </li>
-      <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.save_dataset_to_file">save_dataset_to_file() (selene_sdk.samplers.OnlineSampler method)</a>
+      <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.save_dataset_to_file">save_dataset_to_file() (selene_sdk.samplers.MultiFileSampler method)</a>
+
+      <ul>
+        <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.save_dataset_to_file">(selene_sdk.samplers.OnlineSampler method)</a>
 </li>
+        <li><a href="samplers.html#selene_sdk.samplers.Sampler.save_dataset_to_file">(selene_sdk.samplers.Sampler method)</a>
+</li>
+      </ul></li>
       <li><a href="selene.html#module-selene_sdk">selene_sdk (module)</a>
 </li>
       <li><a href="interpret.html#module-selene_sdk.interpret">selene_sdk.interpret (module)</a>
@@ -603,6 +635,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="samplers.file_samplers.html#module-selene_sdk.samplers.file_samplers">selene_sdk.samplers.file_samplers (module)</a>
+</li>
       <li><a href="sequences.html#module-selene_sdk.sequences">selene_sdk.sequences (module)</a>
 </li>
       <li><a href="targets.html#module-selene_sdk.targets">selene_sdk.targets (module)</a>
@@ -625,8 +659,12 @@
       </ul></li>
       <li><a href="interpret.html#selene_sdk.interpret.ISMResult.sequence_type">sequence_type (selene_sdk.interpret.ISMResult attribute)</a>
 </li>
-      <li><a href="samplers.html#selene_sdk.samplers.Sampler.set_mode">set_mode() (selene_sdk.samplers.Sampler method)</a>
+      <li><a href="samplers.html#selene_sdk.samplers.MultiFileSampler.set_mode">set_mode() (selene_sdk.samplers.MultiFileSampler method)</a>
+
+      <ul>
+        <li><a href="samplers.html#selene_sdk.samplers.Sampler.set_mode">(selene_sdk.samplers.Sampler method)</a>
 </li>
+      </ul></li>
       <li><a href="interpret.html#selene_sdk.interpret.sort_standard_chrs">sort_standard_chrs() (in module selene_sdk.interpret)</a>
 </li>
       <li><a href="samplers.html#selene_sdk.samplers.OnlineSampler.STRAND_SIDES">STRAND_SIDES (selene_sdk.samplers.OnlineSampler attribute)</a>
