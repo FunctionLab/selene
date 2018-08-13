@@ -6,6 +6,8 @@ import h5py
 import numpy as np
 import scipy.io
 
+from .file_sampler import FileSampler
+
 
 def load_mat_file(filepath, sequence_key, targets_key=None):
     """
@@ -40,17 +42,18 @@ def load_mat_file(filepath, sequence_key, targets_key=None):
         if targets_key:
             targets = mat[targets_key]
         return (mat[sequence_key], targets)
-    except ValueError:
+    except (NotImplementedError, ValueError):
         mat = h5py.File(filepath, 'r')
         sequences = mat[sequence_key][()]
         targets = None
         if targets_key:
             targets = mat[targets_key][()]
         mat.close()
-        return (sequences, targets)
+        sequences = np.transpose(sequences, (2, 1, 0))
+        return (sequences, targets.T)
 
 
-class MatFileSampler(object):
+class MatFileSampler(FileSampler):
     """
     A sampler for which the dataset is loaded directly from a `*.mat` file.
 
@@ -64,9 +67,9 @@ class MatFileSampler(object):
         Default is None. The key for the targets data matrix.
     random_seed : int, optional
         Default is 436. Sets the random seed for sampling.
-    shuffle_file : bool, optional
-        Default is True. Shuffle the data in the matrix before
-        sampling from it.
+    shuffle : bool, optional
+        Default is True. Shuffle the order of the samples in the matrix
+        before sampling from it.
 
     Attributes
     ----------
@@ -79,10 +82,11 @@ class MatFileSampler(object):
                  sequence_key,
                  targets_key=None,
                  random_seed=436,
-                 shuffle_file=True):
+                 shuffle=True):
         """
         Constructs a new `MatFileSampler` object.
         """
+        super(MatFileSampler, self).__init__()
         sequences_mat, targets_mat = load_mat_file(
             filepath, sequence_key, targets_key=targets_key)
         self._sample_seqs = sequences_mat
@@ -94,7 +98,7 @@ class MatFileSampler(object):
             self.n_samples).tolist()
         self._sample_next = 0
 
-        self._shuffle = shuffle_file
+        self._shuffle = shuffle
         if self._shuffle:
             np.random.shuffle(self._sample_indices)
 

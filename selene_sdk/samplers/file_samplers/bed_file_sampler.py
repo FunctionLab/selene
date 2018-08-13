@@ -3,7 +3,9 @@ This module provides the BedFileSampler class.
 """
 import numpy as np
 
-class BedFileSampler(object):
+from .file_sampler import FileSampler
+
+class BedFileSampler(FileSampler):
     """
     A sampler for which the dataset is loaded directly from a `*.bed` file.
 
@@ -72,6 +74,7 @@ class BedFileSampler(object):
         """
         Constructs a new `BedFileSampler` object.
         """
+        super(BedFileSampler, self).__init__()
         self.filepath = filepath
         self._file_handle = open(self.filepath, 'r')
         self.reference_sequence = reference_sequence

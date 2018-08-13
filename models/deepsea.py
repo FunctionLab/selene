@@ -60,12 +60,6 @@ class DeepSEA(nn.Module):
     def forward(self, x):
         """Forward propagation of a batch.
         """
-        for layer in self.conv_net.children():
-            if isinstance(layer, nn.Conv1d):
-                layer.weight.data.renorm_(2, 0, 0.9)
-        for layer in self.classifier.children():
-            if isinstance(layer, nn.Linear):
-                layer.weight.data.renorm_(2, 0, 0.9)
         out = self.conv_net(x)
         reshape_out = out.view(out.size(0), 960 * self.n_channels)
         predict = self.classifier(reshape_out)

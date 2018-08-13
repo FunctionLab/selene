@@ -74,7 +74,8 @@ class EvaluateModel(object):
         self.model = model
         self.criterion = criterion
 
-        trained_model = torch.load(trained_model_path)
+        trained_model = torch.load(
+            trained_model_path, map_location=lambda storage, location: storage)
         self.model = load_model_from_state_dict(
             trained_model["state_dict"], self.model)
         self.model.eval()

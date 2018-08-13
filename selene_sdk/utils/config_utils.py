@@ -68,7 +68,6 @@ def initialize_model(model_configs, train=True, lr=None):
         from selene_sdk.utils import NonStrandSpecific
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"]["mode"])
-
     criterion = module.criterion()
     if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)

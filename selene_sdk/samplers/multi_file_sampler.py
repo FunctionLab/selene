@@ -1,58 +1,75 @@
-"""This module provides the `Sampler` base class, which defines the
-interface for sampling classes. These sampling classes should provide
-a way to query some training/validation/test data for examples.
 """
-from abc import ABCMeta
-from abc import abstractmethod
-from collections import defaultdict
-import os
+This module provides the `MultiFileSampler` class, which uses a
+FileSampler for each mode of sampling (train, test, validation).
+The MultiFileSampler is therefore a subclass of Sampler.
+"""
+
+from .sampler import Sampler
 
 
-class Sampler(metaclass=ABCMeta):
+class MultiFileSampler(Sampler):
     """
-    The base class for sampler currently enforces that all samplers
-    have modes for drawing training and validation samples to train a
-    model.
+    This sampler contains individual file samplers for each mode.
+    The file samplers parse .bed/.mat files that correspond to
+    training, validation, and testing and MultiFileSampler calls on
+    the correct file sampler to draw samples for a given mode.
 
-    Parameters
+    Attributes
     ----------
+    train_sampler : selene_sdk.samplers.file_samplers.FileSampler
+        Load your training data as a `FileSampler` before passing it
+        into the `MultiFileSampler` constructor.
+    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler
+        The validation dataset file sampler.
     features : list(str)
-        The list of features (classes) the model predicts.
+        The list of features the model should predict
+    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
+        Default is None. The test file sampler is optional.
     save_datasets : list(str), optional
-        Default is `[]` the empty list. The list of modes for which we should
-        save sampled data to file (1 or more of ['train', 'validate', 'test']).
+        Default is None. Currently, we are only including these parameters
+        so that `MultiFileSampler` is consistent with `Sampler`. The save
+        dataset functionality for MultiFileSampler has not been defined
+        yet.
     output_dir : str or None, optional
-        Default is None. Path to the output directory. Used if we save
-        any of the data sampled. If `save_datasets` is non-empty,
-        `output_dir` must be a valid path. If the directory does not
-        yet exist, it will be created for you.
+        Default is None. Used if the sampler has any data or logging
+        statements to save to file. Currently not useful for
+        `MultiFileSampler`.
 
     Attributes
     ----------
     modes : list(str)
         A list of the names of the modes that the object may operate in.
     mode : str or None
-        The current mode that the object is operating in.
+        Default is `None`. The current mode that the object is operating in.
 
     """
-    BASE_MODES = ("train", "validate")
-    """
-    The types of modes that the `Sampler` object can run in.
-    """
-
-    def __init__(self, features, save_datasets=[], output_dir=None):
+    def __init__(self,
+                 train_sampler,
+                 validate_sampler,
+                 features,
+                 test_sampler=None,
+                 save_datasets=[],
+                 output_dir=None):
         """
-        Constructs a new `Sampler` object.
+        Constructs a new `MultiFileSampler` object.
         """
-        self.modes = list(self.BASE_MODES)
-        self.mode = None
+        super(MultiFileSampler, self).__init__(
+            features,
+            save_datasets=save_datasets,
+            output_dir=output_dir)
 
-        self._features = features
-        self._save_datasets = defaultdict(list)
+        self._samplers = {
+            "train": train_sampler,
+            "validate": validate_sampler
+        }
 
-        self._output_dir = output_dir
-        if output_dir is not None:
-            os.makedirs(output_dir, exist_ok=True)
+        self._index_to_feature = {
+            i: f for (i, f) in enumerate(features)
+        }
+
+        if test_sampler is not None:
+            self.modes.append("test")
+            self._samplers["test"] = test_sampler
 
     def set_mode(self, mode):
         """
@@ -62,7 +79,8 @@ class Sampler(metaclass=ABCMeta):
         ----------
         mode : str
             The name of the mode to use. It must be one of
-            `Sampler.BASE_MODES`.
+            `Sampler.BASE_MODES` ("train", "validate") or "test" if
+            the test data is supplied.
 
         Raises
         ------
@@ -76,7 +94,6 @@ class Sampler(metaclass=ABCMeta):
                 "{1}".format(mode, self.modes))
         self.mode = mode
 
-    @abstractmethod
     def get_feature_from_index(self, index):
         """
         Returns the feature corresponding to an index in the feature
@@ -93,9 +110,8 @@ class Sampler(metaclass=ABCMeta):
             The name of the feature occurring at the specified index.
 
         """
-        raise NotImplementedError()
+        return self._index_to_feature[index]
 
-    @abstractmethod
     def sample(self, batch_size=1):
         """
         Fetches a mini-batch of the data from the sampler.
@@ -106,9 +122,8 @@ class Sampler(metaclass=ABCMeta):
             Default is 1. The size of the batch to retrieve.
 
         """
-        raise NotImplementedError()
+        return self._samplers[self.mode].sample(batch_size)
 
-    @abstractmethod
     def get_data_and_targets(self, mode, batch_size, n_samples):
         """
         This method fetches a subset of the data from the sampler,
@@ -126,9 +141,9 @@ class Sampler(metaclass=ABCMeta):
             The total number of samples to retrieve.
 
         """
-        raise NotImplementedError()
+        return self._samplers[mode].get_data_and_targets(
+            batch_size, n_samples)
 
-    @abstractmethod
     def get_validation_set(self, batch_size, n_samples=None):
         """
         This method returns a subset of validation data from the
@@ -144,9 +159,9 @@ class Sampler(metaclass=ABCMeta):
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
         """
-        raise NotImplementedError()
+        return self._samplers["validate"].get_data_and_targets(
+            batch_size, n_samples)
 
-    @abstractmethod
     def get_test_set(self, batch_size, n_samples=None):
         """
         This method returns a subset of testing data from the
@@ -180,15 +195,18 @@ class Sampler(metaclass=ABCMeta):
         ValueError
             If no test partition of the data was specified during
             sampler initialization.
-
         """
-        raise NotImplementedError()
+        return self._samplers["test"].get_data_and_targets(
+            batch_size, n_samples)
 
-    @abstractmethod
     def save_dataset_to_file(self, mode, close_filehandle=False):
         """
-        Save samples for each partition (i.e. train/validate/test) to
-        disk.
+        We implement this function in this class only because the
+        TrainModel class calls this method. In the future, we will
+        likely remove this method or implement a different way
+        of "saving the data" for file samplers. For example, we
+        may only output the row numbers sampled so that users may
+        reproduce exactly what order the data was sampled.
 
         Parameters
         ----------
@@ -200,6 +218,5 @@ class Sampler(metaclass=ABCMeta):
             data corresponding to the input `mode` has been saved to
             file and `save_dataset_to_file` will not be called with
             `mode` again.
-
         """
-        raise NotImplementedError()
+        return None

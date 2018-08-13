@@ -26,6 +26,7 @@ The Github repository is located `here <https://github.com/FunctionLab/selene>`_
    interpret
    predict
    samplers
+   samplers.file_samplers
    sequences
    targets
    utils

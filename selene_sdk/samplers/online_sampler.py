@@ -6,6 +6,7 @@ Objects of the class `OnlineSampler`, are samplers which load examples
 """
 from abc import ABCMeta
 import os
+import random
 
 import numpy as np
 
@@ -108,7 +109,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         the same.
 
     """
-    # @TODO: Is there a compelling reason why STRAND_SIDES should be here?
     STRAND_SIDES = ('+', '-')
     """
     Defines the strands that features can be sampled from.
@@ -131,7 +131,14 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         Creates a new `OnlineSampler` object.
         """
-        super(OnlineSampler, self).__init__(seed=seed)
+        super(OnlineSampler, self).__init__(
+            features,
+            save_datasets=save_datasets,
+            output_dir=output_dir)
+
+        self.seed = seed
+        np.random.seed(self.seed)
+        random.seed(self.seed + 1)
 
         if (sequence_length + center_bin_to_predict) % 2 != 0:
             raise ValueError(
@@ -193,19 +200,14 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         self.reference_sequence = reference_sequence
 
-        self._features = features
         self.n_features = len(self._features)
 
         self.target = GenomicFeatures(
             target_path, self._features,
             feature_thresholds=feature_thresholds)
 
-        os.makedirs(output_dir, exist_ok=True)
-
-        self._save_datasets = {}
         self._save_filehandles = {}
         for mode in save_datasets:
-            self._save_datasets[mode] = []
             self._save_filehandles[mode] = open(
                 os.path.join(output_dir, "{0}_data.bed".format(mode)),
                 'w+')
