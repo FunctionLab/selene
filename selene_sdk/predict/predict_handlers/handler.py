@@ -7,7 +7,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 
 
-def write_to_file(data_across_features, info_cols, column_names, output_path):
+def write_to_file(data_across_features, info_cols, output_handle, close=False):
     """
     Write samples with valid predictions/scores to a tab-delimited file.
 
@@ -24,20 +24,20 @@ def write_to_file(data_across_features, info_cols, column_names, output_path):
         in `info_cols` corresponds to each row that will be written to the
         file. All columns in an element of `info_cols` will be prepended to
         the values in an element of `data_across_features`.
-    column_names : list(str)
-        The column names written as the first line of the file.
-    output_path : str
-        Path to the file where we should write the predictions or scores.
+    output_handle : _io.TextIOWrapper
+        File handle we use to write the information
+    close : bool, optional
+        Default is False. Set `close` to True if you are finished writing
+        to this file.
 
     """
-    with open(output_path, 'w+') as file_handle:
-        file_handle.write("{columns}\n".format(
-            columns='\t'.join(column_names)))
-        for info, preds in zip(info_cols, data_across_features):
-            preds_str = '\t'.join(
-                probabilities_to_string(preds))
-            info_str = '\t'.join([str(i) for i in info])
-            file_handle.write("{0}\t{1}\n".format(info_str, preds_str))
+    for info, preds in zip(info_cols, data_across_features):
+        preds_str = '\t'.join(
+            probabilities_to_string(preds))
+        info_str = '\t'.join([str(i) for i in info])
+        output_handle.write("{0}\t{1}\n".format(info_str, preds_str))
+    if close:
+        output_handle.close()
 
 
 def write_NAs_to_file(info_cols, column_names, output_path):
@@ -92,23 +92,12 @@ class PredictionsHandler(metaclass=ABCMeta):
     The abstract base class for handlers, which "handle" model
     predictions. # TODO(DOCUMENTATION): Elaborate.
 
-    Attributes
-    ----------
-    needs_base_pred : bool
-        # TODO
-    results : list # TODO
-        # TODO
-    samples : list # TODO
-        # TODO
-    NA_samples : list # TODO
-        # TODO
-
     """
     def __init__(self):
         self.needs_base_pred = False
-        self.results = []
-        self.samples = []
-        self.NA_samples = []
+        self._results = []
+        self._samples = []
+        self._NA_samples = []
 
     def handle_NA(self, row_ids):
         """
@@ -120,7 +109,7 @@ class PredictionsHandler(metaclass=ABCMeta):
             # TODO
 
         """
-        self.NA_samples.append(row_ids)
+        self._NA_samples.append(row_ids)
 
     @abstractmethod
     def handle_batch_predictions(self, *args, **kwargs):

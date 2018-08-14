@@ -480,7 +480,7 @@ class AnalyzeSequences(object):
             reporter.handle_batch_predictions(preds, batch_ids)
 
         fasta_file.close()
-        reporter.write_to_file()
+        reporter.write_to_file(close=True)
 
 
     def in_silico_mutagenesis_predict(self,
@@ -543,7 +543,7 @@ class AnalyzeSequences(object):
                     r.handle_batch_predictions(outputs, batch_ids)
 
         for r in reporters:
-            r.write_to_file()
+            r.write_to_file(close=True)
 
     def in_silico_mutagenesis(self,
                               sequence,
@@ -763,7 +763,10 @@ class AnalyzeSequences(object):
         for a in all_alts:
             prefix = sequence[:self._start_radius]
             suffix = sequence[self._start_radius + len(ref):]
-            alt_sequence = prefix + a + suffix
+            if a == '*':  # indicates a deletion
+                alt_sequence = prefix + suffix
+            else:
+                alt_sequence = prefix + a + suffix
 
             if len(alt_sequence) > self.sequence_length:
                 # truncate on both sides equally
@@ -857,4 +860,4 @@ class AnalyzeSequences(object):
                 batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
 
         for r in reporters:
-            r.write_to_file()
+            r.write_to_file(close=True)

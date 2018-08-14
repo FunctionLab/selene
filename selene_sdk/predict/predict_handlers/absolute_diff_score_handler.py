@@ -48,11 +48,13 @@ class AbsDiffScoreHandler(PredictionsHandler):
         super(AbsDiffScoreHandler, self).__init__()
 
         self.needs_base_pred = True
-        self.column_names = nonfeature_columns + features
-        self.results = []
-        self.samples = []
-        self.NA_samples = []
-        self.output_path = output_path
+        self._results = []
+        self._samples = []
+        self._NA_samples = []
+        column_names = nonfeature_columns + features
+        self._output_handle = open(output_path, 'w+')
+        self._output_handle.write("{0}\n".format(
+            '\t'.join(column_names)))
 
     def handle_NA(self, batch_ids):
         """
@@ -94,17 +96,21 @@ class AbsDiffScoreHandler(PredictionsHandler):
 
         """
         absolute_diffs = np.abs(baseline_predictions - batch_predictions)
-        self.results.append(absolute_diffs)
-        self.samples.append(batch_ids)
+        self._results.append(absolute_diffs)
+        self._samples.append(batch_ids)
+        if len(self._results) > 200000:
+            self.write_to_file()
 
-    def write_to_file(self):
+    def write_to_file(self, close=False):
         """
         TODO
 
         """
-        self.results = np.vstack(self.results)
-        self.samples = np.vstack(self.samples)
-        write_to_file(self.results,
-                      self.samples,
-                      self.column_names,
-                      self.output_path)
+        self._results = np.vstack(self._results)
+        self._samples = np.vstack(self._samples)
+        write_to_file(self._results,
+                      self._samples,
+                      self._output_handle,
+                      close=close)
+        self._results = []
+        self._samples = []
