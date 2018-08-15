@@ -88,6 +88,10 @@ class WritePredictionsHandler(PredictionsHandler):
                               self._column_names,
                               "{0}.NA".format(NA_file_prefix))
             self._NA_samples = []
+
+        if not self._results:
+            self._output_handle.close()
+            return None
         self._results = np.vstack(self._results)
         self._samples = np.vstack(self._samples)
         write_to_file(self._results,

@@ -103,6 +103,9 @@ class LogitScoreHandler(PredictionsHandler):
         """
         TODO
         """
+        if not self._results:
+            self._output_handle.close()
+            return None
         self._results = np.vstack(self._results)
         self._samples = np.vstack(self._samples)
         write_to_file(self._results,
