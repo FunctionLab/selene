@@ -36,6 +36,7 @@ class WritePredictionsHandler(PredictionsHandler):
         self._samples = []
         self._NA_samples = []
         self._column_names = nonfeature_columns + features
+        self._output_path = output_path
         self._output_handle = open(output_path, 'w+')
         self._output_handle.write("{0}\n".format(
             '\t'.join(self._column_names)))
@@ -83,7 +84,7 @@ class WritePredictionsHandler(PredictionsHandler):
         if self._NA_samples:
             self._NA_samples = np.vstack(self._NA_samples)
             NA_file_prefix = '.'.join(
-                self.output_path.split('.')[:-1])
+                self._output_path.split('.')[:-1])
             write_NAs_to_file(self._NA_samples,
                               self._column_names,
                               "{0}.NA".format(NA_file_prefix))
