@@ -6,15 +6,19 @@ encodings.
 
 """
 import numpy as np
+import pkg_resources
 import pyfaidx
+import tabix
 
 from .sequence import Sequence
 from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
 
 
-def _get_sequence_from_coords(len_chrs, genome_sequence, chrom,
-                              start, end, strand='+'):
+def _get_sequence_from_coords(len_chrs, genome_sequence,
+                              chrom, start, end,
+                              strand='+',
+                              blacklist_tabix=None):
     """
     Gets the genomic sequence at the input coordinates.
 
@@ -51,6 +55,14 @@ def _get_sequence_from_coords(len_chrs, genome_sequence, chrom,
     if start > len_chrs[chrom] or end > (len_chrs[chrom] + 1) \
             or start < 0:
         return ""
+
+    if blacklist_tabix is not None:
+        try:
+            rows = blacklist_tabix.query(chrom, start, end)
+            for row in rows:
+                return ""
+        except tabix.TabixError:
+            pass
 
     if strand == '+' or strand == '-':
         return genome_sequence(chrom, start, end, strand)
@@ -131,13 +143,27 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path):
+    def __init__(self, input_path, blacklist_regions=None):
         """
         Constructs a `Genome` object.
         """
         self.genome = pyfaidx.Fasta(input_path)
         self.chrs = sorted(self.genome.keys())
         self.len_chrs = self._get_len_chrs()
+
+        if blacklist_regions == "hg19":
+            self._blacklist_tabix = tabix.open(
+                pkg_resources.resource_filename(
+                    "selene_sdk",
+                    "sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz"))
+        elif blacklist_regions == "hg38":
+            self._blacklist_tabix = tabix.open(
+                pkg_resources.resource_filename(
+                    "selene_sdk",
+                    "sequences/data/hg38.blacklist.bed.gz"))
+        elif blacklist_regions is not None:
+            self._blacklist_tabix = tabix.open(
+                blacklist_regions)
 
     def get_chrs(self):
         """Gets the list of chromosome names.
