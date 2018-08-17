@@ -214,6 +214,9 @@ class RandomPositionsSampler(OnlineSampler):
             elif self.test_holdout and chrom in self.test_holdout:
                 self._sample_from_mode["test"].indices.append(
                     index)
+            else:
+                self._sample_from_mode["train"].indices.append(
+                    index)
 
             self.sample_from_intervals.append(
                 (chrom,
