@@ -229,7 +229,7 @@
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
 
 
-<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span> <span class="n">info_cols</span><span class="p">,</span> <span class="n">column_names</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span> <span class="n">info_cols</span><span class="p">,</span> <span class="n">output_handle</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Write samples with valid predictions/scores to a tab-delimited file.</span>
 
@@ -246,20 +246,20 @@
 <span class="sd">        in `info_cols` corresponds to each row that will be written to the</span>
 <span class="sd">        file. All columns in an element of `info_cols` will be prepended to</span>
 <span class="sd">        the values in an element of `data_across_features`.</span>
-<span class="sd">    column_names : list(str)</span>
-<span class="sd">        The column names written as the first line of the file.</span>
-<span class="sd">    output_path : str</span>
-<span class="sd">        Path to the file where we should write the predictions or scores.</span>
+<span class="sd">    output_handle : _io.TextIOWrapper</span>
+<span class="sd">        File handle we use to write the information</span>
+<span class="sd">    close : bool, optional</span>
+<span class="sd">        Default is False. Set `close` to True if you are finished writing</span>
+<span class="sd">        to this file.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
-        <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{columns}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">column_names</span><span class="p">)))</span>
-        <span class="k">for</span> <span class="n">info</span><span class="p">,</span> <span class="n">preds</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">info_cols</span><span class="p">,</span> <span class="n">data_across_features</span><span class="p">):</span>
-            <span class="n">preds_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">probabilities_to_string</span><span class="p">(</span><span class="n">preds</span><span class="p">))</span>
-            <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
-            <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info_str</span><span class="p">,</span> <span class="n">preds_str</span><span class="p">))</span></div>
+    <span class="k">for</span> <span class="n">info</span><span class="p">,</span> <span class="n">preds</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">info_cols</span><span class="p">,</span> <span class="n">data_across_features</span><span class="p">):</span>
+        <span class="n">preds_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">probabilities_to_string</span><span class="p">(</span><span class="n">preds</span><span class="p">))</span>
+        <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
+        <span class="n">output_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info_str</span><span class="p">,</span> <span class="n">preds_str</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
+        <span class="n">output_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 <span class="k">def</span> <span class="nf">write_NAs_to_file</span><span class="p">(</span><span class="n">info_cols</span><span class="p">,</span> <span class="n">column_names</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
@@ -314,23 +314,12 @@
 <span class="sd">    The abstract base class for handlers, which &quot;handle&quot; model</span>
 <span class="sd">    predictions. # TODO(DOCUMENTATION): Elaborate.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    needs_base_pred : bool</span>
-<span class="sd">        # TODO</span>
-<span class="sd">    results : list # TODO</span>
-<span class="sd">        # TODO</span>
-<span class="sd">    samples : list # TODO</span>
-<span class="sd">        # TODO</span>
-<span class="sd">    NA_samples : list # TODO</span>
-<span class="sd">        # TODO</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="PredictionsHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -342,7 +331,7 @@
 <span class="sd">            # TODO</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_ids</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_ids</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PredictionsHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_batch_predictions">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">handle_batch_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

@@ -233,20 +233,6 @@ which generally are used for logging and saving outputs from models.</p>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for handlers, which “handle” model
 predictions. # TODO(DOCUMENTATION): Elaborate.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – # TODO</li>
-<li><strong>results</strong> (<em>list # TODO</em>) – # TODO</li>
-<li><strong>samples</strong> (<em>list # TODO</em>) – # TODO</li>
-<li><strong>NA_samples</strong> (<em>list # TODO</em>) – # TODO</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA">
 <code class="descname">handle_NA</code><span class="sig-paren">(</span><em>row_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
@@ -288,17 +274,7 @@ predictions.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
-<li><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – # TODO</li>
-<li><strong>column_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – # TODO</li>
-<li><strong>results</strong> (<em>list        # TODO</em>) – # TODO</li>
-<li><strong>samples</strong> (<em>list        # TODO</em>) – # TODO</li>
-<li><strong>NA_samples</strong> (<em>list        # TODO</em>) – # TODO</li>
-<li><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – # TODO</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
 model will return its predictions.</li>
 <li><strong>nonfeature_columns</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence to
@@ -354,7 +330,7 @@ features).</li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -365,7 +341,7 @@ features).</li>
 <h2>LogitScoreHandler<a class="headerlink" href="#logitscorehandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler">
-<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">LogitScoreHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">LogitScoreHandler</code><span class="sig-paren">(</span><em>features</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>The logit score handler calculates and records the
 difference between <cite>logit(alt)</cite> and <cite>logit(ref)</cite> predictions.
@@ -378,18 +354,8 @@ then the log-odds is the logit of <cite>p</cite>, or</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
-<li><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – # TODO</li>
-<li><strong>column_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – # TODO</li>
-<li><strong>results</strong> (<em>list # TODO</em>) – # TODO</li>
-<li><strong>samples</strong> (<em>list # TODO</em>) – # TODO</li>
-<li><strong>NA_samples</strong> (<em>list # TODO</em>) – # TODO</li>
-<li><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – # TODO</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>features_list</strong> (<em>list of str</em>) – List of sequence-level features, in the same order that the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>features</strong> (<em>list of str</em>) – List of sequence-level features, in the same order that the
 model will return its predictions.</li>
 <li><strong>nonfeature_columns</strong> (<em>list of str</em>) – Columns in the file that help to identify the input sequence to
 which the features data corresponds.</li>
@@ -445,7 +411,7 @@ features).</li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -456,7 +422,7 @@ features).</li>
 <h2>WritePredictionsHandler<a class="headerlink" href="#writepredictionshandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler">
-<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">WritePredictionsHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">WritePredictionsHandler</code><span class="sig-paren">(</span><em>features</em>, <em>nonfeature_columns</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>Collects batches of model predictions and writes all of them
 to file at the end.</p>
@@ -465,7 +431,7 @@ to file at the end.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>features_list</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
+<li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
 model will return its predictions.</li>
 <li><strong>nonfeature_columns</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence to
 which the features data corresponds.</li>
@@ -515,7 +481,7 @@ sequence.</li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -526,7 +492,7 @@ sequence.</li>
 <h2>WriteRefAltHandler<a class="headerlink" href="#writerefalthandler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler">
-<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">WriteRefAltHandler</code><span class="sig-paren">(</span><em>features_list</em>, <em>nonfeature_columns</em>, <em>out_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">WriteRefAltHandler</code><span class="sig-paren">(</span><em>features</em>, <em>nonfeature_columns</em>, <em>out_filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>Used during variant effect prediction. This handler records the
 predicted values for the reference and alternate sequences, and
@@ -536,14 +502,13 @@ stores these values in two separate files.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
-<li><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – # TODO</li>
 <li><strong>ref_writer</strong> (<em># TODO</em>) – # TODO</li>
 <li><strong>alt_writer</strong> (<em># TODO</em>) – # TODO</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>features_list</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
+<li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
 model will return its predictions.</li>
 <li><strong>nonfeature_columns</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence
 to which the features data corresponds.</li>
@@ -601,7 +566,7 @@ features).</li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file">
-<code class="descname">write_to_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
 </dd></dl>
 
@@ -612,7 +577,7 @@ features).</li>
 <h2>write_to_file<a class="headerlink" href="#write-to-file" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.predict.predict_handlers.write_to_file">
-<code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>data_across_features</em>, <em>info_cols</em>, <em>column_names</em>, <em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.write_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">selene_sdk.predict.predict_handlers.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>data_across_features</em>, <em>info_cols</em>, <em>output_handle</em>, <em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write samples with valid predictions/scores to a tab-delimited file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -628,8 +593,9 @@ sequences inputted to the model and the length of each element
 in <cite>info_cols</cite> corresponds to each row that will be written to the
 file. All columns in an element of <cite>info_cols</cite> will be prepended to
 the values in an element of <cite>data_across_features</cite>.</li>
-<li><strong>column_names</strong> (<em>list(str)</em>) – The column names written as the first line of the file.</li>
-<li><strong>output_path</strong> (<em>str</em>) – Path to the file where we should write the predictions or scores.</li>
+<li><strong>output_handle</strong> (<em>_io.TextIOWrapper</em>) – File handle we use to write the information</li>
+<li><strong>close</strong> (<em>bool, optional</em>) – Default is False. Set <cite>close</cite> to True if you are finished writing
+to this file.</li>
 </ul>
 </td>
 </tr>

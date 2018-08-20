@@ -228,15 +228,19 @@
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">pyfaidx</span>
+<span class="kn">import</span> <span class="nn">tabix</span>
 
 <span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">sequence_to_encoding</span>
 <span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">encoding_to_sequence</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sequence_from_coords</span><span class="p">(</span><span class="n">len_chrs</span><span class="p">,</span> <span class="n">genome_sequence</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span>
-                              <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_sequence_from_coords</span><span class="p">(</span><span class="n">len_chrs</span><span class="p">,</span> <span class="n">genome_sequence</span><span class="p">,</span>
+                              <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span>
+                              <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
+                              <span class="n">blacklist_tabix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Gets the genomic sequence at the input coordinates.</span>
 
@@ -273,6 +277,14 @@
     <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
             <span class="ow">or</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">blacklist_tabix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">blacklist_tabix</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">except</span> <span class="n">tabix</span><span class="o">.</span><span class="n">TabixError</span><span class="p">:</span>
+            <span class="k">pass</span>
 
     <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">or</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">genome_sequence</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span>
@@ -353,13 +365,27 @@
 <span class="sd">    from the alphabet, but we are uncertain which.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">blacklist_regions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a `Genome` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">genome</span> <span class="o">=</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">Fasta</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chrs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_len_chrs</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">blacklist_regions</span> <span class="o">==</span> <span class="s2">&quot;hg19&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+                    <span class="s2">&quot;selene_sdk&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz&quot;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">blacklist_regions</span> <span class="o">==</span> <span class="s2">&quot;hg38&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
+                    <span class="s2">&quot;selene_sdk&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;sequences/data/hg38.blacklist.bed.gz&quot;</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">blacklist_regions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                <span class="n">blacklist_regions</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Genome.get_chrs"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_chrs">[docs]</a>    <span class="k">def</span> <span class="nf">get_chrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets the list of chromosome names.</span>

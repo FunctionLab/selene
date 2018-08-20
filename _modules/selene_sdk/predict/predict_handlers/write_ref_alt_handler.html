@@ -235,8 +235,6 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    needs_base_pred : bool</span>
-<span class="sd">        # TODO</span>
 <span class="sd">    ref_writer : # TODO</span>
 <span class="sd">        # TODO</span>
 <span class="sd">    alt_writer : # TODO</span>
@@ -244,7 +242,7 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    features_list : list(str)</span>
+<span class="sd">    features : list(str)</span>
 <span class="sd">        List of sequence-level features, in the same order that the</span>
 <span class="sd">        model will return its predictions.</span>
 <span class="sd">    nonfeature_columns : list(str)</span>
@@ -257,7 +255,7 @@
 <span class="sd">        the file names.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="n">out_filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `WriteRefAltHandler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -265,9 +263,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span> <span class="o">=</span> <span class="n">WritePredictionsHandler</span><span class="p">(</span>
-            <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.ref&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_filename</span><span class="p">))</span>
+            <span class="n">features</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.ref&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_filename</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span> <span class="o">=</span> <span class="n">WritePredictionsHandler</span><span class="p">(</span>
-            <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.alt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_filename</span><span class="p">))</span>
+            <span class="n">features</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.alt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out_filename</span><span class="p">))</span>
 
 <div class="viewcode-block" id="WriteRefAltHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -312,12 +310,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span>
             <span class="n">batch_predictions</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="WriteRefAltHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="WriteRefAltHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WriteRefAltHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_writer</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

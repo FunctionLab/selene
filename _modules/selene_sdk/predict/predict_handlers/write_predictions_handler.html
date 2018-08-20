@@ -224,7 +224,6 @@
 <span class="sd">TODO</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
 <span class="kn">from</span> <span class="nn">.handler</span> <span class="k">import</span> <span class="n">write_NAs_to_file</span><span class="p">,</span> <span class="n">write_to_file</span><span class="p">,</span> <span class="n">PredictionsHandler</span>
 
 
@@ -233,13 +232,9 @@
 <span class="sd">    Collects batches of model predictions and writes all of them</span>
 <span class="sd">    to file at the end.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    features_list : list(str)</span>
+<span class="sd">    features : list(str)</span>
 <span class="sd">        List of sequence-level features, in the same order that the</span>
 <span class="sd">        model will return its predictions.</span>
 <span class="sd">    nonfeature_columns : list(str)</span>
@@ -250,7 +245,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_list</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">nonfeature_columns</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `WritePredictionsHandler` object.</span>
 
@@ -258,12 +253,15 @@
 
         <span class="nb">super</span><span class="p">(</span><span class="n">WritePredictionsHandler</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="n">nonfeature_columns</span> <span class="o">+</span> <span class="n">features_list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_column_names</span> <span class="o">=</span> <span class="n">nonfeature_columns</span> <span class="o">+</span> <span class="n">features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span> <span class="o">=</span> <span class="n">output_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_column_names</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="WritePredictionsHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -296,25 +294,35 @@
 <span class="sd">            file) that together make up a unique identifier for a</span>
 <span class="sd">            sequence.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_predictions</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_predictions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">200000</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="WritePredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="WritePredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">)</span>
             <span class="n">NA_file_prefix</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">write_NAs_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NA_samples</span><span class="p">,</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">write_NAs_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_column_names</span><span class="p">,</span>
                               <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.NA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NA_file_prefix</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">)</span>
-        <span class="n">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span>
-                      <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">,</span>
-                      <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
-                      <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">)</span>
+        <span class="n">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="p">,</span>
+                      <span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span></div></div>
 </pre></div>
 
            </div>
