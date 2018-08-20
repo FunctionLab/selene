@@ -4,7 +4,6 @@ a way to query some training/validation/test data for examples.
 """
 from abc import ABCMeta
 from abc import abstractmethod
-from collections import defaultdict
 import os
 
 
@@ -48,7 +47,10 @@ class Sampler(metaclass=ABCMeta):
         self.mode = None
 
         self._features = features
-        self._save_datasets = defaultdict(list)
+
+        self._save_datasets = {}
+        for mode in save_datasets:
+            self._save_datasets[mode] = []
 
         self._output_dir = output_dir
         if output_dir is not None:
