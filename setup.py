@@ -34,7 +34,11 @@ setup(name="selene-sdk",
       packages=find_packages(),
       url="https://github.com/FunctionLab/selene",
       package_data={
-        "selene-sdk": ["interpret/data/gencode_v28_hg38/*", "interpret/data/gencode_v28_hg19/*"]
+        "selene-sdk": [
+            "interpret/data/gencode_v28_hg38/*",
+            "interpret/data/gencode_v28_hg19/*",
+            "sequences/data/*"
+        ]
       },
       classifiers=(
         "Programming Language :: Python :: 3",
