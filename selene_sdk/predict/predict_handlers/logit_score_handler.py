@@ -18,24 +18,9 @@ class LogitScoreHandler(PredictionsHandler):
         \\mathrm{logit}(p) = \\log\\left(\\frac{p}{1 - p}\\right) =
         \\log(p) - \\log(1 - p)
 
-    Attributes
-    ----------
-    needs_base_pred : bool
-        # TODO
-    column_names : list(str)
-        # TODO
-    results : list # TODO
-        # TODO
-    samples : list # TODO
-        # TODO
-    NA_samples : list # TODO
-        # TODO
-    output_path : str
-        # TODO
-
     Parameters
     ----------
-    features_list : list of str
+    features : list of str
         List of sequence-level features, in the same order that the
         model will return its predictions.
     nonfeature_columns : list of str
@@ -52,7 +37,7 @@ class LogitScoreHandler(PredictionsHandler):
     """
 
     def __init__(self,
-                 features_list,
+                 features,
                  nonfeature_columns,
                  output_path):
         """
@@ -61,11 +46,13 @@ class LogitScoreHandler(PredictionsHandler):
         super(LogitScoreHandler).__init__()
 
         self.needs_base_pred = True
-        self.column_names = nonfeature_columns + features_list
-        self.results = []
-        self.samples = []
-        self.NA_samples = []
-        self.output_path = output_path
+        self._results = []
+        self._samples = []
+        self._NA_samples = []
+        column_names = nonfeature_columns + features
+        self._output_handle = open(output_path, 'w+')
+        self._output_handle.write("{0}\n".format(
+            '\t'.join(column_names)))
 
     def handle_NA(self, batch_ids):
         """
@@ -107,16 +94,23 @@ class LogitScoreHandler(PredictionsHandler):
 
         """
         logits = logit(baseline_predictions) - logit(batch_predictions)
-        self.results.append(logits)
-        self.samples.append(batch_ids)
+        self._results.append(logits)
+        self._samples.append(batch_ids)
+        if len(self._results) > 200000:
+            self.write_to_file()
 
-    def write_to_file(self):
+    def write_to_file(self, close=False):
         """
         TODO
         """
-        self.results = np.vstack(self.results)
-        self.samples = np.vstack(self.samples)
-        write_to_file(self.results,
-                      self.samples,
-                      self.column_names,
-                      self.output_path)
+        if not self._results:
+            self._output_handle.close()
+            return None
+        self._results = np.vstack(self._results)
+        self._samples = np.vstack(self._samples)
+        write_to_file(self._results,
+                      self._samples,
+                      self._output_handle,
+                      close=close)
+        self._results = []
+        self._samples = []

@@ -2,7 +2,6 @@
 TODO
 """
 import numpy as np
-
 from .handler import write_NAs_to_file, write_to_file, PredictionsHandler
 
 
@@ -11,13 +10,9 @@ class WritePredictionsHandler(PredictionsHandler):
     Collects batches of model predictions and writes all of them
     to file at the end.
 
-    Attributes
-    ----------
-
-
     Parameters
     ----------
-    features_list : list(str)
+    features : list(str)
         List of sequence-level features, in the same order that the
         model will return its predictions.
     nonfeature_columns : list(str)
@@ -28,7 +23,7 @@ class WritePredictionsHandler(PredictionsHandler):
 
     """
 
-    def __init__(self, features_list, nonfeature_columns, output_path):
+    def __init__(self, features, nonfeature_columns, output_path):
         """
         Constructs a new `WritePredictionsHandler` object.
 
@@ -36,12 +31,15 @@ class WritePredictionsHandler(PredictionsHandler):
 
         super(WritePredictionsHandler).__init__()
 
-        self.needs_base_pred = False
-        self.column_names = nonfeature_columns + features_list
-        self.results = []
-        self.samples = []
-        self.NA_samples = []
-        self.output_path = output_path
+        self.needs_base_pred = True
+        self._results = []
+        self._samples = []
+        self._NA_samples = []
+        self._column_names = nonfeature_columns + features
+        self._output_path = output_path
+        self._output_handle = open(output_path, 'w+')
+        self._output_handle.write("{0}\n".format(
+            '\t'.join(self._column_names)))
 
     def handle_NA(self, batch_ids):
         """
@@ -74,22 +72,32 @@ class WritePredictionsHandler(PredictionsHandler):
             file) that together make up a unique identifier for a
             sequence.
         """
-        self.results.append(batch_predictions)
-        self.samples.append(batch_ids)
+        self._results.append(batch_predictions)
+        self._samples.append(batch_ids)
+        if len(self._results) > 200000:
+            self.write_to_file()
 
-    def write_to_file(self):
+    def write_to_file(self, close=False):
         """
         TODO
         """
-        if self.NA_samples:
+        if self._NA_samples:
+            self._NA_samples = np.vstack(self._NA_samples)
             NA_file_prefix = '.'.join(
-                self.output_path.split('.')[:-1])
-            write_NAs_to_file(self.NA_samples,
-                              self.column_names,
+                self._output_path.split('.')[:-1])
+            write_NAs_to_file(self._NA_samples,
+                              self._column_names,
                               "{0}.NA".format(NA_file_prefix))
-        self.results = np.vstack(self.results)
-        self.samples = np.vstack(self.samples)
-        write_to_file(self.results,
-                      self.samples,
-                      self.column_names,
-                      self.output_path)
+            self._NA_samples = []
+
+        if not self._results:
+            self._output_handle.close()
+            return None
+        self._results = np.vstack(self._results)
+        self._samples = np.vstack(self._samples)
+        write_to_file(self._results,
+                      self._samples,
+                      self._output_handle,
+                      close=close)
+        self._results = []
+        self._samples = []

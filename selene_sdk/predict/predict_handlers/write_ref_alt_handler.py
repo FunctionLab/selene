@@ -13,8 +13,6 @@ class WriteRefAltHandler(PredictionsHandler):
 
     Attributes
     ----------
-    needs_base_pred : bool
-        # TODO
     ref_writer : # TODO
         # TODO
     alt_writer : # TODO
@@ -22,7 +20,7 @@ class WriteRefAltHandler(PredictionsHandler):
 
     Parameters
     ----------
-    features_list : list(str)
+    features : list(str)
         List of sequence-level features, in the same order that the
         model will return its predictions.
     nonfeature_columns : list(str)
@@ -35,7 +33,7 @@ class WriteRefAltHandler(PredictionsHandler):
         the file names.
     """
 
-    def __init__(self, features_list, nonfeature_columns, out_filename):
+    def __init__(self, features, nonfeature_columns, out_filename):
         """
         Constructs a new `WriteRefAltHandler` object.
         """
@@ -43,9 +41,9 @@ class WriteRefAltHandler(PredictionsHandler):
 
         self.needs_base_pred = True
         self.ref_writer = WritePredictionsHandler(
-            features_list, nonfeature_columns, "{0}.ref".format(out_filename))
+            features, nonfeature_columns, "{0}.ref".format(out_filename))
         self.alt_writer = WritePredictionsHandler(
-            features_list, nonfeature_columns, "{0}.alt".format(out_filename))
+            features, nonfeature_columns, "{0}.alt".format(out_filename))
 
     def handle_NA(self, batch_ids):
         """
@@ -90,9 +88,9 @@ class WriteRefAltHandler(PredictionsHandler):
         self.alt_writer.handle_batch_predictions(
             batch_predictions, batch_ids)
 
-    def write_to_file(self):
+    def write_to_file(self, close=False):
         """
         TODO
         """
-        self.ref_writer.write_to_file()
-        self.alt_writer.write_to_file()
+        self.ref_writer.write_to_file(close=close)
+        self.alt_writer.write_to_file(close=close)
