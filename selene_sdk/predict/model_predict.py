@@ -833,11 +833,11 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2)
             start = center - self._start_radius
             end = center + self._end_radius
-
-            if "chr" not in chrom:
-                chrom = "chr" + chrom
-            if "MT" in chrom:
-                chrom = chrom[:-1]
+            if isinstance(self.reference_sequence, Genome):
+                if "chr" not in chrom:
+                    chrom = "chr" + chrom
+                if "MT" in chrom:
+                    chrom = chrom[:-1]
 
             if not self.reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
