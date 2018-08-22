@@ -1055,11 +1055,11 @@
             <span class="n">center</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span>
             <span class="n">end</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span>
-
-            <span class="k">if</span> <span class="s2">&quot;chr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
-                <span class="n">chrom</span> <span class="o">=</span> <span class="s2">&quot;chr&quot;</span> <span class="o">+</span> <span class="n">chrom</span>
-            <span class="k">if</span> <span class="s2">&quot;MT&quot;</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
-                <span class="n">chrom</span> <span class="o">=</span> <span class="n">chrom</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span> <span class="n">Genome</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;chr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
+                    <span class="n">chrom</span> <span class="o">=</span> <span class="s2">&quot;chr&quot;</span> <span class="o">+</span> <span class="n">chrom</span>
+                <span class="k">if</span> <span class="s2">&quot;MT&quot;</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
+                    <span class="n">chrom</span> <span class="o">=</span> <span class="n">chrom</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">coords_in_bounds</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reporters</span><span class="p">:</span>
