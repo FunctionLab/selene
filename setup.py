@@ -28,7 +28,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
-      version="0.0.1",
+      version="0.1.0",
       description=("framework for developing sequence-level "
                    "deep learning networks"),
       packages=find_packages(),
@@ -60,6 +60,6 @@ setup(name="selene-sdk",
         "scipy",
         "seaborn",
         "statsmodels",
-        "torch",
+        "torch>=0.4.0",
         "torchvision"
     ])
