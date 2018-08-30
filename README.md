@@ -8,9 +8,7 @@ You have found Selene, a Python library and command line interface for training 
 
 Selene is a Python 3+ package. We recommend using it with Python 3.6 or above. 
 
-### Installing selene with [Anaconda](https://www.anaconda.com/download/):
-COMING SOON. We are working on getting Selene registered on Bioconda. 
-For now, we recommend installing and running Selene (using [selene_cli.py](selene_cli.py)) from the source build for better control over the PyTorch-related dependencies. Please see the instructions below for doing so.
+### Installing selene with [Anaconda](https://www.anaconda.com/download/) (for Linux):
 
 ```sh
 conda install -c bioconda selene-sdk

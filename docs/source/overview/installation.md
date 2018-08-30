@@ -4,11 +4,7 @@ We recommend that users either clone and build the repository or install Selene 
 
 ## Installing with Anaconda
 
-We are in the process of uploading Selene to [Bioconda](https://bioconda.github.io/), a channel for the [conda](https://www.anaconda.com/download/) package manager. 
-
-It should be uploaded within the next week. If you'd like to be notified when it is available, please send me an e-mail at <kchen@flatironinstitute.org>. Thanks for your patience!
-
-To install with conda, use the following command in your terminal:
+To install with conda (recommended for Linux users), run the following command in your terminal:
 ```
 conda install -c bioconda selene-sdk
 ```
