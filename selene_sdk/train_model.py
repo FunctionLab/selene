@@ -389,7 +389,7 @@ class TrainModel(object):
         loss.backward()
         self.optimizer.step()
 
-        return loss.data[0]
+        return loss.item()
 
     def _evaluate_on_data(self, data_in_batches):
         """
@@ -420,16 +420,18 @@ class TrainModel(object):
                 inputs = inputs.cuda()
                 targets = targets.cuda()
 
-            inputs = Variable(inputs, volatile=True)
-            targets = Variable(targets, volatile=True)
+            with torch.no_grad():
+                inputs = Variable(inputs)
+                targets = Variable(targets)
 
-            predictions = self.model(inputs.transpose(1, 2))
-            loss = self.criterion(predictions, targets)
+                predictions = self.model(
+                    inputs.transpose(1, 2))
+                loss = self.criterion(predictions, targets)
 
-            all_predictions.append(predictions.data.cpu().numpy())
+                all_predictions.append(
+                    predictions.data.cpu().numpy())
 
-            batch_losses.append(loss.data[0])
-
+                batch_losses.append(loss.item())
         all_predictions = np.vstack(all_predictions)
         return np.average(batch_losses), all_predictions
 

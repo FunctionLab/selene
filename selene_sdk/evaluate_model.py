@@ -145,14 +145,15 @@ class EvaluateModel(object):
             if self.use_cuda:
                 inputs = inputs.cuda()
                 targets = targets.cuda()
-            inputs = Variable(inputs, volatile=True)
-            targets = Variable(targets, volatile=True)
+            with torch.no_grad():
+                inputs = Variable(inputs)
+                targets = Variable(targets)
 
-            predictions = self.model(inputs.transpose(1, 2))
-            loss = self.criterion(predictions, targets)
+                predictions = self.model(inputs.transpose(1, 2))
+                loss = self.criterion(predictions, targets)
 
-            all_predictions.append(predictions.data.cpu().numpy())
-            batch_losses.append(loss.data[0])
+                all_predictions.append(predictions.data.cpu().numpy())
+                batch_losses.append(loss.item())
         all_predictions = np.vstack(all_predictions)
 
         average_scores = self._metrics.update(
