@@ -85,7 +85,13 @@ class Genome(Sequence):
         Path to an indexed FASTA file, that is, a `*.fasta` file with
         a corresponding `*.fai` file in the same directory. This file
         should contain the target organism's genome sequence.
-
+    blacklist_regions : str or None, optional
+        Default is None. Path to a tabix-indexed list of regions from
+        which we should not output sequences. This is used to ensure that
+        we are not sampling from areas where we will never collect
+        measurements. You can pass as input "hg19" or "hg38" to use the
+        blacklist regions released by ENCODE. You can also pass in your own
+        tabix-indexed .gz file.
 
     Attributes
     ----------

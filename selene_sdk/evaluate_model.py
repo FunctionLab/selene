@@ -138,7 +138,6 @@ class EvaluateModel(object):
         batch_losses = []
         all_predictions = []
         for (inputs, targets) in self._test_data:
-
             inputs = torch.Tensor(inputs)
             targets = torch.Tensor(targets)
 
