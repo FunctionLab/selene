@@ -179,8 +179,6 @@ class TrainModel(object):
             verbosity=logging_verbosity)
 
         self._create_validation_set(n_samples=n_validation_samples)
-        # TODO: Only `selene_sdk.samplers.OnlineSampler` and sub-classes have `get_feature_from_index`.
-        # So, what should be done to allow more general sampling methods?
         self._validation_metrics = PerformanceMetrics(
             self.sampler.get_feature_from_index,
             report_gt_feature_n_positives=report_gt_feature_n_positives)
@@ -244,7 +242,6 @@ class TrainModel(object):
             self.sampler.get_validation_set(
                 self.batch_size, n_samples=n_samples)
         t_f = time()
-        # TODO: Correct the # of examples and batches so that they reflect the actual #, not estimates.
         logger.info(("{0} s to load {1} validation examples ({2} validation "
                      "batches) to evaluate after each training step.").format(
                       t_f - t_i,
@@ -268,7 +265,6 @@ class TrainModel(object):
             self.sampler.get_test_set(
                 self.batch_size, n_samples=n_samples)
         t_f = time()
-        # TODO: Correct the # of examples and batches so that they reflect the actual #, not estimates.
         logger.info(("{0} s to load {1} test examples ({2} test batches) "
                      "to evaluate after all training steps.").format(
                       t_f - t_i,
@@ -346,7 +342,6 @@ class TrainModel(object):
                 # Logging training and validation on same line requires 2 parsers or more complex parser.
                 # Separate logging of train/validate is just a grep for validation/train and then same parser.
 
-            # TODO: Do we want to save a checkpoint at step == 0 (as is the case now)?
             # Should checkpoint saving occur before validation (if they both occur in the same step) or not?
             if step % self.nth_step_save_checkpoint == 0:
                 self._save_checkpoint({
@@ -389,7 +384,7 @@ class TrainModel(object):
         loss.backward()
         self.optimizer.step()
 
-        return loss.data[0]
+        return loss.item()
 
     def _evaluate_on_data(self, data_in_batches):
         """
@@ -420,16 +415,18 @@ class TrainModel(object):
                 inputs = inputs.cuda()
                 targets = targets.cuda()
 
-            inputs = Variable(inputs, volatile=True)
-            targets = Variable(targets, volatile=True)
+            with torch.no_grad():
+                inputs = Variable(inputs)
+                targets = Variable(targets)
 
-            predictions = self.model(inputs.transpose(1, 2))
-            loss = self.criterion(predictions, targets)
+                predictions = self.model(
+                    inputs.transpose(1, 2))
+                loss = self.criterion(predictions, targets)
 
-            all_predictions.append(predictions.data.cpu().numpy())
+                all_predictions.append(
+                    predictions.data.cpu().numpy())
 
-            batch_losses.append(loss.data[0])
-
+                batch_losses.append(loss.item())
         all_predictions = np.vstack(all_predictions)
         return np.average(batch_losses), all_predictions
 
@@ -451,7 +448,6 @@ class TrainModel(object):
         average_scores = self._validation_metrics.update(all_predictions,
                                                          self._all_validation_targets)
 
-        # TODO: This results in validation loss being logged twice. Is that ideal?
         for name, score in average_scores.items():
             logger.debug("[STATS] average {0}: {1}".format(name, score))
             print("[VALIDATE] average {0}: {1}".format(name, score))
