@@ -1,7 +1,13 @@
+import os
+
 import numpy as np
 from setuptools import find_packages
 from setuptools import setup
 
+
+with open(os.path.join(os.path.dirname(__file__), "README.md"),
+          encoding='utf-8') as readme:
+    long_description = readme.read()
 
 try:
     from Cython.Distutils.extension import Extension
@@ -29,6 +35,8 @@ cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
       version="0.1.0",
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
                    "deep learning networks"),
       packages=find_packages(),
