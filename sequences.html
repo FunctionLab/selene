@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                master (0.0.1)
+                master (0.1.0)
               </div>
             
           
@@ -423,9 +423,17 @@ wrapper class around the <cite>pyfaidx.Fasta</cite> class.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>input_path</strong> (<em>str</em>) – Path to an indexed FASTA file, that is, a <cite>*.fasta</cite> file with
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>input_path</strong> (<em>str</em>) – Path to an indexed FASTA file, that is, a <cite>*.fasta</cite> file with
 a corresponding <cite>*.fai</cite> file in the same directory. This file
-should contain the target organism’s genome sequence.</p>
+should contain the target organism’s genome sequence.</li>
+<li><strong>blacklist_regions</strong> (<em>str or None, optional</em>) – Default is None. Path to a tabix-indexed list of regions from
+which we should not output sequences. This is used to ensure that
+we are not sampling from areas where we will never collect
+measurements. You can pass as input “hg19” or “hg38” to use the
+blacklist regions released by ENCODE. You can also pass in your own
+tabix-indexed .gz file.</li>
+</ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">

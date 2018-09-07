@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                master (0.0.1)
+                master (0.1.0)
               </div>
             
           
@@ -360,21 +360,21 @@
         <span class="n">batch_losses</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">all_predictions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_test_data</span><span class="p">:</span>
-
             <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
             <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">:</span>
                 <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
                 <span class="n">targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-            <span class="n">inputs</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">targets</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
 
-            <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+                <span class="n">predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
 
-            <span class="n">all_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
-            <span class="n">batch_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">all_predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predictions</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                <span class="n">batch_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
         <span class="n">all_predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">all_predictions</span><span class="p">)</span>
 
         <span class="n">average_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
