@@ -14,6 +14,7 @@ The Github repository is located `here <https://github.com/FunctionLab/selene>`_
    :maxdepth: 1
    :caption: Overview
 
+   overview/overview
    overview/installation
    overview/tutorials
    overview/extending

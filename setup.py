@@ -34,7 +34,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
-      version="0.1.0",
+      version="0.1.2",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
@@ -42,10 +42,12 @@ setup(name="selene-sdk",
       packages=find_packages(),
       url="https://github.com/FunctionLab/selene",
       package_data={
-        "selene-sdk": [
-            "interpret/data/gencode_v28_hg38/*",
-            "interpret/data/gencode_v28_hg19/*",
-            "sequences/data/*"
+        "selene_sdk.interpret": [
+            "data/gencode_v28_hg38/*",
+            "data/gencode_v28_hg19/*"
+        ],
+        "selene_sdk.sequences": [
+            "data/*"
         ]
       },
       classifiers=(
