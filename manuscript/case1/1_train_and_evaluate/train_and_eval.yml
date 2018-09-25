@@ -1,0 +1,43 @@
+---
+ops: [train, evaluate]
+model: {
+    file: <ABSOLUTE_PATH>/selene/manuscript/case1/deepsea.py,
+    class: DeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 1,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+sampler: !obj:selene_sdk.samplers.IntervalsSampler {
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta
+    },
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/distinct_features.txt
+    },
+    target_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/sorted_GATA1_proery_bm.bed.gz, 
+    intervals_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/hg38_TF_intervals.txt,
+    test_holdout: [chr8, chr9],
+    validation_holdout: [chr6, chr7],
+    seed: 127,
+    sequence_length: 1000,
+    center_bin_to_predict: 200,
+    feature_thresholds: 0.5,
+    sample_negative: True,
+    mode: train,
+    save_datasets: [train, test, validate]
+}
+train_model: !obj:selene_sdk.TrainModel {
+    batch_size: 64,
+    max_steps: 640000,
+    report_stats_every_n_steps: 32000,
+    report_gt_feature_n_positives: 20,
+    use_cuda: True,
+    data_parallel: True
+}
+output_dir: <ABSOLUTE_PATH>/selene/manuscript/case1/training_outputs
+random_seed: 42
+create_subdirectory: False
+...
