@@ -1,0 +1,30 @@
+---
+ops: [analyze]
+model: {
+    file: <ABSOLUTE_PATH>/selene/manuscript/case1/deepsea.py,
+    class: DeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 1,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
+    sequence_length: 1000,
+    batch_size: 64,
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/distinct_features.txt 
+    },
+    trained_model_path: <ABSOLUTE_PATH>/selene/manuscript/case1/training_outputs/best_model.pth.tar,
+    use_cuda: True,
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta
+    }
+}
+in_silico_mutagenesis: {
+    input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/regulatory_mutations.fa, 
+    save_data: ["logits"],
+    output_dir: <ABSOLUTE_PATH>/selene/manuscript/case1/ism_outputs
+}
+...
