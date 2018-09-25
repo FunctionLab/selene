@@ -1,0 +1,3 @@
+recursive-include selene_sdk/interpret/data/gencode_v28_hg38 *.bed*
+recursive-include selene_sdk/interpret/data/gencode_v28_hg19 *.bed*
+recursive-include selene_sdk/sequences/data *.bed*
