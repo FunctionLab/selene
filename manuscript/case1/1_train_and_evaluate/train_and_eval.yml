@@ -1,7 +1,7 @@
 ---
 ops: [train, evaluate]
 model: {
-    file: <ABSOLUTE_PATH>/selene/manuscript/case1/deepsea.py,
+    file: <ABSOLUTE_PATH>/selene/models/deepsea.py,
     class: DeepSEA,
     sequence_length: 1000,
     n_classes_to_predict: 1,
