@@ -34,13 +34,23 @@ get_indices_and_probabilities
 -----------------------------
 .. autofunction:: get_indices_and_probabilities
 
-Configuration
--------------------
-.. autofunction:: instantiate
-.. autofunction:: load
+load_path (for config.yml)
+---------------------------
 .. autofunction:: load_path
+
+instantiate (configuration object)
+----------------------------------
+.. autofunction:: instantiate
+
+initialize_model
+----------------
 .. autofunction:: initialize_model
-.. autofunction:: execute
+
+parse_configs_and_run
+----------------------
 .. autofunction:: parse_configs_and_run
 
+execute (run Selene operations)
+-------------------------------
+.. autofunction:: execute
 
