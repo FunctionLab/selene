@@ -168,7 +168,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#load-features-list">load_features_list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#load-model-from-state-dict">load_model_from_state_dict</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#load-path-for-config-yml">load_path (for config.yml)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#instantiate-configuration-object">instantiate (configuration object)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#initialize-model">initialize_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parse-configs-and-run">parse_configs_and_run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#execute-run-selene-operations">execute (run Selene operations)</a></li>
 </ul>
 </li>
 </ul>
@@ -264,7 +268,7 @@ the non-strand specific prediction.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+90bcf41 ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+ab9a597 ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
 <li><strong>mode</strong> (<em>{'mean'</em><em>, </em><em>'max'}</em>) – How to handle outputting a non-strand specific prediction.</li>
 </ul>
 </td>
@@ -641,70 +645,8 @@ used to weight the indices proportionally to interval length.</li>
 </dd></dl>
 
 </div>
-<div class="section" id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="selene_sdk.utils.instantiate">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">instantiate</code><span class="sig-paren">(</span><em>proxy</em>, <em>bindings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.instantiate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiate a hierarchy of proxy objects.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>proxy</strong> (<em>object</em>) – A <cite>_Proxy</cite> object or list/dict/literal. Strings are run through
-<cite>_preprocess</cite>.</li>
-<li><strong>bindings</strong> (<em>dict, optional</em>) – A dictionary mapping previously instantiated <cite>_Proxy</cite> objects
-to their instantiated values.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>obj</strong> – The result object from recursively instantiating the object DAG.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="selene_sdk.utils.load">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">load</code><span class="sig-paren">(</span><em>stream</em>, <em>environ=None</em>, <em>instantiate=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads a YAML configuration from a string or file-like object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>stream</strong> (<em>str or object</em>) – Either a string containing valid YAML or a file-like object
-supporting the <cite>.read()</cite> interface.</li>
-<li><strong>environ</strong> (<em>dict, optional</em>) – A dictionary used for ${FOO} substitutions in addition to
-environment variables. If a key appears both in <cite>os.environ</cite>
-and this dictionary, the value in this dictionary is used.</li>
-<li><strong>instantiate</strong> (<em>bool, optional</em>) – If <cite>False</cite>, do not actually instantiate the objects but instead
-produce a nested hierarchy of <cite>_Proxy</cite> objects.</li>
-<li><strong>**kwargs</strong> (<em>dict</em>) – Other keyword arguments, all of which are passed to <cite>yaml.load</cite>.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>graph</strong> – The dictionary or object (if the top-level element specified
-a Python object to instantiate), or a nested hierarchy of
-<cite>_Proxy</cite> objects.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
-</dd></dl>
-
+<div class="section" id="load-path-for-config-yml">
+<h2>load_path (for config.yml)<a class="headerlink" href="#load-path-for-config-yml" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.load_path">
 <code class="descclassname">selene_sdk.utils.</code><code class="descname">load_path</code><span class="sig-paren">(</span><em>path</em>, <em>environ=None</em>, <em>instantiate=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#load_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_path" title="Permalink to this definition">¶</a></dt>
@@ -739,6 +681,40 @@ a Python object to instantiate), or a nested hierarchy of
 <p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
 </dd></dl>
 
+</div>
+<div class="section" id="instantiate-configuration-object">
+<h2>instantiate (configuration object)<a class="headerlink" href="#instantiate-configuration-object" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene_sdk.utils.instantiate">
+<code class="descclassname">selene_sdk.utils.</code><code class="descname">instantiate</code><span class="sig-paren">(</span><em>proxy</em>, <em>bindings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.instantiate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a hierarchy of proxy objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>proxy</strong> (<em>object</em>) – A <cite>_Proxy</cite> object or list/dict/literal. Strings are run through
+<cite>_preprocess</cite>.</li>
+<li><strong>bindings</strong> (<em>dict, optional</em>) – A dictionary mapping previously instantiated <cite>_Proxy</cite> objects
+to their instantiated values.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>obj</strong> – The result object from recursively instantiating the object DAG.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="initialize-model">
+<h2>initialize_model<a class="headerlink" href="#initialize-model" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.initialize_model">
 <code class="descclassname">selene_sdk.utils.</code><code class="descname">initialize_model</code><span class="sig-paren">(</span><em>model_configs</em>, <em>train=True</em>, <em>lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#initialize_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.initialize_model" title="Permalink to this definition">¶</a></dt>
@@ -767,7 +743,7 @@ True.</p>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+90bcf41 ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+90bcf41 ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+ab9a597 ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+ab9a597 ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>
@@ -777,39 +753,9 @@ True.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="selene_sdk.utils.execute">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">execute</code><span class="sig-paren">(</span><em>operations</em>, <em>configs</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute operations in _Selene_.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>operations</strong> (<em>list(str)</em>) – The list of operations to carry out in _Selene_.</li>
-<li><strong>configs</strong> (<em>dict or object</em>) – The loaded configurations from a YAML file.</li>
-<li><strong>output_dir</strong> (<em>str or None</em>) – The path to the directory where all outputs will be saved.
-If None, this means that an <cite>output_dir</cite> was not specified
-in the top-level configuration keys. <cite>output_dir</cite> must be
-specified in each class’s individual configuration wherever
-it is required.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Executes the operations listed and outputs any files
-to the dirs specified in each operation’s configuration.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">None</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If an expected key in configuration is missing.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+</div>
+<div class="section" id="parse-configs-and-run">
+<h2>parse_configs_and_run<a class="headerlink" href="#parse-configs-and-run" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.parse_configs_and_run">
 <code class="descclassname">selene_sdk.utils.</code><code class="descname">parse_configs_and_run</code><span class="sig-paren">(</span><em>configs</em>, <em>create_subdirectory=True</em>, <em>lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#parse_configs_and_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.parse_configs_and_run" title="Permalink to this definition">¶</a></dt>
@@ -849,6 +795,42 @@ to the dirs specified in each operation’s configuration.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="execute-run-selene-operations">
+<h2>execute (run Selene operations)<a class="headerlink" href="#execute-run-selene-operations" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="selene_sdk.utils.execute">
+<code class="descclassname">selene_sdk.utils.</code><code class="descname">execute</code><span class="sig-paren">(</span><em>operations</em>, <em>configs</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute operations in _Selene_.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>operations</strong> (<em>list(str)</em>) – The list of operations to carry out in _Selene_.</li>
+<li><strong>configs</strong> (<em>dict or object</em>) – The loaded configurations from a YAML file.</li>
+<li><strong>output_dir</strong> (<em>str or None</em>) – The path to the directory where all outputs will be saved.
+If None, this means that an <cite>output_dir</cite> was not specified
+in the top-level configuration keys. <cite>output_dir</cite> must be
+specified in each class’s individual configuration wherever
+it is required.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Executes the operations listed and outputs any files
+to the dirs specified in each operation’s configuration.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">None</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If an expected key in configuration is missing.</p>
 </td>
 </tr>
 </tbody>
