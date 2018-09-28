@@ -12,4 +12,4 @@
 
 source activate selene-env
 
-python -u ../../../selene_cli.py ./online_train.yml --lr=0.08
+python -u ../../../selene_cli.py ./train_online_sampler.yml --lr=0.08
