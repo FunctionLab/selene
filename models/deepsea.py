@@ -1,4 +1,5 @@
-"""DeepSEA architecture (Zhou & Troyanskaya, 2015).
+"""
+DeepSEA architecture (Zhou & Troyanskaya, 2015).
 """
 import numpy as np
 import torch
@@ -6,18 +7,12 @@ import torch.nn as nn
 
 
 class DeepSEA(nn.Module):
-    def __init__(self, window_size, n_genomic_features):
+    def __init__(self, sequence_length, n_genomic_features):
         """
         Parameters
         ----------
-        window_size : int
+        sequence_length : int
         n_genomic_features : int
-
-        Attributes
-        ----------
-        conv_net : torch.nn.Sequential
-        n_channels : int
-        classifier : torch.nn.Sequential
         """
         super(DeepSEA, self).__init__()
         conv_kernel_size = 8
@@ -28,18 +23,16 @@ class DeepSEA(nn.Module):
             nn.ReLU(inplace=True),
             nn.MaxPool1d(
                 kernel_size=pool_kernel_size, stride=pool_kernel_size),
-            nn.BatchNorm1d(320),
+            nn.Dropout(p=0.2),
 
             nn.Conv1d(320, 480, kernel_size=conv_kernel_size),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(
                 kernel_size=pool_kernel_size, stride=pool_kernel_size),
-            nn.BatchNorm1d(480),
             nn.Dropout(p=0.2),
 
             nn.Conv1d(480, 960, kernel_size=conv_kernel_size),
             nn.ReLU(inplace=True),
-            nn.BatchNorm1d(960),
             nn.Dropout(p=0.5))
 
         reduce_by = conv_kernel_size - 1
@@ -47,13 +40,12 @@ class DeepSEA(nn.Module):
         self.n_channels = int(
             np.floor(
                 (np.floor(
-                    (window_size - reduce_by) / pool_kernel_size)
+                    (sequence_length - reduce_by) / pool_kernel_size)
                  - reduce_by) / pool_kernel_size)
             - reduce_by)
         self.classifier = nn.Sequential(
             nn.Linear(960 * self.n_channels, n_genomic_features),
             nn.ReLU(inplace=True),
-            nn.BatchNorm1d(n_genomic_features),
             nn.Linear(n_genomic_features, n_genomic_features),
             nn.Sigmoid())
 
@@ -66,8 +58,17 @@ class DeepSEA(nn.Module):
         return predict
 
 def criterion():
+    """
+    The criterion the model aims to minimize.
+    """
     return nn.BCELoss()
 
 def get_optimizer(lr):
+    """
+    The optimizer and the parameters with which to initialize the optimizer.
+    At a later time, we initialize the optimizer by also passing in the model
+    parameters (`model.parameters()`). We cannot initialize the optimizer
+    until the model has been initialized.
+    """
     return (torch.optim.SGD,
             {"lr": lr, "weight_decay": 1e-6, "momentum": 0.9})
