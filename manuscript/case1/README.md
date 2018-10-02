@@ -18,10 +18,11 @@ We have included comments in that file with more information about what is downl
 We have provided an example SLURM script [`train_and_eval.sh`](https://github.com/FunctionLab/selene/blob/master/manuscript/case1/1_train_and_evaluate/train_and_eval.sh) that shows how we run training and evaluation on a GPU node, where batch computations are carried out on 2 GPU nodes. 
 In this case, we are running Selene using [`../../../selene_cli.py`](https://github.com/FunctionLab/selene/blob/master/selene_cli.py) and a configuration file.
 The CLI script should try to run the local version of Selene (that is, it works if you clone the entire repository and build the Cython modules using `python setup.py build_ext --inplace`).
-In this case, the `selene-env` conda environment activated in the `.sh` script does not contain `selene-sdk`; instead, it contains all the dependencies of Selene (see: [`selene-gpu.yml`](https://github.com/FunctionLab/selene/blob/master/selene-gpu.yml)). 
-If you want to use the installed `selene-sdk` package (through conda or pip), you can just copy the top-level `selene_cli.py` script in this repository and run the code for a specific case.
+In this case, the `selene-env` conda environment activated in the `.sh` script does not contain `selene-sdk`; instead, it contains all the dependencies of Selene (see: [`selene-gpu.yml`](https://github.com/FunctionLab/selene/blob/master/selene-gpu.yml)) as well as the `docopt` package (which parses the arguments for the CLI). 
+If you want to use the installed `selene-sdk` package (through conda or pip), you can just move the CLI script outside the repository and run the code for a specific case.
 
-The configuration file, [`train_and_eval.yml`](https://github.com/FunctionLab/selene/blob/master/manuscript/case1/1_train_and_evaluate/train_and_eval.yml) needs to be filled out with the absolute paths of all the data files before you are able to run training. 
+The configuration file, [`train_and_eval.yml`](https://github.com/FunctionLab/selene/blob/master/manuscript/case1/1_train_and_evaluate/train_and_eval.yml) needs to be filled out with the absolute paths of all the data files before you are able to run training. The training data, sampling regions (`data/hg38_TF_intervals.txt`, lifted over from the hg19 TF regions in Zhou & Troyanskaya (2015)'s ENCODE/Roadmap Epigenomics data), and reference sequence (hg38) are all in the `data`
+directory downloaded from `download_data.sh`. 
 
 The outputs from training and evaluation are included in the directory `training_outputs`.
 
@@ -29,7 +30,7 @@ The outputs from training and evaluation are included in the directory `training
 
 The information in step 1 applies to this step as well. 
 
-The input FASTA sequences were generated using a script in the `data` directory.
+The input FASTA sequences were generated using a script in the `data` directory (see: last line of `data/process_data.sh`, `./data/get_test_regions.py`).
 
 The outputs from _in silico_ mutagenesis are included in the directory `ism_outputs`.
 
