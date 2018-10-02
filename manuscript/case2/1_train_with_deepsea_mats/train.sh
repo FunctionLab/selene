@@ -4,11 +4,8 @@
 #SBATCH --partition=gpu
 #SBATCH --constraint=v100
 #SBATCH -n 1
-#SBATCH --mem 100000
 #SBATCH -o train_mats_%j.out
 #SBATCH -e train_mats_%j.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=kchen@flatironinstitute.org
 
 source activate selene-env
 

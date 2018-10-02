@@ -12,14 +12,14 @@ model: {
 }
 sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     reference_sequence: !obj:selene_sdk.sequences.Genome {
-        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_online_sampler/data/male.hg19.fasta,
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_online_sampler/data/male.hg19.fasta,
         blacklist_regions: hg19
     },
     features: !obj:selene_sdk.utils.load_features_list {
-        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_online_sampler/data/distinct_features.txt
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_online_sampler/data/distinct_features.txt
     },
-    target_path: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_online_sampler/data/sorted_deepsea_data.bed.gz, 
-    intervals_path: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_online_sampler/data/TF_intervals.txt,
+    target_path: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_online_sampler/data/sorted_deepsea_data.bed.gz, 
+    intervals_path: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_online_sampler/data/TF_intervals.txt,
     test_holdout: [chr8, chr9],
     validation_holdout: [chr6, chr7],
     seed: 127,

@@ -1,0 +1,34 @@
+---
+ops: [analyze]
+model: {
+    file: <ABSOLUTE_PATH>/selene/manuscript/case3/deeper_deepsea_arch.py, 
+    class: DeeperDeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 919,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
+    sequence_length: 1000,
+    batch_size: 64,
+    use_cuda: True,
+    trained_model_path: <ABSOLUTE_PATH>/selene/manuscript/case3/1_variant_effect_prediction/data/best_model.pth.tar,
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case3/1_variant_effect_prediction/data/male.hg19.fasta
+    },
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case3/1_variant_effect_prediction/data/distinct_features.txt
+    },
+}
+variant_effect_prediction: {
+    vcf_files: [
+        <ABSOLUTE_PATH>/selene/manuscript/case3/1_variant_effect_prediction/data/lt0.05_igap.vcf,
+        <ABSOLUTE_PATH>/selene/manuscript/case3/1_variant_effect_prediction/data/gt0.50_igap.vcf
+    ], 
+    save_data: [abs_diffs],
+    output_dir: <ABSOLUTE_PATH>/selene/manuscript/case3/predict_outputs
+}
+random_seed: 123
+...

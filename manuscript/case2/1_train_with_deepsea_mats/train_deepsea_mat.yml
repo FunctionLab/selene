@@ -12,26 +12,26 @@ model: {
 }
 sampler: !obj:selene_sdk.samplers.MultiFileSampler {
     train_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
-        filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_deepsea_mats/data/train.mat,
+        filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/train.mat,
         sequence_key: trainxdata,
         targets_key: traindata,
         shuffle: True,
         random_seed: 12
     },
     validate_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
-        filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_deepsea_mats/data/valid.mat,
+        filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/valid.mat,
         sequence_key: validxdata,
         targets_key: validdata,
         shuffle: False
     },
     test_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
-        filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_deepsea_mats/data/test.mat,
+        filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/test.mat,
         sequence_key: testxdata,
         targets_key: testdata,
         shuffle: False
     },
     features: !obj:selene_sdk.utils.load_features_list {
-        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/train_with_deepsea_mats/data/deepsea_predictor.names
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/deepsea_predictor.names
     }
 }
 train_model: !obj:selene_sdk.TrainModel {

@@ -1,0 +1,29 @@
+---
+ops: [evaluate]
+model: {
+    file: <ABSOLUTE_PATH>/selene/manuscript/case2/deeper_deepsea_arch.py,
+    class: DeeperDeepSEA,
+    sequence_length: 1000,
+    n_classes_to_predict: 919,
+    non_strand_specific: {
+        use_module: True,
+        mode: mean
+    }
+}
+sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+    filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/2_model_comparison/deepsea_test.mat,
+    sequence_key: sequences,
+    targets_key: targets,
+    shuffle: False
+}
+evaluate_model: !obj:selene_sdk.EvaluateModel {
+    batch_size: 64,
+    features:  !obj:selene_sdk.utils.load_features_list {
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_online_sampler/data/distinct_features.txt
+    },
+    use_cuda: True, 
+    report_gt_feature_n_positives: 50,
+    trained_model_path: <ABSOLUTE_PATH>/selene/manuscript/case2/online_sampler_outputs/best_model.pth.tar,
+    output_dir: <ABSOLUTE_PATH>/selene/manuscript/case2/evaluation_outputs
+}
+...
