@@ -34,8 +34,8 @@ The outputs from variant effect prediction can be found in the directory `predic
 
 In this step, we run the following Python scripts:
 
-1. `scores_as_npz.py` to convert the scores `.tsv` files generated from variant effect prediction to compressed NumPy matrix files. The `.tsv` files contain the row (variants) and column (features) labels for the matrix. 
-2. `variant_groups_comparison.py` to compare the predicted effect for the 2 variant groups across the genomic features predicted by the model. The following steps are taken:
+1. [`scores_as_npz.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case3/scores_as_npz.py) to convert the scores `.tsv` files generated from variant effect prediction to compressed NumPy matrix files. The `.tsv` files contain the row (variants) and column (features) labels for the matrix. 
+2. [`variant_groups_comparison.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case3/variant_groups_comparison.py) to compare the predicted effect for the 2 variant groups across the genomic features predicted by the model. The following steps are taken:
    
    - For each genomic feature, get the p-value for the 1-sided Wilcoxon rank sum test for the 2 groups (we expect that the nominally significant variants will have a larger predicted effect, or absolute difference score).
    - FDR correct the p-values using the Benjamini-Hochberg correction, alpha = 0.05.
