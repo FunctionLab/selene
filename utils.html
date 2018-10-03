@@ -268,7 +268,7 @@ the non-strand specific prediction.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+29e5ba8 ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+d1ac1eb ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
 <li><strong>mode</strong> (<em>{'mean'</em><em>, </em><em>'max'}</em>) – How to handle outputting a non-strand specific prediction.</li>
 </ul>
 </td>
@@ -649,7 +649,7 @@ used to weight the indices proportionally to interval length.</li>
 <h2>load_path (for config.yml)<a class="headerlink" href="#load-path-for-config-yml" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.load_path">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">load_path</code><span class="sig-paren">(</span><em>path</em>, <em>environ=None</em>, <em>instantiate=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#load_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_path" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">selene_sdk.utils.</code><code class="descname">load_path</code><span class="sig-paren">(</span><em>path</em>, <em>environ=None</em>, <em>instantiate=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#load_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience function for loading a YAML configuration from a
 file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -743,7 +743,7 @@ True.</p>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+29e5ba8 ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+29e5ba8 ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+d1ac1eb ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+d1ac1eb ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>
