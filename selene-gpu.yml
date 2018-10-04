@@ -13,25 +13,23 @@ dependencies:
 - pip=9.0.1
 - pyyaml=3.12
 - scikit-learn=0.19.0
-- scipy=0.19.1
+- scipy=1.1.0
 - statsmodels=0.9.0
 - pytabix=0.0.2
 - matplotlib=2.2.2
 - python=3.6.5
-- tensorflow=1.8.0
 - ipykernel=4.8.2
 - ipython=6.4.0
 - jupyter=1.0.0
-- numpy=1.13.3
+- numpy=1.15.0
 - plotly=2.7.0
 - cuda80=1.0
-- pytorch=0.2.0
-- torchvision=0.1.9
+- pytorch=0.4.0
 - pip:
   - commonmark==0.5.4
   - pyfaidx==0.5.3.1
   - recommonmark==0.4.0
   - seaborn==0.8.1
   - sphinx-rtd-theme==0.4.0
-  - torch==0.2.0.post4
+  - torch==0.4.0
 
