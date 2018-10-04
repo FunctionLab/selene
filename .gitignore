@@ -5,6 +5,7 @@ output/
 *.err
 *.sh
 *.tar
+*.tar.gz
 
 # Mac
 .DS_Store
