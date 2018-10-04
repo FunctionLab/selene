@@ -301,7 +301,7 @@ def load(stream, environ=None, instantiate=True, **kwargs):
         return proxy_graph
 
 
-def load_path(path, environ=None, instantiate=True, **kwargs):
+def load_path(path, environ=None, instantiate=False, **kwargs):
     """Convenience function for loading a YAML configuration from a
     file.
 
