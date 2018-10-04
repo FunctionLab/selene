@@ -547,8 +547,8 @@
 <span class="sd">        Constructs a new `AnalyzeSequences` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">trained_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-                <span class="n">trained_model_path</span><span class="p">,</span>
-                <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">storage</span><span class="p">)</span>
+            <span class="n">trained_model_path</span><span class="p">,</span>
+            <span class="n">map_location</span><span class="o">=</span><span class="k">lambda</span> <span class="n">storage</span><span class="p">,</span> <span class="n">location</span><span class="p">:</span> <span class="n">storage</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">load_model_from_state_dict</span><span class="p">(</span>
             <span class="n">trained_model</span><span class="p">[</span><span class="s2">&quot;state_dict&quot;</span><span class="p">],</span> <span class="n">model</span><span class="p">)</span>
@@ -590,9 +590,10 @@
         <span class="n">inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">batch_sequences</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">:</span>
             <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">volatile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">outputs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">outputs</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_initialize_reporters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                               <span class="n">save_data</span><span class="p">,</span>
@@ -999,10 +1000,13 @@
         <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_sequence_from_coords</span><span class="p">(</span>
             <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
+        <span class="n">start_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
         <span class="n">alt_encodings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">all_alts</span><span class="p">:</span>
-            <span class="n">prefix</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">]</span>
-            <span class="n">suffix</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">):]</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[:</span><span class="n">start_pos</span><span class="p">]</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="n">start_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">):]</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span>
             <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>  <span class="c1"># indicates a deletion</span>
                 <span class="n">alt_sequence</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">suffix</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1070,9 +1074,10 @@
         <span class="n">batch_alt_seqs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">)</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">:</span>
-            <span class="n">center</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span>
             <span class="n">end</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span>
+            <span class="k">assert</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span> <span class="n">Genome</span><span class="p">):</span>
                 <span class="k">if</span> <span class="s2">&quot;chr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
                     <span class="n">chrom</span> <span class="o">=</span> <span class="s2">&quot;chr&quot;</span> <span class="o">+</span> <span class="n">chrom</span>
@@ -1083,14 +1088,17 @@
                 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reporters</span><span class="p">:</span>
                     <span class="n">r</span><span class="o">.</span><span class="n">handle_NA</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">))</span>
                 <span class="k">continue</span>
-            <span class="n">ref_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
+            <span class="n">seq_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
                 <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+            <span class="n">ref_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+            <span class="n">start_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">seq_encoding</span><span class="p">[</span><span class="n">start_pos</span><span class="p">:</span><span class="n">start_pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">),</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">ref_encoding</span>
 
             <span class="n">all_alts</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">alt_encodings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alts</span><span class="p">(</span>
                 <span class="n">all_alts</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">all_alts</span><span class="p">:</span>
-                <span class="n">batch_ref_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ref_encoding</span><span class="p">)</span>
+                <span class="n">batch_ref_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq_encoding</span><span class="p">)</span>
                 <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span>
             <span class="n">batch_alt_seqs</span> <span class="o">+=</span> <span class="n">alt_encodings</span>
 
