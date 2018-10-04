@@ -21,7 +21,7 @@ pip install selene-sdk
 
 ### Installing selene from source:
 
-First, download the latest commits from the source repository:
+First, download the latest commits from the source repository (or download the latest tagged version of Selene for a stable release):
 ```
 git clone https://github.com/FunctionLab/selene.git
 ```
