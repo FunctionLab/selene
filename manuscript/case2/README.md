@@ -13,6 +13,7 @@ Finally, the file `download_data.sh` will download all the data and outputs requ
 The rest of this README assumes that you have run this script.
 Any directories mentioned in the README that are not included by default should have been downloaded using `download_data.sh`.
 We have included comments in that file with more information about what is downloaded. 
+You can view the files names and some descriptions at [this Zenodo record](https://doi.org/10.5281/zenodo.1445552) as well.
 
 ## Step 1: train a new architecture
 

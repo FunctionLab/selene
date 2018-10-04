@@ -71,7 +71,7 @@ def visualize_group_means(feature,
     plt.rcParams["font.size"] = 10
     title = "Feature {0} (q-value={1:.2e})".format(feature, qvalue)
     fig = plt.figure()
-    fig, ax = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(4, 4))
+    fig, ax = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(6, 4))
     ax.errorbar([1, 2],
                 [sig_mean, nonsig_mean],
                 yerr=[sig_upper - sig_lower, nonsig_upper - nonsig_lower],
