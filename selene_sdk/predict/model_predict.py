@@ -307,8 +307,8 @@ class AnalyzeSequences(object):
         Constructs a new `AnalyzeSequences` object.
         """
         trained_model = torch.load(
-                trained_model_path,
-                map_location=lambda storage, location: storage)
+            trained_model_path,
+            map_location=lambda storage, location: storage)
 
         self.model = load_model_from_state_dict(
             trained_model["state_dict"], model)
@@ -350,9 +350,10 @@ class AnalyzeSequences(object):
         inputs = torch.Tensor(batch_sequences)
         if self.use_cuda:
             inputs = inputs.cuda()
-        inputs = Variable(inputs, volatile=True)
-        outputs = self.model.forward(inputs.transpose(1, 2))
-        return outputs.data.cpu().numpy()
+        with torch.no_grad():
+            inputs = Variable(inputs)
+            outputs = self.model.forward(inputs.transpose(1, 2))
+            return outputs.data.cpu().numpy()
 
     def _initialize_reporters(self,
                               save_data,
@@ -759,10 +760,13 @@ class AnalyzeSequences(object):
         sequence = self.reference_sequence.get_sequence_from_coords(
             chrom, start, end)
 
+        start_pos = self._start_radius - int(len(ref) / 2)
+
         alt_encodings = []
         for a in all_alts:
-            prefix = sequence[:self._start_radius]
-            suffix = sequence[self._start_radius + len(ref):]
+            prefix = sequence[:start_pos]
+            suffix = sequence[start_pos + len(ref):]
+            assert len(prefix) + len(suffix) + len(ref) == self.sequence_length
             if a == '*':  # indicates a deletion
                 alt_sequence = prefix + suffix
             else:
@@ -830,9 +834,10 @@ class AnalyzeSequences(object):
         batch_alt_seqs = []
         batch_ids = []
         for (chrom, pos, name, ref, alt) in variants:
-            center = pos + int(len(ref) / 2)
+            center = pos + int(len(ref) / 2) - 1
             start = center - self._start_radius
             end = center + self._end_radius
+            assert end - start == self.sequence_length
             if isinstance(self.reference_sequence, Genome):
                 if "chr" not in chrom:
                     chrom = "chr" + chrom
@@ -843,14 +848,17 @@ class AnalyzeSequences(object):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
                 continue
-            ref_encoding = self.reference_sequence.get_encoding_from_coords(
+            seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end)
+            ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
+            start_pos = self._start_radius - int(len(ref) / 2)
+            seq_encoding[start_pos:start_pos + len(ref), :] = ref_encoding
 
             all_alts = alt.split(',')
             alt_encodings = self._process_alts(
                 all_alts, ref, chrom, start, end)
             for a in all_alts:
-                batch_ref_seqs.append(ref_encoding)
+                batch_ref_seqs.append(seq_encoding)
                 batch_ids.append((chrom, pos, name, ref, a))
             batch_alt_seqs += alt_encodings
 

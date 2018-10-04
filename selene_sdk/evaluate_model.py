@@ -71,13 +71,12 @@ class EvaluateModel(object):
                  n_test_samples=None,
                  report_gt_feature_n_positives=10,
                  use_cuda=False):
-        self.model = model
         self.criterion = criterion
 
         trained_model = torch.load(
             trained_model_path, map_location=lambda storage, location: storage)
         self.model = load_model_from_state_dict(
-            trained_model["state_dict"], self.model)
+            trained_model["state_dict"], model)
         self.model.eval()
 
         self.sampler = data_sampler
