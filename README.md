@@ -42,11 +42,20 @@ python setup.py install
 
 Please install `docopt` before running the command-line script `selene_cli.py` provided in the repository.
 
-## Tutorials and examples
+## About Selene
+
+Selene is composed of a command-line interface and an API (the `selene-sdk` Python package). 
+Users supply their data, model architecture, and configuration parameters, and Selene runs the user-specified operations (training, evaluation, prediction) for that sequence-based model.
+
+For a more detailed overview of the components in the Selene software development kit (SDK), please consult the page [here](http://selene.flatironinstitute.org/overview/overview.html).
+
+![summary figure](docs/source/_static/img/selene_overview.png)
+
+### Tutorials and examples
 
 Tutorials for selene are available [here](https://github.com/FunctionLab/selene/tree/master/tutorials).
 
-## Documentation
+### Documentation
 
 The documentation for selene is available [here](https://selene.flatironinstitute.org/).
 
