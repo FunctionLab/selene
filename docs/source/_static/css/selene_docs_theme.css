@@ -70,7 +70,7 @@ footer p {
 
 /* Change link colors in the body and literal colors.*/
 .rst-content tt.literal, .rst-content tt.literal, .rst-content code.literal {
-    color: #F9C755;
+    color: #F05732;
 }
 
 .rst-content tt.xref, a .rst-content tt, .rst-content tt.xref, .rst-content code.xref, a .rst-content tt, a .rst-content code {
@@ -78,15 +78,15 @@ footer p {
 }
 
 a {
-    color: #F9C755;
+    color: #F05732;
 }
 
 a:hover {
-    color: #F9C755;
+    color: #F05732;
 }
 
 a:visited {
-    color: #AB7906;
+    color: #A53D24;
   /*  color: #BE8607;*/
 }
 
