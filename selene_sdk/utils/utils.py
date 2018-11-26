@@ -8,6 +8,7 @@ from collections import OrderedDict
 import logging
 
 import numpy as np
+import sys
 
 
 def get_indices_and_probabilities(interval_lengths, indices):
@@ -165,8 +166,17 @@ def initialize_logger(output_path, verbosity=2):
     elif verbosity == 2:
         logger.setLevel(logging.DEBUG)
 
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    file_formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s")
 
     file_handle = logging.FileHandler(output_path)
-    file_handle.setFormatter(formatter)
+    file_handle.setFormatter(file_formatter)
     logger.addHandler(file_handle)
+
+    stdout_formatter = logging.Formatter(
+        "%(asctime)s - %(message)s")
+
+    stdout_handle = logging.StreamHandler(sys.stdout)
+    stdout_handle.setFormatter(stdout_formatter)
+    stdout_handle.setLevel(logging.INFO)
+    logger.addHandler(stdout_formatter)
