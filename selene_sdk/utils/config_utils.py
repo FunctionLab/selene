@@ -13,6 +13,49 @@ import torch
 from . import instantiate
 
 
+def module_from_file(path):
+    """
+    Load a module created based on a Python file path.
+
+    Parameters
+    ----------
+    path : str
+        Path to the model architecture file.
+
+    Returns
+    -------
+    The loaded module
+
+    """
+    module_spec = importlib.util.spec_from_file_location(
+        "user_model_module", path)
+    module = importlib.util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(module)
+    return module
+
+
+def module_from_dir(path):
+    """
+    This method expects that you pass in the path to a valid Python module,
+    where the `__init__.py` file already imports the model class,
+    `criterion`, and `get_optimizer` methods from the appropriate file
+    (e.g. `__init__.py` contains the line `from <model_class_file> import
+    <ModelClass>`).
+
+    Parameters
+    ----------
+    path : str
+        Path to the Python module containing the model class.
+
+    Returns
+    -------
+    The loaded module
+    """
+    parent_path, module_dir = os.path.split(path)
+    sys.path.append(parent_path)
+    return importlib.import_module(module_dir)
+
+
 def initialize_model(model_configs, train=True, lr=None):
     """
     Initialize model (and associated criterion, optimizer)
@@ -26,7 +69,6 @@ def initialize_model(model_configs, train=True, lr=None):
         and optimizer class that can be found within the input model file.
     lr : float or None, optional
         If `train`, a learning rate must be specified. Otherwise, None.
-
 
     Returns
     -------
@@ -48,26 +90,22 @@ def initialize_model(model_configs, train=True, lr=None):
         If `train` but the `lr` specified is not a float.
 
     """
-    import_model_from = model_configs["file"]
+    import_model_from = model_configs["path"]
     model_class_name = model_configs["class"]
 
-    # TODO: would like to find a better way...
-    path, filename = os.path.split(import_model_from)
-    parent_path, model_dir = os.path.split(path)
-    sys.path.append(parent_path)
-
-    module_name = filename.split('.')[0]
-    module = importlib.import_module("{0}.{1}".format(model_dir, module_name))
+    module = None
+    if os.path.isdir(import_model_from):
+        module = module_from_dir(import_model_from)
+    else:
+        module = module_from_file(import_model_from)
     model_class = getattr(module, model_class_name)
 
-    sequence_length = model_configs["sequence_length"]
-    n_classes = model_configs["n_classes_to_predict"]
-    model = model_class(sequence_length, n_classes)
+    model = model_class(**model_configs["class_args"])
 
-    if model_configs["non_strand_specific"]["use_module"]:
+    if "non_strand_specific" in model_configs:
         from selene_sdk.utils import NonStrandSpecific
         model = NonStrandSpecific(
-            model, mode=model_configs["non_strand_specific"]["mode"])
+            model, mode=model_configs["non_strand_specific"])
     criterion = module.criterion()
     if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)
@@ -135,15 +173,18 @@ def execute(operations, configs, output_dir):
             trainer.train_and_validate()
 
         elif op == "evaluate":
-            if not model and "evaluate_model" in configs:
+            if trainer is not None:
+                trainer.evaluate()
+
+            if not model:
                 model, loss = initialize_model(
                     configs["model"], train=False)
+            if "evaluate_model" in configs:
                 sampler_info = configs["sampler"]
 
                 evaluate_model_info = configs["evaluate_model"]
 
                 data_sampler = instantiate(sampler_info)
-
                 evaluate_model_info.bind(
                     model=model,
                     criterion=loss,
@@ -152,8 +193,6 @@ def execute(operations, configs, output_dir):
                     evaluate_model_info.bind(output_dir=output_dir)
                 evaluator = instantiate(evaluate_model_info)
                 evaluator.evaluate()
-            elif trainer is not None:
-                trainer.evaluate()
 
         elif op == "analyze":
             if not model:
