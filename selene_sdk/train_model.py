@@ -168,6 +168,13 @@ class TrainModel(object):
         else:
             self.nth_step_save_checkpoint = save_checkpoint_every_n_steps
 
+        logger.info("Training parameters set: batch size {0}, "
+                    "number of steps per 'epoch': {1}, "
+                    "maximum number of steps: {2}".format(
+                        self.batch_size,
+                        self.nth_step_report_stats,
+                        self.max_steps))
+
         torch.set_num_threads(cpu_n_threads)
 
         self.use_cuda = use_cuda
@@ -246,6 +253,7 @@ class TrainModel(object):
             will use all validation examples in the sampler.
 
         """
+        logger.info("Creating validation dataset.")
         t_i = time()
         self._validation_data, self._all_validation_targets = \
             self.sampler.get_validation_set(
@@ -282,6 +290,7 @@ class TrainModel(object):
             `None`, will use all test examples in the sampler.
 
         """
+        logger.info("Creating test dataset.")
         t_i = time()
         self._test_data, self._all_test_targets = \
             self.sampler.get_test_set(
@@ -321,19 +330,23 @@ class TrainModel(object):
         Trains the model and measures validation performance.
 
         """
-        logger.info(
-            ("[TRAIN] max_steps: {0}, batch_size: {1}").format(
-                self.max_steps, self.batch_size))
-
         min_loss = self._min_loss
         scheduler = ReduceLROnPlateau(
             self.optimizer, 'max', patience=16, verbose=True,
             factor=0.8)
-        for step in range(self._start_step, self.max_steps):
-            train_loss = self.train()
 
+        time_per_step = []
+        for step in range(self._start_step, self.max_steps):
+            t_i = time()
+            train_loss = self.train()
+            t_f = time()
+            time_per_step.append(t_f - t_i)
             # TODO: Should we have some way to report training stats without running validation?
             if step and step % self.nth_step_report_stats == 0:
+                logger.info(("[STEP {0}] average number "
+                             "of steps per second: {1}").format(
+                    step, 1. / np.average(time_per_step)))
+                time_per_step = []
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
                 self._train_logger.info(train_loss)
@@ -357,10 +370,9 @@ class TrainModel(object):
                     "state_dict": self.model.state_dict(),
                     "min_loss": min_loss,
                     "optimizer": self.optimizer.state_dict()}, is_best)
-                logger.info(
-                    ("[STATS] step={0}: "
-                     "Training loss: {1}, validation loss: {2}.").format(
-                        step, train_loss, validation_loss)) # Should training loss and validation loss be reported at the same line?
+                logger.info("training loss: {0}".format(train_loss))
+                logger.info("validation loss: {0}".format(validation_loss))
+
                 # Logging training and validation on same line requires 2 parsers or more complex parser.
                 # Separate logging of train/validate is just a grep for validation/train and then same parser.
 
@@ -471,8 +483,7 @@ class TrainModel(object):
                                                          self._all_validation_targets)
 
         for name, score in average_scores.items():
-            logger.debug("[STATS] average {0}: {1}".format(name, score))
-            print("[VALIDATE] average {0}: {1}".format(name, score))
+            logger.info("validation average {0}: {1}".format(name, score))
 
         average_scores["loss"] = average_loss
         return average_scores
@@ -501,8 +512,7 @@ class TrainModel(object):
             data=all_predictions)
 
         for name, score in average_scores.items():
-            logger.debug("[STATS] average {0}: {1}".format(name, score))
-            print("[TEST] average {0}: {1}".format(name, score))
+            logger.info("test average {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")
