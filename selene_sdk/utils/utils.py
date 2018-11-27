@@ -179,4 +179,4 @@ def initialize_logger(output_path, verbosity=2):
     stdout_handle = logging.StreamHandler(sys.stdout)
     stdout_handle.setFormatter(stdout_formatter)
     stdout_handle.setLevel(logging.INFO)
-    logger.addHandler(stdout_formatter)
+    logger.addHandler(stdout_handle)
