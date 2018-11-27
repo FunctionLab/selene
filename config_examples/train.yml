@@ -1,14 +1,13 @@
 ---
 ops: [train, evaluate]
 model: {
-    file: /absolute/path/to/model/architecture.py, 
+    path: /absolute/path/to/model/architecture.py, 
     class: ModelArchitectureClassName,
-    sequence_length: 1000,
-    n_classes_to_predict: 2,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        arg1: val1,
+        arg2: val2
+    },
+    non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     reference_sequence: !obj:selene_sdk.sequences.Genome {
