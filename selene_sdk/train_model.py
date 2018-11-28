@@ -549,7 +549,7 @@ class TrainModel(object):
         None
 
         """
-        logger.info("[TRAIN] {0}: Saving model state to file.".format(
+        logger.debug("[TRAIN] {0}: Saving model state to file.".format(
             state["step"]))
         cp_filepath = os.path.join(
             self.output_dir, filename)

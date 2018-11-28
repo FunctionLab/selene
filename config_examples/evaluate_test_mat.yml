@@ -13,7 +13,11 @@ sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
     filepath: /path/to/test.mat, 
     sequence_key: testxdata,
     targets_key: testdata,
-    shuffle_file: False
+    random_seed: 456,
+    shuffle: False,
+    sequence_batch_axis: 0,
+    sequence_alphabet_axis: 1,
+    targets_batch_axis: 0
 }
 evaluate_model: !obj:selene_sdk.EvaluateModel {
     features:  !obj:selene_sdk.utils.load_features_list {

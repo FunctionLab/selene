@@ -11,21 +11,22 @@ model: {
 }
 sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     reference_sequence: !obj:selene_sdk.sequences.Genome {
-        input_path: /path/to/genome/hg.fa
+        input_path: /path/to/reference_sequence.fa,
+        blacklist_regions: hg19  # only hg19 and hg38, remove if not applicable
     },
+    target_path: /path/to/tabix/indexed/targets.bed.gz,
     features: !obj:selene_sdk.utils.load_features_list {
         input_path: /path/to/distinct_features.txt
     },
-    target_path: /path/to/tabix/indexed/targets.bed.gz, 
-    intervals_path: /path/to/intervals.txt,
-    test_holdout: [chr8, chr9],
-    validation_holdout: [chr6, chr7],
+    intervals_path: /path/to/intervals.bed,
+    sample_negative: True,  # train on samples with no targets present
     seed: 127,
+    test_holdout: [chr8, chr9],  # can also be proportional, e.g. 0.10
+    validation_holdout: [chr6, chr7],  # can also be proportional, e.g. 0.10
     sequence_length: 1000,
     center_bin_to_predict: 200,
     feature_thresholds: 0.5,
     mode: train,
-    sample_negative: True,  # train on samples with no targets present
     save_datasets: [test]
 }
 train_model: !obj:selene_sdk.TrainModel {
@@ -36,7 +37,11 @@ train_model: !obj:selene_sdk.TrainModel {
     n_test_samples: 640000,
     cpu_n_threads: 32,
     use_cuda: True,
-    data_parallel: True,  # multiple GPUs
+    data_parallel: True,  # multiple GPUs,
+    logging_verbosity: 2,
+    # if resuming training, replace `False` below with the path to the trained
+    # model weights file created in a previous training run with Selene
+    checkpoint_resume: False
 }
 random_seed: 133
 output_dir: /path/to/output_dir
