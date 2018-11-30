@@ -190,11 +190,9 @@ class EvaluateModel(object):
             data=self._all_test_targets)
 
         loss = np.average(batch_losses)
-        logger.debug("[STATS] average loss: {0}".format(
-            loss))
+        logger.info("test loss: {0}".format(loss))
         for name, score in average_scores.items():
-            logger.debug("[STATS] average {0}: {1}".format(
-                name, score))
+            logger.info("test average {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")

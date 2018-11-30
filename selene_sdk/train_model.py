@@ -36,6 +36,20 @@ class TrainModel(object):
     This class ties together the various objects and methods needed to
     train and validate a model.
 
+    TrainModel saves a checkpoint model (overwriting it after
+    `save_checkpoint_every_n_steps`) as well as a best-performing model
+    (overwriting it after `report_stats_every_n_steps` if the latest
+    validation performance is better than the previous best-performing
+    model) to `output_dir`.
+
+    TrainModel also outputs 2 files that can be used to monitor training
+    as Selene runs: `selene_sdk.train_model.train.txt` (training loss) and
+    `selene_sdk.train_model.validation.txt` (validation loss & average
+    ROC AUC). The columns in these files can be used to quickly visualize
+    training history (e.g. you can use `matplotlib`, `plt.plot(auc_list)`)
+    and see, for example, whether the model is still improving, if there are
+    signs of overfitting, etc.
+
     Parameters
     ----------
     model : torch.nn.Module
@@ -202,6 +216,7 @@ class TrainModel(object):
             report_gt_feature_n_positives=report_gt_feature_n_positives)
 
         if "test" in self.sampler.modes:
+            self._test_data = None
             self._n_test_samples = n_test_samples
             self._report_gt_feature_n_positives = report_gt_feature_n_positives
 
