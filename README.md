@@ -59,7 +59,18 @@ The documentation for Selene is available [here](https://selene.flatironinstitut
 
 ## Examples
 
-In general, we recommend that the manuscript case studies and the tutorials be run on a machine with a GPU. All examples take significantly longer when run on a CPU machine. 
+We provide 2 sets of examples: Jupyter notebook tutorials and case studies that we've described in our manuscript. 
+The Jupyter notebooks are more accessible in that they can be easily perused and run on a laptop. 
+We also take the opportunity to show how Selene can be used through the CLI (via configuration files) as well as through the API. 
+Finally, the notebooks are particularly useful for demonstrating various visualization components that Selene contains. 
+The API, along with the visualization functions, are much less emphasized in the manuscript's case studies.
+
+In the case studies, we demonstrate more complex use cases (e.g. training on much larger datasets) that we could not present in a Jupyter notebook.
+Further, we show how you can use the outputs of variant effect prediction in a subsequent statistical analysis (case 3).
+These examples reflect how we most often use Selene in our own projects, whereas the Jupyter notebooks survey the many different ways and contexts in which we can use Selene.
+
+In general, we recommend that the examples be run on a machine with a CUDA-enabled GPU. All examples take significantly longer when run on a CPU machine.
+(See the following sections for time estimates.)
 
 ### Tutorials
 
