@@ -9,7 +9,7 @@ In the following sections, we briefly discuss each submodule and top-level class
 
 We start with the modules for sampling data because both training and evaluting a model in Selene will require a user to specify the kind of sampler they want to use. 
 
-### _sequences_ submodule [API](http://selene.flatironinstitute.org/sequences.html))
+### _sequences_ submodule ([API](http://selene.flatironinstitute.org/sequences.html))
 
 The _sequences_ submodule defines the `Sequence` type, and includes implementations for several sub-classes.
 These sub-classes--`Genome` and `Proteome`--represent different kinds of biological sequences (e.g. DNA, RNA, amino acid sequences), and implement the `Sequence` interface’s methods for reading the reference sequence from files (e.g. FASTA), querying subsequences of the reference sequence, and subsequently converting those queried subsequences into a numeric representation.
