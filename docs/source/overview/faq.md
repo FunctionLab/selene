@@ -1,7 +1,8 @@
 # Additional resources 
 
 ## Hyperparameter optimization
-Selene does not support hyperparameter optimization, where hyperparameters are the variables that govern the training process (i.e. these parameters are constant during training, compared to model parameters which are optimized/"tuned" by the training process itself). 
+Hyperparameter optimization is the process of finding the set of hyperparameters that yields an optimal model against a predefined score (e.g. minimizing a loss function). 
+Hyperparameters are the variables that govern the training process (i.e. these parameters are constant during training, compared to model parameters which are optimized/"tuned" by the training process itself). 
 Hyperparameter tuning works by running multiple trials of a single training run with different values for your chosen hyperparameters, set within some specified limit. Some examples of hyperparameters:
 - learning rate
 - number of hidden units
