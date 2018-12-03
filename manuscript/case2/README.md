@@ -15,9 +15,9 @@ Any directories mentioned in the README that are not included by default should 
 We have included comments in that file with more information about what is downloaded. 
 You can view the files names and some descriptions at [this Zenodo record](https://doi.org/10.5281/zenodo.1445552) as well.
 
-The steps that we provide in this directory use input data that was processed from data from the ENCODE and Roadmap Epigenomics projects.
+NOTE: The steps that we provide in this directory use input data that was processed from ENCODE and Roadmap Epigenomics.
 Please consult the methods section in our [manuscript](https://doi.org/10.1101/438291) for a detailed summary of what data processing steps were taken.
-The code can be reviewed in `data/process_data.sh` after running `download_data.sh`. 
+The code to implement these steps can be viewed in `data/process_data.sh` after running `download_data.sh`.
 
 ## Step 1: train a new architecture
 
@@ -31,9 +31,9 @@ The outputs from training and evaluation can be found in `mat_training_outputs` 
 The `.sh` scripts in each of these directories runs Selene using [`../../../selene_cli.py`](https://github.com/FunctionLab/selene/blob/master/selene_cli.py) and a configuration file.
 They also activate a conda environment called `selene-env`, the contents of which depend on how you would like to use Selene:
 
-    - The CLI script `../../../selene_cli.py` will try to run the local version of Selene (that is, this repository). It will work if you have built the Cython modules using `python setup.py build_ext --inplace`. In this case, your `selene-env` conda environment would not contain the `selene-sdk` Python package. Instead, it would contain all the dependencies of Selene (see: [`selene-gpu.yml`](https://github.com/FunctionLab/selene/blob/master/selene-gpu.yml)) as well as the `docopt`
+- The CLI script `../../../selene_cli.py` will try to run the local version of Selene (that is, this repository). It will work if you have built the Cython modules using `python setup.py build_ext --inplace`. In this case, your `selene-env` conda environment would not contain the `selene-sdk` Python package. Instead, it would contain all the dependencies of Selene (see: [`selene-gpu.yml`](https://github.com/FunctionLab/selene/blob/master/selene-gpu.yml)) as well as the `docopt`
   package (which parses the arguments for the CLI).
-    - If you want to use the installed `selene-sdk` package (through conda or pip), you can just move the CLI script outside the repository and run the code for a specific case. (Make sure your `selene-env` contains `selene-sdk` and `docopt`.)
+- If you want to use the installed `selene-sdk` package (through conda or pip), you can just move the CLI script outside the repository and run the code for a specific case. (Make sure your `selene-env` contains `selene-sdk` and `docopt`.)
 
 Please fill out the absolute paths to the appropriate files in the `.yml` files before using the `.sh` scripts. 
 

@@ -14,9 +14,9 @@ Any directories mentioned in the README that are not included by default should 
 We have included comments in that file with more information about what is downloaded. 
 You can view the file names and some descriptions at [this Zenodo record](https://doi.org/10.5281/zenodo.1442434) as well.
 
-The steps that we provide in this directory use input data that was processed from Cistrome.
+NOTE: The steps that we provide in this directory use input data that was processed from Cistrome.
 Please consult the methods section in our [manuscript](https://doi.org/10.1101/438291) for a detailed summary of what data processing steps were taken.
-The code can be reviewed in `data/process_data.sh` after running `download_data.sh`.
+The code to implement these steps can be viewed in `data/process_data.sh` after running `download_data.sh`.
 
 ## Step 1: train and evaluate
 
