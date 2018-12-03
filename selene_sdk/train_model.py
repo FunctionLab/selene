@@ -541,23 +541,51 @@ class TrainModel(object):
 
         return (average_scores, feature_scores_dict)
 
-    def _save_checkpoint(self, state, is_best,
+    def _save_checkpoint(self,
+                         state,
+                         is_best,
                          dir_path=None,
-                         filename="checkpoint.pth.tar"):
+                         filename="checkpoint"):
         """
-        Saves snapshot of the model state to file.
+        Saves snapshot of the model state to file. Will save a checkpoint
+        with name `filename` and, if this is the model's best performance
+        so far, will save the `best_performing` model state as well.
+
+        We have decided to save the model in 2 different formats:
+
+            (1) state dictionary (only the model parameters)
+                e.g. checkpoint.state.pth.tar, best_performing.state.pth.tar
+            (2) the entire model
+                e.g. checkpoint.model.pth.tar, best_performing.model.pth.tar
+
+        When loading a trained model through Selene, we require that you
+        pass in format (1) as well as the model architecture. This is a
+        more stable format and the one that we recommend users use. Note that
+        we do save a number of additional, Selene-specific parameters
+        in the dictionary for `.state.pth.tar`, and that the
+        actual `model.state_dict()` is stored in the `state_dict` key of the
+        dictionary loaded by `torch.load`.
+
+        Having (2) available is important for making our models compatible
+        with Kipoi in its current version (0.6.5). Note that we may
+        consider removing this output in the future when it is not necessary.
+
+        See: https://pytorch.org/docs/stable/notes/serialization.html for more
+        information about how models are saved in PyTorch.
 
         Parameters
         ----------
         state : dict
-            Information about the state of the model
+            Information about the state of the model.
         is_best : bool
             Is this the model's best performance so far?
         dir_path : str, optional
             Default is None. Will output file to the current working directory
             if no path to directory is specified.
         filename : str, optional
-            Default is "checkpoint.pth.tar". Specify the checkpoint filename.
+            Default is "checkpoint". Specify the checkpoint filename. Will
+            append a file extension to the end of the `filename`
+            (e.g. `.pth.tar`).
 
         Returns
         -------
@@ -568,9 +596,12 @@ class TrainModel(object):
             state["step"]))
         cp_filepath = os.path.join(
             self.output_dir, filename)
-        torch.save(state, cp_filepath)
+        torch.save(self.model, "{0}.model.pth.tar".format(cp_filepath))
+        torch.save(state, "{0}.state.pth.tar".format(cp_filepath))
         if is_best:
-            best_filepath = os.path.join(
-                self.output_dir,
-                "best_model.pth.tar")
-            shutil.copyfile(cp_filepath, best_filepath)
+            best_filepath = os.path.join(self.output_dir, "best_performing")
+            shutil.copyfile("{0}.model.pth.tar".format(cp_filepath),
+                            "{0}.model.pth.tar".format(best_filepath))
+            shutil.copyfile("{0}.state.pth.tar".format(cp_filepath),
+                            "{0}.state.pth.tar".format(best_filepath))
+
