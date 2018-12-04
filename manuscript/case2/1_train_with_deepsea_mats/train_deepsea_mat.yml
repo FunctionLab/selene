@@ -1,20 +1,22 @@
 ---
 ops: [train, evaluate]
 model: {
-    file: <ABSOLUTE_PATH>/selene/manuscript/case2/deeper_deepsea_arch.py,
+    path: <ABSOLUTE_PATH>/selene/manuscript/case2/deeper_deepsea_arch.py,
     class: DeeperDeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 919,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {  # DeeperDeepSEA.__init__ inputs
+        sequence_length: 1000,
+        n_targets: 919
+    },
+    non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.MultiFileSampler {
     train_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
         filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/train.mat,
         sequence_key: trainxdata,
         targets_key: traindata,
+        sequence_batch_axis: 2,
+        sequence_alphabet_axis: 1,
+        targets_batch_axis: 1,
         shuffle: True,
         random_seed: 12
     },
@@ -22,12 +24,18 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
         filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/valid.mat,
         sequence_key: validxdata,
         targets_key: validdata,
+        sequence_batch_axis: 0,
+        sequence_alphabet_axis: 1,
+        targets_batch_axis: 0,
         shuffle: False
     },
     test_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
         filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/1_train_with_deepsea_mats/data/test.mat,
         sequence_key: testxdata,
         targets_key: testdata,
+        sequence_batch_axis: 0,
+        sequence_alphabet_axis: 1,
+        targets_batch_axis: 0,
         shuffle: False
     },
     features: !obj:selene_sdk.utils.load_features_list {
