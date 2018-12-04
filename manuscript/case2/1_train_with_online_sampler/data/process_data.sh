@@ -15,3 +15,9 @@ bgzip -c sorted_deepsea_data.bed > sorted_deepsea_data.bed.gz
 tabix -p bed sorted_deepsea_data.bed.gz
 
 sort -o distinct_features.txt distinct_features.txt
+
+python create_TF_intervals.py distinct_features.txt \
+                              sorted_deepsea_data.bed \
+                              TF_intervals_unmerged.txt
+
+bedtools merge -i TF_intervals_unmerged.txt > TF_intervals.txt

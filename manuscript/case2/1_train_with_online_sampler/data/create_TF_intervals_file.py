@@ -2,7 +2,9 @@
 Description:
     This script is used to create the file `TF_intervals.txt` from the file
     `sorted_deepsea_data.bed` that was created by running
-    `process_chromatin_profiles.py`.
+    `process_chromatin_profiles.py`. `TF_intervals.txt` is used as input
+    to a `selene_sdk.samplers.IntervalsSampler` and contains only the
+    regions in `sorted_deepsea_data.bed` annotated to at least 1 TF.
 
 Usage:
     create_TF_intervals_file.py <features> <data-bed> <output-txt>
