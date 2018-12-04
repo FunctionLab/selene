@@ -97,14 +97,12 @@ class MatFileSampler(FileSampler):
         self._sample_tgts = out[1]
         self._mat_fh = None
         if len(out) > 2:
-            # TODO: when can I close this file handle?
             self._mat_fh = out[2]
         self._seq_batch_axis = sequence_batch_axis
         self._seq_alphabet_axis = sequence_alphabet_axis
         self._seq_final_axis = 3 - sequence_batch_axis - sequence_alphabet_axis
         if self._sample_tgts is not None:
             self._tgts_batch_axis = targets_batch_axis
-
         self.n_samples = self._sample_seqs.shape[self._seq_batch_axis]
 
         self._sample_indices = np.arange(
@@ -114,6 +112,10 @@ class MatFileSampler(FileSampler):
         self._shuffle = shuffle
         if self._shuffle:
             np.random.shuffle(self._sample_indices)
+
+    def __exit__(self):
+        if self._mat_fh is not None:
+            self._mat_fh.close()
 
     def sample(self, batch_size=1):
         """
@@ -148,7 +150,6 @@ class MatFileSampler(FileSampler):
         else:
             use_indices = self._sample_indices[self._sample_next:sample_up_to]
         self._sample_next += batch_size
-
         use_indices = sorted(use_indices)
         if self._seq_batch_axis == 0:
             sequences = self._sample_seqs[use_indices, :, :].astype(float)
@@ -157,11 +158,11 @@ class MatFileSampler(FileSampler):
         else:
             sequences = self._sample_seqs[:, :, use_indices].astype(float)
 
-        if self._seq_batch_axis != 0 and self._seq_alphabet_axis != 1:
+        if self._seq_batch_axis != 0 or self._seq_alphabet_axis != 2:
             sequences = np.transpose(
                 sequences, (self._seq_batch_axis,
-                            self._seq_alphabet_axis,
-                            self._seq_final_axis))
+                            self._seq_final_axis,
+                            self._seq_alphabet_axis))
         if self._sample_tgts is not None:
             if self._tgts_batch_axis == 0:
                 targets = self._sample_tgts[use_indices, :].astype(float)
