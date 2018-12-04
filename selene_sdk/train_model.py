@@ -544,31 +544,19 @@ class TrainModel(object):
     def _save_checkpoint(self,
                          state,
                          is_best,
-                         dir_path=None,
                          filename="checkpoint"):
         """
         Saves snapshot of the model state to file. Will save a checkpoint
-        with name `filename` and, if this is the model's best performance
-        so far, will save the `best_performing` model state as well.
+        with name `<filename>.pth.tar` and, if this is the model's best
+        performance so far, will save the state to a `best_model.pth.tar`
+        file as well.
 
-        We have decided to save the model in 2 different formats:
-
-            (1) state dictionary (only the model parameters)
-                e.g. checkpoint.state.pth.tar, best_performing.state.pth.tar
-            (2) the entire model
-                e.g. checkpoint.model.pth.tar, best_performing.model.pth.tar
-
-        When loading a trained model through Selene, we require that you
-        pass in format (1) as well as the model architecture. This is a
-        more stable format and the one that we recommend users use. Note that
-        we do save a number of additional, Selene-specific parameters
-        in the dictionary for `.state.pth.tar`, and that the
-        actual `model.state_dict()` is stored in the `state_dict` key of the
-        dictionary loaded by `torch.load`.
-
-        Having (2) available is important for making our models compatible
-        with Kipoi in its current version (0.6.5). Note that we may
-        consider removing this output in the future when it is not necessary.
+        Models are saved in the state dictionary format. This is a more
+        stable format compared to saving the whole model (which is another
+        option supported by PyTorch). Note that we do save a number of
+        additional, Selene-specific parameters in the dictionary
+        and that the actual `model.state_dict()` is stored in the `state_dict`
+        key of the dictionary loaded by `torch.load`.
 
         See: https://pytorch.org/docs/stable/notes/serialization.html for more
         information about how models are saved in PyTorch.
@@ -576,16 +564,17 @@ class TrainModel(object):
         Parameters
         ----------
         state : dict
-            Information about the state of the model.
+            Information about the state of the model. Note that this is
+            not `model.state_dict()`, but rather, a dictionary containing
+            keys that can be used for continued training in Selene
+            _in addition_ to a key `state_dict` that contains
+            `model.state_dict()`.
         is_best : bool
             Is this the model's best performance so far?
-        dir_path : str, optional
-            Default is None. Will output file to the current working directory
-            if no path to directory is specified.
         filename : str, optional
             Default is "checkpoint". Specify the checkpoint filename. Will
             append a file extension to the end of the `filename`
-            (e.g. `.pth.tar`).
+            (e.g. `checkpoint.pth.tar`).
 
         Returns
         -------
@@ -596,12 +585,9 @@ class TrainModel(object):
             state["step"]))
         cp_filepath = os.path.join(
             self.output_dir, filename)
-        torch.save(self.model, "{0}.model.pth.tar".format(cp_filepath))
-        torch.save(state, "{0}.state.pth.tar".format(cp_filepath))
+        torch.save(state, "{0}.pth.tar".format(cp_filepath))
         if is_best:
-            best_filepath = os.path.join(self.output_dir, "best_performing")
-            shutil.copyfile("{0}.model.pth.tar".format(cp_filepath),
-                            "{0}.model.pth.tar".format(best_filepath))
-            shutil.copyfile("{0}.state.pth.tar".format(cp_filepath),
-                            "{0}.state.pth.tar".format(best_filepath))
+            best_filepath = os.path.join(self.output_dir, "best_model")
+            shutil.copyfile("{0}.pth.tar".format(cp_filepath),
+                            "{0}.pth.tar".format(best_filepath))
 
