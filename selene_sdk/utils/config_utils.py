@@ -7,6 +7,7 @@ import os
 import importlib
 import sys
 from time import strftime
+import types
 
 import torch
 
@@ -27,10 +28,11 @@ def module_from_file(path):
     The loaded module
 
     """
-    module_spec = importlib.util.spec_from_file_location(
-        "user_model_module", path)
-    module = importlib.util.module_from_spec(module_spec)
-    module_spec.loader.exec_module(module)
+    parent_path, module_file = os.path.split(path)
+    loader = importlib.machinery.SourceFileLoader(
+        module_file[:-3], path)
+    module = types.ModuleType(loader.name)
+    loader.exec_module(module)
     return module
 
 
@@ -52,7 +54,7 @@ def module_from_dir(path):
     The loaded module
     """
     parent_path, module_dir = os.path.split(path)
-    sys.path.append(parent_path)
+    sys.path.insert(0, parent_path)
     return importlib.import_module(module_dir)
 
 
