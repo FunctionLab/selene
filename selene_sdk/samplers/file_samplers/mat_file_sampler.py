@@ -113,10 +113,6 @@ class MatFileSampler(FileSampler):
         if self._shuffle:
             np.random.shuffle(self._sample_indices)
 
-    def __exit__(self):
-        if self._mat_fh is not None:
-            self._mat_fh.close()
-
     def sample(self, batch_size=1):
         """
         Draws a mini-batch of examples and their corresponding
