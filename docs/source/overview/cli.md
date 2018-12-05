@@ -229,7 +229,7 @@ For variant effect prediction and _in silico_ mutagenesis, a number of scores ca
 - `logits` (log-fold change scores): The difference between `logit(alt)` and `logit(ref)` predictions.
 You'll find examples of how this is specified in the [variant effect prediction](#Variant-effect-prediction) and [_in silico_ mutagenesis](#In-silico-mutagenesis) sections.
 
-In all `analyze`-related operations, we ask that you specify 2 configuration keys. One will always be the `analyze_sequences` key, which we will explain generally here. The other one is dependent on which of the 3 sub-operations you use and will be explained in the appropriate subsection below. 
+In all `analyze`-related operations, we ask that you specify 2 configuration keys. One will always be the `analyze_sequences` key and the other one is dependent on which of the 3 sub-operations you use---`prediction`, `variant_effect_prediction` or `in_silico_mutagenesis`.
 ```YAML
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     trained_model_path: /path/to/trained/model.pth.tar,
