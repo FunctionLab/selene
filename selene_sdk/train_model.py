@@ -87,13 +87,21 @@ class TrainModel(object):
         available validation samples from the appropriate data file.
     n_test_samples : int or None, optional
         Default is `None`. Specify the number of test samples in the test set.
-        If `n_test_samples` is `None` and the data sampler used is the
-        `selene_sdk.samplers.IntervalsSampler`, the size of the test set is
-        the number of test intervals we can sample from. If
-        `None` and using `selene_sdk.samplers.RandomSampler`, we will retrieve
-        640000 test samples. If `None` and using
-        `selene_sdk.samplers.MultiFileSampler`, we will use all available
-        test samples from the appropriate data file.
+        If `n_test_samples` is `None` and
+
+            - the sampler you specified has no test partition, you should not
+              specify `evaluate` as one of the operations in the `ops` list.
+              That is, Selene will not automatically evaluate your trained
+              model on a test dataset, because the sampler you are using does
+              not have any test data.
+            - the sampler you use is of type `selene_sdk.samplers.OnlineSampler`
+              (and the test partition exists), we will retrieve 640000 test
+              samples.
+            - the sampler you use is of type
+              `selene_sdk.samplers.MultiFileSampler` (and the test partition
+              exists), we will use all the test samples available in the
+              appropriate data file.
+
     cpu_n_threads : int, optional
         Default is 1. Sets the number of OpenMP threads used for parallelizing
         CPU operations.

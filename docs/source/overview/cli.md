@@ -20,7 +20,7 @@ We strongly recommend you read through the first 4 sections ([Overview](#Overvie
     - [Variant effect prediction](#Variant-effect-prediction)
     - [_In silico_ mutagenesis](#In-silico-mutagenesis)
 - [Sampler configurations](#Sampler-configurations)
-    - Samplers for training (and evaluation, optional):
+    - Samplers for training (and evaluation, optionally):
         - [Random positions sampler](#Random-positions-sampler)
         - [Intervals sampler](#Intervals-sampler)
         - [Multiple-file sampler](#Multiple-file-sampler)
@@ -29,7 +29,7 @@ We strongly recommend you read through the first 4 sections ([Overview](#Overvie
         - [Matrix file sampler](#Matrix-file-sampler)
 
 ## Overview
-Selene's CLI accepts configuration files that are composed of 4 main (high-level) groups:
+Selene's CLI accepts configuration files in the [YAML](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html) format that are composed of 4 main (high-level) groups:
 1. list of operations
 2. general configuration parameters
 3. model configuration
@@ -83,7 +83,7 @@ For all operations, Selene requires that you specify the model architecture, los
 ### Expected input class and methods
 There are two possible formats you can use to do this:
 
-- single Python file: We expect that most people will start using Selene with model architectures in this format. In this case, you implement your architecture as a class and include 2 static methods, `criterion` and `get_optimizer` in the same file. 
+- single Python file: We expect that most people will start using Selene with model architectures in this format. In this case, you implement your architecture as a class and include 2 static methods, `criterion` and `get_optimizer` in the same file. See our [DeepSEA model file](https://github.com/FunctionLab/selene/blob/master/models/deepsea.py) as an example. 
    
    * The `criterion` method should not take any input arguments and must return a loss function object of type `torch.nn._Loss`. 
    * The `get_optimizer` method should accept a single input `lr`, the learning rate. (Note that this method is not used for the `evaluate` and `analyze` operations in Selene.) It returns a tuple, where `tuple[0]` is the optimizer class `torch.optim.Optimizer` and `tuple[1]` is a dictionary of any optional arguments with which Selene can then instantiate the class. Selene will first instantiate the model and then pass the required `model.parameters()` argument as input to the `torch.optim.Optimizer` class constructor.
@@ -107,7 +107,7 @@ model: {
 
 - `path`: This can be the path to a Python file or a Python module (directory). See the [previous section](#Expected-input-class-and-methods) for details.
 - `class`: The model architecture class name.
-- `class_args`: The arguments needed to instantiate the class.
+- `class_args`: The arguments needed to instantiate the class. In the case of [DeepSEA](https://github.com/FunctionLab/selene/blob/master/models/deepsea.py), the `class_args` keys would be `sequence_length` and `n_genomic_features`. 
 - `non_strand_specific`: Optional, possible values are `mean` or `max` if you want to use this parameter. (Otherwise, do not use this key in your model configuration.) If your model does not need to train on strand-specific input sequences, we have implemented a class that will pass both the forward and reverse sequence to the model and either take the `mean` or the `max` value across the two sets of predictions for a sample. 
 
 ## A note for the following sections
@@ -144,10 +144,12 @@ train_model: !obj:selene_sdk.TrainModel {
 - `n_validation_samples`: Default is `None`. Specify the number of validation samples in the validation set. If `None`
    - and the data sampler you use is of type `selene_sdk.samplers.OnlineSampler`, we will by default retrieve 32000 validation samples.
    - and you are using a `selene_sdk.samplers.MultiFileSampler`, we will use all the validation samples available in the appropriate data file.
-- `n_test_samples`: Default is `None`. Specify the number of test samples in the test set. If `None`
-    - and the sampler you specified has no test partition, it is assumed that you will not be evaluating your trained model using the `evaluate` method available in `selene_sdk.TrainModel`. (i.e. `evaluate` should not be one of the operations in the `ops` list)
-    - and the sampler you use is of type `selene_sdk.samplers.OnlineSampler` (and the test partition exists), we will retrieve 640000 test samples.
-    - and the sampler you use is of type `selene_sdk.samplers.MultiFileSampler`, we will use all the test samples available in the appropriate data file. 
+- `n_test_samples`: Default is `None`. Specify the number of test samples in the test set. If `None` and
+    - the sampler you specified has no test partition, you should not specify `evaluate` as one of the operations in the `ops` list. That is, Selene will not automatically evaluate your trained model on a test dataset, because the sampler you are using does not have any test data. 
+    - the sampler you use is of type `selene_sdk.samplers.OnlineSampler` (and the test partition exists), we will retrieve 640000 test samples.
+    - the sampler you use is of type `selene_sdk.samplers.MultiFileSampler` (and the test partition exists), we will use all the test samples available in the appropriate data file.
+    
+    You can review the [section on samplers](#Samplers-used-for-training-(and-evaluation,-optionally)) for more information. 
 - `cpu_n_threads`: Default is 1. The number of OpenMP threads used for parallelizing CPU operations in PyTorch.
 - `use_cuda`: Default is False. Specify whether CUDA GPUs are available for torch to use during training.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use during training.
@@ -159,9 +161,8 @@ train_model: !obj:selene_sdk.TrainModel {
  - `checkpoint_resume`: Default is `None`. If not `None`, you should pass in the path to a model weights file generated by `torch.save` (and can now be read by `torch.load`) to resume training. 
  
 #### Additional notes
-An important thing to observe about the contents of `train_model`: the [documentation for the `TrainModel` class](http://selene.flatironinstitute.org/selene.html#trainmodel) in `selene_sdk` shows that we are missing a number of arguments needed to instantiate the class.
-
-- `output_dir` can be specified as a top-level key in the configuration. You can specify it within each function-type constructor (e.g.  `!obj:selene_sdk.TrainModel`) if you prefer. If `output_dir` exists as a top-level key, Selene does use the top-level `output_dir` and ignores all other `output_dir` keys.
+Attentive readers might have noticed that in the [documentation for the `TrainModel` class](http://selene.flatironinstitute.org/selene.html#trainmodel) there are more input arguments than are required to instantiate the class through the CLI configuration file. This is because they are assumed to be carried through/retrieved from other configuration keys for consistency. Specifically:
+- `output_dir` can be specified as a top-level key in the configuration. You can specify it within each function-type constructor (e.g.  `!obj:selene_sdk.TrainModel`) if you prefer. If `output_dir` exists as a top-level key, Selene does use the top-level `output_dir` and ignores all other `output_dir` keys. **The `output_dir` is omitted in many of the configurations for this reason.**
 - `model`, `loss_criterion`, `optimizer_class`, `optimizer_kwargs` are all retrieved from the path in the [`model` configuration](#Model-architecture). 
 - `data_sampler`has its own separate configuration that you will need to specify in the same YAML file. Please see [Sampler configurations](#Sampler-configurations) for more information.
 
@@ -198,7 +199,7 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
 
 #### Optional parameters
 - `batch_size`: Default is 64. Specify the batch size to process examples. Should be a power of 2.
-- `n_test_samples`: Default is `None`. Use `n_test_samples` if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type `selene_sdk.samplers.OnlineSampler`, by default it will use 640000 test samples if `None`. If you are using a file sampler, it will use all samples available in the file.
+- `n_test_samples`: Default is `None`. Use `n_test_samples` if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type [`selene_sdk.samplers.OnlineSampler`](#Samplers-used-for-training-(and-evaluation,-optionally))--you must specify a test partition in this case--it will default to 640000 test samples if `n_test_samples = None`. If you are using a file sampler ([multiple-file sampler](#Multiple-file-sampler) or [BED](#BED-file-sampler)/[matrix](#Matrix-file-sampler) file samplers), it will use all samples available in the file.
 - `report_gt_feature_n_positives`: Default is 10. In total, each class/feature must have more than `report_gt_feature_n_positives` positive examples in the test set to be considered in the performance computation. the output file that reports each class' performance will report 'NA' for classes that do not have enough positive samples.
 - `use_cuda`: Default is False. Specify whether CUDA GPUs are available for torch to use.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use.
@@ -229,7 +230,7 @@ For variant effect prediction and _in silico_ mutagenesis, a number of scores ca
 - `logits` (log-fold change scores): The difference between `logit(alt)` and `logit(ref)` predictions.
 You'll find examples of how this is specified in the [variant effect prediction](#Variant-effect-prediction) and [_in silico_ mutagenesis](#In-silico-mutagenesis) sections.
 
-In all `analyze`-related operations, we ask that you specify 2 configuration keys. One will always be the `analyze_sequences` key, which we will explain generally here. The other one is dependent on which of the 3 sub-operations you use and will be explained in the appropriate subsection below. 
+In all `analyze`-related operations, we ask that you specify 2 configuration keys. One will always be the `analyze_sequences` key. The other one is dependent on which of the 3 sub-operations you use and will be explained in the appropriate subsection below. 
 ```YAML
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     trained_model_path: /path/to/trained/model.pth.tar,
@@ -334,7 +335,7 @@ in_silico_mutagenesis: {
 ## Sampler configurations
 Data sampling is used during model training and evaluation. You must specify the sampler in the configuration YAML file alongside the other operation-specific configurations (i.e. `train_model` or `evaluate_model`). 
 
-### Samplers used for training (and evaluation, optional)
+### Samplers used for training (and evaluation, optionally)
 Training requires a sampler that specifies the data for training, validation, and (optionally) testing. While Selene can directly evaluate a trained model on a test dataset when training is finished, it is not a required step and so the test dataset specification is also optional. Here, we provide examples for the samplers we have implemented that can be used for training.
 
 There are 2 kinds of samplers implemented in Selene right now: "online" samplers and file samplers. Online samplers generate data samples on-the-fly and require you to pass in a reference sequence FASTA file and a tabix-indexed BED file so that Selene can query for an input sequence and its associated biological classes using genomic coordinates. The file sampler we use supports loading different `.mat` or `.bed` files (can support more formats upon request) for the training, validation, and test sets. 
@@ -497,3 +498,147 @@ sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
 - `sequence_batch_axis`: Optional, default is 0. Specify the batch axis for the sequences matrix.
 - `sequence_alphabet_axis`: Optional, default is 1. Specify the alphabet axis.
 - `targets_batch_axis`: Optional, default is 0. Specify the batch axis for the targets matrix.
+
+## Examples of full configuration files
+We do have a more comprehensive set of [examples on our Github](https://github.com/FunctionLab/selene/blob/master/config_examples) that you can review. We reproduce a few of these in this document to show how you can put all of the different configuration components together to create a YAML file that can be run by Selene's CLI:
+
+### Training (using intervals sampler)
+```YAML
+---
+ops: [train, evaluate]
+model: {
+    path: /absolute/path/to/model/architecture.py,
+    class: ModelArchitectureClassName,
+    class_args: {
+        arg1: val1,
+        arg2: val2
+    },
+    non_strand_specific: mean
+}
+sampler: !obj:selene_sdk.samplers.IntervalsSampler {
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+        input_path: /path/to/reference_sequence.fa,
+        blacklist_regions: hg19
+    },
+    target_path: /path/to/tabix/indexed/targets.bed.gz,
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: /path/to/distinct_features.txt
+    },
+    intervals_path: /path/to/intervals.bed,
+    sample_negative: True,
+    seed: 127,
+    validation_holdout: [chr6, chr7],
+    test_holdout: [chr8, chr9],  # specifying a test partition
+    sequence_length: 1000,
+    center_bin_to_predict: 200,
+    feature_thresholds: 0.5,
+    mode: train,  # starting mode for sampler
+    save_datasets: [test]
+}
+train_model: !obj:selene_sdk.TrainModel {
+    batch_size: 64,
+    max_steps: 80000,
+    report_stats_every_n_steps: 16000,
+    n_validation_samples: 32000,
+    n_test_samples: 640000,
+    cpu_n_threads: 32,
+    use_cuda: True,
+    data_parallel: True,
+    logging_verbosity: 2,
+    checkpoint_resume: False
+}
+random_seed: 133
+output_dir: /path/to/output_dir
+...
+```
+
+#### Some notes
+- Ordering of the keys does not matter.
+- We included many of the optional keys in this configuration. You do not need to specify these if you want to use their default values.
+- In this example, we specified a test partition in our intervals sampler by assigning a list of chromosomes to `test_holdout`. If no such holdout was specified (e.g. None or empty list), you would not be able to specify `n_test_samples` in `TrainModel` and would need to omit `evaluate` from the `ops` list. 
+- `output_dir` is specified at the top-level and used by both the sampler and the `TrainModel` class. 
+
+### Evaluate (using matrix file sampler)
+```YAML
+---
+ops: [evaluate]
+model: {
+    path: /absolute/path/to/model/architecture.py,
+    class: ModelArchitectureClassName,
+    class_args: {
+        arg1: val1,
+        arg2: val2
+    },
+    non_strand_specific: mean
+}
+sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+    filepath: /path/to/test.mat,
+    sequence_key: testxdata,
+    targets_key: testdata,
+    random_seed: 456,
+    shufle: False,
+    sequence_batch_axis: 0,
+    sequence_alphabet_axis: 1,
+    targets_batch_axis: 0
+}
+evaluate_model: !obj:selene_sdk.EvaluateModel {
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: /path/to/features_list.txt
+    },
+    trained_model_path: /path/to/trained/model.pth.tar,
+    batch_size: 64,
+    report_gt_feature_n_positives: 50,
+    use_cuda: True,
+    data_parallel: False
+}
+random_seed: 123
+output_dir: /path/to/output_dir
+create_subdirectory: False
+...
+```
+
+### Some notes
+- For the matrix file sampler, we assume that you know ahead of time the shape of the data matrix. That is, which dimension is the batch dimension? Sequence? Alphabet (should be size 4 for DNA/RNA)? You must specify the keys that end in `axis` unless the shape of the sequences matrix is `(n_samples, n_alphabet, n_sequence_length)` and the shape of the targets matrix is `(n_samples, n_targets)`.
+- In this case, since `create_subdirectory` is False, all outputs from evaluate are written to `output_dir` directly (as opposed to being written in a timestamped subdirectory). Be careful of overwriting files.
+
+### Analyze sequences (variant effect prediction)
+```YAML
+ops: [analyze]
+model: {
+    path: /absolute/path/to/model/architecture.py,
+    class: ModelArchitectureClassName,
+    class_args: {
+        arg1: val1,
+        arg2: val2
+    },
+    non_strand_specific: mean
+}
+analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
+    trained_model_path: /path/to/trained/model.pth.tar,
+    sequence_length: 1000,
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path: /path/to/distinct_features.txt
+    },
+    batch_size: 64,
+    use_cuda: True,
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+        input_path: /path/to/reference_sequence.fa
+    }
+}
+variant_effect_prediction: {
+    vcf_files: [
+        /path/to/file1.vcf,
+        /path/to/file2.vcf
+    ],
+    save_data: [predictions, abs_diffs],
+    output_dir: /path/to/output/predicts/dir
+}
+random_seed: 123
+```
+
+#### Some notes
+- We ask that in all `analyze` cases, you specify the `output_dir` (when applicable) within the sub-operation dictionary. This is because only the sub-operation generates output, so there is no need to share this parameter across multiple configurations.
+- In this variant effect prediction example, Selene will go through each VCF file and get the model predictions for each variant (ref and alt). `analyze_sequences` must have the parameter `reference_sequence` so that Selene can create sequences centered at each variant position by querying the reference sequence file. 
+- The output from this operation will be 6 files: 3 for each input VCF file. This is because of what is specified in `save_data`:
+    - `predictions` will output 2 files per input VCF: the model predictions for all `ref`s and the model predictions for all `alts`. 
+    - `abs_diffs` will output 1 file per input VCF: the absolute difference between the `ref` and `alt` model predictions. (Certainly, outputting the files from `predictions` is sufficient to compute `abs_diffs` yourself.)
