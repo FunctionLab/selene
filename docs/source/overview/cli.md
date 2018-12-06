@@ -16,15 +16,15 @@ We strongly recommend you read through the first 4 sections ([Overview](#Overvie
 - [Evaluate](#Evaluate)
     - [Expected outputs for evaluation](#Expected-outputs-for-evaluation)
 - [Analyze sequences](#Analyze-sequences)
-    - [Prediction on sequences](#Predict-on-sequences)
+    - [Prediction on sequences](#Prediction-on-sequences)
     - [Variant effect prediction](#Variant-effect-prediction)
     - [_In silico_ mutagenesis](#In-silico-mutagenesis)
 - [Sampler configurations](#Sampler-configurations)
-    - Samplers for training (and evaluation, optionally):
+    - [Samplers for training (and evaluation, optionally)](#samplers-used-for-training-and-evaluation-optionally):
         - [Random positions sampler](#Random-positions-sampler)
         - [Intervals sampler](#Intervals-sampler)
         - [Multiple-file sampler](#Multiple-file-sampler)
-    - File samplers for evaluation:
+    - [File samplers for evaluation](#samplers-used-for-evaluation):
         - [BED file sampler](#BED-file-sampler)
         - [Matrix file sampler](#Matrix-file-sampler)
 
@@ -54,9 +54,9 @@ Every file should start with the operations that you want to run.
 ops: [train, evaluate, analyze]
 ```
 The `ops` key expects one or more of `[train, evaluate, analyze]` to be specified as a list. In addition to the general & model architecture configurations described in the next 2 sections, each of these operations has an expected set of configurations:
-- `train`: `train_model` (see [Train](#Train)) and `sampler` (see [Samplers used for training](#Samplers-used-for-training))
-- `evaluate`: `evaluate_model` (see [Evaluate](#Evaluate)) and `sampler` (see [Samplers used for evaluation](#Samplers-used-for-evaluate))
-- `analyze`: `analyze_sequences` (see [Analyze](#Analyze)) and one of [`prediction`](#Prediction-on-sequences), [`variant_effect_prediction`](#Variant-effect-prediction), or [`in_silico_mutagenesis`](#In-silico-mutagenesis). 
+- `train`: `train_model` (see [Train](#Train)) and `sampler` (see [Samplers used for training](#samplers-used-for-training-and-evaluation-optionally))
+- `evaluate`: `evaluate_model` (see [Evaluate](#Evaluate)) and `sampler` (see [Samplers used for evaluation](#samplers-used-for-evaluation))
+- `analyze`: `analyze_sequences` (see [Analyze sequences](#Analyze-sequences)) and one of [`prediction`](#Prediction-on-sequences), [`variant_effect_prediction`](#Variant-effect-prediction), or [`in_silico_mutagenesis`](#In-silico-mutagenesis). 
 
 **Note**: You should be able to use multiple operations (i.e. specify the necessary configuration keys for those operations in a single file). However, if `[train, evaluate]` are both specified, we expect that they will both rely on the same sampler. If you need to train and evaluate using different samplers, please create 2 separate YAML files. 
 
@@ -149,7 +149,7 @@ train_model: !obj:selene_sdk.TrainModel {
     - the sampler you use is of type `selene_sdk.samplers.OnlineSampler` (and the test partition exists), we will retrieve 640000 test samples.
     - the sampler you use is of type `selene_sdk.samplers.MultiFileSampler` (and the test partition exists), we will use all the test samples available in the appropriate data file.
     
-    You can review the [section on samplers](#Samplers-used-for-training-(and-evaluation,-optionally)) for more information. 
+    You can review the [section on samplers](#samplers-used-for-training-and-evaluation-optionally) for more information. 
 - `cpu_n_threads`: Default is 1. The number of OpenMP threads used for parallelizing CPU operations in PyTorch.
 - `use_cuda`: Default is False. Specify whether CUDA GPUs are available for torch to use during training.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use during training.
@@ -199,7 +199,7 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
 
 #### Optional parameters
 - `batch_size`: Default is 64. Specify the batch size to process examples. Should be a power of 2.
-- `n_test_samples`: Default is `None`. Use `n_test_samples` if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type [`selene_sdk.samplers.OnlineSampler`](#Samplers-used-for-training-(and-evaluation,-optionally))--you must specify a test partition in this case--it will default to 640000 test samples if `n_test_samples = None`. If you are using a file sampler ([multiple-file sampler](#Multiple-file-sampler) or [BED](#BED-file-sampler)/[matrix](#Matrix-file-sampler) file samplers), it will use all samples available in the file.
+- `n_test_samples`: Default is `None`. Use `n_test_samples` if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type [`selene_sdk.samplers.OnlineSampler`](#samplers-used-for-training-and-evaluation-optionally))--you must specify a test partition in this case--it will default to 640000 test samples if `n_test_samples = None`. If you are using a file sampler ([multiple-file sampler](#Multiple-file-sampler) or [BED](#BED-file-sampler)/[matrix](#Matrix-file-sampler) file samplers), it will use all samples available in the file.
 - `report_gt_feature_n_positives`: Default is 10. In total, each class/feature must have more than `report_gt_feature_n_positives` positive examples in the test set to be considered in the performance computation. the output file that reports each class' performance will report 'NA' for classes that do not have enough positive samples.
 - `use_cuda`: Default is False. Specify whether CUDA GPUs are available for torch to use.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use.
