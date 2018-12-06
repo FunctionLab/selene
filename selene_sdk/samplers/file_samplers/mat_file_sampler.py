@@ -164,6 +164,8 @@ class MatFileSampler(FileSampler):
                 targets = self._sample_tgts[use_indices, :].astype(float)
             else:
                 targets = self._sample_tgts[:, use_indices].astype(float)
+                targets = np.transpose(
+                    targets, (1, 0))
             return (sequences, targets)
         return sequences,
 
