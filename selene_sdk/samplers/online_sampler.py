@@ -276,7 +276,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         if close_filehandle:
             file_handle.close()
 
-    def get_data_and_targets(self, mode, batch_size, n_samples):
+    def get_data_and_targets(self, batch_size, n_samples, mode=None):
         """
         This method fetches a subset of the data from the sampler,
         divided into batches. This method also allows the user to
@@ -285,14 +285,15 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         Parameters
         ----------
-        mode : str
-            The mode to run the sampler in when fetching the samples.
-            See `selene_sdk.samplers.IntervalsSampler.modes` for more
-            information.
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int
             The total number of samples to retrieve.
+        mode : str, optional
+            Default is None. The mode to run the sampler in when
+            fetching the samples. See
+            `selene_sdk.samplers.IntervalsSampler.modes` for more
+            information. If None, will use the current mode `self.mode`.
 
         Returns
         -------
@@ -310,7 +311,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             :math:`S =` `n_samples`.
 
         """
-        self.set_mode(mode)
+        if mode is not None:
+            self.set_mode(mode)
         sequences_and_targets = []
 
         n_batches = int(n_samples / batch_size)
@@ -360,7 +362,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             n_samples = 32000
         elif not n_samples:
             n_samples = 640000
-        return self.get_data_and_targets(mode, batch_size, n_samples)
+        return self.get_data_and_targets(batch_size, n_samples, mode=mode)
 
     def get_validation_set(self, batch_size, n_samples=None):
         """
