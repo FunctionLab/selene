@@ -124,6 +124,7 @@ train_model: !obj:selene_sdk.TrainModel {
     max_steps: 960000,
     report_stats_every_n_steps: 32000,
     save_checkpoint_every_n_steps: 1000,
+    save_new_checkpoints_after_n_steps: 640000,
     n_validation_samples: 64000,
     n_test_samples: 960000,
     cpu_n_threads: 32,
@@ -137,10 +138,11 @@ train_model: !obj:selene_sdk.TrainModel {
 #### Required parameters
 - `batch_size`:  Number of samples in one forward/backward pass (a single step).
 - `max_steps`: Total number of steps for which to train the model. 
-- `report_stats_every_n_steps`: The frequency with which to report summary statistics. 
+- `report_stats_every_n_steps`: The frequency with which to report summary statistics. You can set this value to be equivalent to a training epoch (`n_steps * batch_size`) being the total number of samples seen by the model so far. Selene evaluates the model on the validation dataset every `report_stats_every_n_steps` and, if the model obtains the best performance so far (based on the user-specified loss function), Selene saves the model state to a file called `best_model.pth.tar` in `output_dir`.  
 
 #### Optional parameters
 - `save_checkpoint_every_n_steps`: Default is 1000. The number of steps before Selene saves a new checkpoint model weights file. If this parameter is set to `None`, we will set it to the same value as `report_stats_every_n_steps`.
+- `save_new_checkpoints_after_n_steps`: Default is None. The number of steps after which Selene will continually save new checkpoint model weights files (`checkpoint-<TIMESTAMP>.pth.tar`) every `save_checkpoint_every_n_steps`. Before this, the file `checkpoint.pth.tar` is overwritten every `save_checkpoint_every_n_steps` to limit the memory requirements.
 - `n_validation_samples`: Default is `None`. Specify the number of validation samples in the validation set. If `None`
    - and the data sampler you use is of type `selene_sdk.samplers.OnlineSampler`, we will by default retrieve 32000 validation samples.
    - and you are using a `selene_sdk.samplers.MultiFileSampler`, we will use all the validation samples available in the appropriate data file.
@@ -168,7 +170,7 @@ Attentive readers might have noticed that in the [documentation for the `TrainMo
 
 #### Expected outputs for training
 These outputs will be written to `output_dir` (a top-level parameter, can also  be specified within the function-type constructor, see above).
-- `best_model.pth.tar`: the best performing model so far
+- `best_model.pth.tar`: the best performing model so far. IMPORTANT: for all `*.pth.tar` files output by Selene right now, we save additional information beyond the model's state dictionary so that users may continue training these models through Selene if they wish. If you would like to save only the state dictionary, you can run `out = torch.load(<*.pth.tar>)` and then save only the `state_dict` key with `torch.save(out["state_dict"], <state_dict_only.pth.tar>)`. 
 - `checkpoint.pth.tar`: model saved every `save_checkpoint_every_n_steps` steps
 - `selene_sdk.train_model.log`: a detailed log file containing information about how much time it takes for batches to sampled and propagated through the model, how the model is performing, etc.
 - `selene_sdk.train_model.train.txt`: model training loss is printed to this file every `report_stats_every_n_steps`.

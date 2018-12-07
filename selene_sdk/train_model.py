@@ -5,6 +5,7 @@ import logging
 import math
 import os
 import shutil
+from time import strftime
 from time import time
 
 import numpy as np
@@ -71,12 +72,23 @@ class TrainModel(object):
         The frequency with which to report summary statistics. You can
         set this value to be equivalent to a training epoch
         (`n_steps * batch_size`) being the total number of samples
-        seen by the model so far.
+        seen by the model so far. Selene evaluates the model on the validation
+        dataset every `report_stats_every_n_steps` and, if the model obtains
+        the best performance so far (based on the user-specified loss function),
+        Selene saves the model state to a file called `best_model.pth.tar` in
+        `output_dir`.
     output_dir : str
         The output directory to save model checkpoints and logs in.
     save_checkpoint_every_n_steps : int or None, optional
         Default is 1000. If None, set to the same value as
         `report_stats_every_n_steps`
+    save_new_checkpoints_after_n_steps : int or None, optional
+        Default is None. The number of steps after which Selene will
+        continually save new checkpoint model weights files
+        (`checkpoint-<TIMESTAMP>.pth.tar`) every
+        `save_checkpoint_every_n_steps`. Before this point,
+        the file `checkpoint.pth.tar` is overwritten every
+        `save_checkpoint_every_n_steps` to limit the memory requirements.
     n_validation_samples : int or None, optional
         Default is `None`. Specify the number of validation samples in the
         validation set. If `n_validation_samples` is `None` and the data sampler
@@ -164,6 +176,7 @@ class TrainModel(object):
                  report_stats_every_n_steps,
                  output_dir,
                  save_checkpoint_every_n_steps=1000,
+                 save_new_checkpoints_after_n_steps=None,
                  report_gt_feature_n_positives=10,
                  n_validation_samples=None,
                  n_test_samples=None,
@@ -189,6 +202,8 @@ class TrainModel(object):
             self.nth_step_save_checkpoint = report_stats_every_n_steps
         else:
             self.nth_step_save_checkpoint = save_checkpoint_every_n_steps
+
+        self.save_new_checkpoints = save_new_checkpoints_after_n_steps
 
         logger.info("Training parameters set: batch size {0}, "
                     "number of steps per 'epoch': {1}, "
@@ -364,6 +379,27 @@ class TrainModel(object):
             train_loss = self.train()
             t_f = time()
             time_per_step.append(t_f - t_i)
+
+            if step % self.nth_step_save_checkpoint == 0:
+                checkpoint_dict = {
+                    "step": step,
+                    "arch": self.model.__class__.__name__,
+                    "state_dict": self.model.state_dict(),
+                    "min_loss": min_loss,
+                    "optimizer": self.optimizer.state_dict()
+                }
+                if self.save_new_checkpoints is not None and \
+                        self.save_new_checkpoints >= step:
+                    checkpoint_filename = "checkpoint-{0}".format(
+                        strftime("%m%d%H%M%S"))
+                    self._save_checkpoint(
+                        checkpoint_dict, False, filename=checkpoint_filename)
+                    logger.debug("Saving checkpoint `{0}.pth.tar`".format(
+                        checkpoint_filename))
+                else:
+                    self._save_checkpoint(
+                        checkpoint_dict, False)
+
             # TODO: Should we have some way to report training stats without running validation?
             if step and step % self.nth_step_report_stats == 0:
                 logger.info(("[STEP {0}] average number "
@@ -384,28 +420,20 @@ class TrainModel(object):
                     self._validation_logger.info("{0}\tNA".format(
                         validation_loss))
 
-                is_best = validation_loss < min_loss
-                min_loss = min(validation_loss, min_loss)
-                self._save_checkpoint({
-                    "step": step,
-                    "arch": self.model.__class__.__name__,
-                    "state_dict": self.model.state_dict(),
-                    "min_loss": min_loss,
-                    "optimizer": self.optimizer.state_dict()}, is_best)
+                if validation_loss < min_loss:
+                    min_loss = validation_loss
+                    self._save_checkpoint({
+                        "step": step,
+                        "arch": self.model.__class__.__name__,
+                        "state_dict": self.model.state_dict(),
+                        "min_loss": min_loss,
+                        "optimizer": self.optimizer.state_dict()}, True)
+                    logger.debug("Updating `best_model.pth.tar`")
                 logger.info("training loss: {0}".format(train_loss))
                 logger.info("validation loss: {0}".format(validation_loss))
 
                 # Logging training and validation on same line requires 2 parsers or more complex parser.
                 # Separate logging of train/validate is just a grep for validation/train and then same parser.
-
-            # Should checkpoint saving occur before validation (if they both occur in the same step) or not?
-            if step % self.nth_step_save_checkpoint == 0:
-                self._save_checkpoint({
-                    "step": step,
-                    "arch": self.model.__class__.__name__,
-                    "state_dict": self.model.state_dict(),
-                    "min_loss": min_loss,
-                    "optimizer": self.optimizer.state_dict()}, False)
         self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
     def train(self):
