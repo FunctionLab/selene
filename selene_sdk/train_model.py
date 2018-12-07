@@ -367,14 +367,13 @@ class TrainModel(object):
             # TODO: Should we have some way to report training stats without running validation?
             if step and step % self.nth_step_report_stats == 0:
                 logger.info(("[STEP {0}] average number "
-                             "of steps per second: {1}").format(
+                             "of steps per second: {1:.1f}").format(
                     step, 1. / np.average(time_per_step)))
                 time_per_step = []
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
                 self._train_logger.info(train_loss)
-                # TODO: check if "roc_auc" is a key in `valid_scores`?
-                if valid_scores["roc_auc"]:
+                if "roc_auc" in valid_scores and valid_scores["roc_auc"]:
                     validation_roc_auc = valid_scores["roc_auc"]
                     self._validation_logger.info(
                         "{0}\t{1}".format(validation_loss,
@@ -423,7 +422,6 @@ class TrainModel(object):
         self.sampler.set_mode("train")
 
         inputs, targets = self._get_batch()
-
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
 
@@ -501,10 +499,8 @@ class TrainModel(object):
         """
         average_loss, all_predictions = self._evaluate_on_data(
             self._validation_data)
-
         average_scores = self._validation_metrics.update(all_predictions,
                                                          self._all_validation_targets)
-
         for name, score in average_scores.items():
             logger.info("validation average {0}: {1}".format(name, score))
 
