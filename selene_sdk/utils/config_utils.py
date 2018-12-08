@@ -172,6 +172,10 @@ def execute(operations, configs, output_dir):
                 train_model_info.bind(output_dir=output_dir)
 
             trainer = instantiate(train_model_info)
+            # TODO: will find a better way to handle this in the future
+            if "load_test_set" in configs and configs["load_test_set"] and \
+                    "evaluate" in operations:
+                trainer.create_test_set()
             trainer.train_and_validate()
 
         elif op == "evaluate":
@@ -262,6 +266,15 @@ def parse_configs_and_run(configs,
             for reproducibility. Optional.
             * `lr`: The learning rate, if one of the operations in the list is\
             "train".
+            * `load_test_set`: If `ops: [train, evaluate]`, you may set\
+               this parameter to True if you would like to load the test\
+               set into memory ahead of time--and therefore save the test\
+               data to a .bed file at the start of training. This is only\
+               useful if you have a machine that can support a large increase\
+               (on the order of GBs) in memory usage and if you want to\
+               create a test dataset early-on because you do not know if your\
+               model will finish training and evaluation within the allotted\
+               time that your job is run.
 
     create_subdirectory : bool, optional
         Default is True. If `create_subdirectory`, will create a directory
@@ -281,7 +294,7 @@ def parse_configs_and_run(configs,
         to the dirs specified in each operation's configuration.
 
     """
-    operations = configs.pop("ops")
+    operations = configs["ops"]
 
     if "train" in operations and "lr" not in configs and lr != "None":
         configs["lr"] = float(lr)
@@ -298,7 +311,7 @@ def parse_configs_and_run(configs,
               "this parameter must have it specified in their individual "
               "parameter configuration.")
     else:
-        current_run_output_dir = configs.pop("output_dir")
+        current_run_output_dir = configs["output_dir"]
         os.makedirs(current_run_output_dir, exist_ok=True)
         if "create_subdirectory" in configs:
             create_subdirectory = configs["create_subdirectory"]
@@ -310,7 +323,7 @@ def parse_configs_and_run(configs,
             current_run_output_dir))
 
     if "random_seed" in configs:
-        seed = configs.pop("random_seed")
+        seed = configs["random_seed"]
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
     else:

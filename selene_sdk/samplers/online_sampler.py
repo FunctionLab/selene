@@ -207,10 +207,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             feature_thresholds=feature_thresholds)
 
         self._save_filehandles = {}
-        for mode in save_datasets:
-            self._save_filehandles[mode] = open(
-                os.path.join(output_dir, "{0}_data.bed".format(mode)),
-                'w+')
 
     def get_feature_from_index(self, index):
         """
@@ -268,6 +264,11 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         if mode not in self._save_datasets:
             return
         samples = self._save_datasets[mode]
+        if mode not in self._save_filehandles:
+            self._save_filehandles[mode] = open(
+                os.path.join(self._output_dir,
+                             "{0}_data.bed".format(mode)),
+                'w+')
         file_handle = self._save_filehandles[mode]
         while len(samples) > 0:
             cols = samples.pop(0)
