@@ -2,14 +2,13 @@
 ops: [analyze]
 model: {
     # TODO: please update this with the absolute path to the model file
-    file: /full/path/to/deeperdeepsea.py 
+    path: <ABSOLUTE_PATH>/tutorials/variants_and_visualizations/deeperdeepsea.py,
     class: DeeperDeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 919,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        sequence_length: 1000,
+        n_targets: 919
+    },
+    non_strand_specific: mean
 }
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     sequence_length: 1000,
