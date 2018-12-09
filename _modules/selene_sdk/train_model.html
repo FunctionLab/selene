@@ -252,6 +252,8 @@
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="k">import</span> <span class="n">Variable</span>
 <span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="k">import</span> <span class="n">ReduceLROnPlateau</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">average_precision_score</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">initialize_logger</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">load_model_from_state_dict</span>
@@ -357,6 +359,11 @@
 <span class="sd">        The directory to save model checkpoints and logs.</span>
 <span class="sd">    training_loss : list(float)</span>
 <span class="sd">        The current training loss.</span>
+<span class="sd">    metrics : dict</span>
+<span class="sd">        A dictionary that maps metric names (`str`) to metric functions.</span>
+<span class="sd">        By default, this contains `&quot;roc_auc&quot;`, which maps to</span>
+<span class="sd">        `sklearn.metrics.roc_auc_score`, and `&quot;average_precision&quot;`,</span>
+<span class="sd">        which maps to `sklearn.metrics.average_precision_score`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -378,7 +385,9 @@
                  <span class="n">use_cuda</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">data_parallel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">logging_verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                 <span class="n">checkpoint_resume</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">checkpoint_resume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">metrics</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span>
+                              <span class="n">average_precision</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `TrainModel` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -421,13 +430,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_validation_set</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_validation_samples</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validation_metrics</span> <span class="o">=</span> <span class="n">PerformanceMetrics</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_feature_from_index</span><span class="p">,</span>
-            <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="n">report_gt_feature_n_positives</span><span class="p">)</span>
+            <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="n">report_gt_feature_n_positives</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s2">&quot;test&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_create_test_set</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">n_test_samples</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_test_metrics</span> <span class="o">=</span> <span class="n">PerformanceMetrics</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">get_feature_from_index</span><span class="p">,</span>
-                <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="n">report_gt_feature_n_positives</span><span class="p">)</span>
+                <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="n">report_gt_feature_n_positives</span><span class="p">,</span>
+                <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_step</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_min_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span> <span class="c1"># TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.</span>
@@ -464,7 +475,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
         <span class="c1"># TODO: this makes the assumption that all models will report ROC AUC,</span>
         <span class="c1"># which is not the case.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;loss</span><span class="se">\t</span><span class="s2">roc_auc&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span> <span class="o">+</span>
+            <span class="nb">sorted</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validation_metrics</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">()])))</span>
 
     <span class="k">def</span> <span class="nf">_create_validation_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -555,17 +567,14 @@
                 <span class="n">valid_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
                 <span class="n">validation_loss</span> <span class="o">=</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_train_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">train_loss</span><span class="p">)</span>
-                <span class="c1"># TODO: check if &quot;roc_auc&quot; is a key in `valid_scores`?</span>
-                <span class="k">if</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]:</span>
-                    <span class="n">validation_roc_auc</span> <span class="o">=</span> <span class="n">valid_scores</span><span class="p">[</span><span class="s2">&quot;roc_auc&quot;</span><span class="p">]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">,</span>
-                                          <span class="n">validation_roc_auc</span><span class="p">))</span>
-                    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-                        <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">validation_roc_auc</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="s2">NA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">validation_loss</span><span class="p">))</span>
+                <span class="n">to_log</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_validation_metrics</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">valid_scores</span> <span class="ow">and</span> <span class="n">valid_scores</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                        <span class="n">to_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">valid_scores</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">to_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;NA&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_validation_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">to_log</span><span class="p">))</span>
+                <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">validation_loss</span> <span class="o">*</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
 
                 <span class="n">is_best</span> <span class="o">=</span> <span class="n">validation_loss</span> <span class="o">&lt;</span> <span class="n">min_loss</span>
                 <span class="n">min_loss</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">validation_loss</span><span class="p">,</span> <span class="n">min_loss</span><span class="p">)</span>

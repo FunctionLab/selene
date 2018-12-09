@@ -268,7 +268,7 @@ the non-strand specific prediction.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+17c6d16 ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+5f2736b ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
 <li><strong>mode</strong> (<em>{'mean'</em><em>, </em><em>'max'}</em>) – How to handle outputting a non-strand specific prediction.</li>
 </ul>
 </td>
@@ -282,7 +282,7 @@ the non-strand specific prediction.</li>
 <h2>PerformanceMetrics<a class="headerlink" href="#performancemetrics" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.utils.PerformanceMetrics">
-<em class="property">class </em><code class="descclassname">selene_sdk.utils.</code><code class="descname">PerformanceMetrics</code><span class="sig-paren">(</span><em>get_feature_from_index_fn</em>, <em>report_gt_feature_n_positives=10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.utils.</code><code class="descname">PerformanceMetrics</code><span class="sig-paren">(</span><em>get_feature_from_index_fn</em>, <em>report_gt_feature_n_positives=10</em>, <em>metrics={'average_precision': &lt;function average_precision_score&gt;</em>, <em>'roc_auc': &lt;function roc_auc_score&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Tracks and calculates metrics to evaluate how closely a model’s
 predictions match the true values it was designed to predict.</p>
@@ -295,6 +295,10 @@ predictions match the true values it was designed to predict.</p>
 name (<cite>str</cite>).</li>
 <li><strong>report_gt_feature_n_positives</strong> (<em>int, optional</em>) – Default is 10. The minimum number of positive examples for a
 feature in order to compute the score for it.</li>
+<li><strong>metrics</strong> (<em>dict</em>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
+By default, this contains <cite>“roc_auc”</cite>, which maps to
+<cite>sklearn.metrics.roc_auc_score</cite>, and <cite>“average_precision”</cite>,
+which maps to <cite>sklearn.metrics.average_precision_score</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -743,7 +747,7 @@ True.</p>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+17c6d16 ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+17c6d16 ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+5f2736b ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+5f2736b ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>

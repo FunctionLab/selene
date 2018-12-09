@@ -251,6 +251,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">precision_recall_curve</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_curve</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">r2_score</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;selene&quot;</span><span class="p">)</span>
@@ -441,11 +442,11 @@
     <span class="n">feature_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feature_preds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
         <span class="n">feature_targets</span> <span class="o">=</span> <span class="n">target</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> \
-                <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">report_gt_feature_n_positives</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+               <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">report_gt_feature_n_positives</span><span class="p">:</span>
             <span class="n">feature_scores</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric_fn</span><span class="p">(</span>
                 <span class="n">feature_targets</span><span class="p">,</span> <span class="n">feature_preds</span><span class="p">)</span>
-    <span class="n">valid_feature_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">feature_scores</span> <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">valid_feature_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">feature_scores</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">s</span><span class="p">)]</span> <span class="c1"># Allow 0 or negative values.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_feature_scores</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">feature_scores</span>
     <span class="n">average_score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">valid_feature_scores</span><span class="p">)</span>
@@ -477,7 +478,7 @@
     <span class="n">feature_score_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
         <span class="n">feature</span> <span class="o">=</span> <span class="n">get_feature_from_index_fn</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">score</span><span class="p">):</span>
             <span class="n">feature_score_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">feature_score_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -497,6 +498,13 @@
 <span class="sd">    report_gt_feature_n_positives : int, optional</span>
 <span class="sd">        Default is 10. The minimum number of positive examples for a</span>
 <span class="sd">        feature in order to compute the score for it.</span>
+<span class="sd">    metrics : dict</span>
+<span class="sd">        A dictionary that maps metric names (`str`) to metric functions.</span>
+<span class="sd">        By default, this contains `&quot;roc_auc&quot;`, which maps to</span>
+<span class="sd">        `sklearn.metrics.roc_auc_score`, and `&quot;average_precision&quot;`,</span>
+<span class="sd">        which maps to `sklearn.metrics.average_precision_score`.</span>
+
+
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -516,16 +524,16 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">get_feature_from_index_fn</span><span class="p">,</span>
-                 <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+                 <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                 <span class="n">metrics</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">average_precision</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new object of the `PerformanceMetrics` class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skip_threshold</span> <span class="o">=</span> <span class="n">report_gt_feature_n_positives</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_feature_from_index</span> <span class="o">=</span> <span class="n">get_feature_from_index_fn</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;roc_auc&quot;</span><span class="p">:</span> <span class="n">Metric</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[]),</span>
-            <span class="s2">&quot;average_precision&quot;</span><span class="p">:</span> <span class="n">Metric</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[])</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Metric</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">v</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[])</span>
 
 <div class="viewcode-block" id="PerformanceMetrics.add_metric"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics.add_metric">[docs]</a>    <span class="k">def</span> <span class="nf">add_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">metric_fn</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -670,7 +678,7 @@
             <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">metric_scores</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">feature_scores</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_scores</span><span class="p">:</span>
-                    <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="s2">NA</span><span class="se">\t</span><span class="s2">NA</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="p">))</span>
+                    <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;NA&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_cols</span><span class="p">))))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">metric_score_cols</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                         <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">metric_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>

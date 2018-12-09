@@ -248,7 +248,7 @@
 <h2>TrainModel<a class="headerlink" href="#trainmodel" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.TrainModel">
-<em class="property">class </em><code class="descclassname">selene_sdk.</code><code class="descname">TrainModel</code><span class="sig-paren">(</span><em>model</em>, <em>data_sampler</em>, <em>loss_criterion</em>, <em>optimizer_class</em>, <em>optimizer_kwargs</em>, <em>batch_size</em>, <em>max_steps</em>, <em>report_stats_every_n_steps</em>, <em>output_dir</em>, <em>save_checkpoint_every_n_steps=1000</em>, <em>report_gt_feature_n_positives=10</em>, <em>n_validation_samples=None</em>, <em>n_test_samples=None</em>, <em>cpu_n_threads=32</em>, <em>use_cuda=False</em>, <em>data_parallel=False</em>, <em>logging_verbosity=2</em>, <em>checkpoint_resume=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.</code><code class="descname">TrainModel</code><span class="sig-paren">(</span><em>model</em>, <em>data_sampler</em>, <em>loss_criterion</em>, <em>optimizer_class</em>, <em>optimizer_kwargs</em>, <em>batch_size</em>, <em>max_steps</em>, <em>report_stats_every_n_steps</em>, <em>output_dir</em>, <em>save_checkpoint_every_n_steps=1000</em>, <em>report_gt_feature_n_positives=10</em>, <em>n_validation_samples=None</em>, <em>n_test_samples=None</em>, <em>cpu_n_threads=32</em>, <em>use_cuda=False</em>, <em>data_parallel=False</em>, <em>logging_verbosity=2</em>, <em>checkpoint_resume=None</em>, <em>metrics={'average_precision': &lt;function average_precision_score&gt;</em>, <em>'roc_auc': &lt;function roc_auc_score&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class ties together the various objects and methods needed to
 train and validate a model.</p>
@@ -297,10 +297,10 @@ using <cite>torch.load</cite>.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+17c6d16 ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+5f2736b ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
 <li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</li>
 <li><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</li>
-<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.0.0a0+17c6d16 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
+<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.0.0a0+5f2736b ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batch to use during training.</li>
 <li><strong>max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</li>
 <li><strong>nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to report summary statistics.</li>
@@ -309,6 +309,10 @@ using <cite>torch.load</cite>.</li>
 <li><strong>data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</li>
 <li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The directory to save model checkpoints and logs.</li>
 <li><strong>training_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – The current training loss.</li>
+<li><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
+By default, this contains <cite>“roc_auc”</cite>, which maps to
+<cite>sklearn.metrics.roc_auc_score</cite>, and <cite>“average_precision”</cite>,
+which maps to <cite>sklearn.metrics.average_precision_score</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -403,7 +407,7 @@ Should be a power of 2.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+17c6d16 ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.0.0a0+5f2736b ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
 <li><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</li>
 <li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</li>
 <li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</li>
