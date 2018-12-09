@@ -13,6 +13,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import average_precision_score
 
 from .utils import initialize_logger
 from .utils import load_model_from_state_dict
@@ -162,6 +164,11 @@ class TrainModel(object):
         The directory to save model checkpoints and logs.
     training_loss : list(float)
         The current training loss.
+    metrics : dict
+        A dictionary that maps metric names (`str`) to metric functions.
+        By default, this contains `"roc_auc"`, which maps to
+        `sklearn.metrics.roc_auc_score`, and `"average_precision"`,
+        which maps to `sklearn.metrics.average_precision_score`.
 
     """
 
@@ -184,7 +191,9 @@ class TrainModel(object):
                  use_cuda=False,
                  data_parallel=False,
                  logging_verbosity=2,
-                 checkpoint_resume=None):
+                 checkpoint_resume=None,
+                 metrics=dict(roc_auc=roc_auc_score,
+                              average_precision=average_precision_score)):
         """
         Constructs a new `TrainModel` object.
         """
@@ -236,12 +245,16 @@ class TrainModel(object):
         self._create_validation_set(n_samples=n_validation_samples)
         self._validation_metrics = PerformanceMetrics(
             self.sampler.get_feature_from_index,
-            report_gt_feature_n_positives=report_gt_feature_n_positives)
+            report_gt_feature_n_positives=report_gt_feature_n_positives,
+            metrics=metrics)
 
         if "test" in self.sampler.modes:
             self._test_data = None
             self._n_test_samples = n_test_samples
-            self._report_gt_feature_n_positives = report_gt_feature_n_positives
+            self._test_metrics = PerformanceMetrics(
+                self.sampler.get_feature_from_index,
+                report_gt_feature_n_positives=report_gt_feature_n_positives,
+                metrics=metrics)
 
         self._start_step = 0
         self._min_loss = float("inf") # TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.
@@ -278,7 +291,8 @@ class TrainModel(object):
         self._train_logger.info("loss")
         # TODO: this makes the assumption that all models will report ROC AUC,
         # which is not the case.
-        self._validation_logger.info("loss\troc_auc")
+        self._validation_logger.info("\t".join(["loss"] +
+            sorted([x for x in self._validation_metrics.metrics.keys()])))
 
     def _create_validation_set(self, n_samples=None):
         """
@@ -312,27 +326,11 @@ class TrainModel(object):
         evaluated.
 
         """
-        self._create_test_set(n_samples=self._n_test_samples)
-        self._test_metrics = PerformanceMetrics(
-            self.sampler.get_feature_from_index,
-            report_gt_feature_n_positives=self._report_gt_feature_n_positives)
-
-    def _create_test_set(self, n_samples=None):
-        """
-        Generates the set of test examples.
-
-        Parameters
-        ----------
-        n_samples : int or None, optional
-            Default is `None`. The size of the test set to generate. If
-            `None`, will use all test examples in the sampler.
-
-        """
         logger.info("Creating test dataset.")
         t_i = time()
         self._test_data, self._all_test_targets = \
             self.sampler.get_test_set(
-                self.batch_size, n_samples=n_samples)
+                self.batch_size, n_samples=self._n_test_samples)
         t_f = time()
         logger.info(("{0} s to load {1} test examples ({2} test batches) "
                      "to evaluate after all training steps.").format(
@@ -409,16 +407,14 @@ class TrainModel(object):
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
                 self._train_logger.info(train_loss)
-                if "roc_auc" in valid_scores and valid_scores["roc_auc"]:
-                    validation_roc_auc = valid_scores["roc_auc"]
-                    self._validation_logger.info(
-                        "{0}\t{1}".format(validation_loss,
-                                          validation_roc_auc))
-                    scheduler.step(
-                        math.ceil(validation_roc_auc * 1000.0) / 1000.0)
-                else:
-                    self._validation_logger.info("{0}\tNA".format(
-                        validation_loss))
+                to_log = [str(validation_loss)]
+                for k in sorted(self._validation_metrics.metrics.keys()):
+                    if k in valid_scores and valid_scores[k]:
+                        to_log.append(str(valid_scores[k]))
+                    else:
+                        to_log.append("NA")
+                self._validation_logger.info("\t".join(to_log))
+                scheduler.step(math.ceil(validation_loss * 1000.0) / 1000.0)
 
                 if validation_loss < min_loss:
                     min_loss = validation_loss

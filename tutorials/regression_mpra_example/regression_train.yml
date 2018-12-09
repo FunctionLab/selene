@@ -1,0 +1,51 @@
+---
+ops: [train, evaluate]
+model: {
+    file: /absolute/path/to/selene_sdk/tutorials/regression_mpra_example/utr_model.py,
+    class: UTRModel,
+    sequence_length: 50,
+    n_classes_to_predict: 1,
+    non_strand_specific: {
+        use_module: False
+    }
+}
+sampler: !obj:selene_sdk.samplers.MultiFileSampler {
+    features: ["MRL"],
+    train_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+        filepath: ./train.mat,
+        sequence_key: x,
+        targets_key: y,
+        shuffle: True
+    },
+    validate_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+        filepath: ./validate.mat,
+        sequence_key: x,
+        targets_key: y,
+        shuffle: False
+    },
+    test_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+        filepath: ./test.mat,
+        sequence_key: x,
+        targets_key: y,
+        shuffle: False
+    }
+}
+train_model: !obj:selene_sdk.TrainModel {
+    batch_size: 128,
+    max_steps: 8124,
+    report_gt_feature_n_positives: 0,
+    report_stats_every_n_steps: 2031,
+    n_validation_samples: 20000,
+    save_checkpoint_every_n_steps: 2031,
+    n_test_samples: 20000,
+    use_cuda: True,
+    data_parallel: False,
+    logging_verbosity: 2,
+    metrics: {
+        r2: !import:sklearn.metrics.r2_score
+    }
+}
+output_dir: ./
+random_seed: 1337
+create_subdirectory: True
+...

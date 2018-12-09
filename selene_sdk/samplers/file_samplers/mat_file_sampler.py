@@ -251,5 +251,5 @@ class MatFileSampler(FileSampler):
         sequences_and_targets.append((seqs, tgts))
         targets_mat.append(tgts)
         # TODO: should not assume targets are always integers
-        targets_mat = np.vstack(targets_mat).astype(int)
+        targets_mat = np.vstack(targets_mat).astype(float)
         return sequences_and_targets, targets_mat
