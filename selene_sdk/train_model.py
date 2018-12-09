@@ -526,7 +526,7 @@ class TrainModel(object):
         average_scores = self._validation_metrics.update(all_predictions,
                                                          self._all_validation_targets)
         for name, score in average_scores.items():
-            logger.info("validation average {0}: {1}".format(name, score))
+            logger.info("validation {0}: {1}".format(name, score))
 
         average_scores["loss"] = average_loss
         return average_scores
@@ -555,7 +555,7 @@ class TrainModel(object):
             data=all_predictions)
 
         for name, score in average_scores.items():
-            logger.info("test average {0}: {1}".format(name, score))
+            logger.info("test {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")

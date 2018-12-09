@@ -1,7 +1,7 @@
 ---
 ops: [train, evaluate]
 model: {
-    path: /absolute/path/to/selene_sdk/tutorials/regression_mpra_example/utr_model.py,
+    path: <ABSOLUTE_PATH>/tutorials/regression_mpra_example/utr_model.py, 
     class: UTRModel,
     class_args: {
         sequence_length: 50,
