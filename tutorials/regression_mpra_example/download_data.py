@@ -1,9 +1,10 @@
 import io
 import gzip
 import os
-import urllib
+import urllib.request
 import tarfile
 
+import numpy
 import pandas
 import scipy.io
 import selene_sdk.sequences
@@ -14,7 +15,7 @@ def run():
     local_file = "sample_et_al.tar"
 
     # Download the data.
-    urllib.retrieve("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE114002&format=file", local_file)
+    urllib.request.urlretrieve("https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE114002&format=file", local_file)
     with tarfile.open(local_file, "r") as archive:
         contents = archive.extractfile("GSM3130435_egfp_unmod_1.csv.gz").read()
         contents = gzip.decompress(contents).decode("utf-8")
