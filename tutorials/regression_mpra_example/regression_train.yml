@@ -45,7 +45,7 @@ train_model: !obj:selene_sdk.TrainModel {
         r2: !import:sklearn.metrics.r2_score
     }
 }
-output_dir: ./training_outputs
+output_dir: ./
 random_seed: 1337
 create_subdirectory: True
 ...
