@@ -11,6 +11,7 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
+from sklearn.metrics import r2_score
 
 
 logger = logging.getLogger("selene")
@@ -201,11 +202,11 @@ def compute_score(prediction, target, metric_fn,
     feature_scores = np.ones(target.shape[1]) * -1
     for index, feature_preds in enumerate(prediction.T):
         feature_targets = target[:, index]
-        if len(np.unique(feature_targets)) > 1 and \
-                np.sum(feature_targets) > report_gt_feature_n_positives:
+        if len(np.unique(feature_targets)) > 0 and \
+               np.count_nonzero(feature_targets) > report_gt_feature_n_positives:
             feature_scores[index] = metric_fn(
                 feature_targets, feature_preds)
-    valid_feature_scores = [s for s in feature_scores if s >= 0]
+    valid_feature_scores = [s for s in feature_scores if not np.isnan(s)] # Allow 0 or negative values.
     if not valid_feature_scores:
         return None, feature_scores
     average_score = np.average(valid_feature_scores)
@@ -237,7 +238,7 @@ def get_feature_specific_scores(data, get_feature_from_index_fn):
     feature_score_dict = {}
     for index, score in enumerate(data):
         feature = get_feature_from_index_fn(index)
-        if score >= 0:
+        if not np.isnan(score):
             feature_score_dict[feature] = score
         else:
             feature_score_dict[feature] = None
@@ -257,6 +258,13 @@ class PerformanceMetrics(object):
     report_gt_feature_n_positives : int, optional
         Default is 10. The minimum number of positive examples for a
         feature in order to compute the score for it.
+    metrics : dict
+        A dictionary that maps metric names (`str`) to metric functions.
+        By default, this contains `"roc_auc"`, which maps to
+        `sklearn.metrics.roc_auc_score`, and `"average_precision"`,
+        which maps to `sklearn.metrics.average_precision_score`.
+
+
 
     Attributes
     ----------
@@ -276,16 +284,16 @@ class PerformanceMetrics(object):
 
     def __init__(self,
                  get_feature_from_index_fn,
-                 report_gt_feature_n_positives=10):
+                 report_gt_feature_n_positives=10,
+                 metrics=dict(roc_auc=roc_auc_score, average_precision=average_precision_score)):
         """
         Creates a new object of the `PerformanceMetrics` class.
         """
         self.skip_threshold = report_gt_feature_n_positives
         self.get_feature_from_index = get_feature_from_index_fn
-        self.metrics = {
-            "roc_auc": Metric(fn=roc_auc_score, data=[]),
-            "average_precision": Metric(fn=average_precision_score, data=[])
-        }
+        self.metrics = dict()
+        for k, v in metrics.items():
+            self.metrics[k] = Metric(fn=v, data=[])
 
     def add_metric(self, name, metric_fn):
         """
@@ -430,7 +438,7 @@ class PerformanceMetrics(object):
             file_handle.write("{0}\n".format(cols))
             for feature, metric_scores in sorted(feature_scores.items()):
                 if not metric_scores:
-                    file_handle.write("{0}\tNA\tNA\n".format(feature))
+                    file_handle.write("{0}\t{1}\n".format(feature, "\t".join(["NA"] * len(metric_cols))))
                 else:
                     metric_score_cols = '\t'.join(
                         ["{0:.4f}".format(s) for s in metric_scores.values()])
