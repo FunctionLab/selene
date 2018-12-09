@@ -2,18 +2,19 @@
 ops: [train, evaluate]
 model: {
     # TODO: update this line with the absolute path to the file.
-    file: /absolute/path/to/selene_sdk/tutorials/quickstart_training/deeperdeepsea.py,
+    path: <ABSOLUTE_PATH>/tutorials/getting_started_with_selene/deeperdeepsea.py,
     class: DeeperDeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 1,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        sequence_length: 1000,
+        n_targets: 1,
+    },
+    non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     reference_sequence: !obj:selene_sdk.sequences.Genome {
-        input_path: ./hg19.fasta
+        # we include relative paths here, but we recommend using absolute
+        # paths for future configuration files
+        input_path: ./male.hg19.fasta
     },
     features: !obj:selene_sdk.utils.load_features_list {
         input_path: ./distinct_features.txt
@@ -24,15 +25,15 @@ sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     # A positive example is an 1000bp sequence with at least 1 class/feature annotated to it.
     # A negative sample has no classes/features annotated to the sequence.
     sample_negative: True,
-    test_holdout: [chr8, chr9],
-    validation_holdout: [chr6, chr7],
     sequence_length: 1000,
     center_bin_to_predict: 200,
+    test_holdout: [chr8, chr9],
+    validation_holdout: [chr6, chr7],
     # The feature must take up 50% of the bin (200bp) for it to be considered
     # a feature annotated to that sequence.
     feature_thresholds: 0.5,
     mode: train,
-    save_datasets: [test]
+    save_datasets: [validate, test]
 }
 train_model: !obj:selene_sdk.TrainModel {
     batch_size: 64,
@@ -41,9 +42,10 @@ train_model: !obj:selene_sdk.TrainModel {
     n_validation_samples: 32000,
     n_test_samples: 120000,
     cpu_n_threads: 32,
-    use_cuda: True  # TODO: update this if CUDA is not on your machine
+    use_cuda: True,  # TODO: update this if CUDA is not on your machine
+    data_parallel: False
 }
-output_dir: ./training_outputs
 random_seed: 1447
+output_dir: ./training_outputs
 create_subdirectory: False
 ...
