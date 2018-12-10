@@ -9,7 +9,11 @@ Additionally, we have two tutorials that show how to apply trained models. Selen
 
 - Comprehensive _in silico_ mutagenesis tutorial: [`analyzing_mutations_with_trained_models`](https://github.com/FunctionLab/selene/tree/master/tutorials/analyzing_mutations_with_trained_models)
 - Tutorial with both the config file method and the non-config file method of running Selene. Also shows how to run variant effect prediction and visualize the difference scores. Contains an _in silico_ mutagenesis example with known regulatory mutations: [`variants_and_visualizations`](https://github.com/FunctionLab/selene/tree/master/tutorials/variants_and_visualizations)
-- Tutorial demonstrating Selene's use to predict mean ribosomal load based on 5' UTR sequences: [`regression_mpra_example`](https://github.com/FunctionLab/selene/tree/master/tutorials/regression_mpra_example)
+
+We also have a tutorial demonstrating Selene's use to predict mean ribosomal load based on 5' UTR sequences: [`regression_mpra_example`](https://github.com/FunctionLab/selene/tree/master/tutorials/regression_mpra_example). This is a good follow-up tutorial to the Getting Started tutorial if you are interested in training a regression model using Selene. It also shows how to run Selene with another model architecture. 
+
+## Additional note
+The log statements printed in the training tutorials are from running the tutorials on a CUDA-enabled machine. Run times will be far longer (as described in the [repository README](https://github.com/FunctionLab/selene)) if you are running them only on CPU.
 
 ## Contributing tutorials
 
