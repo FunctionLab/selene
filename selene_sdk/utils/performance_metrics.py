@@ -11,7 +11,6 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
-from sklearn.metrics import r2_score
 
 
 logger = logging.getLogger("selene")
