@@ -13,7 +13,7 @@ Additionally, we have two tutorials that show how to apply trained models. Selen
 We also have a tutorial demonstrating Selene's use to predict mean ribosomal load based on 5' UTR sequences: [`regression_mpra_example`](https://github.com/FunctionLab/selene/tree/master/tutorials/regression_mpra_example). This is a good follow-up tutorial to the Getting Started tutorial if you are interested in training a regression model using Selene. It also shows how to run Selene with another model architecture. 
 
 ## Additional note
-The log statements printed in the training tutorials are from running the tutorials on a CUDA-enabled machine. Run times will be far longer (as described in the [repository README](https://github.com/FunctionLab/selene)) if you are running them only on CPU.
+The log statements printed in the training tutorials are from running the tutorials on a CUDA-enabled machine. Run times will be far longer (as described in the [repository README](https://github.com/FunctionLab/selene#tutorials)) if you are running them only on CPU.
 
 ## Contributing tutorials
 
