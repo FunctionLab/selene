@@ -277,7 +277,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         if close_filehandle:
             file_handle.close()
 
-    def get_data_and_targets(self, batch_size, n_samples, mode=None):
+    def get_data_and_targets(self, batch_size, n_samples=None, mode=None):
         """
         This method fetches a subset of the data from the sampler,
         divided into batches. This method also allows the user to
@@ -288,8 +288,12 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         ----------
         batch_size : int
             The size of the batches to divide the data into.
-        n_samples : int
-            The total number of samples to retrieve.
+        n_samples : int or None, optional
+            Default is None. The total number of samples to retrieve.
+            If `n_samples` is None and the mode is `validate`, will
+            set `n_samples` to 32000; if the mode is `test`, will set
+            `n_samples` to 640000 if it is None. If the mode is `train`
+            you must have specified a value for `n_samples`.
         mode : str, optional
             Default is None. The mode to run the sampler in when
             fetching the samples. See
@@ -314,7 +318,13 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         """
         if mode is not None:
             self.set_mode(mode)
+        else:
+            mode = self.mode
         sequences_and_targets = []
+        if n_samples is None and mode == "validate":
+            n_samples = 32000
+        elif n_samples is None and mode == "test":
+            n_samples = 640000
 
         n_batches = int(n_samples / batch_size)
         for _ in range(n_batches):
@@ -332,7 +342,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         Parameters
         ----------
-        mode : str
+        mode : {'test', 'validate'}
             The mode to run the sampler in when fetching the samples.
             See `selene_sdk.samplers.IntervalsSampler.modes` for more
             information.
@@ -359,11 +369,8 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             `target_matrix` is of the shape :math:`S \\times F`
 
         """
-        if not n_samples and mode == "validate":
-            n_samples = 32000
-        elif not n_samples:
-            n_samples = 640000
-        return self.get_data_and_targets(batch_size, n_samples, mode=mode)
+        return self.get_data_and_targets(
+            batch_size, n_samples=n_samples, mode=mode)
 
     def get_validation_set(self, batch_size, n_samples=None):
         """
