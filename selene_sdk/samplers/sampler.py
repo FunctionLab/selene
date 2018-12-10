@@ -111,7 +111,7 @@ class Sampler(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_data_and_targets(self, mode, batch_size, n_samples):
+    def get_data_and_targets(self, batch_size, n_samples, mode=None):
         """
         This method fetches a subset of the data from the sampler,
         divided into batches. This method also allows the user to
@@ -120,12 +120,13 @@ class Sampler(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mode : str
-            The operating mode that the object should run in.
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int
             The total number of samples to retrieve.
+        mode : str, optional
+            Default is None. The operating mode that the object should run in.
+            If None, will use the current mode `self.mode`.
 
         """
         raise NotImplementedError()

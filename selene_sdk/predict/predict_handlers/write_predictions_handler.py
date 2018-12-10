@@ -31,7 +31,7 @@ class WritePredictionsHandler(PredictionsHandler):
 
         super(WritePredictionsHandler).__init__()
 
-        self.needs_base_pred = True
+        self.needs_base_pred = False
         self._results = []
         self._samples = []
         self._NA_samples = []

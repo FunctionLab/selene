@@ -25,6 +25,9 @@ class MultiFileSampler(Sampler):
         The list of features the model should predict
     test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
         Default is None. The test file sampler is optional.
+    mode : str, optional
+        Default is "train". Must be one of `{train, validate, test}`. The
+        starting mode in which to run the sampler.
     save_datasets : list(str), optional
         Default is None. Currently, we are only including these parameters
         so that `MultiFileSampler` is consistent with `Sampler`. The save
@@ -48,6 +51,7 @@ class MultiFileSampler(Sampler):
                  validate_sampler,
                  features,
                  test_sampler=None,
+                 mode="train",
                  save_datasets=[],
                  output_dir=None):
         """
@@ -70,6 +74,8 @@ class MultiFileSampler(Sampler):
         if test_sampler is not None:
             self.modes.append("test")
             self._samplers["test"] = test_sampler
+
+        self.mode = mode
 
     def set_mode(self, mode):
         """
@@ -124,7 +130,7 @@ class MultiFileSampler(Sampler):
         """
         return self._samplers[self.mode].sample(batch_size)
 
-    def get_data_and_targets(self, mode, batch_size, n_samples):
+    def get_data_and_targets(self, batch_size, n_samples, mode=None):
         """
         This method fetches a subset of the data from the sampler,
         divided into batches. This method also allows the user to
@@ -133,14 +139,17 @@ class MultiFileSampler(Sampler):
 
         Parameters
         ----------
-        mode : str
-            The operating mode that the object should run in.
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int
             The total number of samples to retrieve.
+        mode : str, optional
+            Default is None. The operating mode that the sampler
+            should run in. If None, will use the current
+            `self.mode`.
 
         """
+        mode = self.mode
         return self._samplers[mode].get_data_and_targets(
             batch_size, n_samples)
 

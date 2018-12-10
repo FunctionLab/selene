@@ -5,6 +5,7 @@ import logging
 import math
 import os
 import shutil
+from time import strftime
 from time import time
 
 import numpy as np
@@ -38,6 +39,20 @@ class TrainModel(object):
     This class ties together the various objects and methods needed to
     train and validate a model.
 
+    TrainModel saves a checkpoint model (overwriting it after
+    `save_checkpoint_every_n_steps`) as well as a best-performing model
+    (overwriting it after `report_stats_every_n_steps` if the latest
+    validation performance is better than the previous best-performing
+    model) to `output_dir`.
+
+    TrainModel also outputs 2 files that can be used to monitor training
+    as Selene runs: `selene_sdk.train_model.train.txt` (training loss) and
+    `selene_sdk.train_model.validation.txt` (validation loss & average
+    ROC AUC). The columns in these files can be used to quickly visualize
+    training history (e.g. you can use `matplotlib`, `plt.plot(auc_list)`)
+    and see, for example, whether the model is still improving, if there are
+    signs of overfitting, etc.
+
     Parameters
     ----------
     model : torch.nn.Module
@@ -56,38 +71,68 @@ class TrainModel(object):
     max_steps : int
         The maximum number of mini-batches to iterate over.
     report_stats_every_n_steps : int
-        The frequency with which to report summary statistics.
+        The frequency with which to report summary statistics. You can
+        set this value to be equivalent to a training epoch
+        (`n_steps * batch_size`) being the total number of samples
+        seen by the model so far. Selene evaluates the model on the validation
+        dataset every `report_stats_every_n_steps` and, if the model obtains
+        the best performance so far (based on the user-specified loss function),
+        Selene saves the model state to a file called `best_model.pth.tar` in
+        `output_dir`.
     output_dir : str
         The output directory to save model checkpoints and logs in.
     save_checkpoint_every_n_steps : int or None, optional
         Default is 1000. If None, set to the same value as
         `report_stats_every_n_steps`
+    save_new_checkpoints_after_n_steps : int or None, optional
+        Default is None. The number of steps after which Selene will
+        continually save new checkpoint model weights files
+        (`checkpoint-<TIMESTAMP>.pth.tar`) every
+        `save_checkpoint_every_n_steps`. Before this point,
+        the file `checkpoint.pth.tar` is overwritten every
+        `save_checkpoint_every_n_steps` to limit the memory requirements.
     n_validation_samples : int or None, optional
         Default is `None`. Specify the number of validation samples in the
         validation set. If `n_validation_samples` is `None` and the data sampler
         used is the `selene_sdk.samplers.IntervalsSampler` or
         `selene_sdk.samplers.RandomSampler`, we will retrieve 32000
         validation samples. If `None` and using
-        `selene_sdk.samplers.MatFileSampler`, we will use all
-        validation samples in the matrix.
+        `selene_sdk.samplers.MultiFileSampler`, we will use all
+        available validation samples from the appropriate data file.
     n_test_samples : int or None, optional
         Default is `None`. Specify the number of test samples in the test set.
-        If `n_test_samples` is `None` and the data sampler used is the
-        `selene_sdk.samplers.IntervalsSampler`, the size of the test set is
-        the number of test intervals we can sample from. If
-        `None` and using `selene_sdk.samplers.RandomSampler`, the size is
-        :math:`\\frac{N}{20}`, where :math:`N` is the number of possible
-        positions in the test partition of the genome. If  `None` and
-        using `selene_sdk.samplers.MatFileSampler`, we will use all
-        test samples in the matrix.
+        If `n_test_samples` is `None` and
+
+            - the sampler you specified has no test partition, you should not
+              specify `evaluate` as one of the operations in the `ops` list.
+              That is, Selene will not automatically evaluate your trained
+              model on a test dataset, because the sampler you are using does
+              not have any test data.
+            - the sampler you use is of type `selene_sdk.samplers.OnlineSampler`
+              (and the test partition exists), we will retrieve 640000 test
+              samples.
+            - the sampler you use is of type
+              `selene_sdk.samplers.MultiFileSampler` (and the test partition
+              exists), we will use all the test samples available in the
+              appropriate data file.
+
     cpu_n_threads : int, optional
-        Default is 32.
+        Default is 1. Sets the number of OpenMP threads used for parallelizing
+        CPU operations.
     use_cuda : bool, optional
-        Default is `False`. Specify whether CUDA is available for torch
-        to use during training.
+        Default is `False`. Specify whether a CUDA-enabled GPU is available
+        for torch to use during training.
     data_parallel : bool, optional
         Default is `False`. Specify whether multiple GPUs are available
         for torch to use during training.
+    logging_verbosity : {0, 1, 2}, optional
+        Default is 2. Set the logging verbosity level.
+
+            * 0 - Only warnings will be logged.
+            * 1 - Information and warnings will be logged.
+            * 2 - Debug messages, information, and warnings will all be\
+                  logged.
+
     checkpoint_resume : str or None, optional
         Default is `None`. If `checkpoint_resume` is not None, it should be the
         path to a model file generated by `torch.save` that can now be read
@@ -138,10 +183,11 @@ class TrainModel(object):
                  report_stats_every_n_steps,
                  output_dir,
                  save_checkpoint_every_n_steps=1000,
+                 save_new_checkpoints_after_n_steps=None,
                  report_gt_feature_n_positives=10,
                  n_validation_samples=None,
                  n_test_samples=None,
-                 cpu_n_threads=32,
+                 cpu_n_threads=1,
                  use_cuda=False,
                  data_parallel=False,
                  logging_verbosity=2,
@@ -165,6 +211,15 @@ class TrainModel(object):
             self.nth_step_save_checkpoint = report_stats_every_n_steps
         else:
             self.nth_step_save_checkpoint = save_checkpoint_every_n_steps
+
+        self.save_new_checkpoints = save_new_checkpoints_after_n_steps
+
+        logger.info("Training parameters set: batch size {0}, "
+                    "number of steps per 'epoch': {1}, "
+                    "maximum number of steps: {2}".format(
+                        self.batch_size,
+                        self.nth_step_report_stats,
+                        self.max_steps))
 
         torch.set_num_threads(cpu_n_threads)
 
@@ -194,7 +249,8 @@ class TrainModel(object):
             metrics=metrics)
 
         if "test" in self.sampler.modes:
-            self._create_test_set(n_samples=n_test_samples)
+            self._test_data = None
+            self._n_test_samples = n_test_samples
             self._test_metrics = PerformanceMetrics(
                 self.sampler.get_feature_from_index,
                 report_gt_feature_n_positives=report_gt_feature_n_positives,
@@ -211,8 +267,8 @@ class TrainModel(object):
                 checkpoint["state_dict"], self.model)
 
             self._start_step = checkpoint["step"]
-            if self._start_step >= self.max_step:
-                self.max_step += self._start_step
+            if self._start_step >= self.max_steps:
+                self.max_steps += self._start_step
 
             self._min_loss = checkpoint["min_loss"]
             self.optimizer.load_state_dict(
@@ -249,6 +305,7 @@ class TrainModel(object):
             will use all validation examples in the sampler.
 
         """
+        logger.info("Creating validation dataset.")
         t_i = time()
         self._validation_data, self._all_validation_targets = \
             self.sampler.get_validation_set(
@@ -260,22 +317,20 @@ class TrainModel(object):
                       len(self._validation_data) * self.batch_size,
                       len(self._validation_data)))
 
-    # TODO: Determine if we can somehow combine testing and validation set creation methods.
-    def _create_test_set(self, n_samples=None):
+    def create_test_set(self):
         """
-        Generates the set of test examples.
-
-        Parameters
-        ----------
-        n_samples : int or None, optional
-            Default is `None`. The size of the test set to generate. If
-            `None`, will use all test examples in the sampler.
+        Loads the set of test samples.
+        We do not create the test set in the `TrainModel` object until
+        this method is called, so that we avoid having to load it into
+        memory until the model has been trained and is ready to be
+        evaluated.
 
         """
+        logger.info("Creating test dataset.")
         t_i = time()
         self._test_data, self._all_test_targets = \
             self.sampler.get_test_set(
-                self.batch_size, n_samples=n_samples)
+                self.batch_size, n_samples=self._n_test_samples)
         t_f = time()
         logger.info(("{0} s to load {1} test examples ({2} test batches) "
                      "to evaluate after all training steps.").format(
@@ -311,19 +366,44 @@ class TrainModel(object):
         Trains the model and measures validation performance.
 
         """
-        logger.info(
-            ("[TRAIN] max_steps: {0}, batch_size: {1}").format(
-                self.max_steps, self.batch_size))
-
         min_loss = self._min_loss
         scheduler = ReduceLROnPlateau(
             self.optimizer, 'max', patience=16, verbose=True,
             factor=0.8)
+
+        time_per_step = []
         for step in range(self._start_step, self.max_steps):
+            t_i = time()
             train_loss = self.train()
+            t_f = time()
+            time_per_step.append(t_f - t_i)
+
+            if step % self.nth_step_save_checkpoint == 0:
+                checkpoint_dict = {
+                    "step": step,
+                    "arch": self.model.__class__.__name__,
+                    "state_dict": self.model.state_dict(),
+                    "min_loss": min_loss,
+                    "optimizer": self.optimizer.state_dict()
+                }
+                if self.save_new_checkpoints is not None and \
+                        self.save_new_checkpoints >= step:
+                    checkpoint_filename = "checkpoint-{0}".format(
+                        strftime("%m%d%H%M%S"))
+                    self._save_checkpoint(
+                        checkpoint_dict, False, filename=checkpoint_filename)
+                    logger.debug("Saving checkpoint `{0}.pth.tar`".format(
+                        checkpoint_filename))
+                else:
+                    self._save_checkpoint(
+                        checkpoint_dict, False)
 
             # TODO: Should we have some way to report training stats without running validation?
             if step and step % self.nth_step_report_stats == 0:
+                logger.info(("[STEP {0}] average number "
+                             "of steps per second: {1:.1f}").format(
+                    step, 1. / np.average(time_per_step)))
+                time_per_step = []
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
                 self._train_logger.info(train_loss)
@@ -336,29 +416,20 @@ class TrainModel(object):
                 self._validation_logger.info("\t".join(to_log))
                 scheduler.step(math.ceil(validation_loss * 1000.0) / 1000.0)
 
-                is_best = validation_loss < min_loss
-                min_loss = min(validation_loss, min_loss)
-                self._save_checkpoint({
-                    "step": step,
-                    "arch": self.model.__class__.__name__,
-                    "state_dict": self.model.state_dict(),
-                    "min_loss": min_loss,
-                    "optimizer": self.optimizer.state_dict()}, is_best)
-                logger.info(
-                    ("[STATS] step={0}: "
-                     "Training loss: {1}, validation loss: {2}.").format(
-                        step, train_loss, validation_loss)) # Should training loss and validation loss be reported at the same line?
+                if validation_loss < min_loss:
+                    min_loss = validation_loss
+                    self._save_checkpoint({
+                        "step": step,
+                        "arch": self.model.__class__.__name__,
+                        "state_dict": self.model.state_dict(),
+                        "min_loss": min_loss,
+                        "optimizer": self.optimizer.state_dict()}, True)
+                    logger.debug("Updating `best_model.pth.tar`")
+                logger.info("training loss: {0}".format(train_loss))
+                logger.info("validation loss: {0}".format(validation_loss))
+
                 # Logging training and validation on same line requires 2 parsers or more complex parser.
                 # Separate logging of train/validate is just a grep for validation/train and then same parser.
-
-            # Should checkpoint saving occur before validation (if they both occur in the same step) or not?
-            if step % self.nth_step_save_checkpoint == 0:
-                self._save_checkpoint({
-                    "step": step,
-                    "arch": self.model.__class__.__name__,
-                    "state_dict": self.model.state_dict(),
-                    "min_loss": min_loss,
-                    "optimizer": self.optimizer.state_dict()}, False)
         self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
     def train(self):
@@ -375,7 +446,6 @@ class TrainModel(object):
         self.sampler.set_mode("train")
 
         inputs, targets = self._get_batch()
-
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
 
@@ -453,13 +523,10 @@ class TrainModel(object):
         """
         average_loss, all_predictions = self._evaluate_on_data(
             self._validation_data)
-
         average_scores = self._validation_metrics.update(all_predictions,
                                                          self._all_validation_targets)
-
         for name, score in average_scores.items():
-            logger.debug("[STATS] average {0}: {1}".format(name, score))
-            print("[VALIDATE] average {0}: {1}".format(name, score))
+            logger.info("validation {0}: {1}".format(name, score))
 
         average_scores["loss"] = average_loss
         return average_scores
@@ -476,6 +543,8 @@ class TrainModel(object):
             the test set.
 
         """
+        if self._test_data is None:
+            self.create_test_set()
         average_loss, all_predictions = self._evaluate_on_data(
             self._test_data)
 
@@ -486,8 +555,7 @@ class TrainModel(object):
             data=all_predictions)
 
         for name, score in average_scores.items():
-            logger.debug("[STATS] average {0}: {1}".format(name, score))
-            print("[TEST] average {0}: {1}".format(name, score))
+            logger.info("test {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")
@@ -501,36 +569,53 @@ class TrainModel(object):
 
         return (average_scores, feature_scores_dict)
 
-    def _save_checkpoint(self, state, is_best,
-                         dir_path=None,
-                         filename="checkpoint.pth.tar"):
+    def _save_checkpoint(self,
+                         state,
+                         is_best,
+                         filename="checkpoint"):
         """
-        Saves snapshot of the model state to file.
+        Saves snapshot of the model state to file. Will save a checkpoint
+        with name `<filename>.pth.tar` and, if this is the model's best
+        performance so far, will save the state to a `best_model.pth.tar`
+        file as well.
+
+        Models are saved in the state dictionary format. This is a more
+        stable format compared to saving the whole model (which is another
+        option supported by PyTorch). Note that we do save a number of
+        additional, Selene-specific parameters in the dictionary
+        and that the actual `model.state_dict()` is stored in the `state_dict`
+        key of the dictionary loaded by `torch.load`.
+
+        See: https://pytorch.org/docs/stable/notes/serialization.html for more
+        information about how models are saved in PyTorch.
 
         Parameters
         ----------
         state : dict
-            Information about the state of the model
+            Information about the state of the model. Note that this is
+            not `model.state_dict()`, but rather, a dictionary containing
+            keys that can be used for continued training in Selene
+            _in addition_ to a key `state_dict` that contains
+            `model.state_dict()`.
         is_best : bool
             Is this the model's best performance so far?
-        dir_path : str, optional
-            Default is None. Will output file to the current working directory
-            if no path to directory is specified.
         filename : str, optional
-            Default is "checkpoint.pth.tar". Specify the checkpoint filename.
+            Default is "checkpoint". Specify the checkpoint filename. Will
+            append a file extension to the end of the `filename`
+            (e.g. `checkpoint.pth.tar`).
 
         Returns
         -------
         None
 
         """
-        logger.info("[TRAIN] {0}: Saving model state to file.".format(
+        logger.debug("[TRAIN] {0}: Saving model state to file.".format(
             state["step"]))
         cp_filepath = os.path.join(
             self.output_dir, filename)
-        torch.save(state, cp_filepath)
+        torch.save(state, "{0}.pth.tar".format(cp_filepath))
         if is_best:
-            best_filepath = os.path.join(
-                self.output_dir,
-                "best_model.pth.tar")
-            shutil.copyfile(cp_filepath, best_filepath)
+            best_filepath = os.path.join(self.output_dir, "best_model")
+            shutil.copyfile("{0}.pth.tar".format(cp_filepath),
+                            "{0}.pth.tar".format(best_filepath))
+

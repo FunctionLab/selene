@@ -53,7 +53,7 @@ def criterion():
     """
     The loss function to be optimized.
     """
-    return nn.MSELoss(size_average=True, reduce=True)
+    return nn.MSELoss(reduction='elementwise_mean')
 
 
 def get_optimizer(lr):

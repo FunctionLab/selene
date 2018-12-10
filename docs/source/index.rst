@@ -17,7 +17,8 @@ The Github repository is located `here <https://github.com/FunctionLab/selene>`_
    overview/overview
    overview/installation
    overview/tutorials
-   overview/extending
+   overview/cli
+   overview/faq
 
 .. toctree::
    :maxdepth: 1

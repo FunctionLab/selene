@@ -1,14 +1,13 @@
 ---
 ops: [train, evaluate]
 model: {
-    file: <ABSOLUTE_PATH>/selene/manuscript/case2/deeper_deepsea_arch.py,
+    path: <ABSOLUTE_PATH>/selene/manuscript/case2/deeper_deepsea_arch.py,
     class: DeeperDeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 919,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        sequence_length: 1000,
+        n_targets: 919,
+    },
+    non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     reference_sequence: !obj:selene_sdk.sequences.Genome {

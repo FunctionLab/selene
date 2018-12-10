@@ -1,18 +1,18 @@
 ---
 ops: [train, evaluate]
 model: {
-    file: <ABSOLUTE_PATH>/selene/models/deepsea.py,
+    path: <ABSOLUTE_PATH>/selene/models/deepsea.py,
     class: DeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 1,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        sequence_length: 1000,
+        n_genomic_features: 1,
+    },
+    non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     reference_sequence: !obj:selene_sdk.sequences.Genome {
-        input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta
+        input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta,
+        blacklist_regions: hg38
     },
     features: !obj:selene_sdk.utils.load_features_list {
         input_path: <ABSOLUTE_PATH>/selene/manuscript/case1/data/distinct_features.txt

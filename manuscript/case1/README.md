@@ -14,6 +14,10 @@ Any directories mentioned in the README that are not included by default should 
 We have included comments in that file with more information about what is downloaded. 
 You can view the file names and some descriptions at [this Zenodo record](https://doi.org/10.5281/zenodo.1442434) as well.
 
+NOTE: The steps that we provide in this directory use input data that was processed from Cistrome.
+Please consult the methods section in our [manuscript](https://doi.org/10.1101/438291) for a detailed summary of what data processing steps were taken.
+The code to implement these steps can be viewed in `data/process_data.sh` after running `download_data.sh`.
+
 ## Step 1: train and evaluate
 
 We have provided an example SLURM script [`train_and_eval.sh`](https://github.com/FunctionLab/selene/blob/master/manuscript/case1/1_train_and_evaluate/train_and_eval.sh) that shows how we run training and evaluation on a GPU node, where batch computations are carried out on 2 GPU nodes. 
@@ -38,4 +42,4 @@ The outputs from _in silico_ mutagenesis are included in the directory `ism_outp
 ## Step 3: visualize _in silico_ mutagenesis outputs 
 
 Finally, a Jupyter notebook was created to visualize the outputs from _in silico_ mutagenesis. 
-You should be able to run this with no modifications as long as `download_data.sh` was run beforehand. 
+You should be able to run this with no modifications as long as `download_data.sh` was run beforehand.

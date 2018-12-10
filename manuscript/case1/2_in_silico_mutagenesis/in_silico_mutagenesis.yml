@@ -1,14 +1,13 @@
 ---
 ops: [analyze]
 model: {
-    file: <ABSOLUTE_PATH>/selene/models/deepsea.py,
+    path: <ABSOLUTE_PATH>/selene/models/deepsea.py,
     class: DeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 1,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        sequence_length: 1000,
+        n_genomic_features: 1,
+    },
+    non_strand_specific: mean
 }
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     sequence_length: 1000,

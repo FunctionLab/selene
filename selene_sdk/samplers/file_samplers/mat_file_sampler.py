@@ -9,7 +9,7 @@ import scipy.io
 from .file_sampler import FileSampler
 
 
-def load_mat_file(filepath, sequence_key, targets_key=None):
+def _load_mat_file(filepath, sequence_key, targets_key=None):
     """
     Loads data from a `*.mat` file or a `*.h5` file.
 
@@ -24,17 +24,12 @@ def load_mat_file(filepath, sequence_key, targets_key=None):
 
     Returns
     -------
-    sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
-        A tuple containing the numeric representation of the
-        sequence examples and their corresponding labels.
-        If no `targets_key` is specified, `targets` returned
-        is None. The shape of `sequences` will be
-        :math:`S \\times N \\times L`, where :math:`S` is
-        the total number of samples, :math:`N` is the
-        size of the sequence type's alphabet, and :math:`L`
-        is the sequence length.
-        The shape of `targets` will be :math:`S \\times F`,
-        where :math:`F` is the number of features.
+    (sequences, targets, h5py_filehandle) : \
+            tuple(array-like, array-like, h5py.File)
+        If the matrix files can be loaded with `scipy.io`,
+        the tuple will only be (sequences, targets). Otherwise,
+        the 2 matrices and the h5py file handle are returned.
+
     """
     try:  # see if we can load the file using scipy first
         mat = scipy.io.loadmat(filepath)
@@ -44,13 +39,11 @@ def load_mat_file(filepath, sequence_key, targets_key=None):
         return (mat[sequence_key], targets)
     except (NotImplementedError, ValueError):
         mat = h5py.File(filepath, 'r')
-        sequences = mat[sequence_key][()]
+        sequences = mat[sequence_key]
         targets = None
         if targets_key:
-            targets = mat[targets_key][()]
-        mat.close()
-        sequences = np.transpose(sequences, (2, 1, 0))
-        return (sequences, targets.T)
+            targets = mat[targets_key]
+        return (sequences, targets, mat)
 
 
 class MatFileSampler(FileSampler):
@@ -70,6 +63,12 @@ class MatFileSampler(FileSampler):
     shuffle : bool, optional
         Default is True. Shuffle the order of the samples in the matrix
         before sampling from it.
+    sequence_batch_axis : int, optional
+        Default is 0. Specify the batch axis.
+    sequence_alphabet_axis : int, optional
+        Default is 1. Specify the alphabet axis.
+    targets_batch_axis : int, optional
+        Default is 0. Speciy the batch axis.
 
     Attributes
     ----------
@@ -82,17 +81,29 @@ class MatFileSampler(FileSampler):
                  sequence_key,
                  targets_key=None,
                  random_seed=436,
-                 shuffle=True):
+                 shuffle=True,
+                 sequence_batch_axis=0,
+                 sequence_alphabet_axis=1,
+                 targets_batch_axis=0):
         """
         Constructs a new `MatFileSampler` object.
         """
         super(MatFileSampler, self).__init__()
-        sequences_mat, targets_mat = load_mat_file(
-            filepath, sequence_key, targets_key=targets_key)
-        self._sample_seqs = sequences_mat
-        self._sample_tgts = targets_mat
-
-        self.n_samples = self._sample_seqs.shape[0]
+        out = _load_mat_file(
+            filepath,
+            sequence_key,
+            targets_key=targets_key)
+        self._sample_seqs = out[0]
+        self._sample_tgts = out[1]
+        self._mat_fh = None
+        if len(out) > 2:
+            self._mat_fh = out[2]
+        self._seq_batch_axis = sequence_batch_axis
+        self._seq_alphabet_axis = sequence_alphabet_axis
+        self._seq_final_axis = 3 - sequence_batch_axis - sequence_alphabet_axis
+        if self._sample_tgts is not None:
+            self._tgts_batch_axis = targets_batch_axis
+        self.n_samples = self._sample_seqs.shape[self._seq_batch_axis]
 
         self._sample_indices = np.arange(
             self.n_samples).tolist()
@@ -135,11 +146,26 @@ class MatFileSampler(FileSampler):
         else:
             use_indices = self._sample_indices[self._sample_next:sample_up_to]
         self._sample_next += batch_size
+        use_indices = sorted(use_indices)
+        if self._seq_batch_axis == 0:
+            sequences = self._sample_seqs[use_indices, :, :].astype(float)
+        elif self._seq_batch_axis == 1:
+            sequences = self._sample_seqs[:, use_indices, :].astype(float)
+        else:
+            sequences = self._sample_seqs[:, :, use_indices].astype(float)
 
-        sequences = np.transpose(
-            self._sample_seqs[use_indices, :, :], (0, 2, 1)).astype(float)
+        if self._seq_batch_axis != 0 or self._seq_alphabet_axis != 2:
+            sequences = np.transpose(
+                sequences, (self._seq_batch_axis,
+                            self._seq_final_axis,
+                            self._seq_alphabet_axis))
         if self._sample_tgts is not None:
-            targets = self._sample_tgts[use_indices, :].astype(float)
+            if self._tgts_batch_axis == 0:
+                targets = self._sample_tgts[use_indices, :].astype(float)
+            else:
+                targets = self._sample_tgts[:, use_indices].astype(float)
+                targets = np.transpose(
+                    targets, (1, 0))
             return (sequences, targets)
         return sequences,
 

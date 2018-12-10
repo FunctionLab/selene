@@ -11,7 +11,6 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
-from sklearn.metrics import r2_score
 
 
 logger = logging.getLogger("selene")
@@ -433,7 +432,7 @@ class PerformanceMetrics(object):
                     feature_scores[feature][name] = score
 
         metric_cols = [m for m in self.metrics.keys()]
-        cols = '\t'.join(["features"] + metric_cols)
+        cols = '\t'.join(["class"] + metric_cols)
         with open(output_path, 'w+') as file_handle:
             file_handle.write("{0}\n".format(cols))
             for feature, metric_scores in sorted(feature_scores.items()):

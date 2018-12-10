@@ -1,21 +1,21 @@
 ---
 ops: [analyze]
 model: {
-    file: /absolute/path/to/model/architecture.py, 
+    path: /absolute/path/to/model/architecture.py, 
     class: ModelArchitectureClassName,
-    sequence_length: 1000,
-    n_classes_to_predict: 2,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        arg1: val1,
+        arg2: val2
+    },
+    non_strand_specific: mean
 }
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
+    trained_model_path: /path/to/trained/model.pth.tar,
     sequence_length: 1000,
     features: !obj:selene_sdk.utils.load_features_list {
-        input_path: /path/to/distinct_features.txt
+        input_path: /path/to/distinct_features.txt 
     },
-    trained_model_path: /path/to/trained/model.pth.tar,
+    batch_size: 64,
     use_cuda: True
 }
 in_silico_mutagenesis: {
@@ -26,5 +26,5 @@ in_silico_mutagenesis: {
     output_dir: /path/to/output_dir,
     use_sequence_name: False
 }
-random_seed: 1000
+random_seed: 123
 ...

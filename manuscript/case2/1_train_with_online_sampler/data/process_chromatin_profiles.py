@@ -4,10 +4,10 @@ Description:
     features.
 
 Usage:
-    process_human_ENCODE.py <features>
+    process_chromatin_profiles.py <features>
                             <ENCODE-DNase> <ENCODE-TF> <Roadmap>
                             <output-dir>
-    process_human_ENCODE.py -h | --help
+    process_chromatin_profiles.py -h | --help
 
 Options:
     -h --help               Show this screen.

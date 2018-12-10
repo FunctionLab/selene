@@ -15,6 +15,10 @@ Any directories mentioned in the README that are not included by default should 
 We have included comments in that file with more information about what is downloaded. 
 You can view the files names and some descriptions at [this Zenodo record](https://doi.org/10.5281/zenodo.1445552) as well.
 
+NOTE: The steps that we provide in this directory use input data that was processed from ENCODE and Roadmap Epigenomics.
+Please consult the methods section in our [manuscript](https://doi.org/10.1101/438291) for a detailed summary of what data processing steps were taken.
+The code to implement these steps can be viewed in `data/process_data.sh` after running `download_data.sh`.
+
 ## Step 1: train a new architecture
 
 Please refer to the [README in case study 1](https://github.com/FunctionLab/selene/tree/master/manuscript/case1/README.md) for general information about the SLURM scripts and YAML files in `1_train_with_deepsea_mats` and `1_train_with_online_sampler`. 
@@ -23,6 +27,15 @@ Please refer to the [README in case study 1](https://github.com/FunctionLab/sele
 - The config in `1_train_with_online_sampler` uses Selene's [`selene_sdk.samplers.IntervalsSampler`](http://selene.flatironinstitute.org/samplers.html#intervalssampler), which takes as input a tabix-indexed `.bed` file containing all the coordinates from the chromatin profiles, sorted and labeled according to the genomic feature/profile to which the row corresponds. In addition, it takes in a reference sequence (hg19 in this case, downloaded from ENCODE) FASTA, as well as a list of regions from which we should draw our samples. We restrict the regions to sample to the list of regions where there is at least one transcription factor present (in the chromatin profiles data from ENCODE/Roadmap Epigenomics).
 
 The outputs from training and evaluation can be found in `mat_training_outputs` and `online_sampler_outputs`.
+
+The `.sh` scripts in each of these directories runs Selene using [`../../../selene_cli.py`](https://github.com/FunctionLab/selene/blob/master/selene_cli.py) and a configuration file.
+They also activate a conda environment called `selene-env`, the contents of which depend on how you would like to use Selene:
+
+- The CLI script `../../../selene_cli.py` will try to run the local version of Selene (that is, this repository). It will work if you have built the Cython modules using `python setup.py build_ext --inplace`. In this case, your `selene-env` conda environment would not contain the `selene-sdk` Python package. Instead, it would contain all the dependencies of Selene (see: [`selene-gpu.yml`](https://github.com/FunctionLab/selene/blob/master/selene-gpu.yml)) as well as the `docopt`
+  package (which parses the arguments for the CLI).
+- If you want to use the installed `selene-sdk` package (through conda or pip), you can just move the CLI script outside the repository and run the code for a specific case. (Make sure your `selene-env` contains `selene-sdk` and `docopt`.)
+
+Please fill out the absolute paths to the appropriate files in the `.yml` files before using the `.sh` scripts. 
 
 ## Step 2: model comparison
 

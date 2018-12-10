@@ -6,6 +6,7 @@ import os
 
 import numpy as np
 import torch
+import torch.nn as nn
 from torch.autograd import Variable
 
 from .utils import initialize_logger
@@ -20,16 +21,14 @@ class EvaluateModel(object):
     """
     Evaluate model on a test set of sequences with known targets.
 
-    TODO: include a data_parallel parameter?
-
     Parameters
     ----------
     model : torch.nn.Module
-        The trained model.
+        The model architecture.
     criterion : torch.nn._Loss
         The loss function that was optimized during training.
     data_sampler : selene_sdk.samplers.Sampler
-        The example generator.
+        Used to retrieve samples from the test set for evaluation.
     features : list(str)
         List of distinct features the model predicts.
     trained_model_path : str
@@ -40,10 +39,22 @@ class EvaluateModel(object):
         Default is 64. Specify the batch size to process examples.
         Should be a power of 2.
     n_test_samples : int or None, optional
-        Default is None
+        Default is `None`. Use `n_test_samples` if you want to limit the
+        number of samples on which you evaluate your model. If you are
+        using a sampler of type `selene_sdk.samplers.OnlineSampler`,
+        by default it will draw 640000 samples if `n_test_samples` is `None`.
     report_gt_feature_n_positives : int, optional
-    use_cuda : int, optional
-        Default is False.
+        Default is 10. In the final test set, each class/feature must have
+        more than `report_gt_feature_n_positives` positive samples in order to
+        be considered in the test performance computation. The output file that
+        states each class' performance will report 'NA' for classes that do
+        not have enough positive samples.
+    use_cuda : bool, optional
+        Default is `False`. Specify whether a CUDA-enabled GPU is available
+        for torch to use during training.
+    data_parallel : bool, optional
+        Default is `False`. Specify whether multiple GPUs are available
+        for torch to use during training.
 
     Attributes
     ----------
@@ -57,6 +68,10 @@ class EvaluateModel(object):
         List of distinct features the model predicts.
     batch_size : int
         The batch size to process examples. Should be a power of 2.
+    use_cuda : bool
+        If `True`, use a CUDA-enabled GPU. If `False`, use the CPU.
+    data_parallel : bool
+        Whether to use multiple GPUs or not.
 
     """
 
@@ -70,7 +85,8 @@ class EvaluateModel(object):
                  batch_size=64,
                  n_test_samples=None,
                  report_gt_feature_n_positives=10,
-                 use_cuda=False):
+                 use_cuda=False,
+                 data_parallel=False):
         self.criterion = criterion
 
         trained_model = torch.load(
@@ -90,6 +106,11 @@ class EvaluateModel(object):
             os.path.join(self.output_dir, "{0}.log".format(
                 __name__)),
             verbosity=2)
+
+        self.data_parallel = data_parallel
+        if self.data_parallel:
+            self.model = nn.DataParallel(model)
+            logger.debug("Wrapped model in DataParallel")
 
         self.use_cuda = use_cuda
         if self.use_cuda:
@@ -169,11 +190,9 @@ class EvaluateModel(object):
             data=self._all_test_targets)
 
         loss = np.average(batch_losses)
-        logger.debug("[STATS] average loss: {0}".format(
-            loss))
+        logger.info("test loss: {0}".format(loss))
         for name, score in average_scores.items():
-            logger.debug("[STATS] average {0}: {1}".format(
-                name, score))
+            logger.info("test {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")

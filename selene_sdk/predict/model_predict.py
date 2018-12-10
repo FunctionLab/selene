@@ -261,15 +261,16 @@ class AnalyzeSequences(object):
         Architecture must match `model`.
     sequence_length : int
         The length of sequences that the model is expecting.
-    batch_size : int, optional
-        Default is 64. The size of the mini-batches to use.
     features : list(str)
         The names of the features that the model is predicting.
+    batch_size : int, optional
+        Default is 64. The size of the mini-batches to use.
     use_cuda : bool, optional
-        Default is `False`. Specifies whether to use CUDA or not.
+        Default is `False`. Specifies whether CUDA-enabled GPUs are available
+        for torch to use.
     reference_sequence : class, optional
-        Default is `selene_sdk.sequences.Genome`. The type of sequence that
-        this analysis will be performed on. Please note that if you need
+        Default is `selene_sdk.sequences.Genome`. The type of sequence on
+        which this analysis will be performed. Please note that if you need
         to use variant effect prediction, you cannot only pass in the
         class--you must pass in the constructed `selene_sdk.sequences.Sequence`
         object with a particular sequence version (e.g. `Genome("hg19.fa")`).
@@ -448,7 +449,7 @@ class AnalyzeSequences(object):
         reporter = self._initialize_reporters(
             ["predictions"],
             os.path.join(output_dir, output_prefix),
-            ["name"],
+            ["index", "name"],
             mode="prediction")[0]
         fasta_file = pyfaidx.Fasta(input_path)
         sequences = np.zeros((self.batch_size,
@@ -465,7 +466,7 @@ class AnalyzeSequences(object):
 
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
-            batch_ids.append([fasta_record.name])
+            batch_ids.append([i, fasta_record.name])
 
             if i and i % self.batch_size == 0:
                 preds = self.predict(sequences)

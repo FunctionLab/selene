@@ -221,13 +221,13 @@ class GenomicFeatures(Target):
         * `float` - A single threshold applies to all the features\
                     in the dataset.
         * `dict` - A dictionary mapping feature names (`str`) to \
-                 threshold values (`float`), which thereby assigns\
-                 different thresholds to different features. If a\
-                 feature's threshold is not specified in this \
-                 dictionary, then we assume that a key `"default"`\
-                 exists in the dictionary that has the default \
-                 threshold value we should assign to the feature \
-                 name that is absent from the dictionary keys.
+                   threshold values (`float`), which thereby assigns\
+                   different thresholds to different features. If a\
+                   feature's threshold is not specified in this \
+                   dictionary, then we assume that a key `"default"`\
+                   exists in the dictionary that has the default \
+                   threshold value we should assign to the feature \
+                   name that is absent from the dictionary keys.
         * `types.FunctionType` - define a function that takes as \
                                  input the feature name and returns\
                                  the feature's threshold.
