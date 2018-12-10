@@ -37,8 +37,8 @@ sampler: !obj:selene_sdk.samplers.IntervalsSampler {
 }
 train_model: !obj:selene_sdk.TrainModel {
     batch_size: 64,
-    max_steps: 16000,  # update this value for longer training
-    report_stats_every_n_steps: 2000,
+    max_steps: 8000,  # update this value for longer training
+    report_stats_every_n_steps: 1000,
     n_validation_samples: 32000,
     n_test_samples: 120000,
     cpu_n_threads: 32,
@@ -48,4 +48,5 @@ train_model: !obj:selene_sdk.TrainModel {
 random_seed: 1447
 output_dir: ./training_outputs
 create_subdirectory: False
+load_test_set: False
 ...
