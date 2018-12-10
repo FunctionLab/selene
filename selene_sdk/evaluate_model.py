@@ -192,7 +192,7 @@ class EvaluateModel(object):
         loss = np.average(batch_losses)
         logger.info("test loss: {0}".format(loss))
         for name, score in average_scores.items():
-            logger.info("test average {0}: {1}".format(name, score))
+            logger.info("test {0}: {1}".format(name, score))
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")
