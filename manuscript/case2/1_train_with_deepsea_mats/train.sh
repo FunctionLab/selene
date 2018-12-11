@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=7-00:00:00
+#SBATCH --time=5-00:00:00
 #SBATCH --gres=gpu:2
 #SBATCH --partition=gpu
 #SBATCH --constraint=v100

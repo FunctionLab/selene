@@ -3,17 +3,19 @@ ops: [evaluate]
 model: {
     file: <ABSOLUTE_PATH>/selene/manuscript/case2/deeper_deepsea_arch.py,
     class: DeeperDeepSEA,
-    sequence_length: 1000,
-    n_classes_to_predict: 919,
-    non_strand_specific: {
-        use_module: True,
-        mode: mean
-    }
+    class_args: {
+        sequence_length: 1000,
+        n_targets: 919,
+    },
+    non_strand_specific: mean
 }
 sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
     filepath: <ABSOLUTE_PATH>/selene/manuscript/case2/2_model_comparison/deepsea_test.mat,
     sequence_key: sequences,
     targets_key: targets,
+    sequence_batch_axis: 0,
+    sequence_alphabet_axis: 1,
+    targets_batch_axis: 0,
     shuffle: False
 }
 evaluate_model: !obj:selene_sdk.EvaluateModel {
@@ -26,4 +28,5 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
     trained_model_path: <ABSOLUTE_PATH>/selene/manuscript/case2/online_sampler_outputs/best_model.pth.tar,
     output_dir: <ABSOLUTE_PATH>/selene/manuscript/case2/evaluation_outputs
 }
+random_seed: 123
 ...
