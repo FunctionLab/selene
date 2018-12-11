@@ -1,7 +1,7 @@
 ---
 ops: [train, evaluate]
 model: {
-    path: <ABSOLUTE_PATH>/selene/models/deepsea.py,
+    path: <ABSOLUTE_PATH>/selene/manuscript/case1/deepsea.py,
     class: DeepSEA,
     class_args: {
         sequence_length: 1000,
@@ -34,6 +34,8 @@ train_model: !obj:selene_sdk.TrainModel {
     max_steps: 640000,
     report_stats_every_n_steps: 32000,
     report_gt_feature_n_positives: 20,
+    n_validation_samples: 32000,
+    n_test_samples: 640000,
     use_cuda: True,
     data_parallel: True
 }
