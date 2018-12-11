@@ -5,7 +5,8 @@ For this case study, we do the following:
 1. Make variant effect predictions for variants in the [IGAP Alzheimer's disease age at onset survival GWAS (Huang et al., 2017)](https://www.niagads.org/datasets/ng00058). We only use the variants from 2 groups:
     - Nominally significant: p-value < 0.05
     - Nonsignificant: p-value > 0.50
-    The model we trained and evaluated in case study 2 is used for variant prediction here. 
+    
+    The model we trained and evaluated in case study 2 is used for variant effect prediction here. 
 
 2. Next, we determine whether the predicted effect for each feature is significantly higher for variants in the nominally significant variants group compared to the nonsignificant variants group. This would indicate that our model can prioritize disease-associated variants. 
 
