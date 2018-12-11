@@ -13,6 +13,8 @@
 
   
   
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
   
   
 
@@ -92,16 +94,16 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Functional overview of the SDK</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#the-sequences-submodule-api-docs">The <em>sequences</em> submodule (API docs)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#the-targets-submodule-api-docs">The <em>targets</em> submodule (API docs)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#the-samplers-submodule-api-docs">The <em>samplers</em> submodule (API docs)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#training-a-model-api-docs">Training a model (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#evaluating-a-model-api-docs">Evaluating a model (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#using-a-model-to-make-predictions-api-docs">Using a model to make predictions (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#visualizing-model-predictions-api-docs">Visualizing model predictions (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#the-utilities-submodule-api-docs">The utilities submodule (API docs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
@@ -111,7 +113,84 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/extending.html">Extending Selene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
@@ -285,7 +364,7 @@ yet exist, it will be created for you.</li>
 
 <dl class="method">
 <dt id="selene_sdk.samplers.Sampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples</em>, <em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches. This method also allows the user to
 specify what operating mode to run the sampler in when fetching
@@ -295,9 +374,10 @@ the data.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mode</strong> (<em>str</em>) – The operating mode that the object should run in.</li>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
 <li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
+<li><strong>mode</strong> (<em>str, optional</em>) – Default is None. The operating mode that the object should run in.
+If None, will use the current mode <cite>self.mode</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -530,7 +610,7 @@ the same.</li>
 
 <dl class="method">
 <dt id="selene_sdk.samplers.OnlineSampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em>, <em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/online_sampler.html#OnlineSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.OnlineSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches. This method also allows the user to
 specify what operating mode to run the sampler in when fetching
@@ -540,11 +620,16 @@ the data.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
-See <cite>selene_sdk.samplers.IntervalsSampler.modes</cite> for more
-information.</li>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
-<li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
+<li><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is None. The total number of samples to retrieve.
+If <cite>n_samples</cite> is None and the mode is <cite>validate</cite>, will
+set <cite>n_samples</cite> to 32000; if the mode is <cite>test</cite>, will set
+<cite>n_samples</cite> to 640000 if it is None. If the mode is <cite>train</cite>
+you must have specified a value for <cite>n_samples</cite>.</li>
+<li><strong>mode</strong> (<em>str, optional</em>) – Default is None. The mode to run the sampler in when
+fetching the samples. See
+<cite>selene_sdk.samplers.IntervalsSampler.modes</cite> for more
+information. If None, will use the current mode <cite>self.mode</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -577,7 +662,7 @@ mode, divided into mini-batches.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mode</strong> (<em>str</em>) – The mode to run the sampler in when fetching the samples.
+<li><strong>mode</strong> (<em>{‘test’, ‘validate’}</em>) – The mode to run the sampler in when fetching the samples.
 See <cite>selene_sdk.samplers.IntervalsSampler.modes</cite> for more
 information.</li>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
@@ -966,7 +1051,7 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <h2>MultiFileSampler<a class="headerlink" href="#multifilesampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.samplers.MultiFileSampler">
-<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">MultiFileSampler</code><span class="sig-paren">(</span><em>train_sampler</em>, <em>validate_sampler</em>, <em>features</em>, <em>test_sampler=None</em>, <em>save_datasets=[]</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.samplers.</code><code class="descname">MultiFileSampler</code><span class="sig-paren">(</span><em>train_sampler</em>, <em>validate_sampler</em>, <em>features</em>, <em>test_sampler=None</em>, <em>mode='train'</em>, <em>save_datasets=[]</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.sampler.Sampler</span></code></p>
 <p>This sampler contains individual file samplers for each mode.
 The file samplers parse .bed/.mat files that correspond to
@@ -982,6 +1067,8 @@ into the <cite>MultiFileSampler</cite> constructor.</li>
 <li><strong>validate_sampler</strong> (<em>selene_sdk.samplers.file_samplers.FileSampler</em>) – The validation dataset file sampler.</li>
 <li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The list of features the model should predict</li>
 <li><strong>test_sampler</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><em>selene_sdk.samplers.file_samplers.FileSampler</em><em>, </em><em>optional</em>) – Default is None. The test file sampler is optional.</li>
+<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – Default is “train”. Must be one of <cite>{train, validate, test}</cite>. The
+starting mode in which to run the sampler.</li>
 <li><strong>save_datasets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – Default is None. Currently, we are only including these parameters
 so that <cite>MultiFileSampler</cite> is consistent with <cite>Sampler</cite>. The save
 dataset functionality for MultiFileSampler has not been defined
@@ -990,7 +1077,7 @@ yet.</li>
 statements to save to file. Currently not useful for
 <cite>MultiFileSampler</cite>.</li>
 <li><strong>modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – A list of the names of the modes that the object may operate in.</li>
-<li><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – Default is <cite>None</cite>. The current mode that the object is operating in.</li>
+<li><strong>mode</strong> – Default is <cite>None</cite>. The current mode that the object is operating in.</li>
 </ul>
 </td>
 </tr>
@@ -998,7 +1085,7 @@ statements to save to file. Currently not useful for
 </table>
 <dl class="method">
 <dt id="selene_sdk.samplers.MultiFileSampler.get_data_and_targets">
-<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>mode</em>, <em>batch_size</em>, <em>n_samples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples</em>, <em>mode=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches. This method also allows the user to
 specify what operating mode to run the sampler in when fetching
@@ -1008,9 +1095,11 @@ the data.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>mode</strong> (<em>str</em>) – The operating mode that the object should run in.</li>
 <li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
 <li><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</li>
+<li><strong>mode</strong> (<em>str, optional</em>) – Default is None. The operating mode that the sampler
+should run in. If None, will use the current
+<cite>self.mode</cite>.</li>
 </ul>
 </td>
 </tr>

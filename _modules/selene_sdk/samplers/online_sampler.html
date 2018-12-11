@@ -13,6 +13,8 @@
 
   
   
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  
   
   
 
@@ -90,16 +92,16 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/overview.html">Functional overview of the SDK</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#the-sequences-submodule-api-docs">The <em>sequences</em> submodule (API docs)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#the-targets-submodule-api-docs">The <em>targets</em> submodule (API docs)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#the-samplers-submodule-api-docs">The <em>samplers</em> submodule (API docs)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#training-a-model-api-docs">Training a model (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#evaluating-a-model-api-docs">Evaluating a model (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#using-a-model-to-make-predictions-api-docs">Using a model to make predictions (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#visualizing-model-predictions-api-docs">Visualizing model predictions (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#the-utilities-submodule-api-docs">The utilities submodule (API docs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a><ul>
@@ -109,7 +111,84 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/extending.html">Extending Selene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
@@ -447,10 +526,6 @@
             <span class="n">feature_thresholds</span><span class="o">=</span><span class="n">feature_thresholds</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">save_datasets</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_data.bed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">)),</span>
-                <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="OnlineSampler.get_feature_from_index"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.OnlineSampler.get_feature_from_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_from_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -508,6 +583,11 @@
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_dir</span><span class="p">,</span>
+                             <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_data.bed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">)),</span>
+                <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
         <span class="n">file_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">cols</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -516,7 +596,7 @@
         <span class="k">if</span> <span class="n">close_filehandle</span><span class="p">:</span>
             <span class="n">file_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="OnlineSampler.get_data_and_targets"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.OnlineSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">):</span>
+<div class="viewcode-block" id="OnlineSampler.get_data_and_targets"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.OnlineSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method fetches a subset of the data from the sampler,</span>
 <span class="sd">        divided into batches. This method also allows the user to</span>
@@ -525,14 +605,19 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mode : str</span>
-<span class="sd">            The mode to run the sampler in when fetching the samples.</span>
-<span class="sd">            See `selene_sdk.samplers.IntervalsSampler.modes` for more</span>
-<span class="sd">            information.</span>
 <span class="sd">        batch_size : int</span>
 <span class="sd">            The size of the batches to divide the data into.</span>
-<span class="sd">        n_samples : int</span>
-<span class="sd">            The total number of samples to retrieve.</span>
+<span class="sd">        n_samples : int or None, optional</span>
+<span class="sd">            Default is None. The total number of samples to retrieve.</span>
+<span class="sd">            If `n_samples` is None and the mode is `validate`, will</span>
+<span class="sd">            set `n_samples` to 32000; if the mode is `test`, will set</span>
+<span class="sd">            `n_samples` to 640000 if it is None. If the mode is `train`</span>
+<span class="sd">            you must have specified a value for `n_samples`.</span>
+<span class="sd">        mode : str, optional</span>
+<span class="sd">            Default is None. The mode to run the sampler in when</span>
+<span class="sd">            fetching the samples. See</span>
+<span class="sd">            `selene_sdk.samplers.IntervalsSampler.modes` for more</span>
+<span class="sd">            information. If None, will use the current mode `self.mode`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -550,8 +635,15 @@
 <span class="sd">            :math:`S =` `n_samples`.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
         <span class="n">sequences_and_targets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">n_samples</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;validate&quot;</span><span class="p">:</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">32000</span>
+        <span class="k">elif</span> <span class="n">n_samples</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">640000</span>
 
         <span class="n">n_batches</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batches</span><span class="p">):</span>
@@ -569,7 +661,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        mode : str</span>
+<span class="sd">        mode : {&#39;test&#39;, &#39;validate&#39;}</span>
 <span class="sd">            The mode to run the sampler in when fetching the samples.</span>
 <span class="sd">            See `selene_sdk.samplers.IntervalsSampler.modes` for more</span>
 <span class="sd">            information.</span>
@@ -596,11 +688,8 @@
 <span class="sd">            `target_matrix` is of the shape :math:`S \\times F`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">n_samples</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;validate&quot;</span><span class="p">:</span>
-            <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">32000</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="n">n_samples</span><span class="p">:</span>
-            <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">640000</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OnlineSampler.get_validation_set"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.OnlineSampler.get_validation_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_validation_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

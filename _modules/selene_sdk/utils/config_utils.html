@@ -13,6 +13,8 @@
 
   
   
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  
   
   
 
@@ -90,16 +92,16 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/overview.html">Functional overview of the SDK</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#the-sequences-submodule-api-docs">The <em>sequences</em> submodule (API docs)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#the-targets-submodule-api-docs">The <em>targets</em> submodule (API docs)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#the-samplers-submodule-api-docs">The <em>samplers</em> submodule (API docs)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#training-a-model-api-docs">Training a model (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#evaluating-a-model-api-docs">Evaluating a model (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#using-a-model-to-make-predictions-api-docs">Using a model to make predictions (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#visualizing-model-predictions-api-docs">Visualizing model predictions (API docs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#the-utilities-submodule-api-docs">The utilities submodule (API docs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a><ul>
@@ -109,7 +111,84 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../overview/extending.html">Extending Selene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
@@ -247,10 +326,55 @@
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">strftime</span>
+<span class="kn">import</span> <span class="nn">types</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">instantiate</span>
+
+
+<span class="k">def</span> <span class="nf">module_from_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a module created based on a Python file path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the model architecture file.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    The loaded module</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parent_path</span><span class="p">,</span> <span class="n">module_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">loader</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">machinery</span><span class="o">.</span><span class="n">SourceFileLoader</span><span class="p">(</span>
+        <span class="n">module_file</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">module</span>
+
+
+<span class="k">def</span> <span class="nf">module_from_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This method expects that you pass in the path to a valid Python module,</span>
+<span class="sd">    where the `__init__.py` file already imports the model class,</span>
+<span class="sd">    `criterion`, and `get_optimizer` methods from the appropriate file</span>
+<span class="sd">    (e.g. `__init__.py` contains the line `from &lt;model_class_file&gt; import</span>
+<span class="sd">    &lt;ModelClass&gt;`).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Path to the Python module containing the model class.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    The loaded module</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parent_path</span><span class="p">,</span> <span class="n">module_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">parent_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_dir</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="initialize_model"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.initialize_model">[docs]</a><span class="k">def</span> <span class="nf">initialize_model</span><span class="p">(</span><span class="n">model_configs</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -266,7 +390,6 @@
 <span class="sd">        and optimizer class that can be found within the input model file.</span>
 <span class="sd">    lr : float or None, optional</span>
 <span class="sd">        If `train`, a learning rate must be specified. Otherwise, None.</span>
-
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -288,26 +411,22 @@
 <span class="sd">        If `train` but the `lr` specified is not a float.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">import_model_from</span> <span class="o">=</span> <span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span>
+    <span class="n">import_model_from</span> <span class="o">=</span> <span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
     <span class="n">model_class_name</span> <span class="o">=</span> <span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;class&quot;</span><span class="p">]</span>
 
-    <span class="c1"># TODO: would like to find a better way...</span>
-    <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">import_model_from</span><span class="p">)</span>
-    <span class="n">parent_path</span><span class="p">,</span> <span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent_path</span><span class="p">)</span>
-
-    <span class="n">module_name</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">module_name</span><span class="p">))</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">import_model_from</span><span class="p">):</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">module_from_dir</span><span class="p">(</span><span class="n">import_model_from</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">module_from_file</span><span class="p">(</span><span class="n">import_model_from</span><span class="p">)</span>
     <span class="n">model_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">)</span>
 
-    <span class="n">sequence_length</span> <span class="o">=</span> <span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;sequence_length&quot;</span><span class="p">]</span>
-    <span class="n">n_classes</span> <span class="o">=</span> <span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;n_classes_to_predict&quot;</span><span class="p">]</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="n">sequence_length</span><span class="p">,</span> <span class="n">n_classes</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;class_args&quot;</span><span class="p">])</span>
 
-    <span class="k">if</span> <span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;non_strand_specific&quot;</span><span class="p">][</span><span class="s2">&quot;use_module&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s2">&quot;non_strand_specific&quot;</span> <span class="ow">in</span> <span class="n">model_configs</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">selene_sdk.utils</span> <span class="k">import</span> <span class="n">NonStrandSpecific</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">NonStrandSpecific</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;non_strand_specific&quot;</span><span class="p">][</span><span class="s2">&quot;mode&quot;</span><span class="p">])</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;non_strand_specific&quot;</span><span class="p">])</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">criterion</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">train</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">optim_class</span><span class="p">,</span> <span class="n">optim_kwargs</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_optimizer</span><span class="p">(</span><span class="n">lr</span><span class="p">)</span>
@@ -372,18 +491,25 @@
                 <span class="n">train_model_info</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
 
             <span class="n">trainer</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">train_model_info</span><span class="p">)</span>
+            <span class="c1"># TODO: will find a better way to handle this in the future</span>
+            <span class="k">if</span> <span class="s2">&quot;load_test_set&quot;</span> <span class="ow">in</span> <span class="n">configs</span> <span class="ow">and</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;load_test_set&quot;</span><span class="p">]</span> <span class="ow">and</span> \
+                    <span class="s2">&quot;evaluate&quot;</span> <span class="ow">in</span> <span class="n">operations</span><span class="p">:</span>
+                <span class="n">trainer</span><span class="o">.</span><span class="n">create_test_set</span><span class="p">()</span>
             <span class="n">trainer</span><span class="o">.</span><span class="n">train_and_validate</span><span class="p">()</span>
 
         <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;evaluate&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span> <span class="ow">and</span> <span class="s2">&quot;evaluate_model&quot;</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">trainer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="p">:</span>
                 <span class="n">model</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">initialize_model</span><span class="p">(</span>
                     <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">],</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;evaluate_model&quot;</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
                 <span class="n">sampler_info</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;sampler&quot;</span><span class="p">]</span>
 
                 <span class="n">evaluate_model_info</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;evaluate_model&quot;</span><span class="p">]</span>
 
                 <span class="n">data_sampler</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">sampler_info</span><span class="p">)</span>
-
                 <span class="n">evaluate_model_info</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
                     <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
                     <span class="n">criterion</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span>
@@ -392,8 +518,6 @@
                     <span class="n">evaluate_model_info</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
                 <span class="n">evaluator</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">evaluate_model_info</span><span class="p">)</span>
                 <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">trainer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
 
         <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s2">&quot;analyze&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="p">:</span>
@@ -461,6 +585,15 @@
 <span class="sd">            for reproducibility. Optional.</span>
 <span class="sd">            * `lr`: The learning rate, if one of the operations in the list is\</span>
 <span class="sd">            &quot;train&quot;.</span>
+<span class="sd">            * `load_test_set`: If `ops: [train, evaluate]`, you may set\</span>
+<span class="sd">               this parameter to True if you would like to load the test\</span>
+<span class="sd">               set into memory ahead of time--and therefore save the test\</span>
+<span class="sd">               data to a .bed file at the start of training. This is only\</span>
+<span class="sd">               useful if you have a machine that can support a large increase\</span>
+<span class="sd">               (on the order of GBs) in memory usage and if you want to\</span>
+<span class="sd">               create a test dataset early-on because you do not know if your\</span>
+<span class="sd">               model will finish training and evaluation within the allotted\</span>
+<span class="sd">               time that your job is run.</span>
 
 <span class="sd">    create_subdirectory : bool, optional</span>
 <span class="sd">        Default is True. If `create_subdirectory`, will create a directory</span>
@@ -480,7 +613,7 @@
 <span class="sd">        to the dirs specified in each operation&#39;s configuration.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">operations</span> <span class="o">=</span> <span class="n">configs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;ops&quot;</span><span class="p">)</span>
+    <span class="n">operations</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;ops&quot;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="s2">&quot;train&quot;</span> <span class="ow">in</span> <span class="n">operations</span> <span class="ow">and</span> <span class="s2">&quot;lr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">configs</span> <span class="ow">and</span> <span class="n">lr</span> <span class="o">!=</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
         <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;lr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">lr</span><span class="p">)</span>
@@ -497,7 +630,7 @@
               <span class="s2">&quot;this parameter must have it specified in their individual &quot;</span>
               <span class="s2">&quot;parameter configuration.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">current_run_output_dir</span> <span class="o">=</span> <span class="n">configs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;output_dir&quot;</span><span class="p">)</span>
+        <span class="n">current_run_output_dir</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">current_run_output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;create_subdirectory&quot;</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
             <span class="n">create_subdirectory</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;create_subdirectory&quot;</span><span class="p">]</span>
@@ -509,7 +642,7 @@
             <span class="n">current_run_output_dir</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="s2">&quot;random_seed&quot;</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
-        <span class="n">seed</span> <span class="o">=</span> <span class="n">configs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;random_seed&quot;</span><span class="p">)</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;random_seed&quot;</span><span class="p">]</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
