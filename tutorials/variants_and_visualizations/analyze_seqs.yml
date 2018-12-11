@@ -13,12 +13,12 @@ model: {
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     sequence_length: 1000,
     features: !obj:selene_sdk.utils.load_features_list {
-        input_path: ./deepsea_features.txt
+        input_path: ./distinct_features.txt
     },
-    trained_model_path: ./0611_deeperdeepsea.pth.tar,
+    trained_model_path: ./example_deeperdeepsea.pth.tar,
     use_cuda: True,  # TODO: update if CUDA is not enabled on your machine.
     reference_sequence: !obj:selene_sdk.sequences.Genome {
-        input_path: hg19.fasta
+        input_path: male.hg19.fasta
     }
 }
 in_silico_mutagenesis: {
