@@ -37,7 +37,7 @@ _Working directory_: `2_in_silico_mutagenesis`
 
 The information in step 1 applies to this step as well. 
 
-The input FASTA sequences were generated using a script in the `data` directory (see: last line of `../data/process_data.sh` and `../data/get_test_regions.py`).
+The input FASTA sequences were generated using a script in the `data` directory (see: last line of [`../data/process_data.sh`](https://github.com/FunctionLab/selene/blob/master/manuscript/case1/data/process_data.sh) and [`../data/get_test_regions.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case1/data/get_test_regions.py)).
 
 The outputs from _in silico_ mutagenesis are included in the directory `../ism_outputs`.
 
