@@ -198,13 +198,16 @@ def compute_score(prediction, target, metric_fn,
         no features meeting our filtering thresholds, will return
         `(None, [])`.
     """
-    feature_scores = np.ones(target.shape[1]) * -1
+    feature_scores = np.ones(target.shape[1]) * np.nan
     for index, feature_preds in enumerate(prediction.T):
         feature_targets = target[:, index]
         if len(np.unique(feature_targets)) > 0 and \
                np.count_nonzero(feature_targets) > report_gt_feature_n_positives:
-            feature_scores[index] = metric_fn(
-                feature_targets, feature_preds)
+            try:
+                feature_scores[index] = metric_fn(
+                    feature_targets, feature_preds)
+            except ValueError:  # do I need to make this more generic?
+                continue
     valid_feature_scores = [s for s in feature_scores if not np.isnan(s)] # Allow 0 or negative values.
     if not valid_feature_scores:
         return None, feature_scores
