@@ -34,7 +34,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
-      version="0.1.3",
+      version="0.2.0",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
@@ -58,8 +58,9 @@ setup(name="selene-sdk",
       ext_modules=ext_modules,
       cmdclass=cmdclass,
       install_requires=[
+        "cython>=0.27.3",
         "h5py",
-        "matplotlib",
+        "matplotlib>=2.2.3",
         "numpy",
         "pandas",
         "plotly",
@@ -70,6 +71,6 @@ setup(name="selene-sdk",
         "scipy",
         "seaborn",
         "statsmodels",
-        "torch>=0.4.0",
+        "torch>=0.4.1",
         "torchvision"
     ])

@@ -1,7 +1,7 @@
 ---
 ops: [analyze]
 model: {
-    path: <ABSOLUTE_PATH>/selene/models/deepsea.py,
+    path: <ABSOLUTE_PATH>/selene/manuscript/case1/deepsea.py,
     class: DeepSEA,
     class_args: {
         sequence_length: 1000,

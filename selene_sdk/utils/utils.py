@@ -86,7 +86,10 @@ def load_model_from_state_dict(state_dict, model):
         else:
             raise ValueError("Model state dict keys do not match "
                              "the keys specified in `state_dict` input. "
-                             "Cannot load state into the model.")
+                             "Cannot load state into the model:\n\n"
+                             "\tExpected keys:\n\t{0}\n\n"
+                             "\tKeys in the input state dict:\n\t{1}\n".format(
+                                 model_keys, state_dict_keys))
     model.load_state_dict(new_state_dict)
     return model
 

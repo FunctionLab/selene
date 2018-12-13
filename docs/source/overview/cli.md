@@ -1,32 +1,9 @@
 # Selene CLI operations and outputs
-Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations. (See [Operations](#Operations) for more detail.)
+Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations. (See [Operations](#operations) for more detail.)
 
 The sections that follow describe in detail how the various components that make up the configuration file are specified. For operation-specific sections (e.g. training, evaluation), we also explain what the expected outputs are.
 
-## Table of Contents
-
-We strongly recommend you read through the first 4 sections ([Overview](#Overview), [Operations](#Operations), [General configurations](#General-configurations), and [Model architecture](#Model-architecture)) and then pick other sections based on your use case. 
-
-- [Overview](#Overview)
-- [Operations](#Operations)
-- [General configurations](#General-configurations)
-- [Model architecture](#Model-architecture) 
-- [Train](#Train)
-    - [Expected outputs for training](#Expected-outputs-for-training)
-- [Evaluate](#Evaluate)
-    - [Expected outputs for evaluation](#Expected-outputs-for-evaluation)
-- [Analyze sequences](#Analyze-sequences)
-    - [Prediction on sequences](#Prediction-on-sequences)
-    - [Variant effect prediction](#Variant-effect-prediction)
-    - [_In silico_ mutagenesis](#In-silico-mutagenesis)
-- [Sampler configurations](#Sampler-configurations)
-    - [Samplers for training (and evaluation, optionally)](#samplers-used-for-training-and-evaluation-optionally):
-        - [Random positions sampler](#Random-positions-sampler)
-        - [Intervals sampler](#Intervals-sampler)
-        - [Multiple-file sampler](#Multiple-file-sampler)
-    - [File samplers for evaluation](#samplers-used-for-evaluation):
-        - [BED file sampler](#BED-file-sampler)
-        - [Matrix file sampler](#Matrix-file-sampler)
+We strongly recommend you read through the first 4 sections ([Overview](#overview), [Operations](#operations), [General configurations](#general-configurations), and [Model architecture](#model-architecture); and then pick other sections based on your use case. 
 
 ## Overview
 Selene's CLI accepts configuration files in the [YAML](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html) format that are composed of 4 main (high-level) groups:
@@ -54,9 +31,9 @@ Every file should start with the operations that you want to run.
 ops: [train, evaluate, analyze]
 ```
 The `ops` key expects one or more of `[train, evaluate, analyze]` to be specified as a list. In addition to the general & model architecture configurations described in the next 2 sections, each of these operations has an expected set of configurations:
-- `train`: `train_model` (see [Train](#Train)) and `sampler` (see [Samplers used for training](#samplers-used-for-training-and-evaluation-optionally))
-- `evaluate`: `evaluate_model` (see [Evaluate](#Evaluate)) and `sampler` (see [Samplers used for evaluation](#samplers-used-for-evaluation))
-- `analyze`: `analyze_sequences` (see [Analyze sequences](#Analyze-sequences)) and one of [`prediction`](#Prediction-on-sequences), [`variant_effect_prediction`](#Variant-effect-prediction), or [`in_silico_mutagenesis`](#In-silico-mutagenesis). 
+- `train`: `train_model` (see [Train](#train)) and `sampler` (see [Samplers used for training](#samplers-used-for-training-and-evaluation-optionally))
+- `evaluate`: `evaluate_model` (see [Evaluate](#evaluate)) and `sampler` (see [Samplers used for evaluation](#samplers-used-for-evaluation))
+- `analyze`: `analyze_sequences` (see [Analyze sequences](#analyze-sequences)) and one of [`prediction`](#prediction-on-sequences), [`variant_effect_prediction`](#variant-effect-prediction), or [`in_silico_mutagenesis`](#in-silico-mutagenesis). 
 
 **Note**: You should be able to use multiple operations (i.e. specify the necessary configuration keys for those operations in a single file). However, if `[train, evaluate]` are both specified, we expect that they will both rely on the same sampler. If you need to train and evaluate using different samplers, please create 2 separate YAML files. 
 
@@ -73,10 +50,10 @@ load_test_set: True
 
 Note that there should not be any commas at the end of these lines.
 - `random_seed`: Set a random seed for `torch` and `torch.cuda` (if using CUDA) for reproducibility.
-- `output_dir`: The output directory to use for all operations. If no `output_dir` is specified, Selene assumes that the `output_dir` is specified in all relevant function-type values for operations in Selene. (More information on what function-type values are in [later sections](#A-note-for-the-following-sections).)
+- `output_dir`: The output directory to use for all operations. If no `output_dir` is specified, Selene assumes that the `output_dir` is specified in all relevant function-type values for operations in Selene. (More information on what function-type values are in [later sections](#a-note-for-the-following-sections).)
 - `create_subdirectory`: If True, creates a directory within `output_dir`   with the name formatted as `%Y-%m-%d-%H-%M-%S`---the date/time when Selene was run. (This is only applicable if `output_dir` has been specified.)
 - `lr`:  The learning rate. If you use our [CLI script](https://github.com/FunctionLab/selene/blob/master/selene_cli.py), you can pass this in as a command-line argument rather than having it specified in the configuration file. 
-- `load_test_set`: This is only applicable if you have specified `ops: [train, evaluate]`. You can set this parameter to True (by default it is False/ignored and the test set is only loaded when training ends) if you would like to load the test set into memory before training begins--and therefore save the test data generated by a sampler to a .bed file. You would find this useful if you want to save a test dataset (see [Samplers used for training](#samplers- used-for-training-and-evaluation-optionally)) and you do not know if your model will finish training and evaluation within the allotted time that your job is run. Furthermore, you are running Selene on a machine that can support such an increase in memory usage (on the order of GBs). 
+- `load_test_set`: This is only applicable if you have specified `ops: [train, evaluate]`. You can set this parameter to True (by default it is False/ignored and the test set is only loaded when training ends) if you would like to load the test set into memory before training begins--and therefore save the test data generated by a sampler to a .bed file. You would find this useful if you want to save a test dataset (see [Samplers used for training](#samplers-used-for-training-and-evaluation-optionally)) and you do not know if your model will finish training and evaluation within the allotted time that your job is run. You should also be running Selene on a machine that can support such an increase in memory usage (on the order of GBs). 
 
 ## Model architecture
 For all operations, Selene requires that you specify the model architecture, loss, and optimizer as inputs.
@@ -106,7 +83,7 @@ model: {
 }
 ```
 
-- `path`: This can be the path to a Python file or a Python module (directory). See the [previous section](#Expected-input-class-and-methods) for details.
+- `path`: This can be the path to a Python file or a Python module (directory). See the [previous section](#expected-input-class-and-methods) for details.
 - `class`: The model architecture class name.
 - `class_args`: The arguments needed to instantiate the class. In the case of [DeepSEA](https://github.com/FunctionLab/selene/blob/master/models/deepsea.py), the `class_args` keys would be `sequence_length` and `n_genomic_features`. 
 - `non_strand_specific`: Optional, possible values are `mean` or `max` if you want to use this parameter. (Otherwise, do not use this key in your model configuration.) If your model does not need to train on strand-specific input sequences, we have implemented a class that will pass both the forward and reverse sequence to the model and either take the `mean` or the `max` value across the two sets of predictions for a sample. 
@@ -165,14 +142,14 @@ train_model: !obj:selene_sdk.TrainModel {
   - 0: only warnings are logged
   - 1: information and warnings are logged
   - 2: debug messages, information, and warnings are all logged
-- `metrics`: Default is `dict(roc_auc=sklearn.metrics.roc_auc_score, average_precision=sklearn.metrics.average_precision_score)`. A dictionary that maps metric names (`str`) to metric functions. In addition to the [loss function you specified with your model architecture](#expected-input-class-and-methods), these are the metrics that you would like to monitor during the training/evaluation process (they all get reported every `report_stats_every_n_steps`). See the [Regression Models in Selene](https://github.com/FunctionLab/selene/blob/master/tutorials/regression_mpra_example/regression_mpra_example.ipynb) tutorial for a different input to the `metrics` parameter. You can `!import` metrics from `scipy`, `scikit-learn`, `statsmodels`. Each metric function should require, in order, the true values and predicted values as input arguments. For example,
+- `metrics`: Default is a dictionary with `"roc_auc"` mapped to `sklearn.metrics.roc_auc_score` and `"average_precision"` mapped to `sklearn.metrics.average_precision_score`. `metrics` is a dictionary that maps metric names (`str`) to metric functions. In addition to the [loss function you specified with your model architecture](#expected-input-class-and-methods), these are the metrics that you would like to monitor during the training/evaluation process (they all get reported every `report_stats_every_n_steps`). See the [Regression Models in Selene](https://github.com/FunctionLab/selene/blob/master/tutorials/regression_mpra_example/regression_mpra_example.ipynb) tutorial for a different input to the `metrics` parameter. You can `!import` metrics from `scipy`, `scikit-learn`, `statsmodels`. Each metric function should require, in order, the true values and predicted values as input arguments. For example,
   [`sklearn.metrics.average_precision_score`](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html) takes `y_true` and `y_score` as input.  
  - `checkpoint_resume`: Default is `None`. If not `None`, you should pass in the path to a model weights file generated by `torch.save` (and can now be read by `torch.load`) to resume training.  
 #### Additional notes
 Attentive readers might have noticed that in the [documentation for the `TrainModel` class](http://selene.flatironinstitute.org/selene.html#trainmodel) there are more input arguments than are required to instantiate the class through the CLI configuration file. This is because they are assumed to be carried through/retrieved from other configuration keys for consistency. Specifically:
 - `output_dir` can be specified as a top-level key in the configuration. You can specify it within each function-type constructor (e.g.  `!obj:selene_sdk.TrainModel`) if you prefer. If `output_dir` exists as a top-level key, Selene does use the top-level `output_dir` and ignores all other `output_dir` keys. **The `output_dir` is omitted in many of the configurations for this reason.**
-- `model`, `loss_criterion`, `optimizer_class`, `optimizer_kwargs` are all retrieved from the path in the [`model` configuration](#Model-architecture). 
-- `data_sampler`has its own separate configuration that you will need to specify in the same YAML file. Please see [Sampler configurations](#Sampler-configurations) for more information.
+- `model`, `loss_criterion`, `optimizer_class`, `optimizer_kwargs` are all retrieved from the path in the [`model` configuration](#model-architecture). 
+- `data_sampler`has its own separate configuration that you will need to specify in the same YAML file. Please see [Sampler configurations](#sampler-configurations) for more information.
 
 #### Expected outputs for training
 These outputs will be written to `output_dir` (a top-level parameter, can also  be specified within the function-type constructor, see above).
@@ -181,9 +158,9 @@ These outputs will be written to `output_dir` (a top-level parameter, can also  
 - `selene_sdk.train_model.log`: a detailed log file containing information about how much time it takes for batches to sampled and propagated through the model, how the model is performing, etc.
 - `selene_sdk.train_model.train.txt`: model training loss is printed to this file every `report_stats_every_n_steps`.
     - Visualize using `matplotlib` (`plt.plot`)
-- `selene_sdk.train_model.validation.txt`: model validation loss and average ROC AUC are printed to this file (tab-separated) every `report_stats_every_n_steps`. 
+- `selene_sdk.train_model.validation.txt`: model validation loss and other metrics you have specified (defaults would be ROC AUC and AUPRC) are printed to this file (tab-separated) every `report_stats_every_n_steps`. 
     - Visualize one of these columns using `matplotlib` (`plt.plot`)
-- saved sampled datasets (if applicable), e.g. `test_data.bed`: if the `save_datasets` value is not an empty list, Selene periodically saves all the data sampled so far in these .bed files. The columns of these files are `[chr, start, end, strand, semicolon_separated_class_indices]`. In the future, we will adjust this file to support non-binary labels (i.e. since we are only storing class indices, we can only label sequences with 1/0, presence/absence, of a given class).
+- saved sampled datasets (if applicable), e.g. `test_data.bed`: if the `save_datasets` value is not an empty list, Selene periodically saves all the data sampled so far in these .bed files. The columns of these files are `[chr, start, end, strand, semicolon_separated_class_indices]`. In the future, we will adjust this file to support non-binary labels (i.e. since we are only storing class indices in these output .bed files, we can only label sequences with 1/0, presence/absence, of a given class).
 
 ## Evaluate
 
@@ -207,7 +184,7 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
 
 #### Optional parameters
 - `batch_size`: Default is 64. Specify the batch size to process examples. Should be a power of 2.
-- `n_test_samples`: Default is `None`. Use `n_test_samples` if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type [`selene_sdk.samplers.OnlineSampler`](#samplers-used-for-training-and-evaluation-optionally))--you must specify a test partition in this case--it will default to 640000 test samples if `n_test_samples = None`. If you are using a file sampler ([multiple-file sampler](#Multiple-file-sampler) or [BED](#BED-file-sampler)/[matrix](#Matrix-file-sampler) file samplers), it will use all samples available in the file.
+- `n_test_samples`: Default is `None`. Use `n_test_samples` if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type [`selene_sdk.samplers.OnlineSampler`](#samplers-used-for-training-and-evaluation-optionally))--you must specify a test partition in this case--it will default to 640000 test samples if `n_test_samples = None`. If you are using a file sampler ([multiple-file sampler](#multiple-file-sampler) or [BED](#bed-file-sampler)/[matrix](#matrix-file-sampler) file samplers), it will use all samples available in the file.
 - `report_gt_feature_n_positives`: Default is 10. In total, each class/feature must have more than `report_gt_feature_n_positives` positive examples in the test set to be considered in the performance computation. the output file that reports each class' performance will report 'NA' for classes that do not have enough positive samples.
 - `use_cuda`: Default is False. Specify whether CUDA GPUs are available for torch to use.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use.
@@ -219,11 +196,11 @@ If you use a [sampler with multiple data partitions](#samplers-used-for-training
 
 #### Expected outputs for evaluation
 These outputs will be written to `output_dir` (a top-level parameter, can also  be specified within the function-type constructor).
-- `test_performance.txt`: columns are [`class`, `roc_auc`, `average_precision`] (eventually, we will support more scores and allow you to specify which scores you want). The breakdown of performance metrics by each class that the model predicts.
+- `test_performance.txt`: columns are `class` and whatever other metrics you specified (defaults: `roc_auc` and `average_precision`). The breakdown of performance metrics by each class that the model predicts.
 - `test_predictions.npz`: The model predictions for each sample in the test set. Useful if you want to make your own visualizations/figures.
 - `test_targets.npz`: The actual classes for each sample in the test set. Useful if you want to make your own visualizations/figures.
-- `precision_recall_curves.svg`: An AUPRC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.
-- `roc_curves.svg`: An ROC AUC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.
+- `precision_recall_curves.svg`: If using AUPRC as a metric, this is an AUPRC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.
+- `roc_curves.svg`: If using ROC AUC as a metric, this is an ROC AUC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.
 - `selene_sdk.evaluate_model.log`: Note that if `evaluate` is run through `train_model` (that is, no `evaluate_model` configuration was specified, but you used `ops: [train, evaluate]`) you will only see `selene_sdk.train_model.log`. `selene_sdk.evaluate_model.log` is created when `evaluate_model` is used and will output some logging information related to the `selene_sdk.EvaluateModel` class (some debug statements and performance metrics). 
 
 ## Analyze sequences
@@ -238,7 +215,7 @@ For variant effect prediction and _in silico_ mutagenesis, a number of scores ca
 - `diffs` (difference scores): The difference between alt and ref predictions.
 - `abs_diffs` (absolute difference scores): The absolute difference between alt and ref predictions.
 - `logits` (log-fold change scores): The difference between `logit(alt)` and `logit(ref)` predictions.
-You'll find examples of how this is specified in the [variant effect prediction](#Variant-effect-prediction) and [_in silico_ mutagenesis](#In-silico-mutagenesis) sections.
+You'll find examples of how this is specified in the [variant effect prediction](#variant-effect-prediction) and [_in silico_ mutagenesis](#in-silico-mutagenesis) sections.
 
 In all `analyze`-related operations, we ask that you specify 2 configuration keys. One will always be the `analyze_sequences` key and the other one is dependent on which of the 3 sub-operations you use---`prediction`, `variant_effect_prediction` or `in_silico_mutagenesis`.
 ```YAML
@@ -417,8 +394,8 @@ sampler: !obj:selene_sdk.samplers.IntervalsSampler {
     test_holdout: 0.10,
     sequence_length: 1000,
     center_bin_to_predict: 100,
-    feature_thresholds: {"feature1": 0.5, "default": 0.1}
-    mode: test
+    feature_thresholds: {"feature1": 0.5, "default": 0.1},
+    mode: test,
     save_datasets: [test]
 ```
 ##### Parameters
@@ -457,7 +434,7 @@ sampler: !obj:selene_sdk.samplers.MultiFileSampler {
 - `mode`: Default is 'train'. Must be one of `{train, validate, test}`. The starting mode in which to run this sampler.
 
 ### Important note
-If you use any of these samplers (that is, samplers with multiple data partitions) with the [`evaluate_model` configuration](#Evaluate), please make sure that your `mode` is set to `test`. 
+If you use any of these samplers (that is, samplers with multiple data partitions) with the [`evaluate_model` configuration](#evaluate), please make sure that your `mode` is set to `test`. 
 
 ### Samplers used for evaluation
 You can use all the samplers specified for training for evaluation as well (see note above). Additionally, you can use single-file samplers, which we describe below. 

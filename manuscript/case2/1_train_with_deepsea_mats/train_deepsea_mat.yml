@@ -46,8 +46,8 @@ train_model: !obj:selene_sdk.TrainModel {
     batch_size: 64,
     max_steps: 960000, 
     report_stats_every_n_steps: 64000,
-    n_validation_samples: 8000,
-    n_test_samples: 455024,
+    n_validation_samples: 8000,  # matches the number of samples in `valid.mat`
+    n_test_samples: 455024,  # matches the number of samples in `test.mat`
     use_cuda: True,
     data_parallel: True,
     report_gt_feature_n_positives: 50,
