@@ -108,8 +108,8 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-with-anaconda">Installing with Anaconda</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installing-with-pip">Installing with pip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
@@ -187,6 +187,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ and additional resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
 </ul>
 </li>
@@ -321,19 +322,11 @@
             
   <div class="section" id="installation">
 <span id="installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>We recommend that users either clone and build the repository or install Selene through conda. This is because there is less control over PyTorch dependencies with pip.</p>
+<p>Users can either clone and build the repository locally or install Selene through conda. We previously supported installation through pip, but are refraining from releasing the latest version of Selene through pip due to some issues we are observing when using the pip-installed torch and torchvision dependencies.</p>
 <div class="section" id="installing-with-anaconda">
 <span id="installing-with-anaconda"></span><h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
 <p>To install with conda (recommended for Linux users), run the following command in your terminal:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">bioconda</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="installing-with-pip">
-<span id="installing-with-pip"></span><h2>Installing with pip<a class="headerlink" href="#installing-with-pip" title="Permalink to this headline">¶</a></h2>
-<p>Selene can be installed with <a class="reference external" href="https://pypi.org/project/pip/">pip</a>.
-To install with pip, simply type the following commands into the terminal:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
 </pre></div>
 </div>
 </div>
@@ -354,6 +347,9 @@ First, download the latest commits from the source repository:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py install
 </pre></div>
 </div>
+</div>
+<div class="section" id="additional-dependency-for-running-the-cli">
+<span id="additional-dependency-for-running-the-cli"></span><h2>Additional dependency for running the CLI<a class="headerlink" href="#additional-dependency-for-running-the-cli" title="Permalink to this headline">¶</a></h2>
 <p>Please install <code class="docutils literal notranslate"><span class="pre">docopt</span></code> before running the command-line script <code class="docutils literal notranslate"><span class="pre">selene_cli.py</span></code> provided in the repository.</p>
 </div>
 </div>

@@ -108,8 +108,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-with-pip">Installing with pip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
@@ -187,6 +187,7 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ and additional resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#hyperparameter-optimization">Hyperparameter optimization</a></li>
 </ul>
 </li>
@@ -332,6 +333,11 @@
 </ul>
 <p>Please refer to the documentation for these classes.
 If you are interested in contributing new modules to Selene or requesting new functionality, please submit an issue to <a class="reference external" href="https://github.com/FunctionLab/selene/issues">Selene</a> or e-mail <a class="reference external" href="mailto:kchen&#37;&#52;&#48;flatironinstitute&#46;org">kchen<span>&#64;</span>flatironinstitute<span>&#46;</span>org</a>.</p>
+</div>
+<div class="section" id="exporting-a-selene-trained-model-to-kipoi">
+<span id="exporting-a-selene-trained-model-to-kipoi"></span><h2>Exporting a Selene-trained model to Kipoi<a class="headerlink" href="#exporting-a-selene-trained-model-to-kipoi" title="Permalink to this headline">¶</a></h2>
+<p>We have provided an example of how to prepare a model for upload to <a class="reference external" href="http://kipoi.org/">Kipoi’s model zoo</a> using a model trained during case study 2. You can use <a class="reference external" href="https://github.com/FunctionLab/selene/tree/master/manuscript/case2/3_kipoi_export">this example</a> as a starting point for preparing your own model for Kipoi. We have provided a script that can help to automate parts of the process.</p>
+<p>We are also working on an export function that will be built into Selene and accessible through the CLI.</p>
 </div>
 <div class="section" id="hyperparameter-optimization">
 <span id="hyperparameter-optimization"></span><h2>Hyperparameter optimization<a class="headerlink" href="#hyperparameter-optimization" title="Permalink to this headline">¶</a></h2>

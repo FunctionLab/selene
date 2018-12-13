@@ -1,20 +1,12 @@
 # Installation
 
-We recommend that users either clone and build the repository or install Selene through conda. This is because there is less control over PyTorch dependencies with pip.
+Users can either clone and build the repository locally or install Selene through conda. We previously supported installation through pip, but are refraining from releasing the latest version of Selene through pip due to some issues we are observing when using the pip-installed torch and torchvision dependencies.
 
 ## Installing with Anaconda
 
 To install with conda (recommended for Linux users), run the following command in your terminal:
 ```
 conda install -c bioconda selene-sdk
-```
-
-## Installing with pip
-
-Selene can be installed with [pip](https://pypi.org/project/pip/).
-To install with pip, simply type the following commands into the terminal:
-```
-pip install selene-sdk
 ```
 
 ## Installing from source
@@ -38,5 +30,7 @@ Otherwise, if you would like to locally install Selene, you can run
 ```sh
 python setup.py install
 ```
+
+## Additional dependency for running the CLI 
 
 Please install `docopt` before running the command-line script `selene_cli.py` provided in the repository.
