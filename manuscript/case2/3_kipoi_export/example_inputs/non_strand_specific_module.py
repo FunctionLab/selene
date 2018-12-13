@@ -1,0 +1,1 @@
+../../../../selene_sdk/utils/non_strand_specific_module.py

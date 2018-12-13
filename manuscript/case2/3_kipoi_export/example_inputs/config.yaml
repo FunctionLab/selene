@@ -1,0 +1,19 @@
+---
+module_class: model_arch.WrappedDeeperDeepSEA
+authors:
+  - name: Kathy Chen
+    github: kathyxchen
+  - name: author2
+    github: author2_github
+license: BSD 3-Clause
+model_name: DeeperDeepSEA
+trained_on_description: all chromosomes except 6 & 7 for validation and 8 & 9 for test
+selene_version: 0.1.3
+tags:
+  - Histone modification
+  - DNA binding
+  - DNA accessibility
+pytorch_version: 0.4.1
+seq_len: 1000
+n_tasks: 919
+...

@@ -10,6 +10,11 @@ The main modules that users may want to extend are
 Please refer to the documentation for these classes.
 If you are interested in contributing new modules to Selene or requesting new functionality, please submit an issue to [Selene](https://github.com/FunctionLab/selene/issues) or e-mail <kchen@flatironinstitute.org>.
 
+## Exporting a Selene-trained model to Kipoi
+We have provided an example of how to prepare a model for upload to [Kipoi's model zoo](http://kipoi.org/) using a model trained during case study 2. You can use [this example](https://github.com/FunctionLab/selene/tree/master/manuscript/case2/3_kipoi_export) as a starting point for preparing your own model for Kipoi. We have provided a script that can help to automate parts of the process.
+
+We are also working on an export function that will be built into Selene and accessible through the CLI. 
+
 ## Hyperparameter optimization
 Hyperparameter optimization is the process of finding the set of hyperparameters that yields an optimal model against a predefined score (e.g. minimizing a loss function). 
 Hyperparameters are the variables that govern the training process (i.e. these parameters are constant during training, compared to model parameters which are optimized/"tuned" by the training process itself). 

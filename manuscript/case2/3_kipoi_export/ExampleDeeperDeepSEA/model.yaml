@@ -1,0 +1,66 @@
+defined_as: kipoi.model.PyTorchModel
+args:
+  module_class: model_arch.WrappedDeeperDeepSEA  # model_arch.WrappedDeeperDeepSEA 
+  
+  weights: DeeperDeepSEA.state.pth.tar  # remove this line after uploading to Zenodo
+  #  To share the model with others, upload the `.pth.tar` to Zenodo
+  #  or Figshare, fill in the correct URL below, comment out `selene_model.pth.tar` above,
+  #  and uncomment these two lines (`url` and `md5` should still be nested under `weights`):
+  #    url: https://zenodo.org/record/<zenodo id>/files/selene_model.pth?download=1
+  #    md5:  
+info:
+  authors:
+    - name: Kathy Chen
+      github: kathyxchen 
+    - name: author2
+      github: author2_github 
+     
+  license: BSD 3-Clause  
+  doc: >
+      model_name = DeeperDeepSEA
+      ....
+  cite_as: /     # update with the DOI url to the publication
+  # e.g. trained_on: all chromosomes except validation chromosomes 6 & 7
+  #                  and test chromosomes 8 & 9
+  trained_on: all chromosomes except 6 & 7 for validation and 8 & 9 for test 
+  training_procedure: Using Selene version 0.1.3
+  tags:
+    - Histone modification
+    - DNA binding
+    - DNA accessibility
+    
+  
+default_dataloader:
+  defined_as: kipoiseq.dataloaders.SeqIntervalDl
+  default_args:
+    auto_resize_len: 1000
+    alphabet_axis: 0
+    dtype: np.float32
+
+dependencies:
+  conda:
+    - h5py
+    - pytorch::pytorch-cpu==0.4.1
+  pip:
+    - kipoiseq
+
+schema:
+  inputs:
+    name: seq
+    special_type: DNASeq
+    shape: (4, 1000)
+    doc: DNA sequence
+    associated_metadata: ranges
+  targets:
+    name: Output tasks
+    shape: (919, )   # (i.e. n_classes or n_genomic_features)
+    doc: Probability for a specific output task
+    column_labels:
+      - tasks.txt   # list of classes predicted by the model
+
+# Run `kipoi test <model_dir> -o expect.h5` to generate the file
+# test:
+# expect:
+#   url: <URL>/expect.h5
+#   md5: <md5 hash>
+#   precision_decimal: 6
