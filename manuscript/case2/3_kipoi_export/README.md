@@ -35,6 +35,7 @@ python kipoi_export.py <path>/best_model.pth.tar \
                        <path-to-output-dir>
 ```
 
+
 ### Parameters
 - `best_model.pth.tar`: serialized dictionary containing the trained model state and other parameters, from Selene training
 - `class_names.txt`: the list of distinct classes that the model predicts
@@ -47,6 +48,28 @@ The steps taken in the script:
 3. Uses the config YAML to populate the values in [`model-template.yaml`](https://github.com/FunctionLab/selene/tree/master/manuscript/case2/3_kipoi_export/model-template.yaml) and writes a `model.yaml` file to the output directory.
 
 After installing `kipoi`, you should be able to view your Kipoi model folder (default: `~/.kipoi/models`). For the model you want to submit, called `ModelName`, you should specify the output directory as `~/.kipoi/models/ModelName`. 
+
+#### Running the example
+
+Before running the command below, please download the model weights file `DeeperDeepSEA.pth.tar` using
+```sh
+wget <ZENODO RECORD LINK>
+```
+
+```sh
+python kipoi_export.py ./example_inputs/DeeperDeepSEA.pth.tar \
+                       ./example_inputs/class_names.txt \
+                       ./example_inputs/config.yaml \
+                       ./ExampleDeeperDeepSEA
+```
+
+(`ExampleDeeperDeepSEA` should be moved to `~/.kipoi/models/` in the end.)
+
+If you don't want to run `kipoi_export.py` and still want the complete `ExampleDeeperDeepSEA` directory, please download the file `DeeperDeepSEA.state.pth.tar` using
+```sh
+wget <ZENODO RECORD LINK>
+```
+(The difference between `DeeperDeepSEA.pth.tar` and `DeeperDeepSEA.state.pth.tar` is that the latter contains only the model state dictionary and weights, whereas the former contains some extra parameters that are useful for continuing model training in Selene.)
 
 ### The config YAML file
 This is used to generate `model.yaml` from `model-template.yaml`.
@@ -111,7 +134,7 @@ We are working to automate this, but currently, we have to do a few manual steps
 5. Optional, but helpful: rename `non_strand_specific_module.py` to something more representative of your model architecture (e.g. `wrapped_model_name.py`). You can rename the class from `NonStrandSpecific` to `WrappedModelName` or something else as well. Please note that you'll need to update `super(NonStrandSpecific, self).__init__()` with the new class name too. 
 6. Finally, import your class in the file `model_arch/__init__.py` (e.g. from `.wrapped_model_name import WrappedModelName`).
 
-How we applied these steps our example:
+How we applied these steps in our example:
 
 - Create the directory [`model_arch`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch).
 - The architecture file is [`deeper_deepsea_arch.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch/deeper_deepsea_arch.py), which contains the architecture class `DeeperDeepSEA`.
