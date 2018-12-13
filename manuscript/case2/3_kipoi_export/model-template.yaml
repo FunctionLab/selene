@@ -8,7 +8,7 @@ args:
     {% endfor %}
   {% endif %}
   weights: {{ model_weights }}  # remove this line after uploading to Zenodo
-  #  To share the model with others, upload `selene_model.pth.tar` to Zenodo
+  #  To share the model with others, upload the `.pth.tar` to Zenodo
   #  or Figshare, fill in the correct URL below, comment out `selene_model.pth.tar` above,
   #  and uncomment these two lines (`url` and `md5` should still be nested under `weights`):
   #    url: https://zenodo.org/record/<zenodo id>/files/selene_model.pth?download=1

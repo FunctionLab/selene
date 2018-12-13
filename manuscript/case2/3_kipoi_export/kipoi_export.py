@@ -4,7 +4,8 @@ Description:
     a model to the Kipoi model zoo.
 
 Output:
-    Saves model.yaml and TODO to a user-specified output directory.
+    Saves model.yaml, class names, and model state dictionary weights to a
+    user-specified output directory.
 
 Usage:
     kipoi_export.py <saved-model-pth> <class-names> <config-yaml> <output-dir>
