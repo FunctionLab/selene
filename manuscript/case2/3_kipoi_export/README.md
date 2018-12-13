@@ -104,21 +104,21 @@ Otherwise, you can move all your model architecture files into a directory calle
 #### If you used Selene's NonStrandSpecific module:
 We are working to automate this, but currently, we have to do a few manual steps to get our architecture formatted for export to Kipoi. This is applicable to our example, so you can refer to the files in there to see how we did this. 
 
-    1. Create a directory called `model_arch`. This will be the Python module that Kipoi uses to import your model architecture class. 
-    2. Copy the file [`non_strand_specific_module.py`](https://github.com/FunctionLab/selene/blob/master/selene_sdk/utils/non_strand_specific_module.py) from the Selene repostory to your directory.
-    3. For an architecture where the main class `ModelName` is in the file `model_name_arch.py`, you should add the line `from .model_name_arch import ModelName` to `non_strand_specific_module.py`. 
-    4. Next, remove the constructor input `model` from `__init__(self, model, mode="mean")` and set `self.model` to `ModelName(**kwargs)`
-    5. Optional, but helpful: rename `non_strand_specific_module.py` to something more representative of your model architecture (e.g. `wrapped_model_name.py`). You can rename the class from `NonStrandSpecific` to `WrappedModelName` or something else as well. Please note that you'll need to update `super(NonStrandSpecific, self).__init__()` with the new class name too. 
-    6. Finally, import your class in the file `model_arch/__init__.py` (e.g. from `.wrapped_model_name import WrappedModelName`).
+1. Create a directory called `model_arch`. This will be the Python module that Kipoi uses to import your model architecture class. 
+2. Copy the file [`non_strand_specific_module.py`](https://github.com/FunctionLab/selene/blob/master/selene_sdk/utils/non_strand_specific_module.py) from the Selene repostory to your directory.
+3. For an architecture where the main class `ModelName` is in the file `model_name_arch.py`, you should add the line `from .model_name_arch import ModelName` to `non_strand_specific_module.py`. 
+4. Next, remove the constructor input `model` from `__init__(self, model, mode="mean")` and set `self.model` to `ModelName(**kwargs)`
+5. Optional, but helpful: rename `non_strand_specific_module.py` to something more representative of your model architecture (e.g. `wrapped_model_name.py`). You can rename the class from `NonStrandSpecific` to `WrappedModelName` or something else as well. Please note that you'll need to update `super(NonStrandSpecific, self).__init__()` with the new class name too. 
+6. Finally, import your class in the file `model_arch/__init__.py` (e.g. from `.wrapped_model_name import WrappedModelName`).
 
 How we applied these steps our example:
 
-    - Create the directory `model_arch`.
-    - The architecture file is `deeper_deepsea_arch.py`, which contains the architecture class `DeeperDeepSEA`.
-    - Rename `non_strand_specific_module.py` to `wrapped_deeper_deepsea.py` and update the class name in the file to `WrappedDeeperDeepSEA`.
-    - Import `DeeperDeepSEA` with the line `from .deeper_deepsea_arch import DeeperDeepSEA`. 
-    - Remove `model` from `__init__` and set `self.model = DeeperDeepSEA(1000, 919)`. 
-    - Create the file `__init__.py` in `model_arch` with the line `from .wrapped_deeper_deepsea import WrapperDeeperDeepSEA`. 
+- Create the directory [`model_arch`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch).
+- The architecture file is [`deeper_deepsea_arch.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch/deeper_deepsea_arch.py), which contains the architecture class `DeeperDeepSEA`.
+- Rename `non_strand_specific_module.py` to [`wrapped_deeper_deepsea.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch/wrapped_deeper_deepsea.py) and update the class name in the file to `WrappedDeeperDeepSEA` (see lines 27 and 55).
+- Import `DeeperDeepSEA` with the line [`from .deeper_deepsea_arch import DeeperDeepSEA`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch/wrapped_deeper_deepsea.py#7). 
+- Remove `model` from `__init__` and set `self.model = DeeperDeepSEA(1000, 919)` (see lines 54 and 57 in [the file](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch/wrapped_deeper_deepsea.py)). 
+- Create the [file `__init__.py`](https://github.com/FunctionLab/selene/blob/master/manuscript/case2/3_kipoi_export/ExampleDeeperDeepSEA/model_arch/__init__.py) in `model_arch` with the line `from .wrapped_deeper_deepsea import WrapperDeeperDeepSEA`. 
 
 ## Testing
 
