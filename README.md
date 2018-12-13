@@ -7,17 +7,12 @@ Selene is a Python library and command line interface for training deep neural n
 ## Installation
 
 We recommend using Selene with Python 3.6 or above. 
-Package installation should only take a few minutes (less than 10 minutes, typically ~2-3 minutes) with any of these methods (pip, conda, source).  
+Package installation should only take a few minutes (less than 10 minutes, typically ~2-3 minutes) with any of these methods (conda, source). We previously supported installation through pip, but we are refraining from releasing the latest version of Selene with pip until we resolve some issues we are observing with the pip installations of torch and torchvision.   
 
 ### Installing selene with [Anaconda](https://www.anaconda.com/download/) (for Linux):
 
 ```sh
 conda install -c bioconda selene-sdk
-```
-
-### Installing selene with pip:
-```sh
-pip install selene-sdk
 ```
 
 ### Installing selene from source:
@@ -41,6 +36,8 @@ Otherwise, if you would like to locally install Selene, you can run
 ```sh
 python setup.py install
 ```
+
+### Additional dependency for the CLI
 
 Please install `docopt` before running the command-line script `selene_cli.py` provided in the repository.
 
