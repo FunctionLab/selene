@@ -1,0 +1,70 @@
+defined_as: kipoi.model.PyTorchModel
+args:
+  module_class: {{ module_class }}  # model_arch.WrappedDeeperDeepSEA 
+  {% if module_kwargs %}
+  module_kwargs: 
+    {% for k, v in module_kwargs.items(): -%}
+      {{ k }}: {{ v }}
+    {% endfor %}
+  {% endif %}
+  weights: {{ model_weights }}  # remove this line after uploading to Zenodo
+  #  To share the model with others, upload `selene_model.pth.tar` to Zenodo
+  #  or Figshare, fill in the correct URL below, comment out `selene_model.pth.tar` above,
+  #  and uncomment these two lines (`url` and `md5` should still be nested under `weights`):
+  #    url: https://zenodo.org/record/<zenodo id>/files/selene_model.pth?download=1
+  #    md5: {{ selene_model_md5 }} 
+info:
+  authors:
+    {% for a in authors -%}
+      - name: {{ a['name'] }}
+      github: {{ a['github'] }} 
+    {% endfor %} 
+  license: {{ license }}  
+  doc: >
+      model_name = {{ model_name }}
+      ....
+  cite_as: /     # update with the DOI url to the publication
+  # e.g. trained_on: all chromosomes except validation chromosomes 6 & 7
+  #                  and test chromosomes 8 & 9
+  trained_on: {{ trained_on_description }} 
+  training_procedure: Using Selene version {{ selene_version }}
+  {% if tags -%}
+  tags:
+    {% for t in tags -%}
+      - {{ t }}
+    {% endfor %}
+  {% endif %}
+default_dataloader:
+  defined_as: kipoiseq.dataloaders.SeqIntervalDl
+  default_args:
+    auto_resize_len: {{ seq_len }}
+    alphabet_axis: 0
+    dtype: np.float32
+
+dependencies:
+  conda:
+    - h5py
+    - pytorch::pytorch-cpu=={{ pytorch_version }}
+  pip:
+    - kipoiseq
+
+schema:
+  inputs:
+    name: seq
+    special_type: DNASeq
+    shape: (4, {{ seq_len }})
+    doc: DNA sequence
+    associated_metadata: ranges
+  targets:
+    name: Output tasks
+    shape: ({{ n_tasks }}, )   # (i.e. n_classes or n_genomic_features)
+    doc: Probability for a specific output task
+    column_labels:
+      - {{ predictor_names }}   # list of classes predicted by the model
+
+# Run `kipoi test <model_dir> -o expect.h5` to generate the file
+# test:
+# expect:
+#   url: <URL>/expect.h5
+#   md5: <md5 hash>
+#   precision_decimal: 6
