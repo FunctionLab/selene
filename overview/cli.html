@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                master (0.1.3)
+                master (0.2.0)
               </div>
             
           
@@ -114,7 +114,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Selene CLI operations and outputs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#operations">Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#general-configurations">General configurations</a></li>
@@ -322,46 +321,9 @@
             
   <div class="section" id="selene-cli-operations-and-outputs">
 <span id="selene-cli-operations-and-outputs"></span><h1>Selene CLI operations and outputs<a class="headerlink" href="#selene-cli-operations-and-outputs" title="Permalink to this headline">¶</a></h1>
-<p>Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations. (See <a class="reference external" href="#Operations">Operations</a> for more detail.)</p>
+<p>Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations. (See <a class="reference external" href="#operations">Operations</a> for more detail.)</p>
 <p>The sections that follow describe in detail how the various components that make up the configuration file are specified. For operation-specific sections (e.g. training, evaluation), we also explain what the expected outputs are.</p>
-<div class="section" id="table-of-contents">
-<span id="table-of-contents"></span><h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
-<p>We strongly recommend you read through the first 4 sections (<a class="reference external" href="#Overview">Overview</a>, <a class="reference external" href="#Operations">Operations</a>, <a class="reference external" href="#General-configurations">General configurations</a>, and <a class="reference external" href="#Model-architecture">Model architecture</a>) and then pick other sections based on your use case.</p>
-<ul class="simple">
-<li><a class="reference external" href="#Overview">Overview</a></li>
-<li><a class="reference external" href="#Operations">Operations</a></li>
-<li><a class="reference external" href="#General-configurations">General configurations</a></li>
-<li><a class="reference external" href="#Model-architecture">Model architecture</a></li>
-<li><a class="reference external" href="#Train">Train</a><ul>
-<li><a class="reference external" href="#Expected-outputs-for-training">Expected outputs for training</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#Evaluate">Evaluate</a><ul>
-<li><a class="reference external" href="#Expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#Analyze-sequences">Analyze sequences</a><ul>
-<li><a class="reference external" href="#Prediction-on-sequences">Prediction on sequences</a></li>
-<li><a class="reference external" href="#Variant-effect-prediction">Variant effect prediction</a></li>
-<li><a class="reference external" href="#In-silico-mutagenesis"><em>In silico</em> mutagenesis</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#Sampler-configurations">Sampler configurations</a><ul>
-<li><a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally">Samplers for training (and evaluation, optionally)</a>:<ul>
-<li><a class="reference external" href="#Random-positions-sampler">Random positions sampler</a></li>
-<li><a class="reference external" href="#Intervals-sampler">Intervals sampler</a></li>
-<li><a class="reference external" href="#Multiple-file-sampler">Multiple-file sampler</a></li>
-</ul>
-</li>
-<li><a class="reference external" href="#samplers-used-for-evaluation">File samplers for evaluation</a>:<ul>
-<li><a class="reference external" href="#BED-file-sampler">BED file sampler</a></li>
-<li><a class="reference external" href="#Matrix-file-sampler">Matrix file sampler</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
+<p>We strongly recommend you read through the first 4 sections (<a class="reference external" href="#overview">Overview</a>, <a class="reference external" href="#operations">Operations</a>, <a class="reference external" href="#general-configurations">General configurations</a>, and <a class="reference external" href="#model-architecture">Model architecture</a>; and then pick other sections based on your use case.</p>
 <div class="section" id="overview">
 <span id="overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Selene’s CLI accepts configuration files in the <a class="reference external" href="https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html">YAML</a> format that are composed of 4 main (high-level) groups:</p>
@@ -391,9 +353,9 @@
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">ops</span></code> key expects one or more of <code class="docutils literal notranslate"><span class="pre">[train,</span> <span class="pre">evaluate,</span> <span class="pre">analyze]</span></code> to be specified as a list. In addition to the general &amp; model architecture configurations described in the next 2 sections, each of these operations has an expected set of configurations:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">train</span></code>: <code class="docutils literal notranslate"><span class="pre">train_model</span></code> (see <a class="reference external" href="#Train">Train</a>) and <code class="docutils literal notranslate"><span class="pre">sampler</span></code> (see <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally">Samplers used for training</a>)</li>
-<li><code class="docutils literal notranslate"><span class="pre">evaluate</span></code>: <code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> (see <a class="reference external" href="#Evaluate">Evaluate</a>) and <code class="docutils literal notranslate"><span class="pre">sampler</span></code> (see <a class="reference external" href="#samplers-used-for-evaluation">Samplers used for evaluation</a>)</li>
-<li><code class="docutils literal notranslate"><span class="pre">analyze</span></code>: <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code> (see <a class="reference external" href="#Analyze-sequences">Analyze sequences</a>) and one of <a class="reference external" href="#Prediction-on-sequences"><code class="docutils literal notranslate"><span class="pre">prediction</span></code></a>, <a class="reference external" href="#Variant-effect-prediction"><code class="docutils literal notranslate"><span class="pre">variant_effect_prediction</span></code></a>, or <a class="reference external" href="#In-silico-mutagenesis"><code class="docutils literal notranslate"><span class="pre">in_silico_mutagenesis</span></code></a>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">train</span></code>: <code class="docutils literal notranslate"><span class="pre">train_model</span></code> (see <a class="reference external" href="#train">Train</a>) and <code class="docutils literal notranslate"><span class="pre">sampler</span></code> (see <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally">Samplers used for training</a>)</li>
+<li><code class="docutils literal notranslate"><span class="pre">evaluate</span></code>: <code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> (see <a class="reference external" href="#evaluate">Evaluate</a>) and <code class="docutils literal notranslate"><span class="pre">sampler</span></code> (see <a class="reference external" href="#samplers-used-for-evaluation">Samplers used for evaluation</a>)</li>
+<li><code class="docutils literal notranslate"><span class="pre">analyze</span></code>: <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code> (see <a class="reference external" href="#analyze-sequences">Analyze sequences</a>) and one of <a class="reference external" href="#prediction-on-sequences"><code class="docutils literal notranslate"><span class="pre">prediction</span></code></a>, <a class="reference external" href="#variant-effect-prediction"><code class="docutils literal notranslate"><span class="pre">variant_effect_prediction</span></code></a>, or <a class="reference external" href="#in-silico-mutagenesis"><code class="docutils literal notranslate"><span class="pre">in_silico_mutagenesis</span></code></a>.</li>
 </ul>
 <p><strong>Note</strong>: You should be able to use multiple operations (i.e. specify the necessary configuration keys for those operations in a single file). However, if <code class="docutils literal notranslate"><span class="pre">[train,</span> <span class="pre">evaluate]</span></code> are both specified, we expect that they will both rely on the same sampler. If you need to train and evaluate using different samplers, please create 2 separate YAML files.</p>
 </div>
@@ -410,10 +372,10 @@
 <p>Note that there should not be any commas at the end of these lines.</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">random_seed</span></code>: Set a random seed for <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.cuda</span></code> (if using CUDA) for reproducibility.</li>
-<li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code>: The output directory to use for all operations. If no <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified, Selene assumes that the <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified in all relevant function-type values for operations in Selene. (More information on what function-type values are in <a class="reference external" href="#A-note-for-the-following-sections">later sections</a>.)</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code>: The output directory to use for all operations. If no <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified, Selene assumes that the <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified in all relevant function-type values for operations in Selene. (More information on what function-type values are in <a class="reference external" href="#a-note-for-the-following-sections">later sections</a>.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">create_subdirectory</span></code>: If True, creates a directory within <code class="docutils literal notranslate"><span class="pre">output_dir</span></code>   with the name formatted as <code class="docutils literal notranslate"><span class="pre">%Y-%m-%d-%H-%M-%S</span></code>—the date/time when Selene was run. (This is only applicable if <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> has been specified.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">lr</span></code>:  The learning rate. If you use our <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/selene_cli.py">CLI script</a>, you can pass this in as a command-line argument rather than having it specified in the configuration file.</li>
-<li><code class="docutils literal notranslate"><span class="pre">load_test_set</span></code>: This is only applicable if you have specified <code class="docutils literal notranslate"><span class="pre">ops:</span> <span class="pre">[train,</span> <span class="pre">evaluate]</span></code>. You can set this parameter to True (by default it is False/ignored and the test set is only loaded when training ends) if you would like to load the test set into memory before training begins–and therefore save the test data generated by a sampler to a .bed file. You would find this useful if you want to save a test dataset (see [Samplers used for training](#samplers- used-for-training-and-evaluation-optionally)) and you do not know if your model will finish training and evaluation within the allotted time that your job is run. Furthermore, you are running Selene on a machine that can support such an increase in memory usage (on the order of GBs).</li>
+<li><code class="docutils literal notranslate"><span class="pre">load_test_set</span></code>: This is only applicable if you have specified <code class="docutils literal notranslate"><span class="pre">ops:</span> <span class="pre">[train,</span> <span class="pre">evaluate]</span></code>. You can set this parameter to True (by default it is False/ignored and the test set is only loaded when training ends) if you would like to load the test set into memory before training begins–and therefore save the test data generated by a sampler to a .bed file. You would find this useful if you want to save a test dataset (see <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally">Samplers used for training</a>) and you do not know if your model will finish training and evaluation within the allotted time that your job is run. You should also be running Selene on a machine that can support such an increase in memory usage (on the order of GBs).</li>
 </ul>
 </div>
 <div class="section" id="model-architecture">
@@ -446,7 +408,7 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">path</span></code>: This can be the path to a Python file or a Python module (directory). See the <a class="reference external" href="#Expected-input-class-and-methods">previous section</a> for details.</li>
+<li><code class="docutils literal notranslate"><span class="pre">path</span></code>: This can be the path to a Python file or a Python module (directory). See the <a class="reference external" href="#expected-input-class-and-methods">previous section</a> for details.</li>
 <li><code class="docutils literal notranslate"><span class="pre">class</span></code>: The model architecture class name.</li>
 <li><code class="docutils literal notranslate"><span class="pre">class_args</span></code>: The arguments needed to instantiate the class. In the case of <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/models/deepsea.py">DeepSEA</a>, the <code class="docutils literal notranslate"><span class="pre">class_args</span></code> keys would be <code class="docutils literal notranslate"><span class="pre">sequence_length</span></code> and <code class="docutils literal notranslate"><span class="pre">n_genomic_features</span></code>.</li>
 <li><code class="docutils literal notranslate"><span class="pre">non_strand_specific</span></code>: Optional, possible values are <code class="docutils literal notranslate"><span class="pre">mean</span></code> or <code class="docutils literal notranslate"><span class="pre">max</span></code> if you want to use this parameter. (Otherwise, do not use this key in your model configuration.) If your model does not need to train on strand-specific input sequences, we have implemented a class that will pass both the forward and reverse sequence to the model and either take the <code class="docutils literal notranslate"><span class="pre">mean</span></code> or the <code class="docutils literal notranslate"><span class="pre">max</span></code> value across the two sets of predictions for a sample.</li>
@@ -523,7 +485,7 @@
 <li>2: debug messages, information, and warnings are all logged</li>
 </ul>
 </li>
-<li><p class="first"><code class="docutils literal notranslate"><span class="pre">metrics</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">dict(roc_auc=sklearn.metrics.roc_auc_score,</span> <span class="pre">average_precision=sklearn.metrics.average_precision_score)</span></code>. A dictionary that maps metric names (<code class="docutils literal notranslate"><span class="pre">str</span></code>) to metric functions. In addition to the <a class="reference external" href="#expected-input-class-and-methods">loss function you specified with your model architecture</a>, these are the metrics that you would like to monitor during the training/evaluation process (they all get reported every <code class="docutils literal notranslate"><span class="pre">report_stats_every_n_steps</span></code>). See the <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/tutorials/regression_mpra_example/regression_mpra_example.ipynb">Regression Models in Selene</a> tutorial for a different input to the <code class="docutils literal notranslate"><span class="pre">metrics</span></code> parameter. You can <code class="docutils literal notranslate"><span class="pre">!import</span></code> metrics from <code class="docutils literal notranslate"><span class="pre">scipy</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>. Each metric function should require, in order, the true values and predicted values as input arguments. For example,
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">metrics</span></code>: Default is a dictionary with <code class="docutils literal notranslate"><span class="pre">&quot;roc_auc&quot;</span></code> mapped to <code class="docutils literal notranslate"><span class="pre">sklearn.metrics.roc_auc_score</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;average_precision&quot;</span></code> mapped to <code class="docutils literal notranslate"><span class="pre">sklearn.metrics.average_precision_score</span></code>. <code class="docutils literal notranslate"><span class="pre">metrics</span></code> is a dictionary that maps metric names (<code class="docutils literal notranslate"><span class="pre">str</span></code>) to metric functions. In addition to the <a class="reference external" href="#expected-input-class-and-methods">loss function you specified with your model architecture</a>, these are the metrics that you would like to monitor during the training/evaluation process (they all get reported every <code class="docutils literal notranslate"><span class="pre">report_stats_every_n_steps</span></code>). See the <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/tutorials/regression_mpra_example/regression_mpra_example.ipynb">Regression Models in Selene</a> tutorial for a different input to the <code class="docutils literal notranslate"><span class="pre">metrics</span></code> parameter. You can <code class="docutils literal notranslate"><span class="pre">!import</span></code> metrics from <code class="docutils literal notranslate"><span class="pre">scipy</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>. Each metric function should require, in order, the true values and predicted values as input arguments. For example,
 <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html"><code class="docutils literal notranslate"><span class="pre">sklearn.metrics.average_precision_score</span></code></a> takes <code class="docutils literal notranslate"><span class="pre">y_true</span></code> and <code class="docutils literal notranslate"><span class="pre">y_score</span></code> as input.</p>
 </li>
 <li><p class="first"><code class="docutils literal notranslate"><span class="pre">checkpoint_resume</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, you should pass in the path to a model weights file generated by <code class="docutils literal notranslate"><span class="pre">torch.save</span></code> (and can now be read by <code class="docutils literal notranslate"><span class="pre">torch.load</span></code>) to resume training.</p>
@@ -535,8 +497,8 @@
 <p>Attentive readers might have noticed that in the <a class="reference external" href="http://selene.flatironinstitute.org/selene.html#trainmodel">documentation for the <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class</a> there are more input arguments than are required to instantiate the class through the CLI configuration file. This is because they are assumed to be carried through/retrieved from other configuration keys for consistency. Specifically:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code> can be specified as a top-level key in the configuration. You can specify it within each function-type constructor (e.g.  <code class="docutils literal notranslate"><span class="pre">!obj:selene_sdk.TrainModel</span></code>) if you prefer. If <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> exists as a top-level key, Selene does use the top-level <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> and ignores all other <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> keys. <strong>The <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is omitted in many of the configurations for this reason.</strong></li>
-<li><code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">loss_criterion</span></code>, <code class="docutils literal notranslate"><span class="pre">optimizer_class</span></code>, <code class="docutils literal notranslate"><span class="pre">optimizer_kwargs</span></code> are all retrieved from the path in the <a class="reference external" href="#Model-architecture"><code class="docutils literal notranslate"><span class="pre">model</span></code> configuration</a>.</li>
-<li><code class="docutils literal notranslate"><span class="pre">data_sampler</span></code>has its own separate configuration that you will need to specify in the same YAML file. Please see <a class="reference external" href="#Sampler-configurations">Sampler configurations</a> for more information.</li>
+<li><code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">loss_criterion</span></code>, <code class="docutils literal notranslate"><span class="pre">optimizer_class</span></code>, <code class="docutils literal notranslate"><span class="pre">optimizer_kwargs</span></code> are all retrieved from the path in the <a class="reference external" href="#model-architecture"><code class="docutils literal notranslate"><span class="pre">model</span></code> configuration</a>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">data_sampler</span></code>has its own separate configuration that you will need to specify in the same YAML file. Please see <a class="reference external" href="#sampler-configurations">Sampler configurations</a> for more information.</li>
 </ul>
 </div>
 <div class="section" id="expected-outputs-for-training">
@@ -550,11 +512,11 @@
 <li>Visualize using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> (<code class="docutils literal notranslate"><span class="pre">plt.plot</span></code>)</li>
 </ul>
 </li>
-<li><code class="docutils literal notranslate"><span class="pre">selene_sdk.train_model.validation.txt</span></code>: model validation loss and average ROC AUC are printed to this file (tab-separated) every <code class="docutils literal notranslate"><span class="pre">report_stats_every_n_steps</span></code>.<ul>
+<li><code class="docutils literal notranslate"><span class="pre">selene_sdk.train_model.validation.txt</span></code>: model validation loss and other metrics you have specified (defaults would be ROC AUC and AUPRC) are printed to this file (tab-separated) every <code class="docutils literal notranslate"><span class="pre">report_stats_every_n_steps</span></code>.<ul>
 <li>Visualize one of these columns using <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> (<code class="docutils literal notranslate"><span class="pre">plt.plot</span></code>)</li>
 </ul>
 </li>
-<li>saved sampled datasets (if applicable), e.g. <code class="docutils literal notranslate"><span class="pre">test_data.bed</span></code>: if the <code class="docutils literal notranslate"><span class="pre">save_datasets</span></code> value is not an empty list, Selene periodically saves all the data sampled so far in these .bed files. The columns of these files are <code class="docutils literal notranslate"><span class="pre">[chr,</span> <span class="pre">start,</span> <span class="pre">end,</span> <span class="pre">strand,</span> <span class="pre">semicolon_separated_class_indices]</span></code>. In the future, we will adjust this file to support non-binary labels (i.e. since we are only storing class indices, we can only label sequences with 1/0, presence/absence, of a given class).</li>
+<li>saved sampled datasets (if applicable), e.g. <code class="docutils literal notranslate"><span class="pre">test_data.bed</span></code>: if the <code class="docutils literal notranslate"><span class="pre">save_datasets</span></code> value is not an empty list, Selene periodically saves all the data sampled so far in these .bed files. The columns of these files are <code class="docutils literal notranslate"><span class="pre">[chr,</span> <span class="pre">start,</span> <span class="pre">end,</span> <span class="pre">strand,</span> <span class="pre">semicolon_separated_class_indices]</span></code>. In the future, we will adjust this file to support non-binary labels (i.e. since we are only storing class indices in these output .bed files, we can only label sequences with 1/0, presence/absence, of a given class).</li>
 </ul>
 </div>
 </div>
@@ -584,7 +546,7 @@
 <span id="id2"></span><h3>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">batch_size</span></code>: Default is 64. Specify the batch size to process examples. Should be a power of 2.</li>
-<li><code class="docutils literal notranslate"><span class="pre">n_test_samples</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. Use <code class="docutils literal notranslate"><span class="pre">n_test_samples</span></code> if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally"><code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.OnlineSampler</span></code></a>)–you must specify a test partition in this case–it will default to 640000 test samples if <code class="docutils literal notranslate"><span class="pre">n_test_samples</span> <span class="pre">=</span> <span class="pre">None</span></code>. If you are using a file sampler (<a class="reference external" href="#Multiple-file-sampler">multiple-file sampler</a> or <a class="reference external" href="#BED-file-sampler">BED</a>/<a class="reference external" href="#Matrix-file-sampler">matrix</a> file samplers), it will use all samples available in the file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">n_test_samples</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. Use <code class="docutils literal notranslate"><span class="pre">n_test_samples</span></code> if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally"><code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.OnlineSampler</span></code></a>)–you must specify a test partition in this case–it will default to 640000 test samples if <code class="docutils literal notranslate"><span class="pre">n_test_samples</span> <span class="pre">=</span> <span class="pre">None</span></code>. If you are using a file sampler (<a class="reference external" href="#multiple-file-sampler">multiple-file sampler</a> or <a class="reference external" href="#bed-file-sampler">BED</a>/<a class="reference external" href="#matrix-file-sampler">matrix</a> file samplers), it will use all samples available in the file.</li>
 <li><code class="docutils literal notranslate"><span class="pre">report_gt_feature_n_positives</span></code>: Default is 10. In total, each class/feature must have more than <code class="docutils literal notranslate"><span class="pre">report_gt_feature_n_positives</span></code> positive examples in the test set to be considered in the performance computation. the output file that reports each class’ performance will report ‘NA’ for classes that do not have enough positive samples.</li>
 <li><code class="docutils literal notranslate"><span class="pre">use_cuda</span></code>: Default is False. Specify whether CUDA GPUs are available for torch to use.</li>
 <li><code class="docutils literal notranslate"><span class="pre">data_parallel</span></code>: Default is False. Specify whether multiple GPUs are available for torch to use.</li>
@@ -599,11 +561,11 @@
 <span id="expected-outputs-for-evaluation"></span><h3>Expected outputs for evaluation<a class="headerlink" href="#expected-outputs-for-evaluation" title="Permalink to this headline">¶</a></h3>
 <p>These outputs will be written to <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> (a top-level parameter, can also  be specified within the function-type constructor).</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">test_performance.txt</span></code>: columns are [<code class="docutils literal notranslate"><span class="pre">class</span></code>, <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code>, <code class="docutils literal notranslate"><span class="pre">average_precision</span></code>] (eventually, we will support more scores and allow you to specify which scores you want). The breakdown of performance metrics by each class that the model predicts.</li>
+<li><code class="docutils literal notranslate"><span class="pre">test_performance.txt</span></code>: columns are <code class="docutils literal notranslate"><span class="pre">class</span></code> and whatever other metrics you specified (defaults: <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> and <code class="docutils literal notranslate"><span class="pre">average_precision</span></code>). The breakdown of performance metrics by each class that the model predicts.</li>
 <li><code class="docutils literal notranslate"><span class="pre">test_predictions.npz</span></code>: The model predictions for each sample in the test set. Useful if you want to make your own visualizations/figures.</li>
 <li><code class="docutils literal notranslate"><span class="pre">test_targets.npz</span></code>: The actual classes for each sample in the test set. Useful if you want to make your own visualizations/figures.</li>
-<li><code class="docutils literal notranslate"><span class="pre">precision_recall_curves.svg</span></code>: An AUPRC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.</li>
-<li><code class="docutils literal notranslate"><span class="pre">roc_curves.svg</span></code>: An ROC AUC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.</li>
+<li><code class="docutils literal notranslate"><span class="pre">precision_recall_curves.svg</span></code>: If using AUPRC as a metric, this is an AUPRC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.</li>
+<li><code class="docutils literal notranslate"><span class="pre">roc_curves.svg</span></code>: If using ROC AUC as a metric, this is an ROC AUC figure that we generate for you. Each curve corresponds to one of the classes the model predicts.</li>
 <li><code class="docutils literal notranslate"><span class="pre">selene_sdk.evaluate_model.log</span></code>: Note that if <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> is run through <code class="docutils literal notranslate"><span class="pre">train_model</span></code> (that is, no <code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> configuration was specified, but you used <code class="docutils literal notranslate"><span class="pre">ops:</span> <span class="pre">[train,</span> <span class="pre">evaluate]</span></code>) you will only see <code class="docutils literal notranslate"><span class="pre">selene_sdk.train_model.log</span></code>. <code class="docutils literal notranslate"><span class="pre">selene_sdk.evaluate_model.log</span></code> is created when <code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> is used and will output some logging information related to the <code class="docutils literal notranslate"><span class="pre">selene_sdk.EvaluateModel</span></code> class (some debug statements and performance metrics).</li>
 </ul>
 </div>
@@ -622,7 +584,7 @@
 <li><code class="docutils literal notranslate"><span class="pre">diffs</span></code> (difference scores): The difference between alt and ref predictions.</li>
 <li><code class="docutils literal notranslate"><span class="pre">abs_diffs</span></code> (absolute difference scores): The absolute difference between alt and ref predictions.</li>
 <li><code class="docutils literal notranslate"><span class="pre">logits</span></code> (log-fold change scores): The difference between <code class="docutils literal notranslate"><span class="pre">logit(alt)</span></code> and <code class="docutils literal notranslate"><span class="pre">logit(ref)</span></code> predictions.
-You’ll find examples of how this is specified in the <a class="reference external" href="#Variant-effect-prediction">variant effect prediction</a> and <a class="reference external" href="#In-silico-mutagenesis"><em>in silico</em> mutagenesis</a> sections.</li>
+You’ll find examples of how this is specified in the <a class="reference external" href="#variant-effect-prediction">variant effect prediction</a> and <a class="reference external" href="#in-silico-mutagenesis"><em>in silico</em> mutagenesis</a> sections.</li>
 </ul>
 <p>In all <code class="docutils literal notranslate"><span class="pre">analyze</span></code>-related operations, we ask that you specify 2 configuration keys. One will always be the <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code> key and the other one is dependent on which of the 3 sub-operations you use—<code class="docutils literal notranslate"><span class="pre">prediction</span></code>, <code class="docutils literal notranslate"><span class="pre">variant_effect_prediction</span></code> or <code class="docutils literal notranslate"><span class="pre">in_silico_mutagenesis</span></code>.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">analyze_sequences</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.predict.AnalyzeSequences</span> <span class="p p-Indicator">{</span>
@@ -838,8 +800,8 @@ You’ll find examples of how this is specified in the <a class="reference exter
     <span class="nv">test_holdout</span><span class="p p-Indicator">:</span> <span class="nv">0.10</span><span class="p p-Indicator">,</span>
     <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
     <span class="nv">center_bin_to_predict</span><span class="p p-Indicator">:</span> <span class="nv">100</span><span class="p p-Indicator">,</span>
-    <span class="nv">feature_thresholds</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="s">&quot;feature1&quot;</span><span class="p p-Indicator">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span> <span class="s">&quot;default&quot;</span><span class="p p-Indicator">:</span> <span class="nv">0.1</span><span class="p p-Indicator">}</span>
-    <span class="nv">mode</span><span class="p p-Indicator">:</span> <span class="nv">test</span>
+    <span class="nv">feature_thresholds</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="s">&quot;feature1&quot;</span><span class="p p-Indicator">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span> <span class="s">&quot;default&quot;</span><span class="p p-Indicator">:</span> <span class="nv">0.1</span><span class="p p-Indicator">},</span>
+    <span class="nv">mode</span><span class="p p-Indicator">:</span> <span class="nv">test</span><span class="p p-Indicator">,</span>
     <span class="nv">save_datasets</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
@@ -887,7 +849,7 @@ You’ll find examples of how this is specified in the <a class="reference exter
 </div>
 <div class="section" id="important-note">
 <span id="important-note"></span><h3>Important note<a class="headerlink" href="#important-note" title="Permalink to this headline">¶</a></h3>
-<p>If you use any of these samplers (that is, samplers with multiple data partitions) with the <a class="reference external" href="#Evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> configuration</a>, please make sure that your <code class="docutils literal notranslate"><span class="pre">mode</span></code> is set to <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p>
+<p>If you use any of these samplers (that is, samplers with multiple data partitions) with the <a class="reference external" href="#evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> configuration</a>, please make sure that your <code class="docutils literal notranslate"><span class="pre">mode</span></code> is set to <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p>
 </div>
 <div class="section" id="samplers-used-for-evaluation">
 <span id="samplers-used-for-evaluation"></span><h3>Samplers used for evaluation<a class="headerlink" href="#samplers-used-for-evaluation" title="Permalink to this headline">¶</a></h3>
@@ -1133,7 +1095,7 @@ You’ll find examples of how this is specified in the <a class="reference exter
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Selene Contributors.
+        &copy; Copyright 2018, Selene Contributors
 
     </p>
   </div>
@@ -1152,21 +1114,14 @@ You’ll find examples of how this is specified in the <a class="reference exter
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'master',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
