@@ -51,13 +51,14 @@ After installing `kipoi`, you should be able to view your Kipoi model folder (de
 
 #### Running the example
 
-Before running the command below, please download the model weights file `DeeperDeepSEA.pth.tar` using
+Before running the command below, please download the model weights file `best_model.pth.tar` using
 ```sh
-wget <ZENODO RECORD LINK>
+wget https://zenodo.org/record/2254804/files/best_model.pth.tar
 ```
 
+After moving the file to `example_inputs`, run
 ```sh
-python kipoi_export.py ./example_inputs/DeeperDeepSEA.pth.tar \
+python kipoi_export.py ./example_inputs/best_model.pth.tar \
                        ./example_inputs/class_names.txt \
                        ./example_inputs/config.yaml \
                        ./ExampleDeeperDeepSEA
@@ -67,9 +68,11 @@ python kipoi_export.py ./example_inputs/DeeperDeepSEA.pth.tar \
 
 If you don't want to run `kipoi_export.py` and still want the complete `ExampleDeeperDeepSEA` directory, please download the file `DeeperDeepSEA.state.pth.tar` using
 ```sh
-wget <ZENODO RECORD LINK>
+wget https://zenodo.org/record/2254804/files/DeeperDeepSEA.state.pth.tar
 ```
-(The difference between `DeeperDeepSEA.pth.tar` and `DeeperDeepSEA.state.pth.tar` is that the latter contains only the model state dictionary and weights, whereas the former contains some extra parameters that are useful for continuing model training in Selene.)
+and move it to `ExampleDeeperDeepSEA`.
+
+(The difference between `best_model.pth.tar` and `DeeperDeepSEA.state.pth.tar` is that the latter contains only the model state dictionary and weights, whereas the former contains some extra parameters that are useful for continuing model training in Selene.)
 
 ### The config YAML file
 This is used to generate `model.yaml` from `model-template.yaml`.
