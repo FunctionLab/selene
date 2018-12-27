@@ -7,8 +7,7 @@ channels:
 dependencies:
   - cython=0.27.3
   - docopt=0.6.2
-  - h5py=2.8.0
-  - hdf5=1.10.2
+  - h5py=2.9.0
   - matplotlib=2.0.2
   - numpy=1.15.1
   - pandas=0.20.3
