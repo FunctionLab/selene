@@ -349,7 +349,7 @@
 <div class="section" id="operations">
 <span id="operations"></span><h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
 <p>Every file should start with the operations that you want to run.</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">ops</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">evaluate</span><span class="p p-Indicator">,</span> <span class="nv">analyze</span><span class="p p-Indicator">]</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">evaluate</span><span class="p p-Indicator">,</span> <span class="nv">analyze</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">ops</span></code> key expects one or more of <code class="docutils literal notranslate"><span class="pre">[train,</span> <span class="pre">evaluate,</span> <span class="pre">analyze]</span></code> to be specified as a list. In addition to the general &amp; model architecture configurations described in the next 2 sections, each of these operations has an expected set of configurations:</p>
@@ -363,11 +363,11 @@
 <div class="section" id="general-configurations">
 <span id="general-configurations"></span><h2>General configurations<a class="headerlink" href="#general-configurations" title="Permalink to this headline">¶</a></h2>
 <p>In addition to the <code class="docutils literal notranslate"><span class="pre">ops</span></code> key, you can specify the following parameters:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">random_seed</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1337</span>
-<span class="l l-Scalar l-Scalar-Plain">output_dir</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/absolute/path/to/output/dir</span>
-<span class="l l-Scalar l-Scalar-Plain">create_subdirectory</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
-<span class="l l-Scalar l-Scalar-Plain">lr</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
-<span class="l l-Scalar l-Scalar-Plain">load_test_set</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">random_seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1337</span>
+<span class="nt">output_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/absolute/path/to/output/dir</span>
+<span class="nt">create_subdirectory</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="nt">lr</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">load_test_set</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
 </pre></div>
 </div>
 <p>Note that there should not be any commas at the end of these lines.</p>
@@ -396,15 +396,15 @@
 </div>
 <div class="section" id="model-architecture-configuration">
 <span id="model-architecture-configuration"></span><h3>Model architecture configuration<a class="headerlink" href="#model-architecture-configuration" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">path</span><span class="p p-Indicator">:</span> <span class="nv">/absolute/path/to/file_or_model</span><span class="p p-Indicator">,</span>
-    <span class="nv">class</span><span class="p p-Indicator">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
-    <span class="nv">class_args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-        <span class="nv">arg1</span><span class="p p-Indicator">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
-        <span class="nv">arg2</span><span class="p p-Indicator">:</span> <span class="nv">val2</span><span class="p p-Indicator">,</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    path</span><span class="p">:</span> <span class="nv">/absolute/path/to/file_or_model</span><span class="p p-Indicator">,</span>
+<span class="nt">    class</span><span class="p">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
+<span class="nt">    class_args</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">        arg1</span><span class="p">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
+<span class="nt">        arg2</span><span class="p">:</span> <span class="nv">val2</span><span class="p p-Indicator">,</span>
         <span class="nv">...</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">non_strand_specific</span><span class="p p-Indicator">:</span> <span class="nv">mean</span>
+<span class="nt">    non_strand_specific</span><span class="p">:</span> <span class="nv">mean</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -424,23 +424,23 @@
 <div class="section" id="train">
 <span id="train"></span><h2>Train<a class="headerlink" href="#train" title="Permalink to this headline">¶</a></h2>
 <p>An example configuration for training:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">train_model</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.TrainModel</span> <span class="p p-Indicator">{</span>
-    <span class="nv">batch_size</span><span class="p p-Indicator">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
-    <span class="nv">max_steps</span><span class="p p-Indicator">:</span> <span class="nv">960000</span><span class="p p-Indicator">,</span>
-    <span class="nv">report_stats_every_n_steps</span><span class="p p-Indicator">:</span> <span class="nv">32000</span><span class="p p-Indicator">,</span>
-    <span class="nv">save_checkpoint_every_n_steps</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">save_new_checkpoints_after_n_steps</span><span class="p p-Indicator">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
-    <span class="nv">n_validation_samples</span><span class="p p-Indicator">:</span> <span class="nv">64000</span><span class="p p-Indicator">,</span>
-    <span class="nv">n_test_samples</span><span class="p p-Indicator">:</span> <span class="nv">960000</span><span class="p p-Indicator">,</span>
-    <span class="nv">cpu_n_threads</span><span class="p p-Indicator">:</span> <span class="nv">32</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_cuda</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">data_parallel</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">logging_verbosity</span><span class="p p-Indicator">:</span> <span class="nv">2</span><span class="p p-Indicator">,</span>
-    <span class="nv">metrics</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-        <span class="nv">roc_auc</span><span class="p p-Indicator">:</span> <span class="kt">!import:sklearn.metrics.roc_auc_score,</span>
-        <span class="nv">average_precision</span><span class="p p-Indicator">:</span> <span class="kt">!import:sklearn.metrics.average_precision_score</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">train_model</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.TrainModel</span> <span class="p p-Indicator">{</span>
+<span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
+<span class="nt">    max_steps</span><span class="p">:</span> <span class="nv">960000</span><span class="p p-Indicator">,</span>
+<span class="nt">    report_stats_every_n_steps</span><span class="p">:</span> <span class="nv">32000</span><span class="p p-Indicator">,</span>
+<span class="nt">    save_checkpoint_every_n_steps</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    save_new_checkpoints_after_n_steps</span><span class="p">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_validation_samples</span><span class="p">:</span> <span class="nv">64000</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_test_samples</span><span class="p">:</span> <span class="nv">960000</span><span class="p p-Indicator">,</span>
+<span class="nt">    cpu_n_threads</span><span class="p">:</span> <span class="nv">32</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_cuda</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    data_parallel</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    logging_verbosity</span><span class="p">:</span> <span class="nv">2</span><span class="p p-Indicator">,</span>
+<span class="nt">    metrics</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">        roc_auc</span><span class="p">:</span> <span class="kt">!import:sklearn.metrics.roc_auc_score,</span>
+<span class="nt">        average_precision</span><span class="p">:</span> <span class="kt">!import:sklearn.metrics.average_precision_score</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">checkpoint_resume</span><span class="p p-Indicator">:</span> <span class="nv">False</span>    
+<span class="nt">    checkpoint_resume</span><span class="p">:</span> <span class="nv">False</span>    
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -524,15 +524,15 @@
 <div class="section" id="evaluate">
 <span id="evaluate"></span><h2>Evaluate<a class="headerlink" href="#evaluate" title="Permalink to this headline">¶</a></h2>
 <p>An example configuration for evaluation:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">evaluate_model</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.EvaluateModel</span> <span class="p p-Indicator">{</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/features_list.txt</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">evaluate_model</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.EvaluateModel</span> <span class="p p-Indicator">{</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">trained_model_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
-    <span class="nv">batch_size</span><span class="p p-Indicator">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
-    <span class="nv">n_test_samples</span><span class="p p-Indicator">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
-    <span class="nv">report_gt_feature_n_positives</span><span class="p p-Indicator">:</span> <span class="nv">50</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_cuda</span><span class="p p-Indicator">:</span> <span class="nv">True</span>
+<span class="nt">    trained_model_path</span><span class="p">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
+<span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_test_samples</span><span class="p">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
+<span class="nt">    report_gt_feature_n_positives</span><span class="p">:</span> <span class="nv">50</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_cuda</span><span class="p">:</span> <span class="nv">True</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -588,16 +588,16 @@
 You’ll find examples of how this is specified in the <a class="reference external" href="#variant-effect-prediction">variant effect prediction</a> and <a class="reference external" href="#in-silico-mutagenesis"><em>in silico</em> mutagenesis</a> sections.</li>
 </ul>
 <p>In all <code class="docutils literal notranslate"><span class="pre">analyze</span></code>-related operations, we ask that you specify 2 configuration keys. One will always be the <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code> key and the other one is dependent on which of the 3 sub-operations you use—<code class="docutils literal notranslate"><span class="pre">prediction</span></code>, <code class="docutils literal notranslate"><span class="pre">variant_effect_prediction</span></code> or <code class="docutils literal notranslate"><span class="pre">in_silico_mutagenesis</span></code>.</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">analyze_sequences</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.predict.AnalyzeSequences</span> <span class="p p-Indicator">{</span>
-    <span class="nv">trained_model_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/features_list.txt</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">analyze_sequences</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.predict.AnalyzeSequences</span> <span class="p p-Indicator">{</span>
+<span class="nt">    trained_model_path</span><span class="p">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_length</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">batch_size</span><span class="p p-Indicator">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_cuda</span><span class="p p-Indicator">:</span> <span class="nv">False</span><span class="p p-Indicator">,</span>
-    <span class="nv">reference_sequence</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/reference_sequence.fa</span>
+<span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_cuda</span><span class="p">:</span> <span class="nv">False</span><span class="p p-Indicator">,</span>
+<span class="nt">    reference_sequence</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/reference_sequence.fa</span>
     <span class="p p-Indicator">}</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
@@ -626,9 +626,9 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <span id="prediction-on-sequences"></span><h3>Prediction on sequences<a class="headerlink" href="#prediction-on-sequences" title="Permalink to this headline">¶</a></h3>
 <p>For prediction on sequences, we require that a user specifies the path to a FASTA file.</p>
 <p>An example configuration for prediction on sequences:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prediction</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/sequences.fa</span><span class="p p-Indicator">,</span>
-    <span class="nv">output_dir</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/output/dir</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">prediction</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    input_path</span><span class="p">:</span> <span class="nv">/path/to/sequences.fa</span><span class="p p-Indicator">,</span>
+<span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/dir</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -648,14 +648,14 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <li>For indels, sequences are centered at <code class="docutils literal notranslate"><span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span></code>, for the inserted/deleted sequence of length <code class="docutils literal notranslate"><span class="pre">N_bases</span></code>. Selene queries for <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">-</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">+</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> to get the sequence of length <code class="docutils literal notranslate"><span class="pre">N</span></code>. This applies to the counterpart sequence as well. For example, if the sequence is completely deleted, the <code class="docutils literal notranslate"><span class="pre">alt</span></code> column has 0 bases. Selene queries for <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N/2)</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">-</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> to build the counterpart sequence since <code class="docutils literal notranslate"><span class="pre">N_bases</span></code> is 0.</li>
 </ul>
 <p>An example configuration for variant effect prediction:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">variant_effect_prediction</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">vcf_files</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">variant_effect_prediction</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    vcf_files</span><span class="p">:</span> <span class="p p-Indicator">[</span>
         <span class="nv">/path/to/file1.vcf</span><span class="p p-Indicator">,</span>
         <span class="nv">/path/to/file2.vcf</span><span class="p p-Indicator">,</span>
         <span class="nv">...</span>
     <span class="p p-Indicator">],</span>
-    <span class="nv">save_data</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">abs_diffs</span><span class="p p-Indicator">],</span>
-    <span class="nv">output_dir</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/output/predictions/dir</span>
+<span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">abs_diffs</span><span class="p p-Indicator">],</span>
+<span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predictions/dir</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -671,11 +671,11 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <div class="section" id="in-silico-mutagenesis">
 <span id="in-silico-mutagenesis"></span><h3><em>In silico</em> mutagenesis<a class="headerlink" href="#in-silico-mutagenesis" title="Permalink to this headline">¶</a></h3>
 <p>An example configuration for <em>in silico</em> mutagenesis when using a single sequence as input:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">in_silico_mutagenesis</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">input_sequence</span><span class="p p-Indicator">:</span> <span class="nv">ATCGATAAAATTCTGGAG...</span><span class="p p-Indicator">,</span>
-    <span class="nv">save_data</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">,</span> <span class="nv">diffs</span><span class="p p-Indicator">],</span>
-    <span class="nv">output_path_prefix</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/output/dir/filename_prefix</span><span class="p p-Indicator">,</span>
-    <span class="nv">mutate_n_bases</span><span class="p p-Indicator">:</span> <span class="nv">1</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">in_silico_mutagenesis</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    input_sequence</span><span class="p">:</span> <span class="nv">ATCGATAAAATTCTGGAG...</span><span class="p p-Indicator">,</span>
+<span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">,</span> <span class="nv">diffs</span><span class="p p-Indicator">],</span>
+<span class="nt">    output_path_prefix</span><span class="p">:</span> <span class="nv">/path/to/output/dir/filename_prefix</span><span class="p p-Indicator">,</span>
+<span class="nt">    mutate_n_bases</span><span class="p">:</span> <span class="nv">1</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -688,12 +688,12 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <li><code class="docutils literal notranslate"><span class="pre">mutate_n_bases</span></code>: Optional, default is 1. The number of bases to mutate at any time. Standard <em>in silico</em> mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1. Double/triple mutations will be more difficult to interpret and are something we may work on in the future.</li>
 </ul>
 <p>An example configuration for <em>in silico</em> mutagenesis when using a FASTA file as input:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">in_silico_mutagenesis</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/sequences1.fa</span><span class="p p-Indicator">,</span> 
-    <span class="nv">save_data</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">logits</span><span class="p p-Indicator">],</span>
-    <span class="nv">output_dir</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/output/predictions/dir</span><span class="p p-Indicator">,</span>
-    <span class="nv">mutate_n_bases</span><span class="p p-Indicator">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_sequence_name</span><span class="p p-Indicator">:</span> <span class="nv">True</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">in_silico_mutagenesis</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    input_path</span><span class="p">:</span> <span class="nv">/path/to/sequences1.fa</span><span class="p p-Indicator">,</span> 
+<span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">logits</span><span class="p p-Indicator">],</span>
+<span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predictions/dir</span><span class="p p-Indicator">,</span>
+<span class="nt">    mutate_n_bases</span><span class="p">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_sequence_name</span><span class="p">:</span> <span class="nv">True</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -725,23 +725,23 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <span id="random-positions-sampler"></span><h4>Random positions sampler<a class="headerlink" href="#random-positions-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The random positions sampler will construct data samples by randomly selecting a position in the genome and then using the sequence and classes centered at that position as the input and targets for the model to predict.</p>
 <p>An example configuration for the random positions sampler:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.RandomPositionsSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">reference_sequence</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/reference_sequence.fa</span><span class="p p-Indicator">,</span>
-        <span class="nv">blacklist_regions</span><span class="p p-Indicator">:</span> <span class="nv">hg19</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.RandomPositionsSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    reference_sequence</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/reference_sequence.fa</span><span class="p p-Indicator">,</span>
+<span class="nt">        blacklist_regions</span><span class="p">:</span> <span class="nv">hg19</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/features_list.txt</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">target_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/targets_bed.gz</span><span class="p p-Indicator">,</span>
-    <span class="nv">seed</span><span class="p p-Indicator">:</span> <span class="nv">123</span><span class="p p-Indicator">,</span>
-    <span class="nv">validation_holdout</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">chr6</span><span class="p p-Indicator">,</span> <span class="nv">chr7</span><span class="p p-Indicator">],</span>
-    <span class="nv">test_holdout</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">chr8</span><span class="p p-Indicator">,</span> <span class="nv">chr9</span><span class="p p-Indicator">],</span>
-    <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">center_bin_to_predict</span><span class="p p-Indicator">:</span> <span class="nv">200</span><span class="p p-Indicator">,</span>
-    <span class="nv">feature_thresholds</span><span class="p p-Indicator">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span>
-    <span class="nv">mode</span><span class="p p-Indicator">:</span> <span class="nv">train</span><span class="p p-Indicator">,</span>
-    <span class="nv">save_datasets</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">validate</span><span class="p p-Indicator">,</span> <span class="nv">test</span><span class="p p-Indicator">]</span>
+<span class="nt">    target_path</span><span class="p">:</span> <span class="nv">/path/to/targets_bed.gz</span><span class="p p-Indicator">,</span>
+<span class="nt">    seed</span><span class="p">:</span> <span class="nv">123</span><span class="p p-Indicator">,</span>
+<span class="nt">    validation_holdout</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">chr6</span><span class="p p-Indicator">,</span> <span class="nv">chr7</span><span class="p p-Indicator">],</span>
+<span class="nt">    test_holdout</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">chr8</span><span class="p p-Indicator">,</span> <span class="nv">chr9</span><span class="p p-Indicator">],</span>
+<span class="nt">    sequence_length</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    center_bin_to_predict</span><span class="p">:</span> <span class="nv">200</span><span class="p p-Indicator">,</span>
+<span class="nt">    feature_thresholds</span><span class="p">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span>
+<span class="nt">    mode</span><span class="p">:</span> <span class="nv">train</span><span class="p p-Indicator">,</span>
+<span class="nt">    save_datasets</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">validate</span><span class="p p-Indicator">,</span> <span class="nv">test</span><span class="p p-Indicator">]</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -785,25 +785,25 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <span id="intervals-sampler"></span><h4>Intervals sampler<a class="headerlink" href="#intervals-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The intervals sampler will construct data samples by randomly selecting positions only in the regions specified by an intervals <code class="docutils literal notranslate"><span class="pre">.bed</span></code> file and then using the sequence and classes centered at that position as the input and targets for the model to predict.</p>
 <p>An example configuration for the intervals sampler:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.IntervalsSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">reference_sequence</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/reference_sequence.fa</span><span class="p p-Indicator">,</span>
-        <span class="nv">blacklist_regions</span><span class="p p-Indicator">:</span> <span class="nv">hg38</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.IntervalsSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    reference_sequence</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/reference_sequence.fa</span><span class="p p-Indicator">,</span>
+<span class="nt">        blacklist_regions</span><span class="p">:</span> <span class="nv">hg38</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">target_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/targets.bed.gz</span><span class="p p-Indicator">,</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/features_list.txt</span>
+<span class="nt">    target_path</span><span class="p">:</span> <span class="nv">/path/to/targets.bed.gz</span><span class="p p-Indicator">,</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">intervals_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/intervals.bed</span><span class="p p-Indicator">,</span>
-    <span class="nv">sample_negative</span><span class="p p-Indicator">:</span> <span class="nv">False</span><span class="p p-Indicator">,</span>
-    <span class="nv">seed</span><span class="p p-Indicator">:</span> <span class="nv">436</span><span class="p p-Indicator">,</span>
-    <span class="nv">validation_holdout</span><span class="p p-Indicator">:</span> <span class="nv">0.10</span><span class="p p-Indicator">,</span>
-    <span class="nv">test_holdout</span><span class="p p-Indicator">:</span> <span class="nv">0.10</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">center_bin_to_predict</span><span class="p p-Indicator">:</span> <span class="nv">100</span><span class="p p-Indicator">,</span>
-    <span class="nv">feature_thresholds</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="s">&quot;feature1&quot;</span><span class="p p-Indicator">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span> <span class="s">&quot;default&quot;</span><span class="p p-Indicator">:</span> <span class="nv">0.1</span><span class="p p-Indicator">},</span>
-    <span class="nv">mode</span><span class="p p-Indicator">:</span> <span class="nv">test</span><span class="p p-Indicator">,</span>
-    <span class="nv">save_datasets</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
+<span class="nt">    intervals_path</span><span class="p">:</span> <span class="nv">/path/to/intervals.bed</span><span class="p p-Indicator">,</span>
+<span class="nt">    sample_negative</span><span class="p">:</span> <span class="nv">False</span><span class="p p-Indicator">,</span>
+<span class="nt">    seed</span><span class="p">:</span> <span class="nv">436</span><span class="p p-Indicator">,</span>
+<span class="nt">    validation_holdout</span><span class="p">:</span> <span class="nv">0.10</span><span class="p p-Indicator">,</span>
+<span class="nt">    test_holdout</span><span class="p">:</span> <span class="nv">0.10</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_length</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    center_bin_to_predict</span><span class="p">:</span> <span class="nv">100</span><span class="p p-Indicator">,</span>
+<span class="nt">    feature_thresholds</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">&quot;feature1&quot;</span><span class="p">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span><span class="nt"> &quot;default&quot;</span><span class="p">:</span> <span class="nv">0.1</span><span class="p p-Indicator">},</span>
+<span class="nt">    mode</span><span class="p">:</span> <span class="nv">test</span><span class="p p-Indicator">,</span>
+<span class="nt">    save_datasets</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
 <div class="section" id="parameters">
@@ -819,20 +819,20 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <span id="multiple-file-sampler"></span><h4>Multiple-file sampler<a class="headerlink" href="#multiple-file-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The multi-file sampler loads in the training, validation, and optionally, the testing dataset.  The configuration for this therefore asks that you fill in some keys with the function-type constructors of type <code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_samplers.FileSampler</span></code>. Please consult the following sections for information about these file samplers.</p>
 <p>An example configuration for the multiple-file sampler:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.MultiFileSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">train_sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.MultiFileSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    train_sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
         <span class="nv">...</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">validate_sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    validate_sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
         <span class="nv">...</span>
     <span class="p p-Indicator">},</span> 
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/features_list.txt</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">test_sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.BedFileSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    test_sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.BedFileSampler</span> <span class="p p-Indicator">{</span>
         <span class="nv">...</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">mode</span><span class="p p-Indicator">:</span> <span class="nv">train</span>
+<span class="nt">    mode</span><span class="p">:</span> <span class="nv">train</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -859,15 +859,15 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <span id="bed-file-sampler"></span><h4>BED file sampler<a class="headerlink" href="#bed-file-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The BED file sampler loads a dataset from a <code class="docutils literal notranslate"><span class="pre">.bed</span></code> file. This can be generated by one of the online samplers in Selene with the <code class="docutils literal notranslate"><span class="pre">save_dataset</span></code> parameter.</p>
 <p>An example configuration for a BED file sampler:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.BedFileSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">filepath</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/data.bed</span><span class="p p-Indicator">,</span>
-    <span class="nv">reference_sequence</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/reference_sequence.fa</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.BedFileSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    filepath</span><span class="p">:</span> <span class="nv">/path/to/data.bed</span><span class="p p-Indicator">,</span>
+<span class="nt">    reference_sequence</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/reference_sequence.fa</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">n_samples</span><span class="p p-Indicator">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">targets_avail</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">n_features</span><span class="p p-Indicator">:</span> <span class="nv">919</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_samples</span><span class="p">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_length</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    targets_avail</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_features</span><span class="p">:</span> <span class="nv">919</span><span class="p p-Indicator">,</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -887,15 +887,15 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <span id="matrix-file-sampler"></span><h4>Matrix file sampler<a class="headerlink" href="#matrix-file-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The matrix file sampler loads a dataset from a matrix file.</p>
 <p>An example configuration for a matrix file sampler:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">filepath</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/data.mat</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_key</span><span class="p p-Indicator">:</span> <span class="nv">sequences</span><span class="p p-Indicator">,</span>
-    <span class="nv">targets_key</span><span class="p p-Indicator">:</span> <span class="nv">targets</span><span class="p p-Indicator">,</span>
-    <span class="nv">random_seed</span><span class="p p-Indicator">:</span> <span class="nv">123</span><span class="p p-Indicator">,</span>
-    <span class="nv">shuffle</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_batch_axis</span><span class="p p-Indicator">:</span> <span class="nv">0</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_alphabet_axis</span><span class="p p-Indicator">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
-    <span class="nv">targets_batch_axis</span><span class="p p-Indicator">:</span> <span class="nv">0</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    filepath</span><span class="p">:</span> <span class="nv">/path/to/data.mat</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_key</span><span class="p">:</span> <span class="nv">sequences</span><span class="p p-Indicator">,</span>
+<span class="nt">    targets_key</span><span class="p">:</span> <span class="nv">targets</span><span class="p p-Indicator">,</span>
+<span class="nt">    random_seed</span><span class="p">:</span> <span class="nv">123</span><span class="p p-Indicator">,</span>
+<span class="nt">    shuffle</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_batch_axis</span><span class="p">:</span> <span class="nv">0</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_alphabet_axis</span><span class="p">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
+<span class="nt">    targets_batch_axis</span><span class="p">:</span> <span class="nv">0</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -921,50 +921,50 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <div class="section" id="training-using-intervals-sampler">
 <span id="training-using-intervals-sampler"></span><h3>Training (using intervals sampler)<a class="headerlink" href="#training-using-intervals-sampler" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
-<span class="l l-Scalar l-Scalar-Plain">ops</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">evaluate</span><span class="p p-Indicator">]</span>
-<span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">path</span><span class="p p-Indicator">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
-    <span class="nv">class</span><span class="p p-Indicator">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
-    <span class="nv">class_args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-        <span class="nv">arg1</span><span class="p p-Indicator">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
-        <span class="nv">arg2</span><span class="p p-Indicator">:</span> <span class="nv">val2</span>
+<span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">evaluate</span><span class="p p-Indicator">]</span>
+<span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    path</span><span class="p">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
+<span class="nt">    class</span><span class="p">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
+<span class="nt">    class_args</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">        arg1</span><span class="p">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
+<span class="nt">        arg2</span><span class="p">:</span> <span class="nv">val2</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">non_strand_specific</span><span class="p p-Indicator">:</span> <span class="nv">mean</span>
+<span class="nt">    non_strand_specific</span><span class="p">:</span> <span class="nv">mean</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.IntervalsSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">reference_sequence</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/reference_sequence.fa</span><span class="p p-Indicator">,</span>
-        <span class="nv">blacklist_regions</span><span class="p p-Indicator">:</span> <span class="nv">hg19</span>
+<span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.IntervalsSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    reference_sequence</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/reference_sequence.fa</span><span class="p p-Indicator">,</span>
+<span class="nt">        blacklist_regions</span><span class="p">:</span> <span class="nv">hg19</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">target_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/tabix/indexed/targets.bed.gz</span><span class="p p-Indicator">,</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/distinct_features.txt</span>
+<span class="nt">    target_path</span><span class="p">:</span> <span class="nv">/path/to/tabix/indexed/targets.bed.gz</span><span class="p p-Indicator">,</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/distinct_features.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">intervals_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/intervals.bed</span><span class="p p-Indicator">,</span>
-    <span class="nv">sample_negative</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">seed</span><span class="p p-Indicator">:</span> <span class="nv">127</span><span class="p p-Indicator">,</span>
-    <span class="nv">validation_holdout</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">chr6</span><span class="p p-Indicator">,</span> <span class="nv">chr7</span><span class="p p-Indicator">],</span>
-    <span class="nv">test_holdout</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">chr8</span><span class="p p-Indicator">,</span> <span class="nv">chr9</span><span class="p p-Indicator">],</span>  <span class="c1"># specifying a test partition</span>
-    <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">center_bin_to_predict</span><span class="p p-Indicator">:</span> <span class="nv">200</span><span class="p p-Indicator">,</span>
-    <span class="nv">feature_thresholds</span><span class="p p-Indicator">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span>
-    <span class="nv">mode</span><span class="p p-Indicator">:</span> <span class="nv">train</span><span class="p p-Indicator">,</span>  <span class="c1"># starting mode for sampler</span>
-    <span class="nv">save_datasets</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
+<span class="nt">    intervals_path</span><span class="p">:</span> <span class="nv">/path/to/intervals.bed</span><span class="p p-Indicator">,</span>
+<span class="nt">    sample_negative</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    seed</span><span class="p">:</span> <span class="nv">127</span><span class="p p-Indicator">,</span>
+<span class="nt">    validation_holdout</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">chr6</span><span class="p p-Indicator">,</span> <span class="nv">chr7</span><span class="p p-Indicator">],</span>
+<span class="nt">    test_holdout</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">chr8</span><span class="p p-Indicator">,</span> <span class="nv">chr9</span><span class="p p-Indicator">],</span>  <span class="c1"># specifying a test partition</span>
+<span class="nt">    sequence_length</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    center_bin_to_predict</span><span class="p">:</span> <span class="nv">200</span><span class="p p-Indicator">,</span>
+<span class="nt">    feature_thresholds</span><span class="p">:</span> <span class="nv">0.5</span><span class="p p-Indicator">,</span>
+<span class="nt">    mode</span><span class="p">:</span> <span class="nv">train</span><span class="p p-Indicator">,</span>  <span class="c1"># starting mode for sampler</span>
+<span class="nt">    save_datasets</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">train_model</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.TrainModel</span> <span class="p p-Indicator">{</span>
-    <span class="nv">batch_size</span><span class="p p-Indicator">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
-    <span class="nv">max_steps</span><span class="p p-Indicator">:</span> <span class="nv">80000</span><span class="p p-Indicator">,</span>
-    <span class="nv">report_stats_every_n_steps</span><span class="p p-Indicator">:</span> <span class="nv">16000</span><span class="p p-Indicator">,</span>
-    <span class="nv">n_validation_samples</span><span class="p p-Indicator">:</span> <span class="nv">32000</span><span class="p p-Indicator">,</span>
-    <span class="nv">n_test_samples</span><span class="p p-Indicator">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
-    <span class="nv">cpu_n_threads</span><span class="p p-Indicator">:</span> <span class="nv">32</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_cuda</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">data_parallel</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">logging_verbosity</span><span class="p p-Indicator">:</span> <span class="nv">2</span><span class="p p-Indicator">,</span>
-    <span class="nv">checkpoint_resume</span><span class="p p-Indicator">:</span> <span class="nv">False</span>
+<span class="nt">train_model</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.TrainModel</span> <span class="p p-Indicator">{</span>
+<span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
+<span class="nt">    max_steps</span><span class="p">:</span> <span class="nv">80000</span><span class="p p-Indicator">,</span>
+<span class="nt">    report_stats_every_n_steps</span><span class="p">:</span> <span class="nv">16000</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_validation_samples</span><span class="p">:</span> <span class="nv">32000</span><span class="p p-Indicator">,</span>
+<span class="nt">    n_test_samples</span><span class="p">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
+<span class="nt">    cpu_n_threads</span><span class="p">:</span> <span class="nv">32</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_cuda</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    data_parallel</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    logging_verbosity</span><span class="p">:</span> <span class="nv">2</span><span class="p p-Indicator">,</span>
+<span class="nt">    checkpoint_resume</span><span class="p">:</span> <span class="nv">False</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">random_seed</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">133</span>
-<span class="l l-Scalar l-Scalar-Plain">output_dir</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/output_dir</span>
+<span class="nt">random_seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">133</span>
+<span class="nt">output_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/output_dir</span>
 <span class="nn">...</span>
 </pre></div>
 </div>
@@ -981,39 +981,39 @@ You’ll find examples of how this is specified in the <a class="reference exter
 <div class="section" id="evaluate-using-matrix-file-sampler">
 <span id="evaluate-using-matrix-file-sampler"></span><h3>Evaluate (using matrix file sampler)<a class="headerlink" href="#evaluate-using-matrix-file-sampler" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
-<span class="l l-Scalar l-Scalar-Plain">ops</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">evaluate</span><span class="p p-Indicator">]</span>
-<span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">path</span><span class="p p-Indicator">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
-    <span class="nv">class</span><span class="p p-Indicator">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
-    <span class="nv">class_args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-        <span class="nv">arg1</span><span class="p p-Indicator">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
-        <span class="nv">arg2</span><span class="p p-Indicator">:</span> <span class="nv">val2</span>
+<span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">evaluate</span><span class="p p-Indicator">]</span>
+<span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    path</span><span class="p">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
+<span class="nt">    class</span><span class="p">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
+<span class="nt">    class_args</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">        arg1</span><span class="p">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
+<span class="nt">        arg2</span><span class="p">:</span> <span class="nv">val2</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">non_strand_specific</span><span class="p p-Indicator">:</span> <span class="nv">mean</span>
+<span class="nt">    non_strand_specific</span><span class="p">:</span> <span class="nv">mean</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">sampler</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
-    <span class="nv">filepath</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/test.mat</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_key</span><span class="p p-Indicator">:</span> <span class="nv">testxdata</span><span class="p p-Indicator">,</span>
-    <span class="nv">targets_key</span><span class="p p-Indicator">:</span> <span class="nv">testdata</span><span class="p p-Indicator">,</span>
-    <span class="nv">random_seed</span><span class="p p-Indicator">:</span> <span class="nv">456</span><span class="p p-Indicator">,</span>
-    <span class="nv">shufle</span><span class="p p-Indicator">:</span> <span class="nv">False</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_batch_axis</span><span class="p p-Indicator">:</span> <span class="nv">0</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_alphabet_axis</span><span class="p p-Indicator">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
-    <span class="nv">targets_batch_axis</span><span class="p p-Indicator">:</span> <span class="nv">0</span>
+<span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
+<span class="nt">    filepath</span><span class="p">:</span> <span class="nv">/path/to/test.mat</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_key</span><span class="p">:</span> <span class="nv">testxdata</span><span class="p p-Indicator">,</span>
+<span class="nt">    targets_key</span><span class="p">:</span> <span class="nv">testdata</span><span class="p p-Indicator">,</span>
+<span class="nt">    random_seed</span><span class="p">:</span> <span class="nv">456</span><span class="p p-Indicator">,</span>
+<span class="nt">    shufle</span><span class="p">:</span> <span class="nv">False</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_batch_axis</span><span class="p">:</span> <span class="nv">0</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_alphabet_axis</span><span class="p">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
+<span class="nt">    targets_batch_axis</span><span class="p">:</span> <span class="nv">0</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">evaluate_model</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.EvaluateModel</span> <span class="p p-Indicator">{</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/features_list.txt</span>
+<span class="nt">evaluate_model</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.EvaluateModel</span> <span class="p p-Indicator">{</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">trained_model_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
-    <span class="nv">batch_size</span><span class="p p-Indicator">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
-    <span class="nv">report_gt_feature_n_positives</span><span class="p p-Indicator">:</span> <span class="nv">50</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_cuda</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">data_parallel</span><span class="p p-Indicator">:</span> <span class="nv">False</span>
+<span class="nt">    trained_model_path</span><span class="p">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
+<span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
+<span class="nt">    report_gt_feature_n_positives</span><span class="p">:</span> <span class="nv">50</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_cuda</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    data_parallel</span><span class="p">:</span> <span class="nv">False</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">random_seed</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">123</span>
-<span class="l l-Scalar l-Scalar-Plain">output_dir</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/output_dir</span>
-<span class="l l-Scalar l-Scalar-Plain">create_subdirectory</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="nt">random_seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">123</span>
+<span class="nt">output_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/path/to/output_dir</span>
+<span class="nt">create_subdirectory</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">False</span>
 <span class="nn">...</span>
 </pre></div>
 </div>
@@ -1027,37 +1027,37 @@ You’ll find examples of how this is specified in the <a class="reference exter
 </div>
 <div class="section" id="analyze-sequences-variant-effect-prediction">
 <span id="analyze-sequences-variant-effect-prediction"></span><h3>Analyze sequences (variant effect prediction)<a class="headerlink" href="#analyze-sequences-variant-effect-prediction" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">ops</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">analyze</span><span class="p p-Indicator">]</span>
-<span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">path</span><span class="p p-Indicator">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
-    <span class="nv">class</span><span class="p p-Indicator">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
-    <span class="nv">class_args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-        <span class="nv">arg1</span><span class="p p-Indicator">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
-        <span class="nv">arg2</span><span class="p p-Indicator">:</span> <span class="nv">val2</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">analyze</span><span class="p p-Indicator">]</span>
+<span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    path</span><span class="p">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
+<span class="nt">    class</span><span class="p">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
+<span class="nt">    class_args</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">        arg1</span><span class="p">:</span> <span class="nv">val1</span><span class="p p-Indicator">,</span>
+<span class="nt">        arg2</span><span class="p">:</span> <span class="nv">val2</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">non_strand_specific</span><span class="p p-Indicator">:</span> <span class="nv">mean</span>
+<span class="nt">    non_strand_specific</span><span class="p">:</span> <span class="nv">mean</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">analyze_sequences</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.predict.AnalyzeSequences</span> <span class="p p-Indicator">{</span>
-    <span class="nv">trained_model_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
-    <span class="nv">sequence_length</span><span class="p p-Indicator">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
-    <span class="nv">features</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/distinct_features.txt</span>
+<span class="nt">analyze_sequences</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.predict.AnalyzeSequences</span> <span class="p p-Indicator">{</span>
+<span class="nt">    trained_model_path</span><span class="p">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
+<span class="nt">    sequence_length</span><span class="p">:</span> <span class="nv">1000</span><span class="p p-Indicator">,</span>
+<span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/distinct_features.txt</span>
     <span class="p p-Indicator">},</span>
-    <span class="nv">batch_size</span><span class="p p-Indicator">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
-    <span class="nv">use_cuda</span><span class="p p-Indicator">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
-    <span class="nv">reference_sequence</span><span class="p p-Indicator">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
-        <span class="nv">input_path</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/reference_sequence.fa</span>
+<span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
+<span class="nt">    use_cuda</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    reference_sequence</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.sequences.Genome</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/reference_sequence.fa</span>
     <span class="p p-Indicator">}</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">variant_effect_prediction</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span>
-    <span class="nv">vcf_files</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span>
+<span class="nt">variant_effect_prediction</span><span class="p">:</span> <span class="p p-Indicator">{</span>
+<span class="nt">    vcf_files</span><span class="p">:</span> <span class="p p-Indicator">[</span>
         <span class="nv">/path/to/file1.vcf</span><span class="p p-Indicator">,</span>
         <span class="nv">/path/to/file2.vcf</span>
     <span class="p p-Indicator">],</span>
-    <span class="nv">save_data</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">,</span> <span class="nv">abs_diffs</span><span class="p p-Indicator">],</span>
-    <span class="nv">output_dir</span><span class="p p-Indicator">:</span> <span class="nv">/path/to/output/predicts/dir</span>
+<span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">,</span> <span class="nv">abs_diffs</span><span class="p p-Indicator">],</span>
+<span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predicts/dir</span>
 <span class="p p-Indicator">}</span>
-<span class="l l-Scalar l-Scalar-Plain">random_seed</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">123</span>
+<span class="nt">random_seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">123</span>
 </pre></div>
 </div>
 <div class="section" id="some-notes">
