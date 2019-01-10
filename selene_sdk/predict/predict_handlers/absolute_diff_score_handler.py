@@ -3,7 +3,9 @@ TODO
 """
 import numpy as np
 
-from .handler import write_to_file, PredictionsHandler
+from .handler import _create_warning_handler
+from .handler import PredictionsHandler
+from .handler import write_to_file
 
 
 class AbsDiffScoreHandler(PredictionsHandler):
@@ -51,10 +53,17 @@ class AbsDiffScoreHandler(PredictionsHandler):
         self._results = []
         self._samples = []
         self._NA_samples = []
+
+        self._features = features
+        self._nonfeature_columns = nonfeature_columns
+        self._output_path = output_path
+
+        self._output_handle = open(self._output_path, 'w+')
         column_names = nonfeature_columns + features
-        self._output_handle = open(output_path, 'w+')
         self._output_handle.write("{0}\n".format(
             '\t'.join(column_names)))
+
+        self._warn_handler = None
 
     def handle_NA(self, batch_ids):
         """
@@ -67,6 +76,20 @@ class AbsDiffScoreHandler(PredictionsHandler):
 
         """
         super().handle_NA(batch_ids)
+
+    def handle_warning(self,
+                       batch_predictions,
+                       batch_ids,
+                       baseline_predictions):
+        if self._warn_handler is None:
+            self._warn_handler = _create_warning_handler(
+                self._features,
+                self._nonfeature_columns,
+                self._output_path,
+                AbsDiffScoreHandler)
+        self._warn_handler.handle_batch_predictions(
+            batch_predictions, batch_ids, baseline_predictions)
+
 
     def handle_batch_predictions(self,
                                  batch_predictions,

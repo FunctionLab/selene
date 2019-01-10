@@ -1,6 +1,7 @@
 """
 TODO
 """
+from .handler import _create_warning_handler
 from .handler import PredictionsHandler
 from .write_predictions_handler import WritePredictionsHandler
 
@@ -40,6 +41,13 @@ class WriteRefAltHandler(PredictionsHandler):
         super(WriteRefAltHandler).__init__()
 
         self.needs_base_pred = True
+
+        self._features = features
+        self._nonfeature_columns = nonfeature_columns
+        self._out_filename = out_filename
+
+        self._warn_handler = None
+
         self.ref_writer = WritePredictionsHandler(
             features, nonfeature_columns, "{0}.ref".format(out_filename))
         self.alt_writer = WritePredictionsHandler(
@@ -56,6 +64,19 @@ class WriteRefAltHandler(PredictionsHandler):
 
         """
         self.ref_writer.handle_NA(batch_ids)
+
+    def handle_warning(self,
+                       batch_predictions,
+                       batch_ids,
+                       base_predictions):
+        if self._warn_handler is None:
+            self._warn_handler = _create_warning_handler(
+                self._features,
+                self._nonfeature_columns,
+                self._out_filename,
+                WriteRefAltHandler)
+        self._warn_handler.handle_batch_predictions(
+            batch_predictions, batch_ids, base_predictions)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
@@ -94,3 +115,5 @@ class WriteRefAltHandler(PredictionsHandler):
         """
         self.ref_writer.write_to_file(close=close)
         self.alt_writer.write_to_file(close=close)
+        if self._warn_handler is not None:
+            self._warn_handler.write_to_file()

@@ -5,6 +5,7 @@ that "handle" model predictions.
 """
 from abc import ABCMeta
 from abc import abstractmethod
+import os
 
 
 def write_to_file(data_across_features, info_cols, output_handle, close=False):
@@ -87,6 +88,35 @@ def probabilities_to_string(probabilities):
     return ["{:.2e}".format(p) for p in probabilities]
 
 
+def _create_warning_handler(features,
+                            nonfeature_columns,
+                            output_filepath,
+                            constructor):
+    """
+    Helper to create a predictions handler that stores the predictions/scores
+    for variants that have raised a warning.
+
+    Parameters
+    ----------
+    features : list(str)
+    nonfeature_columns : list(str)
+    output_filepath : str
+    constructor : abc.ABCMeta
+        The handler class. Should implement
+        selene_sdk.predict.predict_handlers.PredictionsHandler.
+
+    Returns
+    -------
+    selene_sdk.predict.predict_handlers.PredictionsHandler
+        The initialized warning handler object.
+    """
+    path, filename = os.path.split(output_filepath)
+    filepath = os.path.join(
+        path,
+        "warning.{0}".format(filename))
+    return constructor(features, nonfeature_columns, filepath)
+
+
 class PredictionsHandler(metaclass=ABCMeta):
     """
     The abstract base class for handlers, which "handle" model
@@ -110,6 +140,15 @@ class PredictionsHandler(metaclass=ABCMeta):
 
         """
         self._NA_samples.append(row_ids)
+
+    @abstractmethod
+    def handle_warning(self, *args, **kwargs):
+        """
+        Must be able to handle a warning raised when processing
+        a batch of model predictions by diverting the output to
+        a different file.
+        """
+        raise NotImplementedError
 
     @abstractmethod
     def handle_batch_predictions(self, *args, **kwargs):

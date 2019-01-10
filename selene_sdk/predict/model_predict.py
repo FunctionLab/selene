@@ -4,6 +4,7 @@ methods.
 """
 import itertools
 import os
+import warnings
 
 import numpy as np
 import pyfaidx
@@ -700,18 +701,25 @@ class AnalyzeSequences(object):
                                    batch_ref_seqs,
                                    batch_alt_seqs,
                                    batch_ids,
-                                   reporters):
+                                   reporters,
+                                   warn=False):
         """
-        TODO
+        Helper method for variant effect prediction. Gets the model
+        predictions and updates the reporters.
 
         Parameters
         ----------
         batch_ref_seqs : list(np.ndarray)
-            TODO
+            One-hot encoded sequences with the ref base(s).
         batch_alt_seqs : list(np.ndarray)
-            TODO
+            One-hot encoded sequences with the alt base(s).
         reporters : list(PredictionsHandler)
-            TODO
+            List of prediction handlers.
+        warn : bool
+            Whether a warning was raised or not. If `warn`, directs handlers
+            to divert the predictions/scores to different files
+            (filename prefixed by 'warning.') so that users
+            know that Selene detected an issue with these variants.
 
         Returns
         -------
@@ -724,9 +732,12 @@ class AnalyzeSequences(object):
         ref_outputs = self.predict(batch_ref_seqs)
         alt_outputs = self.predict(batch_alt_seqs)
         for r in reporters:
-            if r.needs_base_pred:
-                r.handle_batch_predictions(
-                    alt_outputs, batch_ids, ref_outputs)
+            if r.needs_base_pred and warn:
+                r.handle_warning(alt_outputs, batch_ids, ref_outputs)
+            elif r.needs_base_pred:
+                r.handle_batch_predictions(alt_outputs, batch_ids, ref_outputs)
+            elif warn:
+                r.handle_warning(alt_outputs, batch_ids)
             else:
                 r.handle_batch_predictions(alt_outputs, batch_ids)
 
@@ -838,7 +849,7 @@ class AnalyzeSequences(object):
             center = pos + int(len(ref) / 2) - 1
             start = center - self._start_radius
             end = center + self._end_radius
-            assert end - start == self.sequence_length
+
             if isinstance(self.reference_sequence, Genome):
                 if "chr" not in chrom:
                     chrom = "chr" + chrom
@@ -849,18 +860,38 @@ class AnalyzeSequences(object):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt))
                 continue
+
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end)
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
-            start_pos = self._start_radius - int(len(ref) / 2)
-            seq_encoding[start_pos:start_pos + len(ref), :] = ref_encoding
-
             all_alts = alt.split(',')
             alt_encodings = self._process_alts(
                 all_alts, ref, chrom, start, end)
-            for a in all_alts:
-                batch_ref_seqs.append(seq_encoding)
-                batch_ids.append((chrom, pos, name, ref, a))
+
+            start_pos = self._start_radius - int(len(ref) / 2)
+            seq_encoding_at_ref = seq_encoding[start_pos:start_pos + len(ref), :]
+            references_match = np.array_equal(seq_encoding_at_ref, ref_encoding)
+            if not references_match:
+                sequence_at_ref = self.reference_sequence.encoding_to_sequence(
+                    seq_encoding_at_ref)
+                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}), "
+                              "reference does not match the reference genome. "
+                              "Reference genome contains {5} instead. "
+                              "Predictions/scores associated with this "
+                              "variant--where we use '{3}' in the input "
+                              "sequence--will be written to files where the "
+                              "filename is prefixed by 'warning.'".format(
+                                  chrom, pos, name, ref, alt, sequence_at_ref))
+                seq_encoding[start_pos:start_pos + len(ref), :] = ref_encoding
+                warn_batch_ids = [(chrom, pos, name, ref, a) for a in all_alts]
+                warn_ref_seqs = [seq_encoding] * len(all_alts)
+                self._handle_ref_alt_predictions(
+                    warn_ref_seqs, alt_encodings, warn_batch_ids,
+                    reporters, warn=True)
+                continue
+
+            batch_ids += [(chrom, pos, name, ref, a) for a in all_alts]
+            batch_ref_seqs += [seq_encoding] * len(all_alts)
             batch_alt_seqs += alt_encodings
 
             if len(batch_ref_seqs) >= self.batch_size:
