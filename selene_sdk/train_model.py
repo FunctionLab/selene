@@ -456,7 +456,8 @@ class TrainModel(object):
         inputs = Variable(inputs)
         targets = Variable(targets)
 
-        predictions = self.model(inputs.transpose(1, 2))
+        inputs = inputs.transpose(1, 2).unsqueeze_(2)
+        predictions = self.model(inputs)
         loss = self.criterion(predictions, targets)
 
         self.optimizer.zero_grad()
@@ -498,8 +499,8 @@ class TrainModel(object):
                 inputs = Variable(inputs)
                 targets = Variable(targets)
 
-                predictions = self.model(
-                    inputs.transpose(1, 2))
+                inputs = inputs.transpose(1, 2).unsqueeze_(2)
+                predictions = self.model(inputs)
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(
