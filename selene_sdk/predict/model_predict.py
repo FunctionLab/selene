@@ -3,6 +3,7 @@ This module provides the `AnalyzeSequences` class and supporting
 methods.
 """
 import itertools
+import math
 import os
 import warnings
 
@@ -312,8 +313,12 @@ class AnalyzeSequences(object):
             trained_model_path,
             map_location=lambda storage, location: storage)
 
-        self.model = load_model_from_state_dict(
-            trained_model["state_dict"], model)
+        if "state_dict" not in trained_model:
+            self.model = load_model_from_state_dict(
+                trained_model, model)
+        else:
+            self.model = load_model_from_state_dict(
+                trained_model["state_dict"], model)
         self.model.eval()
 
         self.use_cuda = use_cuda
@@ -354,7 +359,8 @@ class AnalyzeSequences(object):
             inputs = inputs.cuda()
         with torch.no_grad():
             inputs = Variable(inputs)
-            outputs = self.model.forward(inputs.transpose(1, 2))
+            inputs = inputs.transpose(1, 2).unsqueeze_(2)
+            outputs = self.model.forward(inputs)
             return outputs.data.cpu().numpy()
 
     def _initialize_reporters(self,
@@ -414,7 +420,7 @@ class AnalyzeSequences(object):
     def _pad_sequence(self, sequence):
         diff = (self.sequence_length - len(sequence)) / 2
         pad_l = int(np.floor(diff))
-        pad_r = int(np.ceil(diff))
+        pad_r = math.ceil(diff)
         sequence = ((self.reference_sequence.UNK_BASE * pad_l) +
                     sequence +
                     (self.reference_sequence.UNK_BASE * pad_r))
@@ -585,7 +591,7 @@ class AnalyzeSequences(object):
         if n < self.sequence_length: # Pad string length as necessary.
              diff = (self.sequence_length - n) / 2
              pad_l = int(np.floor(diff))
-             pad_r = int(np.ceil(diff))
+             pad_r = math.ceil(diff)
              sequence = ((self.reference_sequence.UNK_BASE * pad_l) +
                          sequence +
                          (self.reference_sequence.UNK_BASE * pad_r))
@@ -741,27 +747,22 @@ class AnalyzeSequences(object):
             else:
                 r.handle_batch_predictions(alt_outputs, batch_ids)
 
-    def _process_alts(self,
-                      all_alts,
-                      ref,
-                      chrom,
-                      start,
-                      end):
+    def _process_alts(self, all_alts, ref, chrom, pos, ref_seq_center):
         """
         TODO
 
         Parameters
         ----------
-        all_alts : TODO
-            TODO
-        ref : TODO
-            TODO
+        all_alts : list(str)
+            The list of alternate alleles corresponding to the variant
+        ref : str
+            The reference allele of the variant
         chrom : str
-            TODO
-        start : TODO
-            TODO
-        end : TODO
-            TODO
+            The chromosome the variant is in
+        pos : int
+            The position of the variant
+        ref_seq_center : int
+            The center position of the sequence containing the reference allele
 
         Returns
         -------
@@ -769,37 +770,75 @@ class AnalyzeSequences(object):
             TODO
 
         """
-        sequence = self.reference_sequence.get_sequence_from_coords(
-            chrom, start, end)
-
-        start_pos = self._start_radius - int(len(ref) / 2)
-
         alt_encodings = []
         for a in all_alts:
-            prefix = sequence[:start_pos]
-            suffix = sequence[start_pos + len(ref):]
-            assert len(prefix) + len(suffix) + len(ref) == self.sequence_length
-            if a == '*':  # indicates a deletion
-                alt_sequence = prefix + suffix
-            else:
-                alt_sequence = prefix + a + suffix
-
-            if len(alt_sequence) > self.sequence_length:
-                # truncate on both sides equally
-                midpoint = int(len(alt_sequence) / 2)
-                start = midpoint - int(self.sequence_length / 2)
-                end = midpoint + int(self.sequence_length / 2)
-                if self.sequence_length % 2 != 0:
-                    end += 1
-                alt_sequence = alt_sequence[start:end]
-            elif len(alt_sequence) < self.sequence_length:
-                alt_sequence = _add_sequence_surrounding_alt(
-                    alt_sequence, self.sequence_length,
-                    chrom, start, end, self.reference_sequence)
+            if a == '*':   # indicates a deletion
+                a = ''
+            ref_len = len(ref)
+            alt_len = len(a)
+            sequence = None
+            if ref_len == alt_len:  # substitution
+                start_pos = ref_seq_center - self._start_radius
+                end_pos = ref_seq_center + self._end_radius
+                sequence = self.reference_sequence.get_sequence_from_coords(
+                    chrom, start_pos, end_pos)
+                remove_ref_start = self._start_radius - ref_len // 2
+                sequence = (sequence[:remove_ref_start] +
+                            a +
+                            sequence[remove_ref_start + ref_len:])
+                assert len(sequence) == self.sequence_length
+            elif ref_len > alt_len:  # deletion
+                seq_lhs = self.reference_sequence.get_sequence_from_coords(
+                    chrom, pos - self._start_radius, pos - alt_len // 2)
+                seq_rhs = self.reference_sequence.get_sequence_from_coords(
+                    chrom,
+                    pos + len(ref),
+                    pos + len(ref) + self._end_radius - math.ceil(alt_len / 2))
+                sequence = seq_lhs + a + seq_rhs
+                assert len(sequence) == self.sequence_length
+            else:  # insertion
+                seq_lhs = self.reference_sequence.get_sequence_from_coords(
+                    chrom,
+                    pos - self._start_radius,
+                    pos - alt_len // 2)
+                seq_rhs = self.reference_sequence.get_sequence_from_coords(
+                    chrom,
+                    pos + math.ceil(alt_len / 2),
+                    pos + self._end_radius)
+                sequence = seq_lhs + a + seq_rhs
+                assert len(sequence) == self.sequence_length
             alt_encoding = self.reference_sequence.sequence_to_encoding(
-                alt_sequence)
+                sequence)
             alt_encodings.append(alt_encoding)
         return alt_encodings
+
+    def _handle_standard_ref(self, ref_encoding, seq_encoding):
+        ref_len = ref_encoding.shape[0]
+        start_pos = self._start_radius - ref_len // 2
+        sequence_encoding_at_ref = seq_encoding[
+            start_pos:start_pos + ref_len, :]
+        sequence_at_ref = self.reference_sequence.encoding_to_sequence(
+            sequence_encoding_at_ref)
+        references_match = np.array_equal(
+            sequence_encoding_at_ref, ref_encoding)
+        if not references_match:
+            seq_encoding[start_pos:start_pos + ref_len, :] = \
+                ref_encoding
+        return references_match, seq_encoding, sequence_at_ref
+
+    def _handle_long_ref(self, ref_encoding, seq_encoding):
+        ref_len = ref_encoding.shape[0]
+        sequence_encoding_at_ref = seq_encoding
+        sequence_at_ref = self.reference_sequence.encoding_to_sequence(
+            sequence_encoding_at_ref)
+        ref_start = ref_len // 2 - self._start_radius
+        ref_end = ref_len // 2 + self._end_radius
+        ref_encoding = ref_encoding[ref_start:ref_end]
+        references_match = np.array_equal(
+            sequence_encoding_at_ref, ref_encoding)
+        if not references_match:
+            seq_encoding = ref_encoding
+        return references_match, seq_encoding, sequence_at_ref
 
     def variant_effect_prediction(self,
                                   vcf_file,
@@ -846,6 +885,8 @@ class AnalyzeSequences(object):
         batch_alt_seqs = []
         batch_ids = []
         for (chrom, pos, name, ref, alt) in variants:
+            # centers the sequence containing the ref allele based on the size
+            # of ref
             center = pos + int(len(ref) / 2) - 1
             start = center - self._start_radius
             end = center + self._end_radius
@@ -865,15 +906,17 @@ class AnalyzeSequences(object):
                 chrom, start, end)
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             all_alts = alt.split(',')
-            alt_encodings = self._process_alts(
-                all_alts, ref, chrom, start, end)
+            alt_encodings = self._process_alts(all_alts, ref, chrom, pos, center)
 
-            start_pos = self._start_radius - int(len(ref) / 2)
-            seq_encoding_at_ref = seq_encoding[start_pos:start_pos + len(ref), :]
-            references_match = np.array_equal(seq_encoding_at_ref, ref_encoding)
-            if not references_match:
-                sequence_at_ref = self.reference_sequence.encoding_to_sequence(
-                    seq_encoding_at_ref)
+            match = True
+            seq_at_ref = None
+            if len(ref) < self.sequence_length:
+                match, seq_encoding, seq_at_ref = self._handle_standard_ref(
+                    ref_encoding, seq_encoding)
+            else:
+                match, seq_encoding, seq_at_ref = self._handle_long_ref(
+                    ref_encoding, seq_encoding)
+            if not match:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}), "
                               "reference does not match the reference genome. "
                               "Reference genome contains {5} instead. "
@@ -881,8 +924,7 @@ class AnalyzeSequences(object):
                               "variant--where we use '{3}' in the input "
                               "sequence--will be written to files where the "
                               "filename is prefixed by 'warning.'".format(
-                                  chrom, pos, name, ref, alt, sequence_at_ref))
-                seq_encoding[start_pos:start_pos + len(ref), :] = ref_encoding
+                                  chrom, pos, name, ref, alt, seq_at_ref))
                 warn_batch_ids = [(chrom, pos, name, ref, a) for a in all_alts]
                 warn_ref_seqs = [seq_encoding] * len(all_alts)
                 self._handle_ref_alt_predictions(
