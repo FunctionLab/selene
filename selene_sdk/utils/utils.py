@@ -80,8 +80,11 @@ def load_model_from_state_dict(state_dict, model):
         value = state_dict[k2]
         if k1 == k2:
             new_state_dict[k2] = value
-        elif ('module' in k1 and k2 in k1) \
-                or ('module' in k2 and k1 in k2):
+        else:
+            new_state_dict[k1] = value
+        """
+        elif ('model' in k1 and k2 in k1) \
+                or ('model' in k2 and k1 in k2):
             new_state_dict[k1] = value
         else:
             raise ValueError("Model state dict keys do not match "
@@ -90,6 +93,7 @@ def load_model_from_state_dict(state_dict, model):
                              "\tExpected keys:\n\t{0}\n\n"
                              "\tKeys in the input state dict:\n\t{1}\n".format(
                                  model_keys, state_dict_keys))
+        """
     model.load_state_dict(new_state_dict)
     return model
 
