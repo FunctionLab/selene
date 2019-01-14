@@ -1,8 +1,6 @@
 """
 TODO
 """
-import numpy as np
-
 from .handler import _create_warning_handler
 from .handler import PredictionsHandler
 from .handler import write_NAs_to_file
@@ -46,9 +44,9 @@ class WritePredictionsHandler(PredictionsHandler):
         self._output_path = output_path
         self._output_handle = open(self._output_path, 'w+')
 
-        column_names = nonfeature_columns + features
+        self._column_names = nonfeature_columns + features
         self._output_handle.write("{0}\n".format(
-            '\t'.join(column_names)))
+            '\t'.join(self._column_names)))
 
         self._warn_handler = None
 
@@ -95,7 +93,7 @@ class WritePredictionsHandler(PredictionsHandler):
         """
         self._results.append(batch_predictions)
         self._samples.append(batch_ids)
-        if len(self._results) > 200000:
+        if len(self._results) > 100000:
             self.write_to_file()
 
     def write_to_file(self, close=False):
@@ -103,7 +101,6 @@ class WritePredictionsHandler(PredictionsHandler):
         TODO
         """
         if self._NA_samples:
-            self._NA_samples = np.vstack(self._NA_samples)
             NA_file_prefix = '.'.join(
                 self._output_path.split('.')[:-1])
             write_NAs_to_file(self._NA_samples,
@@ -114,8 +111,6 @@ class WritePredictionsHandler(PredictionsHandler):
         if not self._results:
             self._output_handle.close()
             return None
-        self._results = np.vstack(self._results)
-        self._samples = np.vstack(self._samples)
         write_to_file(self._results,
                       self._samples,
                       self._output_handle,

@@ -32,11 +32,12 @@ def write_to_file(data_across_features, info_cols, output_handle, close=False):
         to this file.
 
     """
-    for info, preds in zip(info_cols, data_across_features):
-        preds_str = '\t'.join(
-            probabilities_to_string(preds))
-        info_str = '\t'.join([str(i) for i in info])
-        output_handle.write("{0}\t{1}\n".format(info_str, preds_str))
+    for info_batch, preds_batch in zip(info_cols, data_across_features):
+        for info, preds in zip(info_batch, preds_batch):
+            preds_str = '\t'.join(
+                probabilities_to_string(list(preds)))
+            info_str = '\t'.join([str(i) for i in info])
+            output_handle.write("{0}\t{1}\n".format(info_str, preds_str))
     if close:
         output_handle.close()
 
@@ -65,9 +66,10 @@ def write_NAs_to_file(info_cols, column_names, output_path):
     with open(output_path, 'w+') as file_handle:
         file_handle.write("{columns}\n".format(
             columns='\t'.join(column_names)))
-        for info in info_cols:
-            write_info = '\t'.join([str(i) for i in info])
-            file_handle.write("{0}\n".format(write_info))
+        for info_batch in info_cols:
+            for info in info_batch:
+                write_info = '\t'.join([str(i) for i in info])
+                file_handle.write("{0}\n".format(write_info))
 
 
 def probabilities_to_string(probabilities):
