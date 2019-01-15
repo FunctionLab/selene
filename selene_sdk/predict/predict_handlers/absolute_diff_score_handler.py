@@ -121,7 +121,7 @@ class AbsDiffScoreHandler(PredictionsHandler):
         absolute_diffs = np.abs(baseline_predictions - batch_predictions)
         self._results.append(absolute_diffs)
         self._samples.append(batch_ids)
-        if len(self._results) > 200000:
+        if len(self._results) > 100000:
             self.write_to_file()
 
     def write_to_file(self, close=False):
@@ -132,8 +132,6 @@ class AbsDiffScoreHandler(PredictionsHandler):
         if not self._results:
             self._output_handle.close()
             return None
-        self._results = np.vstack(self._results)
-        self._samples = np.vstack(self._samples)
         write_to_file(self._results,
                       self._samples,
                       self._output_handle,

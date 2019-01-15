@@ -1,7 +1,6 @@
 """
 TODO
 """
-import numpy as np
 from scipy.special import logit
 
 from .handler import _create_warning_handler
@@ -118,7 +117,7 @@ class LogitScoreHandler(PredictionsHandler):
         logits = logit(baseline_predictions) - logit(batch_predictions)
         self._results.append(logits)
         self._samples.append(batch_ids)
-        if len(self._results) > 200000:
+        if len(self._results) > 100000:
             self.write_to_file()
 
     def write_to_file(self, close=False):
@@ -128,8 +127,6 @@ class LogitScoreHandler(PredictionsHandler):
         if not self._results:
             self._output_handle.close()
             return None
-        self._results = np.vstack(self._results)
-        self._samples = np.vstack(self._samples)
         write_to_file(self._results,
                       self._samples,
                       self._output_handle,
