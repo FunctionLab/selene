@@ -10,6 +10,7 @@ import warnings
 import numpy as np
 import pyfaidx
 import torch
+import torch.nn as nn
 from torch.autograd import Variable
 
 from .predict_handlers import AbsDiffScoreHandler
@@ -192,63 +193,6 @@ def read_vcf_file(input_path):
     return variants
 
 
-def _add_sequence_surrounding_alt(alt_sequence,
-                                  sequence_length,
-                                  chrom,
-                                  ref_start,
-                                  ref_end,
-                                  reference_sequence):
-    """
-    TODO
-
-    Parameters
-    ----------
-    alt_sequence : str
-    sequence_length : int
-    chrom : str
-    ref_start : int
-    ref_end : int
-    reference_sequence : selene_sdk.sequences.Sequence
-
-    Returns
-    -------
-    str
-
-    """
-    alt_len = len(alt_sequence)
-    add_start = int((sequence_length - alt_len) / 2)
-    add_end = add_start
-    if (sequence_length - alt_len) % 2 != 0:
-        add_end += 1
-
-    lhs_end = ref_start
-    lhs_start = ref_start - add_start
-
-    rhs_start = ref_end
-    rhs_end = ref_end + add_end
-
-    if not reference_sequence.coords_in_bounds(chrom, rhs_start, rhs_end):
-        # add everything to the LHS
-        lhs_start = ref_start - sequence_length + alt_len
-        alt_sequence = reference_sequence.get_sequence_from_coords(
-            chrom, lhs_start, lhs_end) + alt_sequence
-    elif not reference_sequence.coords_in_bounds(chrom, lhs_start, lhs_end):
-        # add everything to RHS
-        rhs_end = ref_end + sequence_length - alt_len
-        alt_sequence += reference_sequence.get_sequence_from_coords(
-            chrom, rhs_start, rhs_end)
-    else:
-        if lhs_start >= lhs_end:
-            lhs_sequence = ""
-        else:
-            lhs_sequence = reference_sequence.get_sequence_from_coords(
-                chrom, lhs_start, lhs_end)
-        rhs_sequence = reference_sequence.get_sequence_from_coords(
-            chrom, rhs_start, rhs_end)
-        alt_sequence = lhs_sequence + alt_sequence + rhs_sequence
-    return alt_sequence
-
-
 class AnalyzeSequences(object):
     """
     Score sequences and their variants using the predictions made
@@ -270,6 +214,9 @@ class AnalyzeSequences(object):
     use_cuda : bool, optional
         Default is `False`. Specifies whether CUDA-enabled GPUs are available
         for torch to use.
+    data_parallel : bool, optional
+        Default is `False`. Specify whether multiple GPUs are available for
+        torch to use during training.
     reference_sequence : class, optional
         Default is `selene_sdk.sequences.Genome`. The type of sequence on
         which this analysis will be performed. Please note that if you need
@@ -292,7 +239,9 @@ class AnalyzeSequences(object):
     features : list(str)
         The names of the features that the model is predicting.
     use_cuda : bool
-        Specifies whether to use CUDA or not.
+        Specifies whether to use a CUDA-enabled GPU or not.
+    data_parallel : bool
+        Whether to use multiple GPUs or not.
     reference_sequence : class
         The type of sequence on which this analysis will be performed.
 
@@ -305,6 +254,7 @@ class AnalyzeSequences(object):
                  features,
                  batch_size=64,
                  use_cuda=False,
+                 data_parallel=False,
                  reference_sequence=Genome):
         """
         Constructs a new `AnalyzeSequences` object.
@@ -320,6 +270,10 @@ class AnalyzeSequences(object):
             self.model = load_model_from_state_dict(
                 trained_model["state_dict"], model)
         self.model.eval()
+
+        self.data_parallel = data_parallel
+        if self.data_parallel:
+            self.model = nn.DataParallel(model)
 
         self.use_cuda = use_cuda
         if self.use_cuda:
@@ -749,7 +703,9 @@ class AnalyzeSequences(object):
 
     def _process_alts(self, all_alts, ref, chrom, pos, ref_seq_center):
         """
-        TODO
+        Iterate through the alternate alleles of the variant and return
+        the encoded sequences cenetered at those alleles for input into
+        the model.
 
         Parameters
         ----------
@@ -766,8 +722,9 @@ class AnalyzeSequences(object):
 
         Returns
         -------
-        TODO
-            TODO
+        list(numpy.ndarray)
+            A list of the encoded sequences containing alternate alleles at
+            the center
 
         """
         alt_encodings = []
@@ -793,7 +750,8 @@ class AnalyzeSequences(object):
                 seq_rhs = self.reference_sequence.get_sequence_from_coords(
                     chrom,
                     pos + len(ref),
-                    pos + len(ref) + self._end_radius - math.ceil(alt_len / 2))
+                    pos + len(ref) + self._end_radius - math.ceil(alt_len / 2),
+                    pad=True)
                 sequence = seq_lhs + a + seq_rhs
                 assert len(sequence) == self.sequence_length
             else:  # insertion
@@ -864,7 +822,19 @@ class AnalyzeSequences(object):
         Returns
         -------
         None
-            Saves all files to `output_dir`.
+            Saves all files to `output_dir`. If any bases in the 'ref' column
+            of the VCF do not match those at the specified position in the
+            reference genome, the scores/predictions will be output to a
+            file prefixed with `warning.`. If most of your variants show up
+            in these warning files, please check that the reference genome
+            you specified matches the one from which the VCF was created.
+            The warning files can be used directly if you have verified that
+            the 'ref' bases specified for these variants are correct (Selene
+            will have substituted these bases for those in the reference
+            genome). Finally, some variants may show up in an 'NA' file.
+            This is because the surrounding sequence context ended up
+            being out of bounds or the chromosome containing the variant
+            did not show up in the reference genome FASTA file.
 
         """
         variants = read_vcf_file(vcf_file)
@@ -887,7 +857,7 @@ class AnalyzeSequences(object):
         for (chrom, pos, name, ref, alt) in variants:
             # centers the sequence containing the ref allele based on the size
             # of ref
-            center = pos + int(len(ref) / 2) - 1
+            center = pos + len(ref) // 2 - 1
             start = center - self._start_radius
             end = center + self._end_radius
 
