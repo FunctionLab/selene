@@ -3,7 +3,6 @@ This module provides the `AnalyzeSequences` class and supporting
 methods.
 """
 import itertools
-import logging
 import math
 import os
 import warnings
@@ -27,9 +26,6 @@ from ..utils import load_model_from_state_dict
 ISM_COLS = ["pos", "ref", "alt"]
 VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
-
-
-logger = logging.getLogger("selene")
 
 
 def in_silico_mutagenesis_sequences(sequence,
