@@ -319,6 +319,7 @@ class AnalyzeSequences(object):
     def _initialize_reporters(self,
                               save_data,
                               output_path_prefix,
+                              output_format,
                               nonfeature_cols,
                               mode="ism"):
         """
@@ -331,6 +332,7 @@ class AnalyzeSequences(object):
             following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_path_prefix : str
             TODO
+        output_format : {'tsv', 'hdf5'}
         nonfeature_cols : list(str)
             TODO
         mode : str
@@ -343,31 +345,20 @@ class AnalyzeSequences(object):
 
         """
         reporters = []
+        constructor_args = [self.features,
+                           nonfeature_cols,
+                           output_path_prefix,
+                           output_format]
         if "diffs" in save_data:
-            filename = "{0}_diffs.tsv".format(output_path_prefix)
-            diff_handler = DiffScoreHandler(
-                self.features, nonfeature_cols, filename)
-            reporters.append(diff_handler)
+            reporters.append(DiffScoreHandler(*constructor_args))
         if "abs_diffs" in save_data:
-            filename = "{0}_abs_diffs.tsv".format(output_path_prefix)
-            abs_diff_handler = AbsDiffScoreHandler(
-                self.features, nonfeature_cols, filename)
-            reporters.append(abs_diff_handler)
+            reporters.append(AbsDiffScoreHandler(*constructor_args))
         if "logits" in save_data:
-            filename = "{0}_logits.tsv".format(output_path_prefix)
-            logit_handler = LogitScoreHandler(
-                self.features, nonfeature_cols, filename)
-            reporters.append(logit_handler)
+            reporters.append(LogitScoreHandler(*constructor_args))
         if "predictions" in save_data and mode != "varianteffect":
-            filename = "{0}_predictions.tsv".format(output_path_prefix)
-            preds_handler = WritePredictionsHandler(
-                self.features, nonfeature_cols, filename)
-            reporters.append(preds_handler)
+            reporters.append(WritePredictionsHandler(*constructor_args))
         elif "predictions" in save_data and mode == "varianteffect":
-            filename = "{0}_predictions".format(output_path_prefix)
-            preds_handler = WriteRefAltHandler(
-                self.features, nonfeature_cols, filename)
-            reporters.append(preds_handler)
+            reporters.append(WriteRefAltHandler(*constructor_args))
         return reporters
 
     def _pad_sequence(self, sequence):
@@ -384,7 +375,10 @@ class AnalyzeSequences(object):
         end = int(start + self.sequence_length)
         return str.upper(sequence[start:end])
 
-    def get_predictions_for_fasta_file(self, input_path, output_dir):
+    def get_predictions_for_fasta_file(self,
+                                       input_path,
+                                       output_dir,
+                                       output_format="tsv"):
         """
         Get model predictions for sequences in a FASTA file.
 
@@ -409,6 +403,7 @@ class AnalyzeSequences(object):
         reporter = self._initialize_reporters(
             ["predictions"],
             os.path.join(output_dir, output_prefix),
+            output_format,
             ["index", "name"],
             mode="prediction")[0]
         fasta_file = pyfaidx.Fasta(input_path)
@@ -511,6 +506,7 @@ class AnalyzeSequences(object):
                               sequence,
                               save_data,
                               output_path_prefix="ism",
+                              output_format="tsv",
                               mutate_n_bases=1):
         """
         Applies *in silico* mutagenesis to a sequence.
@@ -559,7 +555,7 @@ class AnalyzeSequences(object):
             reference_sequence=self.reference_sequence)
 
         reporters = self._initialize_reporters(
-            save_data, output_path_prefix, ISM_COLS)
+            save_data, output_path_prefix, output_format, ISM_COLS)
 
         current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
             sequence)
@@ -580,6 +576,7 @@ class AnalyzeSequences(object):
                                         input_path,
                                         save_data,
                                         output_dir,
+                                        output_format="tsv",
                                         mutate_n_bases=1,
                                         use_sequence_name=True):
         """
@@ -644,7 +641,7 @@ class AnalyzeSequences(object):
                     output_dir, str(i))
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
-                save_data, file_prefix, ISM_COLS)
+                save_data, file_prefix, output_format, ISM_COLS)
 
             if "predictions" in save_data:
                 predictions_reporter = reporters[-1]
@@ -800,7 +797,8 @@ class AnalyzeSequences(object):
     def variant_effect_prediction(self,
                                   vcf_file,
                                   save_data,
-                                  output_dir=None):
+                                  output_dir=None,
+                                  output_format="tsv"):
         """
         Get model predictions and scores for a list of variants.
 
@@ -814,9 +812,17 @@ class AnalyzeSequences(object):
             A list of the data files to output. Must input 1 or more of the
             following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_dir : str or None, optional
-            Path to the output directory. If no path is specified, will save
-            files corresponding to the options in `save_data` to the
-            current working directory.
+            Default is None. Path to the output directory. If no path is
+            specified, will save files corresponding to the options in
+            `save_data` to the current working directory.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save TSV or HDF5 files. TSV
+            is suitable for a short list of variants (e.g. a few hundred
+            variants) and/or models with a small number of features (<1000).
+            Otherwise, you have the option of saving all scores/predictions in
+            HDF5. In this case, variant information (corresponding to rows in
+            the HDF5 file) and class/feature names (corresponding to the
+            columns in the file) will be stored as separate .txt files.
 
         Returns
         -------
@@ -847,7 +853,10 @@ class AnalyzeSequences(object):
             output_dir = path
         output_path_prefix = os.path.join(output_dir, output_path_prefix)
         reporters = self._initialize_reporters(
-            save_data, output_path_prefix, VARIANTEFFECT_COLS,
+            save_data,
+            output_path_prefix,
+            output_format,
+            VARIANTEFFECT_COLS,
             mode="varianteffect")
 
         batch_ref_seqs = []
