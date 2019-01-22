@@ -102,7 +102,7 @@ class WriteRefAltHandler(PredictionsHandler):
                 self._nonfeature_columns,
                 self._output_path_prefix,
                 self._output_format,
-                WriteRefAltHandler)
+                WritePredictionsHandler)
         self._warn_handle.handle_batch_predictions(
             batch_predictions, batch_ids, base_predictions)
 
