@@ -1,11 +1,10 @@
 """
-TODO
+Handles computing and outputting the log fold change scores
 """
 from scipy.special import logit
 
 from .handler import _create_warning_handler
 from .handler import PredictionsHandler
-from .handler import write_to_file
 
 
 class LogitScoreHandler(PredictionsHandler):
@@ -27,24 +26,33 @@ class LogitScoreHandler(PredictionsHandler):
     nonfeature_columns : list of str
         Columns in the file that help to identify the input sequence to
         which the features data corresponds.
-    output_path : str
-        Path to the file where the logit scores will be written.
+    output_path_prefix : str
+        Path to the file to which Selene will write the absolute difference
+        scores. The path may contain a filename prefix. Selene will append
+        `logits` to the end of the prefix.
+    output_format : {'tsv', 'hdf5'}
+        Specify the desired output format. TSV can be specified if you
+        would like the final file to be easily perused. However, saving
+        to a TSV file is much slower than saving to an HDF5 file.
 
-    Notes
-    -----
-
-
+    Attributes
+    ----------
+    needs_base_pred : bool
+        Whether the handler needs the base (reference) prediction as input
+        to compute the final output
 
     """
 
     def __init__(self,
                  features,
                  nonfeature_columns,
-                 output_path):
+                 output_path_prefix,
+                 output_format):
         """
         Constructs a new `LogitScoreHandler` object.
         """
-        super(LogitScoreHandler).__init__()
+        super(LogitScoreHandler, self).__init__(
+            features, nonfeature_columns, output_path_prefix, output_format)
 
         self.needs_base_pred = True
         self._results = []
@@ -53,14 +61,12 @@ class LogitScoreHandler(PredictionsHandler):
 
         self._features = features
         self._nonfeature_columns = nonfeature_columns
-        self._output_path = output_path
+        self._output_path_prefix = output_path_prefix
+        self._output_format = output_format
 
-        self._output_handle = open(self._output_path, 'w+')
-        column_names = nonfeature_columns + features
-        self._output_handle.write("{0}\n".format(
-            '\t'.join(column_names)))
+        self._create_write_handler("logits")
 
-        self._warn_handler = None
+        self._warn_handle = None
 
     def handle_NA(self, batch_ids):
         """
@@ -78,13 +84,14 @@ class LogitScoreHandler(PredictionsHandler):
                        batch_predictions,
                        batch_ids,
                        baseline_predictions):
-        if self._warn_handler is None:
-            self._warn_handler = _create_warning_handler(
+        if self._warn_handle is None:
+            self._warn_handle = _create_warning_handler(
                 self._features,
                 self._nonfeature_columns,
-                self._output_path,
+                self._output_path_prefix,
+                self._output_format,
                 LogitScoreHandler)
-        self._warn_handler.handle_batch_predictions(
+        self._warn_handle.handle_batch_predictions(
             batch_predictions, batch_ids, baseline_predictions)
 
     def handle_batch_predictions(self,
@@ -124,12 +131,4 @@ class LogitScoreHandler(PredictionsHandler):
         """
         TODO
         """
-        if not self._results:
-            self._output_handle.close()
-            return None
-        write_to_file(self._results,
-                      self._samples,
-                      self._output_handle,
-                      close=close)
-        self._results = []
-        self._samples = []
+        super().write_to_file(close=close)
