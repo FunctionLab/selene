@@ -320,7 +320,7 @@ class AnalyzeSequences(object):
                               save_data,
                               output_path_prefix,
                               output_format,
-                              colnames_ids,
+                              colnames_for_ids,
                               mode="ism"):
         """
         Initialize the handlers to which Selene reports model predictions
@@ -339,7 +339,7 @@ class AnalyzeSequences(object):
         output_format : {'tsv', 'hdf5'}
             The desired output format. Currently Selene supports TSV and HDF5
             formats.
-        colnames_ids : list(str)
+        colnames_for_ids : list(str)
             Specify the names of columns that will be used to identify the
             sequence for which Selene has made predictions (e.g. (chrom,
             pos, id, ref, alt) will be the column names for variant effect
@@ -358,7 +358,7 @@ class AnalyzeSequences(object):
         """
         reporters = []
         constructor_args = [self.features,
-                            colnames_ids,
+                            colnames_for_ids,
                             output_path_prefix,
                             output_format]
         if "diffs" in save_data:
