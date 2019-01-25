@@ -23,7 +23,7 @@ class LogitScoreHandler(PredictionsHandler):
     features : list of str
         List of sequence-level features, in the same order that the
         model will return its predictions.
-    nonfeature_columns : list of str
+    columns_for_ids : list of str
         Columns in the file that help to identify the input sequence to
         which the features data corresponds.
     output_path_prefix : str
@@ -45,14 +45,14 @@ class LogitScoreHandler(PredictionsHandler):
 
     def __init__(self,
                  features,
-                 nonfeature_columns,
+                 columns_for_ids,
                  output_path_prefix,
                  output_format):
         """
         Constructs a new `LogitScoreHandler` object.
         """
         super(LogitScoreHandler, self).__init__(
-            features, nonfeature_columns, output_path_prefix, output_format)
+            features, columns_for_ids, output_path_prefix, output_format)
 
         self.needs_base_pred = True
         self._results = []
@@ -60,7 +60,7 @@ class LogitScoreHandler(PredictionsHandler):
         self._NA_samples = []
 
         self._features = features
-        self._nonfeature_columns = nonfeature_columns
+        self._columns_for_ids = columns_for_ids
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
 
@@ -87,7 +87,7 @@ class LogitScoreHandler(PredictionsHandler):
         if self._warn_handle is None:
             self._warn_handle = _create_warning_handler(
                 self._features,
-                self._nonfeature_columns,
+                self._columns_for_ids,
                 self._output_path_prefix,
                 self._output_format,
                 LogitScoreHandler)
