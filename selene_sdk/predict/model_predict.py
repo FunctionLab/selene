@@ -321,10 +321,10 @@ class AnalyzeSequences(object):
                               save_data,
                               output_path_prefix,
                               output_format,
-                              nonfeature_cols,
+                              colnames_for_ids,
                               mode="ism"):
         """
-        TODO
+        Initialize the handlers to which Selene reports model predictions
 
         Parameters
         ----------
@@ -332,24 +332,36 @@ class AnalyzeSequences(object):
             A list of the data files to output. Must input 1 or more of the
             following options: ["abs_diffs", "diffs", "logits", "predictions"].
         output_path_prefix : str
-            TODO
+            Path to which the reporters will output data files. Selene will
+            add a prefix to the resulting filename, where the prefix is based
+            on the name of the user-specified input file. This allows a user
+            to distinguish between output files from different inputs when
+            a user specifies the same output directory for multiple inputs.
         output_format : {'tsv', 'hdf5'}
-        nonfeature_cols : list(str)
-            TODO
-        mode : str
-            TODO
+            The desired output format. Currently Selene supports TSV and HDF5
+            formats.
+        colnames_for_ids : list(str)
+            Specify the names of columns that will be used to identify the
+            sequence for which Selene has made predictions (e.g. (chrom,
+            pos, id, ref, alt) will be the column names for variant effect
+            prediction outputs).
+        mode : {'prediction', 'ism', 'varianteffect'}
+            If saving model predictions, the handler Selene chooses for the
+            task is dependent on the mode. For example, the reporter for
+            variant effect prediction writes paired ref and alt predictions
+            to different files.
 
         Returns
         -------
-        TODO
-            TODO
+        list(selene_sdk.predict.predict_handlers.PredictionsHandler)
+            List of reporters to update as Selene receives model predictions.
 
         """
         reporters = []
         constructor_args = [self.features,
-                           nonfeature_cols,
-                           output_path_prefix,
-                           output_format]
+                            colnames_for_ids,
+                            output_path_prefix,
+                            output_format]
         if "diffs" in save_data:
             reporters.append(DiffScoreHandler(*constructor_args))
         if "abs_diffs" in save_data:
@@ -389,11 +401,33 @@ class AnalyzeSequences(object):
             Input path to the FASTA file.
         output_dir : str
             Output directory to write the model predictions.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package). Choose
+
+                * 'tsv' if your list of sequences is relatively small
+                  (:math:`10^4` or less in order of magnitude) and/or your
+                  model has a small number of features (<1000).
+                * 'hdf5' for anything larger and/or if you would like to
+                  access the predictions/scores as a matrix that you can
+                  easily filter, apply computations, or use in a subsequent
+                  classifier/model. In this case, you may access the matrix
+                  using `mat["data"]` after opening the HDF5 file using
+                  `mat = h5py.File("<output.h5>", 'r')`. The matrix columns
+                  are the features and will match the same ordering as your
+                  features .txt file (same as the order your model outputs
+                  its predictions) and the matrix rows are the sequences.
+                  Note that the row labels (FASTA description/IDs) will be
+                  output as a separate .txt file (should match the ordering
+                  of the sequences in the input FASTA).
 
         Returns
         -------
         None
-            Writes the output to a file in `output_dir`.
+            Writes the output to file(s) in `output_dir`.
 
         """
         os.makedirs(output_dir, exist_ok=True)
@@ -522,6 +556,12 @@ class AnalyzeSequences(object):
         output_path_prefix : str, optional
             The path to which the data files are written. If directories in
             the path do not yet exist they will be automatically created.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save a TSV or HDF5 output file.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package).
         mutate_n_bases : int, optional
             The number of bases to mutate at one time. We recommend leaving
             this parameter set to `1` at this time, as we have not yet
@@ -817,13 +857,26 @@ class AnalyzeSequences(object):
             specified, will save files corresponding to the options in
             `save_data` to the current working directory.
         output_format : {'tsv', 'hdf5'}, optional
-            Default is 'tsv'. Choose whether to save TSV or HDF5 files. TSV
-            is suitable for a short list of variants (e.g. a few hundred
-            variants) and/or models with a small number of features (<1000).
-            Otherwise, you have the option of saving all scores/predictions in
-            HDF5. In this case, variant information (corresponding to rows in
-            the HDF5 file) and class/feature names (corresponding to the
-            columns in the file) will be stored as separate .txt files.
+            Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package). Choose
+
+                * 'tsv' if your list of variants is relatively small
+                  (:math:`10^4` or less in order of magnitude) and/or your
+                  model has a small number of features (<1000).
+                * 'hdf5' for anything larger and/or if you would like to
+                  access the predictions/scores as a matrix that you can
+                  easily filter, apply computations, or use in a subsequent
+                  classifier/model. In this case, you may access the matrix
+                  using `mat["data"]` after opening the HDF5 file using
+                  `mat = h5py.File("<output.h5>", 'r')`. The matrix columns
+                  are the features and will match the same ordering as your
+                  features .txt file (same as the order your model outputs
+                  its predictions) and the matrix rows are the sequences.
+                  Note that the row labels (chrom, pos, id, ref, alt) will be
+                  output as a separate .txt file.
 
         Returns
         -------

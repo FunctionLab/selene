@@ -201,7 +201,7 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
 
     Examples
     --------
-    We have included an example of the output from a`sequence_logo`
+    We have included an example of the output from a `sequence_logo`
     plot below:
 
     .. image:: ../../docs/source/_static/img/sequence_logo_example.png

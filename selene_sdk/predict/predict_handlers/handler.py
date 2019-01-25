@@ -107,7 +107,7 @@ def probabilities_to_string(probabilities):
 
 
 def _create_warning_handler(features,
-                            nonfeature_columns,
+                            columns_for_ids,
                             output_path_prefix,
                             output_format,
                             constructor):
@@ -118,7 +118,7 @@ def _create_warning_handler(features,
     Parameters
     ----------
     features : list(str)
-    nonfeature_columns : list(str)
+    columns_for_ids : list(str)
     output_path_prefix : str
     output_format : {'tsv', 'hdf5'}
     constructor : abc.ABCMeta
@@ -134,7 +134,7 @@ def _create_warning_handler(features,
     filepath = os.path.join(
         path,
         "warning.{0}".format(filename))
-    return constructor(features, nonfeature_columns, filepath, output_format)
+    return constructor(features, columns_for_ids, filepath, output_format)
 
 
 class PredictionsHandler(metaclass=ABCMeta):
@@ -150,7 +150,7 @@ class PredictionsHandler(metaclass=ABCMeta):
     features : list(str)
         List of sequence-level features, in the same order that the
         model will return its predictions.
-    nonfeature_columns : list(str)
+    columns_for_ids : list(str)
         Columns in the file that will help to identify the sequence
         or variant to which the model prediction scores correspond.
     output_path_prefix : str
@@ -172,7 +172,7 @@ class PredictionsHandler(metaclass=ABCMeta):
     """
     def __init__(self,
                  features,
-                 nonfeature_columns,
+                 columns_for_ids,
                  output_path_prefix,
                  output_format):
         self.needs_base_pred = False
@@ -181,7 +181,7 @@ class PredictionsHandler(metaclass=ABCMeta):
         self._NA_samples = []
 
         self._features = features
-        self._nonfeature_columns = nonfeature_columns
+        self._columns_for_ids = columns_for_ids
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
 
@@ -203,7 +203,7 @@ class PredictionsHandler(metaclass=ABCMeta):
         if self._output_format == "tsv":
             self._output_handle = open(
                 "{0}.tsv".format(scores_filepath), 'w+')
-            column_names = self._nonfeature_columns + self._features
+            column_names = self._columns_for_ids + self._features
             self._output_handle.write("{0}\n".format(
                 '\t'.join(column_names)))
         elif self._output_format == "hdf5":
@@ -269,7 +269,7 @@ class PredictionsHandler(metaclass=ABCMeta):
         Writes accumulated handler results to file.
         """
         self._write_NAs_to_file(
-            self._output_path_prefix, self._nonfeature_columns)
+            self._output_path_prefix, self._columns_for_ids)
 
         if not self._results:
             self._output_handle.close()

@@ -19,7 +19,7 @@ class WriteRefAltHandler(PredictionsHandler):
     features : list(str)
         List of sequence-level features, in the same order that the
         model will return its predictions.
-    nonfeature_columns : list(str)
+    columns_for_ids : list(str)
         Columns in the file that help to identify the input sequence
         to which the features data corresponds.
     output_path_prefix : str
@@ -43,18 +43,18 @@ class WriteRefAltHandler(PredictionsHandler):
 
     def __init__(self,
                  features,
-                 nonfeature_columns,
+                 columns_for_ids,
                  output_path_prefix,
                  output_format):
         """
         Constructs a new `WriteRefAltHandler` object.
         """
         super(WriteRefAltHandler, self).__init__(
-            features, nonfeature_columns, output_path_prefix, output_format)
+            features, columns_for_ids, output_path_prefix, output_format)
 
         self.needs_base_pred = True
         self._features = features
-        self._nonfeature_columns = nonfeature_columns
+        self._columns_for_ids = columns_for_ids
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
 
@@ -71,12 +71,12 @@ class WriteRefAltHandler(PredictionsHandler):
 
         self._ref_writer = WritePredictionsHandler(
             features,
-            nonfeature_columns,
+            columns_for_ids,
             ref_filepath,
             output_format)
         self._alt_writer = WritePredictionsHandler(
             features,
-            nonfeature_columns,
+            columns_for_ids,
             alt_filepath,
             output_format)
 
@@ -99,10 +99,10 @@ class WriteRefAltHandler(PredictionsHandler):
         if self._warn_handle is None:
             self._warn_handle = _create_warning_handler(
                 self._features,
-                self._nonfeature_columns,
+                self._columns_for_ids,
                 self._output_path_prefix,
                 self._output_format,
-                WritePredictionsHandler)
+                WriteRefAltHandler)
         self._warn_handle.handle_batch_predictions(
             batch_predictions, batch_ids, base_predictions)
 
