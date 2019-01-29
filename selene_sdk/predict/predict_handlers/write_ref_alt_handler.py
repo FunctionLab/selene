@@ -64,8 +64,8 @@ class WriteRefAltHandler(PredictionsHandler):
         ref_filename = "ref"
         alt_filename = "alt"
         if len(prefix) > 0:
-            ref_filename = "{0}_{1}".format(prefix, ref_filename)
-            alt_filename = "{0}_{1}".format(prefix, alt_filename)
+            ref_filename = "{0}.{1}".format(prefix, ref_filename)
+            alt_filename = "{0}.{1}".format(prefix, alt_filename)
         ref_filepath = os.path.join(output_path, ref_filename)
         alt_filepath = os.path.join(output_path, alt_filename)
 
