@@ -540,7 +540,6 @@ class AnalyzeSequences(object):
                               sequence,
                               save_data,
                               output_path_prefix="ism",
-                              output_format="tsv",
                               mutate_n_bases=1):
         """
         Applies *in silico* mutagenesis to a sequence.
@@ -555,12 +554,6 @@ class AnalyzeSequences(object):
         output_path_prefix : str, optional
             The path to which the data files are written. If directories in
             the path do not yet exist they will be automatically created.
-        output_format : {'tsv', 'hdf5'}, optional
-            Default is 'tsv'. Choose whether to save a TSV or HDF5 output file.
-            TSV is easier to access (i.e. open with text editor/Excel) and
-            quickly peruse, whereas HDF5 files must be accessed through
-            specific packages/viewers that support this format (e.g. h5py
-            Python package).
         mutate_n_bases : int, optional
             The number of bases to mutate at one time. We recommend leaving
             this parameter set to `1` at this time, as we have not yet
@@ -574,7 +567,7 @@ class AnalyzeSequences(object):
 
         """
         path_dirs, _ = os.path.split(output_path_prefix)
-        os.makedirs(path_dirs, exists_ok=True)
+        os.makedirs(path_dirs, exist_ok=True)
 
         n = len(sequence)
         if n < self.sequence_length: # Pad string length as necessary.
@@ -595,7 +588,7 @@ class AnalyzeSequences(object):
             reference_sequence=self.reference_sequence)
 
         reporters = self._initialize_reporters(
-            save_data, output_path_prefix, output_format, ISM_COLS)
+            save_data, output_path_prefix, "tsv", ISM_COLS)
 
         current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
             sequence)
@@ -616,7 +609,6 @@ class AnalyzeSequences(object):
                                         input_path,
                                         save_data,
                                         output_dir,
-                                        output_format="tsv",
                                         mutate_n_bases=1,
                                         use_sequence_name=True):
         """
@@ -681,7 +673,7 @@ class AnalyzeSequences(object):
                     output_dir, str(i))
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
-                save_data, file_prefix, output_format, ISM_COLS)
+                save_data, file_prefix, "tsv", ISM_COLS)
 
             if "predictions" in save_data:
                 predictions_reporter = reporters[-1]
@@ -740,7 +732,7 @@ class AnalyzeSequences(object):
     def _process_alts(self, all_alts, ref, chrom, pos, ref_seq_center):
         """
         Iterate through the alternate alleles of the variant and return
-        the encoded sequences cenetered at those alleles for input into
+        the encoded sequences centered at those alleles for input into
         the model.
 
         Parameters
