@@ -20,7 +20,8 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
 }
 prediction: {
     input_path: /path/to/sequences.fa,
-    output_dir: /path/to/output_dir
+    output_dir: /path/to/output_dir,
+    output_format: tsv
 }
 random_seed: 123
 ...

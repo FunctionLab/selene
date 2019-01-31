@@ -1,7 +1,8 @@
 """
 This class is the abstract base class for all handlers, i.e. objects
-that "handle" model predictions.
-# TODO: Clarify.
+that "handle" model predictions. Specifically, handlers should store
+the model predictions or scores derived from those predictions and eventually
+output them according to a user-specified output format.
 """
 from abc import ABCMeta
 from abc import abstractmethod
@@ -47,6 +48,36 @@ def write_to_hdf5_file(data_across_features,
                        hdf5_handle,
                        info_handle,
                        close=False):
+    """
+    Write samples with valid predictions/scores to an HDF5 file. The
+    dataset attached to this file will be accessed using the key "data".
+    Each column corresponds to the prediction/score for a model class
+    (e.g. genomic feature), and each row is a different input
+    variant/sequence.
+
+    Parameters
+    ----------
+    data_across_features : list(arraylike)
+        For each sequence input, we should have predictions or scores derived
+        from those predictions across all the genomic/sequence-level features
+        our model can predict. The length of this list is the number of
+        sequences inputted to the model and the length of each element
+        (`arraylike`) in the list is the number of sequence-level features.
+    info_cols : list(arraylike)
+        Identifying information attached to each sequence entry. Each item
+        in `info_cols` is the label information for each row that is written
+        to the file. All values in an element of `info_cols` will be written
+        to a separate .txt file.
+    hdf5_handle : h5py._hl.files.File
+        File handle we use to write the data to the HDF5 file.
+    info_handle : _io.TextIOWrapper
+        File handle to write the elements of `info_cols` to a tab-separated
+        .txt file.
+    close : bool, optional
+        Default is False. Set `close` to True if you are finished writing
+        all data to the file..
+
+    """
     for info_batch in info_cols:
         for info in info_batch:
             info_str = '\t'.join([str(i) for i in info])
@@ -229,6 +260,8 @@ class PredictionsHandler(metaclass=ABCMeta):
             output_path, prefix = os.path.split(output_path_prefix)
             NA_filename = "predictions.NA"
             if len(prefix) > 0:
+                if '.ref' in prefix:
+                    prefix, _ = prefix.split('.')
                 NA_filename = "{0}_{1}".format(prefix, NA_filename)
             write_NAs_to_file(self._NA_samples,
                               column_names,
@@ -267,6 +300,12 @@ class PredictionsHandler(metaclass=ABCMeta):
     def write_to_file(self, close=False):
         """
         Writes accumulated handler results to file.
+
+        Parameters
+        ----------
+        close : bool, optional
+            Whether to close the attached file handles or not at the end of
+            writing
         """
         self._write_NAs_to_file(
             self._output_path_prefix, self._columns_for_ids)

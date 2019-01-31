@@ -220,7 +220,7 @@ def execute(operations, configs, output_dir):
                         filepath, **vareff_info)
             if "in_silico_mutagenesis" in configs:
                 ism_info = configs["in_silico_mutagenesis"]
-                if "input_sequence" in ism_info:
+                if "sequence" in ism_info:
                     analyze_seqs.in_silico_mutagenesis(**ism_info)
                 elif "input_path" in ism_info:
                     analyze_seqs.in_silico_mutagenesis_from_file(**ism_info)

@@ -27,7 +27,8 @@ variant_effect_prediction: {
        /path/to/file2.vcf
     ], 
     save_data: [predictions, abs_diffs],
-    output_dir: /path/to/output/predicts/dir 
+    output_dir: /path/to/output/predicts/dir,
+    output_format: hdf5
 }
 random_seed: 123
 ...
