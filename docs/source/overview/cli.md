@@ -305,7 +305,7 @@ in_silico_mutagenesis: {
 ```
 
 #### Parameters for a single sequence input
-- `input_sequence`: A sequence you are interested in. If the sequence length is less than or greater than the expected model's input sequence length, Selene truncates or pads (with unknown base, e.g. `N`) the sequence for you.
+- `sequence`: A sequence you are interested in. If the sequence length is less than or greater than the expected model's input sequence length, Selene truncates or pads (with unknown base, e.g. `N`) the sequence for you.
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. (Note that the raw prediction values will not be outputted by default---you must specify `predictions` in the list if you want them.)
 - `output_path_prefix`: Optional, default is "ism". The path to which the data files are written. We have specified that it should be a filename _prefix_ because we will append additional information depending on what files you would like to output (e.g. `fileprefix_logits.tsv`) If directories in the path do not yet exist, they will automatically be created. 
 - `mutate_n_bases`: Optional, default is 1. The number of bases to mutate at any time. Standard _in silico_ mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1. Double/triple mutations will be more difficult to interpret and are something we may work on in the future. 
@@ -322,7 +322,7 @@ in_silico_mutagenesis: {
 ```
 
 #### Parameters for FASTA file input:
-- `input_path`: Input path to the FASTA file. If you have multiple FASTA files, you can replace this key with `fa_files` and submit an input list, the way we do in variant effect prediction.
+- `input_path`: Input path to the FASTA file. If you have multiple FASTA files, you can replace this key with `fa_files` and submit an input list, the same way it is done in variant effect prediction.
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. 
 - `output_dir`: Output directory to write the model predictions.
 - `mutate_n_bases`: Optional, default is 1. The number of bases to mutate at any time. Standard _in silico_ mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1.

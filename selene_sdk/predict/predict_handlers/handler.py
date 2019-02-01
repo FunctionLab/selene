@@ -254,8 +254,8 @@ class PredictionsHandler(metaclass=ABCMeta):
             self._info_handle = open(labels_filepath, 'w+')
 
     def _write_NAs_to_file(self,
-                          output_path_prefix,
-                          column_names):
+                           output_path_prefix,
+                           column_names):
         if self._NA_samples:
             output_path, prefix = os.path.split(output_path_prefix)
             NA_filename = "predictions.NA"
