@@ -7,6 +7,7 @@ output them according to a user-specified output format.
 from abc import ABCMeta
 from abc import abstractmethod
 import os
+from sys import getsizeof
 
 
 def write_to_tsv_file(data_across_features, info_cols, output_handle, close=False):
@@ -193,6 +194,10 @@ class PredictionsHandler(metaclass=ABCMeta):
         file should be easily perused (e.g. viewed in a text editor/Excel).
         However, saving to a TSV file is much slower than saving to an HDF5
         file.
+    write_mem_limit : int, optional
+        Default is 1500. Specify the amount of memory you can allocate to
+        storing model predictions/scores, in MB. Handlers will write to file
+        whenever this memory limit is reached.
 
     Attributes
     ----------
@@ -205,7 +210,8 @@ class PredictionsHandler(metaclass=ABCMeta):
                  features,
                  columns_for_ids,
                  output_path_prefix,
-                 output_format):
+                 output_format,
+                 write_mem_limit=1500):
         self.needs_base_pred = False
         self._results = []
         self._samples = []
@@ -219,6 +225,8 @@ class PredictionsHandler(metaclass=ABCMeta):
         self._output_handle = None
         self._info_handle = None
         self._warn_handle = None
+
+        self._write_mem_limit = write_mem_limit
 
     def _create_write_handler(self, handler_filename):
         """
@@ -254,8 +262,8 @@ class PredictionsHandler(metaclass=ABCMeta):
             self._info_handle = open(labels_filepath, 'w+')
 
     def _write_NAs_to_file(self,
-                          output_path_prefix,
-                          column_names):
+                           output_path_prefix,
+                           column_names):
         if self._NA_samples:
             output_path, prefix = os.path.split(output_path_prefix)
             NA_filename = "predictions.NA"
@@ -267,6 +275,16 @@ class PredictionsHandler(metaclass=ABCMeta):
                               column_names,
                               os.path.join(output_path, NA_filename))
             self._NA_samples = []
+
+    def _reached_mem_limit(self):
+        mem_used = (getsizeof(self._results) +
+                    getsizeof(self._samples) +
+                    getsizeof(self._NA_samples))
+        # TODO: fix this. used for debugging only
+        if mem_used / 10**6 >= self._mem_limit:
+            print(len(self._results), len(self._samples))
+            return True
+        return False
 
     def handle_NA(self, row_ids):
         """

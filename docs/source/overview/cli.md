@@ -260,12 +260,12 @@ prediction: {
 #### Parameters
 - `input_path`: Input path to the FASTA file.
 - `output_dir`: Output directory to write the model predictions. The resulting file will have the same filename prefix (e.g. `example.fasta` will output `example_predictions.tsv`).
-- `output_format`: Default is 'tsv'. You may specify either 'tsv' or 'hdf5'. 'tsv' is suitable if you do not have many sequences (less than 100) or your model does not predict very many classes (less than 1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). 'hdf5' is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package `h5py`. Once the file is loaded, the full matrix is accessible under the key/name `"data"`.  
+- `output_format`: Default is 'tsv'. You may specify either 'tsv' or 'hdf5'. 'tsv' is suitable if you do not have many sequences (less than 100) or your model does not predict very many classes (less than 1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). 'hdf5' is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package `h5py`. Once the file is loaded, the full matrix is accessible under the key/name `"data"`. Saving to TSV is much slower than saving to HDF5. An additional .txt file with the row labels (descriptions for each sequence in the FASTA) will be output for the HDF5 format as well. It should be ordered in the same way as your input file. 
 
 ### Variant effect prediction
 Currently, we expect that all sequences passed as input to a model must be the same length `N`. 
 - For SNPs, Selene outputs the model predictions for the ref and alt sequences centered at the `(chr, pos)` specified. 
-- For indels, sequences are centered at `pos + (N_bases / 2)`, for the inserted/deleted sequence of length `N_bases`. Selene queries for `start = pos + (N_bases / 2) - (N / 2)` and `end = pos + (N_bases / 2) + (N / 2)` to get the sequence of length `N`. This applies to the counterpart sequence as well. For example, if the sequence is completely deleted, the `alt` column has 0 bases. Selene queries for `start = pos + (N/2)` and `end = pos - (N / 2)` to build the counterpart sequence since `N_bases` is 0.
+- For indels, sequences are centered at `pos + (N_bases / 2)`, for the inserted/deleted sequence of length `N_bases`. Selene queries for `start = pos + (N_bases / 2) - (N / 2)` and `end = pos + (N_bases / 2) + (N / 2)` to get the sequence of length `N`. This applies to the counterpart sequence as well. For example, if the sequence is completely deleted, the `alt` column has 0 bases. Selene queries for `start = pos + (N / 2)` and `end = pos - (N / 2)` to build the counterpart sequence since `N_bases` is 0.
 
 An example configuration for variant effect prediction:
 ```YAML
@@ -276,7 +276,8 @@ variant_effect_prediction: {
         ...
     ],
     save_data: [abs_diffs],
-    output_dir: /path/to/output/predictions/dir
+    output_dir: /path/to/output/predictions/dir,
+    output_format: hdf5
 }
 ```
 
@@ -284,6 +285,12 @@ variant_effect_prediction: {
 - `vcf_files`: Path to a VCF file. Must contain the columns `[#CHROM, POS, ID, REF, ALT]`, in order. Column header does not need to be present. (All other columns in the file will be ignored.)
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. (Note that the raw prediction values will not be outputted by default---you must specify `predictions` in the list if you want them.)
 - `output_dir`: Output directory to write the model predictions. The resulting file will have the same filename prefix.
+- `output_format`: Default is 'tsv'. You may specify either 'tsv' or 'hdf5'. 'tsv' is suitable if you do not have many variants (on the order of :math:`10^4` or less) or your model does not predict very many classes (less than 1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). 'hdf5' is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package `h5py`. Once the file is loaded, the full matrix is accessible under the key/name `"data"`. Saving to TSV is much slower than saving to HDF5. When the output is in HDF5 format, an additional .txt file of row labels (corresponding to the columns (chrom, pos, id, ref, alt)) will be output so that you can match up the rows with the particular variant.  
+
+#### Additional note
+You may find that there are more output files than you expect in `output_dir` at the end of variant effect prediction. The following cases may occur:
+- NAs: for some variants, Selene may not be able to construct a reference sequence centered at `pos` of the specified sequence length. This is likely because `pos` is near the end or the beginning of the chromosome and the sequence length the model accepts as input is large. You will find a list of NA variants in a file that ends with the extension `.NA`. 
+- Warnings: Selene may detect that the `ref` base(s) in a variant do not match with the bases specified in the reference sequence FASTA at the `(chrom, pos)`. In this case, Selene will use the `ref` base(s) specified in the VCF file in place of those in the reference genome and output predictions accordingly. However, the predictions will be diverted to a file prefixed with `warning.` so that you may review these variants and determine whether you still want to use those predictions/scores. If you find that most of the variants are showing up in the warning file, it may be that you have specified the wrong reference genome version---please check this before proceeding.  
 
 ### _In silico_ mutagenesis
 An example configuration for _in silico_ mutagenesis when using a single sequence as input:
@@ -297,7 +304,7 @@ in_silico_mutagenesis: {
 ```
 
 #### Parameters for a single sequence input
-- `input_sequence`: A sequence you are interested in. If the sequence length is less than or greater than the expected model's input sequence length, Selene truncates or pads (with unknown base, e.g. `N`) the sequence for you.
+- `sequence`: A sequence you are interested in. If the sequence length is less than or greater than the expected model's input sequence length, Selene truncates or pads (with unknown base, e.g. `N`) the sequence for you.
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. (Note that the raw prediction values will not be outputted by default---you must specify `predictions` in the list if you want them.)
 - `output_path_prefix`: Optional, default is "ism". The path to which the data files are written. We have specified that it should be a filename _prefix_ because we will append additional information depending on what files you would like to output (e.g. `fileprefix_logits.tsv`) If directories in the path do not yet exist, they will automatically be created. 
 - `mutate_n_bases`: Optional, default is 1. The number of bases to mutate at any time. Standard _in silico_ mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1. Double/triple mutations will be more difficult to interpret and are something we may work on in the future. 
@@ -314,7 +321,7 @@ in_silico_mutagenesis: {
 ```
 
 #### Parameters for FASTA file input:
-- `input_path`: Input path to the FASTA file. If you have multiple FASTA files, you can replace this key with `fa_files` and submit an input list, the way we do in variant effect prediction.
+- `input_path`: Input path to the FASTA file. If you have multiple FASTA files, you can replace this key with `fa_files` and submit an input list, the same way it is done in variant effect prediction.
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. 
 - `output_dir`: Output directory to write the model predictions.
 - `mutate_n_bases`: Optional, default is 1. The number of bases to mutate at any time. Standard _in silico_ mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1.

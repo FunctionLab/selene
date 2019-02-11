@@ -45,12 +45,17 @@ class WriteRefAltHandler(PredictionsHandler):
                  features,
                  columns_for_ids,
                  output_path_prefix,
-                 output_format):
+                 output_format,
+                 write_mem_limit):
         """
         Constructs a new `WriteRefAltHandler` object.
         """
         super(WriteRefAltHandler, self).__init__(
-            features, columns_for_ids, output_path_prefix, output_format)
+            features,
+            columns_for_ids,
+            output_path_prefix,
+            output_format,
+            write_mem_limit)
 
         self.needs_base_pred = True
         self._features = features
