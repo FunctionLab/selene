@@ -39,12 +39,17 @@ class WritePredictionsHandler(PredictionsHandler):
                  features,
                  columns_for_ids,
                  output_path_prefix,
-                 output_format):
+                 output_format,
+                 write_mem_limit):
         """
         Constructs a new `WritePredictionsHandler` object.
         """
         super(WritePredictionsHandler, self).__init__(
-            features, columns_for_ids, output_path_prefix, output_format)
+            features,
+            columns_for_ids,
+            output_path_prefix,
+            output_format,
+            write_mem_limit)
 
         self.needs_base_pred = False
         self._results = []
@@ -104,7 +109,7 @@ class WritePredictionsHandler(PredictionsHandler):
         """
         self._results.append(batch_predictions)
         self._samples.append(batch_ids)
-        if len(self._results) > 100000:
+        if self._reached_mem_limit():
             self.write_to_file()
 
     def write_to_file(self, close=False):

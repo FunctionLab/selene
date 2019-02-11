@@ -227,6 +227,13 @@ class AnalyzeSequences(object):
         model was trained on. That is, if the sequences in your variants file
         are hg19 but your model was trained on hg38 sequences, you should pass
         in hg19.
+    write_mem_limit : int, optional
+        Default is 1500. Specify the amount of memory you can allocate to
+        storing model predictions/scores, in MB. When running one of
+        _in silico_ mutagenesis, variant effect prediction, or prediction,
+        prediction/score handlers will accumulate data in memory and only
+        write this data to files periodically. By default, Selene will write
+        to files when the data takes up 1500MB of space.
 
     Attributes
     ----------
@@ -255,7 +262,8 @@ class AnalyzeSequences(object):
                  batch_size=64,
                  use_cuda=False,
                  data_parallel=False,
-                 reference_sequence=Genome):
+                 reference_sequence=Genome,
+                 write_mem_limit=1500):
         """
         Constructs a new `AnalyzeSequences` object.
         """
@@ -289,6 +297,8 @@ class AnalyzeSequences(object):
         self.batch_size = batch_size
         self.features = features
         self.reference_sequence = reference_sequence
+
+        self._write_mem_limit = write_mem_limit
 
     def predict(self, batch_sequences):
         """
@@ -360,7 +370,8 @@ class AnalyzeSequences(object):
         constructor_args = [self.features,
                             colnames_for_ids,
                             output_path_prefix,
-                            output_format]
+                            output_format,
+                            self._write_mem_limit]
         if "diffs" in save_data:
             reporters.append(DiffScoreHandler(*constructor_args))
         if "abs_diffs" in save_data:

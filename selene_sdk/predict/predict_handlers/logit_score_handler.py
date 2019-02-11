@@ -47,12 +47,17 @@ class LogitScoreHandler(PredictionsHandler):
                  features,
                  columns_for_ids,
                  output_path_prefix,
-                 output_format):
+                 output_format,
+                 write_mem_limit):
         """
         Constructs a new `LogitScoreHandler` object.
         """
         super(LogitScoreHandler, self).__init__(
-            features, columns_for_ids, output_path_prefix, output_format)
+            features,
+            columns_for_ids,
+            output_path_prefix,
+            output_format,
+            write_mem_limit)
 
         self.needs_base_pred = True
         self._results = []
@@ -124,7 +129,7 @@ class LogitScoreHandler(PredictionsHandler):
         logits = logit(baseline_predictions) - logit(batch_predictions)
         self._results.append(logits)
         self._samples.append(batch_ids)
-        if len(self._results) > 100000:
+        if self._reached_mem_limit():
             self.write_to_file()
 
     def write_to_file(self, close=False):

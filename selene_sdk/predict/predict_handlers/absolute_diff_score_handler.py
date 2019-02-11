@@ -43,12 +43,17 @@ class AbsDiffScoreHandler(PredictionsHandler):
                  features,
                  columns_for_ids,
                  output_path_prefix,
-                 output_format):
+                 output_format,
+                 write_mem_limit):
         """
         Constructs a new `AbsDiffScoreHandler` object.
         """
         super(AbsDiffScoreHandler, self).__init__(
-            features, columns_for_ids, output_path_prefix, output_format)
+            features,
+            columns_for_ids,
+            output_path_prefix,
+            output_format,
+            write_mem_limit)
         self.needs_base_pred = True
         self._results = []
         self._samples = []
@@ -149,7 +154,7 @@ class AbsDiffScoreHandler(PredictionsHandler):
         absolute_diffs = np.abs(baseline_predictions - batch_predictions)
         self._results.append(absolute_diffs)
         self._samples.append(batch_ids)
-        if len(self._results) > 100000:
+        if self._reached_mem_limit():
             self.write_to_file()
 
     def write_to_file(self, close=False):
