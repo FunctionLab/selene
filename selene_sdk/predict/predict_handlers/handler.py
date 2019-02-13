@@ -142,6 +142,7 @@ def _create_warning_handler(features,
                             columns_for_ids,
                             output_path_prefix,
                             output_format,
+                            write_mem_limit,
                             constructor):
     """
     Helper to create a predictions handler that stores the predictions/scores
@@ -153,6 +154,7 @@ def _create_warning_handler(features,
     columns_for_ids : list(str)
     output_path_prefix : str
     output_format : {'tsv', 'hdf5'}
+    write_mem_limit : int
     constructor : abc.ABCMeta
         The handler class. Should implement
         selene_sdk.predict.predict_handlers.PredictionsHandler.
@@ -166,7 +168,11 @@ def _create_warning_handler(features,
     filepath = os.path.join(
         path,
         "warning.{0}".format(filename))
-    return constructor(features, columns_for_ids, filepath, output_format)
+    return constructor(features,
+                       columns_for_ids,
+                       filepath,
+                       output_format,
+                       write_mem_limit)
 
 
 class PredictionsHandler(metaclass=ABCMeta):
@@ -196,8 +202,8 @@ class PredictionsHandler(metaclass=ABCMeta):
         file.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
-        storing model predictions/scores, in MB. Handlers will write to file
-        whenever this memory limit is reached.
+        storing model predictions/scores for this particular handler, in MB.
+        Handler will write to file whenever this memory limit is reached.
 
     Attributes
     ----------
@@ -277,14 +283,11 @@ class PredictionsHandler(metaclass=ABCMeta):
             self._NA_samples = []
 
     def _reached_mem_limit(self):
-        mem_used = (getsizeof(self._results) +
-                    getsizeof(self._samples) +
-                    getsizeof(self._NA_samples))
-        # TODO: fix this. used for debugging only
-        if mem_used / 10**6 >= self._mem_limit:
-            print(len(self._results), len(self._samples))
-            return True
-        return False
+        mem_used = (self._results[0].nbytes * len(self._results) +
+                    getsizeof(self._samples[0]) * len(self._samples))
+        if len(self._NA_samples) > 0:
+            mem_used += getsizeof(self._NA_samples[0]) * len(self._NA_samples)
+        return mem_used / 10**6 >= self._write_mem_limit
 
     def handle_NA(self, row_ids):
         """

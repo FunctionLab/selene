@@ -228,12 +228,21 @@ class AnalyzeSequences(object):
         are hg19 but your model was trained on hg38 sequences, you should pass
         in hg19.
     write_mem_limit : int, optional
-        Default is 1500. Specify the amount of memory you can allocate to
+        Default is 5000. Specify the amount of memory you can allocate to
         storing model predictions/scores, in MB. When running one of
         _in silico_ mutagenesis, variant effect prediction, or prediction,
         prediction/score handlers will accumulate data in memory and only
         write this data to files periodically. By default, Selene will write
-        to files when the data takes up 1500MB of space.
+        to files when the total amount of data (across all handlers) takes up
+        5000MB of space. Please keep in mind that Selene will not monitor the
+        memory needed to actually carry out the operations (e.g. variant effect
+        prediction) or load the model, so `write_mem_limit` should always be
+        less than the total amount of CPU memory you have available on your
+        machine. For example, for variant effect prediction, we load all
+        the variants in 1 file into memory before running the operation, so
+        you must have enough memory for that and storing data to handlers.
+        If your model is large and you are running it on CPU, you will
+        need to make sure your CPU has the memory to support this as well.
 
     Attributes
     ----------
@@ -367,12 +376,18 @@ class AnalyzeSequences(object):
             List of reporters to update as Selene receives model predictions.
 
         """
+        save_data = set(save_data) & set(
+            ["diffs", "abs_diffs", "logits", "predictions"])
+        if len(save_data) == 0:
+            raise ValueError("'save_data' parameter must be a list that "
+                             "contains one of ['diffs', 'abs_diffs', "
+                             "'logits', 'predictions'].")
         reporters = []
         constructor_args = [self.features,
                             colnames_for_ids,
                             output_path_prefix,
                             output_format,
-                            self._write_mem_limit]
+                            self._write_mem_limit // len(save_data)]
         if "diffs" in save_data:
             reporters.append(DiffScoreHandler(*constructor_args))
         if "abs_diffs" in save_data:
