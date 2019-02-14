@@ -19,7 +19,8 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     use_cuda: True,
     reference_sequence: !obj:selene_sdk.sequences.Genome {
         input_path: /path/to/reference_sequence.fa
-    }
+    },
+    write_mem_limit: 10000
 }
 variant_effect_prediction: {
     vcf_files: [
