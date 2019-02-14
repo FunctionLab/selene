@@ -16,7 +16,8 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
         input_path: /path/to/distinct_features.txt 
     },
     batch_size: 64,
-    use_cuda: True
+    use_cuda: True,
+    write_mem_limit: 75000
 }
 prediction: {
     input_path: /path/to/sequences.fa,

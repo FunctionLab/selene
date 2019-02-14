@@ -228,8 +228,8 @@ class AnalyzeSequences(object):
         are hg19 but your model was trained on hg38 sequences, you should pass
         in hg19.
     write_mem_limit : int, optional
-        Default is 5000. Specify the amount of memory you can allocate to
-        storing model predictions/scores, in MB. When running one of
+        Default is 5000. Specify, in MB, the amount of memory you want to
+        allocate to storing model predictions/scores. When running one of
         _in silico_ mutagenesis, variant effect prediction, or prediction,
         prediction/score handlers will accumulate data in memory and only
         write this data to files periodically. By default, Selene will write
@@ -239,10 +239,11 @@ class AnalyzeSequences(object):
         prediction) or load the model, so `write_mem_limit` should always be
         less than the total amount of CPU memory you have available on your
         machine. For example, for variant effect prediction, we load all
-        the variants in 1 file into memory before running the operation, so
-        you must have enough memory for that and storing data to handlers.
-        If your model is large and you are running it on CPU, you will
-        need to make sure your CPU has the memory to support this as well.
+        the variants in 1 file into memory before getting the predictions, so
+        your machine must have enough memory to accommodate that. Another
+        possible consideration is your model size and whether you are
+        using it on the CPU or a CUDA-enabled GPU (i.e. setting
+        `use_cuda` to True).
 
     Attributes
     ----------
