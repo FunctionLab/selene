@@ -437,7 +437,8 @@ class AnalyzeSequences(object):
 
                 * 'tsv' if your list of sequences is relatively small
                   (:math:`10^4` or less in order of magnitude) and/or your
-                  model has a small number of features (<1000).
+                  model has a small number of features (<1000). Saving to
+                  TSV is >2x slower than saving with HDF5.
                 * 'hdf5' for anything larger and/or if you would like to
                   access the predictions/scores as a matrix that you can
                   easily filter, apply computations, or use in a subsequent
