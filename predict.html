@@ -146,6 +146,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
@@ -328,7 +329,7 @@ predictions with models that have already been trained.</p>
 <h2>AnalyzeSequences<a class="headerlink" href="#analyzesequences" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.predict.AnalyzeSequences">
-<em class="property">class </em><code class="descclassname">selene_sdk.predict.</code><code class="descname">AnalyzeSequences</code><span class="sig-paren">(</span><em>model</em>, <em>trained_model_path</em>, <em>sequence_length</em>, <em>features</em>, <em>batch_size=64</em>, <em>use_cuda=False</em>, <em>reference_sequence=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.predict.</code><code class="descname">AnalyzeSequences</code><span class="sig-paren">(</span><em>model</em>, <em>trained_model_path</em>, <em>sequence_length</em>, <em>features</em>, <em>batch_size=64</em>, <em>use_cuda=False</em>, <em>data_parallel=False</em>, <em>reference_sequence=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em>, <em>write_mem_limit=1500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Score sequences and their variants using the predictions made
 by a trained model.</p>
@@ -345,6 +346,8 @@ Architecture must match <cite>model</cite>.</li>
 <li><strong>batch_size</strong> (<em>int, optional</em>) – Default is 64. The size of the mini-batches to use.</li>
 <li><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specifies whether CUDA-enabled GPUs are available
 for torch to use.</li>
+<li><strong>data_parallel</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether multiple GPUs are available for
+torch to use during training.</li>
 <li><strong>reference_sequence</strong> (<em>class, optional</em>) – Default is <cite>selene_sdk.sequences.Genome</cite>. The type of sequence on
 which this analysis will be performed. Please note that if you need
 to use variant effect prediction, you cannot only pass in the
@@ -354,15 +357,32 @@ This version does NOT have to be the same sequence version that the
 model was trained on. That is, if the sequences in your variants file
 are hg19 but your model was trained on hg38 sequences, you should pass
 in hg19.</li>
+<li><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 5000. Specify, in MB, the amount of memory you want to
+allocate to storing model predictions/scores. When running one of
+_in <a href="#id3"><span class="problematic" id="id4">silico_</span></a> mutagenesis, variant effect prediction, or prediction,
+prediction/score handlers will accumulate data in memory and only
+write this data to files periodically. By default, Selene will write
+to files when the total amount of data (across all handlers) takes up
+5000MB of space. Please keep in mind that Selene will not monitor the
+memory needed to actually carry out the operations (e.g. variant effect
+prediction) or load the model, so <cite>write_mem_limit</cite> should always be
+less than the total amount of CPU memory you have available on your
+machine. For example, for variant effect prediction, we load all
+the variants in 1 file into memory before getting the predictions, so
+your machine must have enough memory to accommodate that. Another
+possible consideration is your model size and whether you are
+using it on the CPU or a CUDA-enabled GPU (i.e. setting
+<cite>use_cuda</cite> to True).</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+ed949e2 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+82b2690 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</li>
 <li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequences that the model is expecting.</li>
 <li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batches to use.</li>
 <li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</li>
-<li><strong>use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Specifies whether to use CUDA or not.</li>
+<li><strong>use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Specifies whether to use a CUDA-enabled GPU or not.</li>
+<li><strong>data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</li>
 <li><strong>reference_sequence</strong> (<em>class</em>) – The type of sequence on which this analysis will be performed.</li>
 </ul>
 </td>
@@ -371,19 +391,47 @@ in hg19.</li>
 </table>
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">
-<code class="descname">get_predictions_for_fasta_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_predictions_for_fasta_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>output_dir</em>, <em>output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences in a FASTA file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>input_path</strong> (<em>str</em>) – Input path to the FASTA file.</li>
-<li><strong>output_dir</strong> (<em>str</em>) – Output directory to write the model predictions.</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
+<li><p class="first"><strong>input_path</strong> (<em>str</em>) – Input path to the FASTA file.</p>
+</li>
+<li><p class="first"><strong>output_dir</strong> (<em>str</em>) – Output directory to write the model predictions.</p>
+</li>
+<li><p class="first"><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}, optional</em>) – Default is ‘tsv’. Choose whether to save TSV or HDF5 output files.
+TSV is easier to access (i.e. open with text editor/Excel) and
+quickly peruse, whereas HDF5 files must be accessed through
+specific packages/viewers that support this format (e.g. h5py
+Python package). Choose</p>
+<blockquote>
+<div><ul class="simple">
+<li>‘tsv’ if your list of sequences is relatively small
+(<span class="math notranslate nohighlight">\(10^4\)</span> or less in order of magnitude) and/or your
+model has a small number of features (&lt;1000). Saving to
+TSV is &gt;2x slower than saving with HDF5.</li>
+<li>‘hdf5’ for anything larger and/or if you would like to
+access the predictions/scores as a matrix that you can
+easily filter, apply computations, or use in a subsequent
+classifier/model. In this case, you may access the matrix
+using <cite>mat[“data”]</cite> after opening the HDF5 file using
+<cite>mat = h5py.File(“&lt;output.h5&gt;”, ‘r’)</cite>. The matrix columns
+are the features and will match the same ordering as your
+features .txt file (same as the order your model outputs
+its predictions) and the matrix rows are the sequences.
+Note that the row labels (FASTA description/IDs) will be
+output as a separate .txt file (should match the ordering
+of the sequences in the input FASTA).</li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Writes the output to a file in <cite>output_dir</cite>.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Writes the output to file(s) in <cite>output_dir</cite>.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
@@ -512,7 +560,7 @@ where <span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_siz
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The model predictions of shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where <span class="math notranslate nohighlight">\(F\)</span>
 is the number of features (classes) the model predicts.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a></td>
 </tr>
 </tbody>
 </table>
@@ -520,25 +568,64 @@ is the number of features (classes) the model predicts.</td>
 
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.variant_effect_prediction">
-<code class="descname">variant_effect_prediction</code><span class="sig-paren">(</span><em>vcf_file</em>, <em>save_data</em>, <em>output_dir=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
+<code class="descname">variant_effect_prediction</code><span class="sig-paren">(</span><em>vcf_file</em>, <em>save_data</em>, <em>output_dir=None</em>, <em>output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions and scores for a list of variants.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>vcf_file</strong> (<em>str</em>) – Path to a VCF file. Must contain the columns
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
+<li><p class="first"><strong>vcf_file</strong> (<em>str</em>) – Path to a VCF file. Must contain the columns
 [#CHROM, POS, ID, REF, ALT], in order. Column header does not need
-to be present.</li>
-<li><strong>save_data</strong> (<em>list(str)</em>) – A list of the data files to output. Must input 1 or more of the
-following options: [“abs_diffs”, “diffs”, “logits”, “predictions”].</li>
-<li><strong>output_dir</strong> (<em>str or None, optional</em>) – Path to the output directory. If no path is specified, will save
-files corresponding to the options in <cite>save_data</cite> to the
-current working directory.</li>
+to be present.</p>
+</li>
+<li><p class="first"><strong>save_data</strong> (<em>list(str)</em>) – A list of the data files to output. Must input 1 or more of the
+following options: [“abs_diffs”, “diffs”, “logits”, “predictions”].</p>
+</li>
+<li><p class="first"><strong>output_dir</strong> (<em>str or None, optional</em>) – Default is None. Path to the output directory. If no path is
+specified, will save files corresponding to the options in
+<cite>save_data</cite> to the current working directory.</p>
+</li>
+<li><p class="first"><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}, optional</em>) – Default is ‘tsv’. Choose whether to save TSV or HDF5 output files.
+TSV is easier to access (i.e. open with text editor/Excel) and
+quickly peruse, whereas HDF5 files must be accessed through
+specific packages/viewers that support this format (e.g. h5py
+Python package). Choose</p>
+<blockquote>
+<div><ul class="simple">
+<li>‘tsv’ if your list of variants is relatively small
+(<span class="math notranslate nohighlight">\(10^4\)</span> or less in order of magnitude) and/or your
+model has a small number of features (&lt;1000).</li>
+<li>‘hdf5’ for anything larger and/or if you would like to
+access the predictions/scores as a matrix that you can
+easily filter, apply computations, or use in a subsequent
+classifier/model. In this case, you may access the matrix
+using <cite>mat[“data”]</cite> after opening the HDF5 file using
+<cite>mat = h5py.File(“&lt;output.h5&gt;”, ‘r’)</cite>. The matrix columns
+are the features and will match the same ordering as your
+features .txt file (same as the order your model outputs
+its predictions) and the matrix rows are the sequences.
+Note that the row labels (chrom, pos, id, ref, alt) will be
+output as a separate .txt file.</li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Saves all files to <cite>output_dir</cite>.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Saves all files to <cite>output_dir</cite>. If any bases in the ‘ref’ column
+of the VCF do not match those at the specified position in the
+reference genome, the scores/predictions will be output to a
+file prefixed with <cite>warning.</cite>. If most of your variants show up
+in these warning files, please check that the reference genome
+you specified matches the one from which the VCF was created.
+The warning files can be used directly if you have verified that
+the ‘ref’ bases specified for these variants are correct (Selene
+will have substituted these bases for those in the reference
+genome). Finally, some variants may show up in an ‘NA’ file.
+This is because the surrounding sequence context ended up
+being out of bounds or the chromosome containing the variant
+did not show up in the reference genome FASTA file.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>

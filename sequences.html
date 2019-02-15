@@ -146,6 +146,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
@@ -342,7 +343,7 @@ that may occur in a sequence). We expect that
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The array of all members of the alphabet.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=str</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=str</td>
 </tr>
 </tbody>
 </table>
@@ -456,7 +457,7 @@ at queried coordinates, where <span class="math notranslate nohighlight">\(L\)</
 sequence, and <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s
 alphabet. Behavior is undefined for invalid coordinates.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=numpy.float32</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=numpy.float32</td>
 </tr>
 </tbody>
 </table>
@@ -497,7 +498,7 @@ representation.</p>
 <span class="math notranslate nohighlight">\(L\)</span> is the length of the sequence, and <span class="math notranslate nohighlight">\(N\)</span> is
 the size of the sequence type’s alphabet.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=numpy.float32</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=numpy.float32</td>
 </tr>
 </tbody>
 </table>
@@ -681,10 +682,14 @@ sequence.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The <span class="math notranslate nohighlight">\(L \times 4\)</span> encoding of the sequence, where
-<span class="math notranslate nohighlight">\(L = end - start\)</span>.</p>
+<span class="math notranslate nohighlight">\(L = end - start\)</span>, unless <cite>chrom</cite> cannot be found
+in the input FASTA, <cite>start</cite> or <cite>end</cite> are out of bounds,
+or (if a blacklist exists) the region overlaps with a blacklisted
+region. In these cases, it will return an empty encoding–that is,
+<cite>L</cite> = 0 for the NumPy array returned.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=bool</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=bool</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the input char to <cite>strand</cite> is not one of the specified
@@ -698,7 +703,7 @@ choices.
 
 <dl class="method">
 <dt id="selene_sdk.sequences.Genome.get_sequence_from_coords">
-<code class="descname">get_sequence_from_coords</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em>, <em>strand='+'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_sequence_from_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_sequence_from_coords</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em>, <em>strand='+'</em>, <em>pad=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_sequence_from_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the queried chromosome’s sequence at the input coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -709,11 +714,19 @@ choices.
 <li><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the sequence.</li>
 <li><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</li>
 <li><strong>strand</strong> (<em>{‘+’, ‘-‘}, optional</em>) – Default is ‘+’. The strand the sequence is located on.</li>
+<li><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
+and/or <cite>end</cite> are out of bounds to return a sequence of length
+<cite>end - start</cite>.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The genomic sequence of length <span class="math notranslate nohighlight">\(L\)</span> where
-<span class="math notranslate nohighlight">\(L = end - start\)</span>.</p>
+<span class="math notranslate nohighlight">\(L = end - start\)</span>. If <cite>pad</cite> is <cite>False</cite> and one/both of
+<cite>start</cite> and <cite>end</cite> are out of bounds, will return an empty string.
+Also returns an empty string if <cite>chrom</cite> cannot be found in the
+input FASTA file.
+Otherwise, will return the sequence with padding at the start/end
+if appropriate.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
@@ -739,7 +752,7 @@ choices.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The <span class="math notranslate nohighlight">\(L \times 4\)</span> one-hot encoding of the sequence.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=numpy.float32</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=numpy.float32</td>
 </tr>
 </tbody>
 </table>
@@ -880,7 +893,7 @@ sequence.</li>
 <span class="math notranslate nohighlight">\(L = end - start\)</span>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=numpy.float32</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=numpy.float32</p>
 </td>
 </tr>
 </tbody>
@@ -959,7 +972,7 @@ coordinates, where <span class="math notranslate nohighlight">\(L = end - start\
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The <span class="math notranslate nohighlight">\(L \times 20\)</span> array, where <cite>L</cite> was the length of
 the input sequence.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=numpy.float32</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=numpy.float32</td>
 </tr>
 </tbody>
 </table>
@@ -997,7 +1010,7 @@ mapping to values of <cite>[0, 1, 2, 3]</cite>.</li>
 the size of the sequence alphabet.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a>, dtype=numpy.float32</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, dtype=numpy.float32</p>
 </td>
 </tr>
 </tbody>
@@ -1061,7 +1074,7 @@ encoding can be quickly computed.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.15)">numpy.ndarray</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a></p>
 </td>
 </tr>
 </tbody>
