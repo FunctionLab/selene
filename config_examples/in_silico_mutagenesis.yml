@@ -16,7 +16,8 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
         input_path: /path/to/distinct_features.txt 
     },
     batch_size: 64,
-    use_cuda: True
+    use_cuda: True,
+    write_mem_limit: 5000
 }
 in_silico_mutagenesis: {
     fa_files: [

@@ -1,8 +1,8 @@
 """
-TODO
+Handles outputting the model predictions
 """
-import numpy as np
-from .handler import write_NAs_to_file, write_to_file, PredictionsHandler
+from .handler import _create_warning_handler
+from .handler import PredictionsHandler
 
 
 class WritePredictionsHandler(PredictionsHandler):
@@ -15,31 +15,60 @@ class WritePredictionsHandler(PredictionsHandler):
     features : list(str)
         List of sequence-level features, in the same order that the
         model will return its predictions.
-    nonfeature_columns : list(str)
+    columns_for_ids : list(str)
         Columns in the file that help to identify the input sequence to
         which the features data corresponds.
-    output_path : str
-        Path to the file where predictions will be written.
+    output_path_prefix : str
+        Path to the file to which Selene will write the absolute difference
+        scores. The path may contain a filename prefix. Selene will append
+        `predictions` to the end of the prefix.
+    output_format : {'tsv', 'hdf5'}
+        Specify the desired output format. TSV can be specified if you
+        would like the final file to be easily perused. However, saving
+        to a TSV file is much slower than saving to an HDF5 file.
+    write_mem_limit : int, optional
+        Default is 1500. Specify the amount of memory you can allocate to
+        storing model predictions/scores for this particular handler, in MB.
+        Handler will write to file whenever this memory limit is reached.
+
+    Attributes
+    ----------
+    needs_base_pred : bool
+        Whether the handler needs the base (reference) prediction as input
+        to compute the final output
 
     """
 
-    def __init__(self, features, nonfeature_columns, output_path):
+    def __init__(self,
+                 features,
+                 columns_for_ids,
+                 output_path_prefix,
+                 output_format,
+                 write_mem_limit=1500):
         """
         Constructs a new `WritePredictionsHandler` object.
-
         """
-
-        super(WritePredictionsHandler).__init__()
+        super(WritePredictionsHandler, self).__init__(
+            features,
+            columns_for_ids,
+            output_path_prefix,
+            output_format,
+            write_mem_limit)
 
         self.needs_base_pred = False
         self._results = []
         self._samples = []
         self._NA_samples = []
-        self._column_names = nonfeature_columns + features
-        self._output_path = output_path
-        self._output_handle = open(output_path, 'w+')
-        self._output_handle.write("{0}\n".format(
-            '\t'.join(self._column_names)))
+
+        self._features = features
+        self._columns_for_ids = columns_for_ids
+        self._output_path_prefix = output_path_prefix
+        self._output_format = output_format
+        self._write_mem_limit = write_mem_limit
+
+        self._create_write_handler("predictions")
+
+        self._warn_handle = None
 
     def handle_NA(self, batch_ids):
         """
@@ -52,6 +81,18 @@ class WritePredictionsHandler(PredictionsHandler):
 
         """
         super().handle_NA(batch_ids)
+
+    def handle_warning(self, batch_predictions, batch_ids):
+        if self._warn_handle is None:
+            self._warn_handle = _create_warning_handler(
+                self._features,
+                self._columns_for_ids,
+                self._output_path_prefix,
+                self._output_format,
+                self._write_mem_limit,
+                WritePredictionsHandler)
+        self._warn_handle.handle_batch_predictions(
+            batch_predictions, batch_ids)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
@@ -74,30 +115,11 @@ class WritePredictionsHandler(PredictionsHandler):
         """
         self._results.append(batch_predictions)
         self._samples.append(batch_ids)
-        if len(self._results) > 200000:
+        if self._reached_mem_limit():
             self.write_to_file()
 
     def write_to_file(self, close=False):
         """
         TODO
         """
-        if self._NA_samples:
-            self._NA_samples = np.vstack(self._NA_samples)
-            NA_file_prefix = '.'.join(
-                self._output_path.split('.')[:-1])
-            write_NAs_to_file(self._NA_samples,
-                              self._column_names,
-                              "{0}.NA".format(NA_file_prefix))
-            self._NA_samples = []
-
-        if not self._results:
-            self._output_handle.close()
-            return None
-        self._results = np.vstack(self._results)
-        self._samples = np.vstack(self._samples)
-        write_to_file(self._results,
-                      self._samples,
-                      self._output_handle,
-                      close=close)
-        self._results = []
-        self._samples = []
+        super().write_to_file(close=close)
