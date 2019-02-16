@@ -333,8 +333,7 @@ class AnalyzeSequences(object):
             inputs = inputs.cuda()
         with torch.no_grad():
             inputs = Variable(inputs)
-            inputs = inputs.transpose(1, 2).unsqueeze_(2)
-            outputs = self.model.forward(inputs)
+            outputs = self.model.forward(inputs.transpose(1, 2))
             return outputs.data.cpu().numpy()
 
     def _initialize_reporters(self,
