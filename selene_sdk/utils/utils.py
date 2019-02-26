@@ -78,10 +78,7 @@ def load_model_from_state_dict(state_dict, model):
     new_state_dict = OrderedDict()
     for (k1, k2) in zip(model_keys, state_dict_keys):
         value = state_dict[k2]
-        if k1 == k2:
-            new_state_dict[k2] = value
-        else:
-            new_state_dict[k1] = value
+        new_state_dict[k1] = value
         """
         elif ('model' in k1 and k2 in k1) \
                 or ('model' in k2 and k1 in k2):
