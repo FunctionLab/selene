@@ -146,7 +146,7 @@ def mutate_sequence(encoding,
 
 
 # TODO: Is this a general method that might belong in utils?
-def read_vcf_file(input_path):
+def read_vcf_file(input_path, strand_index=None):
     """
     Read the relevant columns for a variant call format (VCF) file to
     collect variants for variant effect prediction.
@@ -189,7 +189,10 @@ def read_vcf_file(input_path):
             name = cols[2]
             ref = cols[3]
             alt = cols[4]
-            variants.append((chrom, pos, name, ref, alt))
+            strand = '+'
+            if strand_index is not None:
+                strand = cols[5]
+            variants.append((chrom, pos, name, ref, alt, strand))
     return variants
 
 
@@ -757,7 +760,13 @@ class AnalyzeSequences(object):
             else:
                 r.handle_batch_predictions(alt_outputs, batch_ids)
 
-    def _process_alts(self, all_alts, ref, chrom, pos, ref_seq_center):
+    def _process_alts(self,
+                      all_alts,
+                      ref,
+                      chrom,
+                      pos,
+                      ref_seq_center,
+                      strand):
         """
         Iterate through the alternate alleles of the variant and return
         the encoded sequences centered at those alleles for input into
@@ -794,7 +803,7 @@ class AnalyzeSequences(object):
                 start_pos = ref_seq_center - self._start_radius
                 end_pos = ref_seq_center + self._end_radius
                 sequence = self.reference_sequence.get_sequence_from_coords(
-                    chrom, start_pos, end_pos)
+                    chrom, start_pos, end_pos, strand=strand)
                 remove_ref_start = self._start_radius - ref_len // 2
                 sequence = (sequence[:remove_ref_start] +
                             a +
@@ -802,11 +811,13 @@ class AnalyzeSequences(object):
                 assert len(sequence) == self.sequence_length
             elif ref_len > alt_len:  # deletion
                 seq_lhs = self.reference_sequence.get_sequence_from_coords(
-                    chrom, pos - self._start_radius, pos - alt_len // 2)
+                    chrom, pos - self._start_radius, pos - alt_len // 2,
+                    strand=strand)
                 seq_rhs = self.reference_sequence.get_sequence_from_coords(
                     chrom,
                     pos + len(ref),
                     pos + len(ref) + self._end_radius - math.ceil(alt_len / 2),
+                    strand=strand,
                     pad=True)
                 sequence = seq_lhs + a + seq_rhs
                 assert len(sequence) == self.sequence_length
@@ -814,11 +825,13 @@ class AnalyzeSequences(object):
                 seq_lhs = self.reference_sequence.get_sequence_from_coords(
                     chrom,
                     pos - self._start_radius,
-                    pos - alt_len // 2)
+                    pos - alt_len // 2,
+                    strand=strand)
                 seq_rhs = self.reference_sequence.get_sequence_from_coords(
                     chrom,
                     pos + math.ceil(alt_len / 2),
-                    pos + self._end_radius)
+                    pos + self._end_radius,
+                    strand=strand)
                 sequence = seq_lhs + a + seq_rhs
                 assert len(sequence) == self.sequence_length
             alt_encoding = self.reference_sequence.sequence_to_encoding(
@@ -858,7 +871,8 @@ class AnalyzeSequences(object):
                                   vcf_file,
                                   save_data,
                                   output_dir=None,
-                                  output_format="tsv"):
+                                  output_format="tsv",
+                                  strand_index=None):
         """
         Get model predictions and scores for a list of variants.
 
@@ -935,7 +949,7 @@ class AnalyzeSequences(object):
         batch_ref_seqs = []
         batch_alt_seqs = []
         batch_ids = []
-        for (chrom, pos, name, ref, alt) in variants:
+        for (chrom, pos, name, ref, alt, strand) in variants:
             # centers the sequence containing the ref allele based on the size
             # of ref
             center = pos + len(ref) // 2 - 1
@@ -950,14 +964,15 @@ class AnalyzeSequences(object):
 
             if not self.reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
-                    r.handle_NA((chrom, pos, name, ref, alt))
+                    r.handle_NA((chrom, pos, name, ref, alt, strand))
                 continue
 
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
-                chrom, start, end)
+                chrom, start, end, strand=strand)
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             all_alts = alt.split(',')
-            alt_encodings = self._process_alts(all_alts, ref, chrom, pos, center)
+            alt_encodings = self._process_alts(
+                all_alts, ref, chrom, pos, center, strand)
 
             match = True
             seq_at_ref = None
