@@ -13,6 +13,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+from ._variant_effect_prediction import read_vcf_file
 from .predict_handlers import AbsDiffScoreHandler
 from .predict_handlers import DiffScoreHandler
 from .predict_handlers import LogitScoreHandler
@@ -24,7 +25,6 @@ from ..utils import load_model_from_state_dict
 
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
-VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
 
 
@@ -143,57 +143,6 @@ def mutate_sequence(encoding,
         mutated_seq[position, :] = 0
         mutated_seq[position, replace_base] = 1
     return mutated_seq
-
-
-# TODO: Is this a general method that might belong in utils?
-def read_vcf_file(input_path, strand_index=None):
-    """
-    Read the relevant columns for a variant call format (VCF) file to
-    collect variants for variant effect prediction.
-
-    Parameters
-    ----------
-    input_path : str
-        Path to the VCF file.
-
-    Returns
-    -------
-    list(tuple)
-        List of variants. Tuple = (chrom, position, id, ref, alt)
-
-    """
-    variants = []
-
-    with open(input_path, 'r') as file_handle:
-        lines = file_handle.readlines()
-        index = 0
-        for index, line in enumerate(lines):
-            if '#' not in line:
-                break
-            if "#CHROM" in line:
-                cols = line.strip().split('\t')
-                if cols[:5] != VCF_REQUIRED_COLS:
-                    raise ValueError(
-                        "First 5 columns in file {0} were {1}. "
-                        "Expected columns: {2}".format(
-                            input_path, cols[:5], VCF_REQUIRED_COLS))
-                index += 1
-                break
-
-        for line in lines[index:]:
-            cols = line.strip().split('\t')
-            if len(cols) < 5:
-                continue
-            chrom = str(cols[0])
-            pos = int(cols[1])
-            name = cols[2]
-            ref = cols[3]
-            alt = cols[4]
-            strand = '+'
-            if strand_index is not None:
-                strand = cols[5]
-            variants.append((chrom, pos, name, ref, alt, strand))
-    return variants
 
 
 class AnalyzeSequences(object):
