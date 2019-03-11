@@ -141,7 +141,7 @@ def _handle_standard_ref(ref_encoding,
                          start_radius,
                          reference_sequence):
     ref_len = ref_encoding.shape[0]
-    start_pos = start_radius - ref_len // 2
+    start_pos = start_radius - ref_len // 2 - 1
     sequence_encoding_at_ref = seq_encoding[
         start_pos:start_pos + ref_len, :]
     sequence_at_ref = reference_sequence.encoding_to_sequence(
@@ -163,8 +163,8 @@ def _handle_long_ref(ref_encoding,
     sequence_encoding_at_ref = seq_encoding
     sequence_at_ref = reference_sequence.encoding_to_sequence(
         sequence_encoding_at_ref)
-    ref_start = ref_len // 2 - start_radius
-    ref_end = ref_len // 2 + end_radius
+    ref_start = ref_len // 2 - start_radius - 1
+    ref_end = ref_len // 2 + end_radius - 1
     ref_encoding = ref_encoding[ref_start:ref_end]
     references_match = np.array_equal(
         sequence_encoding_at_ref, ref_encoding)

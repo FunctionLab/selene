@@ -805,7 +805,7 @@ class AnalyzeSequences(object):
         for (chrom, pos, name, ref, alt, strand) in variants:
             # centers the sequence containing the ref allele based on the size
             # of ref
-            center = pos + len(ref) // 2 - 1
+            center = pos + len(ref) // 2  # - 1
             start = center - self._start_radius
             end = center + self._end_radius
 
@@ -850,9 +850,14 @@ class AnalyzeSequences(object):
                                   chrom, pos, name, ref, alt, seq_at_ref))
                 warn_batch_ids = [(chrom, pos, name, ref, a) for a in all_alts]
                 warn_ref_seqs = [seq_encoding] * len(all_alts)
-                self._handle_ref_alt_predictions(
-                    warn_ref_seqs, alt_encodings, warn_batch_ids,
-                    reporters, warn=True)
+                _handle_ref_alt_predictions(
+                    self.model,
+                    warn_ref_seqs,
+                    alt_encodings,
+                    warn_batch_ids,
+                    reporters,
+                    warn=True,
+                    use_cuda=self.use_cuda)
                 continue
 
             batch_ids += [(chrom, pos, name, ref, a) for a in all_alts]
@@ -860,15 +865,27 @@ class AnalyzeSequences(object):
             batch_alt_seqs += alt_encodings
 
             if len(batch_ref_seqs) >= self.batch_size:
-                self._handle_ref_alt_predictions(
-                    batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
+                _handle_ref_alt_predictions(
+                    self.model,
+                    batch_ref_seqs,
+                    batch_alt_seqs,
+                    batch_ids,
+                    reporters,
+                    warn=False,
+                    use_cuda=self.use_cuda)
                 batch_ref_seqs = []
                 batch_alt_seqs = []
                 batch_ids = []
 
         if batch_ref_seqs:
-            self._handle_ref_alt_predictions(
-                batch_ref_seqs, batch_alt_seqs, batch_ids, reporters)
+            _handle_ref_alt_predictions(
+                self.model,
+                batch_ref_seqs,
+                batch_alt_seqs,
+                batch_ids,
+                reporters,
+                warn=False,
+                use_cuda=self.use_cuda)
 
         for r in reporters:
             r.write_to_file(close=True)
