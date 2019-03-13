@@ -40,12 +40,14 @@ def predict(model, batch_sequences, use_cuda=False):
     Parameters
     ----------
     model : torch.nn.Sequential
+        The model, on mode `eval`.
     batch_sequences : numpy.ndarray
         `batch_sequences` has the shape :math:`B \\times L \\times N`,
         where :math:`B` is `batch_size`, :math:`L` is the sequence length,
         :math:`N` is the size of the sequence type's alphabet.
     use_cuda : bool, optional
-        Default is False.
+        Default is `False`. Specifies whether CUDA-enabled GPUs are available
+        for torch to use.
 
     Returns
     -------
@@ -76,17 +78,23 @@ def _handle_ref_alt_predictions(model,
 
     Parameters
     ----------
+    model : torch.nn.Sequential
+        The model, on mode `eval`.
     batch_ref_seqs : list(np.ndarray)
         One-hot encoded sequences with the ref base(s).
     batch_alt_seqs : list(np.ndarray)
         One-hot encoded sequences with the alt base(s).
     reporters : list(PredictionsHandler)
         List of prediction handlers.
-    warn : bool
+    warn : bool, optional
         Whether a warning was raised or not. If `warn`, directs handlers
         to divert the predictions/scores to different files
         (filename prefixed by 'warning.') so that users
         know that Selene detected an issue with these variants.
+    use_cuda : bool, optional
+        Default is `False`. Specifies whether CUDA-enabled GPUs are available
+        for torch to use.
+
 
     Returns
     -------
@@ -708,19 +716,30 @@ class AnalyzeSequences(object):
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             all_alts = alt.split(',')
             alt_encodings = _process_alts(
-                all_alts, ref, chrom, pos, center, strand,
-                self._start_radius, self._end_radius, self.reference_sequence)
+                all_alts,
+                ref,
+                chrom,
+                pos,
+                center,
+                strand,
+                self._start_radius,
+                self._end_radius,
+                self.reference_sequence)
 
             match = True
             seq_at_ref = None
             if len(ref) < self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_standard_ref(
-                    ref_encoding, seq_encoding,
-                    self._start_radius, self.reference_sequence)
+                    ref_encoding,
+                    seq_encoding,
+                    self._start_radius,
+                    self.reference_sequence)
             else:
                 match, seq_encoding, seq_at_ref = _handle_long_ref(
-                    ref_encoding, seq_encoding,
-                    self._start_radius, self._end_radius,
+                    ref_encoding,
+                    seq_encoding,
+                    self._start_radius,
+                    self._end_radius,
                     self.reference_sequence)
             if not match:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}), "

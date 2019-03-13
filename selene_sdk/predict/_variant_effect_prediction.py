@@ -16,6 +16,12 @@ def read_vcf_file(input_path, strand_index=None):
     ----------
     input_path : str
         Path to the VCF file.
+    strand_index : int or None, optional
+        Default is None. By default we assume the input sequence
+        surrounding a variant should be on the forward strand. If your
+        model is strand-specific, you may want to specify the column number
+        (0-based) in the VCF file that includes the strand corresponding
+        to each variant.
 
     Returns
     -------
@@ -50,8 +56,8 @@ def read_vcf_file(input_path, strand_index=None):
             ref = cols[3]
             alt = cols[4]
             strand = '+'
-            if strand_index is not None:
-                strand = cols[5]
+            if strand_index is not None and cols[strand_index] == '-':
+                strand = '-'
             variants.append((chrom, pos, name, ref, alt, strand))
     return variants
 
@@ -82,6 +88,15 @@ def _process_alts(all_alts,
         The position of the variant
     ref_seq_center : int
         The center position of the sequence containing the reference allele
+    strand : {'+', '-'}
+        The strand the variant is on
+    start_radius : int
+        The number of bases to query on the LHS of the variant.
+    end_radius : int
+        The number of bases to query on the RHS of the variant.
+    reference_sequence : selene_sdk.sequences.Sequence
+        The reference sequence Selene queries to retrieve the model input
+        sequences based on variant coordinates.
 
     Returns
     -------
