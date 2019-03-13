@@ -211,7 +211,6 @@ def _handle_ref_alt_predictions(model,
     """
     batch_ref_seqs = np.array(batch_ref_seqs)
     batch_alt_seqs = np.array(batch_alt_seqs)
-
     ref_outputs = predict(model, batch_ref_seqs, use_cuda=use_cuda)
     alt_outputs = predict(model, batch_alt_seqs, use_cuda=use_cuda)
     for r in reporters:
@@ -805,7 +804,7 @@ class AnalyzeSequences(object):
         for (chrom, pos, name, ref, alt, strand) in variants:
             # centers the sequence containing the ref allele based on the size
             # of ref
-            center = pos + len(ref) // 2  # - 1
+            center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
 

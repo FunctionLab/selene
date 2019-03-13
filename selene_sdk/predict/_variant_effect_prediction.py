@@ -40,7 +40,6 @@ def read_vcf_file(input_path, strand_index=None):
                             input_path, cols[:5], VCF_REQUIRED_COLS))
                 index += 1
                 break
-
         for line in lines[index:]:
             cols = line.strip().split('\t')
             if len(cols) < 5:
@@ -103,32 +102,23 @@ def _process_alts(all_alts,
             end_pos = ref_seq_center + end_radius
             sequence = reference_sequence.get_sequence_from_coords(
                 chrom, start_pos, end_pos, strand=strand)
-            remove_ref_start = start_radius - ref_len // 2
+            remove_ref_start = start_radius - ref_len // 2 - 1
             sequence = (sequence[:remove_ref_start] +
                         a +
                         sequence[remove_ref_start + ref_len:])
-        elif ref_len > alt_len:  # deletion
+        else:  # insertion or deletion
             seq_lhs = reference_sequence.get_sequence_from_coords(
-                chrom, pos - start_radius, pos - alt_len // 2,
-                strand=strand)
-            seq_rhs = reference_sequence.get_sequence_from_coords(
                 chrom,
-                pos + len(ref),
-                pos + len(ref) + end_radius - math.ceil(alt_len / 2),
+                pos - 1 - start_radius + alt_len // 2,
+                pos - 1,
                 strand=strand,
                 pad=True)
-            sequence = seq_lhs + a + seq_rhs
-        else:  # insertion
-            seq_lhs = reference_sequence.get_sequence_from_coords(
-                chrom,
-                pos - start_radius,
-                pos - alt_len // 2,
-                strand=strand)
             seq_rhs = reference_sequence.get_sequence_from_coords(
                 chrom,
-                pos + math.ceil(alt_len / 2),
-                pos + end_radius,
-                strand=strand)
+                pos - 1 + len(ref),
+                pos - 1 + len(ref) + end_radius - math.ceil(alt_len / 2.),
+                strand=strand,
+                pad=True)
             sequence = seq_lhs + a + seq_rhs
         alt_encoding = reference_sequence.sequence_to_encoding(
             sequence)
