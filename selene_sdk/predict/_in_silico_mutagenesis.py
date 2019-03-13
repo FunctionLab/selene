@@ -59,33 +59,6 @@ def in_silico_mutagenesis_sequences(sequence,
     return all_mutated_sequences
 
 
-def _ism_sample_id(sequence, mutation_information):
-    """
-    TODO
-
-    Parameters
-    ----------
-    sequence : str
-        The input sequence to mutate.
-    mutation_information : list(tuple)
-        TODO
-
-    Returns
-    -------
-    TODO
-        TODO
-
-    """
-    positions = []
-    refs = []
-    alts = []
-    for (position, alt) in mutation_information:
-        positions.append(str(position))
-        refs.append(sequence[position])
-        alts.append(alt)
-    return (';'.join(positions), ';'.join(refs), ';'.join(alts))
-
-
 def mutate_sequence(encoding,
                     mutation_information,
                     reference_sequence=Genome):
@@ -121,3 +94,29 @@ def mutate_sequence(encoding,
         mutated_seq[position, replace_base] = 1
     return mutated_seq
 
+
+def _ism_sample_id(sequence, mutation_information):
+    """
+    TODO
+
+    Parameters
+    ----------
+    sequence : str
+        The input sequence to mutate.
+    mutation_information : list(tuple)
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+
+    """
+    positions = []
+    refs = []
+    alts = []
+    for (position, alt) in mutation_information:
+        positions.append(str(position))
+        refs.append(sequence[position])
+        alts.append(alt)
+    return (';'.join(positions), ';'.join(refs), ';'.join(alts))
