@@ -1,0 +1,925 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>selene_sdk.utils.config &mdash; Selene master documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/selene_docs_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Selene
+          
+
+          
+            
+            <img src="../../../_static/selene_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master (0.2.0)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/overview.html">Functional overview of the SDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#sampling">Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id3">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id5">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#id6">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#additional-note">Additional note</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id13">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#id14">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../selene.html">selene_sdk</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#evaluatemodel">EvaluateModel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../interpret.html">selene_sdk.interpret</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sequence-logo">sequence_logo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#heatmap">heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ismresult">ISMResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../predict.html">selene_sdk.predict</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.html">selene_sdk.samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#sampler">Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene_sdk.sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#genome">Genome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#proteome">Proteome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../targets.html">selene_sdk.targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#genomicfeatures">GenomicFeatures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">selene_sdk.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-logger">initialize_logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-path-for-config-yml">load_path (for config.yml)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#instantiate-configuration-object">instantiate (configuration object)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-model">initialize_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#parse-configs-and-run">parse_configs_and_run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#execute-run-selene-operations">execute (run Selene operations)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Selene</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>selene_sdk.utils.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for selene_sdk.utils.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Classes and methods for loading configurations from YAML files.</span>
+<span class="sd">Taken (with minor changes) from `Pylearn2`_.</span>
+
+
+<span class="sd">.. _Pylearn2: \</span>
+<span class="sd">http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+
+<span class="n">SCIENTIFIC_NOTATION_REGEXP</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[\-\+]?(\d+\.?\d*|\d*\.?\d+)?[eE][\-\+]?\d+$&quot;</span>
+<span class="n">IS_INITIALIZED</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="n">_BaseProxy</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;_BaseProxy&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;callable&quot;</span><span class="p">,</span> <span class="s2">&quot;positionals&quot;</span><span class="p">,</span> <span class="s2">&quot;keywords&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;yaml_src&quot;</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">_Proxy</span><span class="p">(</span><span class="n">_BaseProxy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An intermediate representation between initial YAML parse and</span>
+<span class="sd">    object instantiation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    callable : callable</span>
+<span class="sd">        The function/class to call to instantiate this node.</span>
+<span class="sd">    positionals : iterable</span>
+<span class="sd">        Placeholder for future support for positional</span>
+<span class="sd">        arguments (`*args`).</span>
+<span class="sd">    keywords : dict-like</span>
+<span class="sd">        A mapping from keywords to arguments (`**kwargs`), which may be</span>
+<span class="sd">        `_Proxy`s or `_Proxy`s nested inside `dict` or `list` instances.</span>
+<span class="sd">        Keys must be strings that are valid Python variable names.</span>
+<span class="sd">    yaml_src : str</span>
+<span class="sd">        The YAML source that created this node, if available.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This is intended as a robust, forward-compatible intermediate</span>
+<span class="sd">    representation for either internal consumption or external</span>
+<span class="sd">    consumption by another tool e.g. hyperopt.</span>
+<span class="sd">    This particular class mainly exists to  override `_BaseProxy`&#39;s</span>
+<span class="sd">    `__hash__` (to avoid hashing unhashable namedtuple elements).</span>
+
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a hash based on the object ID (to avoid hashing</span>
+<span class="sd">         unhashable namedtuple elements).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets the values for specified keys.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_do_not_recurse</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function symbol used for wrapping an unpickled object</span>
+<span class="sd">    (which should not be recursively expanded).</span>
+
+<span class="sd">    This is recognized and respected by the instantiation parser.</span>
+<span class="sd">    Implementationally, no-op (returns the value passed in as an</span>
+<span class="sd">    argument).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value : object</span>
+<span class="sd">        The value to be returned.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    value : object</span>
+<span class="sd">        The same object passed in as an argument.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">_instantiate_proxy_tuple</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">bindings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Helper function for `_instantiate` that handles objects of the</span>
+<span class="sd">     `_Proxy` class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    proxy : _Proxy object</span>
+<span class="sd">        A `_Proxy` object that.</span>
+<span class="sd">    bindings : dict, optional</span>
+<span class="sd">        A dictionary mapping previously instantiated `_Proxy` objects</span>
+<span class="sd">        to their instantiated values.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obj : object</span>
+<span class="sd">        The result object from recursively instantiating the object DAG.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="n">bindings</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">bindings</span><span class="p">[</span><span class="n">proxy</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Respect _do_not_recurse by just un-packing it (same as calling).</span>
+        <span class="k">if</span> <span class="n">proxy</span><span class="o">.</span><span class="n">callable</span> <span class="o">==</span> <span class="n">_do_not_recurse</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">positionals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;positional arguments not yet &#39;</span>
+                                          <span class="s1">&#39;supported in proxy instantiation&#39;</span><span class="p">)</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">bindings</span><span class="p">))</span>
+                          <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">proxy</span><span class="o">.</span><span class="n">keywords</span><span class="p">))</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">callable</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">yaml_src</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">yaml_src</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># Some classes won&#39;t allow this.</span>
+            <span class="k">pass</span>
+        <span class="n">bindings</span><span class="p">[</span><span class="n">proxy</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">bindings</span><span class="p">[</span><span class="n">proxy</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_preprocess</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Preprocesses a string.</span>
+
+<span class="sd">    Preprocesses a string, by replacing `${VARNAME}` with</span>
+<span class="sd">    `os.environ[&#39;VARNAME&#39;]` and ~ with the path to the user&#39;s</span>
+<span class="sd">    home directory.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    string : str</span>
+<span class="sd">        String object to _preprocess</span>
+<span class="sd">    environ : dict, optional</span>
+<span class="sd">        If supplied, preferentially accept values from</span>
+<span class="sd">        this dictionary as well as `os.environ`. That is,</span>
+<span class="sd">        if a key appears in both, this dictionary takes</span>
+<span class="sd">        precedence.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rval : str</span>
+<span class="sd">        The preprocessed string</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">environ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">environ</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">split</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;${&#39;</span><span class="p">)</span>
+
+    <span class="n">rval</span> <span class="o">=</span> <span class="p">[</span><span class="n">split</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">split</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">subsplit</span> <span class="o">=</span> <span class="n">candidate</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subsplit</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Open ${ not followed by } before &#39;</span>
+                             <span class="s1">&#39;end of string or next ${ in &quot;&#39;</span> <span class="o">+</span> <span class="n">string</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+
+        <span class="n">varname</span> <span class="o">=</span> <span class="n">subsplit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="n">environ</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="k">if</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">environ</span>
+               <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">varname</span><span class="p">])</span>
+        <span class="n">rval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="n">rval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subsplit</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+    <span class="n">rval</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rval</span><span class="p">)</span>
+
+    <span class="n">string</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rval</span>
+
+
+<div class="viewcode-block" id="instantiate"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.instantiate">[docs]</a><span class="k">def</span> <span class="nf">instantiate</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">bindings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Instantiate a hierarchy of proxy objects.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    proxy : object</span>
+<span class="sd">        A `_Proxy` object or list/dict/literal. Strings are run through</span>
+<span class="sd">        `_preprocess`.</span>
+<span class="sd">    bindings : dict, optional</span>
+<span class="sd">        A dictionary mapping previously instantiated `_Proxy` objects</span>
+<span class="sd">        to their instantiated values.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obj : object</span>
+<span class="sd">        The result object from recursively instantiating the object DAG.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bindings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bindings</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">_Proxy</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_instantiate_proxy_tuple</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">bindings</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># Recurse on the keys too, for backward compatibility.</span>
+        <span class="c1"># Is the key instantiation feature ever actually used, by anyone?</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">instantiate</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">bindings</span><span class="p">),</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">bindings</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">proxy</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">instantiate</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">bindings</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">proxy</span><span class="p">]</span>
+    <span class="c1"># In the future it might be good to consider a dict argument that provides</span>
+    <span class="c1"># a type-&gt;callable mapping for arbitrary transformations like this.</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_preprocess</span><span class="p">(</span><span class="n">proxy</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">proxy</span></div>
+
+
+<span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads a YAML configuration from a string or file-like object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stream : str or object</span>
+<span class="sd">        Either a string containing valid YAML or a file-like object</span>
+<span class="sd">        supporting the `.read()` interface.</span>
+<span class="sd">    environ : dict, optional</span>
+<span class="sd">        A dictionary used for ${FOO} substitutions in addition to</span>
+<span class="sd">        environment variables. If a key appears both in `os.environ`</span>
+<span class="sd">        and this dictionary, the value in this dictionary is used.</span>
+<span class="sd">    instantiate : bool, optional</span>
+<span class="sd">        If `False`, do not actually instantiate the objects but instead</span>
+<span class="sd">        produce a nested hierarchy of `_Proxy` objects.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Other keyword arguments, all of which are passed to `yaml.load`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    graph : dict or object</span>
+<span class="sd">        The dictionary or object (if the top-level element specified</span>
+<span class="sd">        a Python object to instantiate), or a nested hierarchy of</span>
+<span class="sd">        `_Proxy` objects.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">IS_INITIALIZED</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">IS_INITIALIZED</span><span class="p">:</span>
+        <span class="n">_initialize</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">stream</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="n">proxy_graph</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">instantiate</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">proxy_graph</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">proxy_graph</span>
+
+
+<div class="viewcode-block" id="load_path"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.load_path">[docs]</a><span class="k">def</span> <span class="nf">load_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience function for loading a YAML configuration from a</span>
+<span class="sd">    file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        The path to the file to load on disk.</span>
+<span class="sd">    environ : dict, optional</span>
+<span class="sd">        A dictionary used for ${FOO} substitutions in addition to</span>
+<span class="sd">        environment variables. If a key appears both in `os.environ`</span>
+<span class="sd">        and this dictionary, the value in this dictionary is used.</span>
+<span class="sd">    instantiate : bool, optional</span>
+<span class="sd">        If `False`, do not actually instantiate the objects but instead</span>
+<span class="sd">        produce a nested hierarchy of `_Proxy` objects.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Other keyword arguments, all of which are passed to `yaml.load`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    graph : dict or object</span>
+<span class="sd">        The dictionary or object (if the top-level element specified</span>
+<span class="sd">        a Python object to instantiate), or a nested hierarchy of</span>
+<span class="sd">        `_Proxy` objects.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">())</span>
+
+    <span class="c1"># This is apparently here to avoid the odd instance where a file gets</span>
+    <span class="c1"># loaded as Unicode instead (see 03f238c6d). It&#39;s rare instance where</span>
+    <span class="c1"># basestring is not the right call.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Expected content to be of type str, got &quot;</span> <span class="o">+</span>
+                             <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">content</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">load</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">instantiate</span><span class="o">=</span><span class="n">instantiate</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="n">environ</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_try_to_import</span><span class="p">(</span><span class="n">tag_suffix</span><span class="p">):</span>
+    <span class="n">components</span> <span class="o">=</span> <span class="n">tag_suffix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">module_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">exec</span><span class="p">(</span><span class="s2">&quot;import </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module_name</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># We know it&#39;s an ImportError, but is it an ImportError related to</span>
+        <span class="c1"># this path,</span>
+        <span class="c1"># or did the module we&#39;re importing have an unrelated ImportError?</span>
+        <span class="c1"># and yes, this test can still have false positives, feel free to</span>
+        <span class="c1"># improve it</span>
+        <span class="n">pieces</span> <span class="o">=</span> <span class="n">module_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">str_e</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span> <span class="ow">in</span> <span class="p">[</span><span class="n">piece</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">piece</span> <span class="ow">in</span> <span class="n">pieces</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+            <span class="c1"># The yaml file is probably to blame.</span>
+            <span class="c1"># Report the problem with the full module path from the YAML</span>
+            <span class="c1"># file</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not import </span><span class="si">{0}</span><span class="s2">; ImportError was </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">module_name</span><span class="p">,</span> <span class="n">str_e</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pcomponents</span> <span class="o">=</span> <span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcomponents</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pcomponents</span><span class="p">):</span>
+                <span class="n">module_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pcomponents</span><span class="p">[:</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">exec</span><span class="p">(</span><span class="s2">&quot;import </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module_name</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">base_msg</span> <span class="o">=</span> <span class="s2">&quot;Could not import </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">module_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pcomponents</span><span class="p">[:</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="n">base_msg</span> <span class="o">+=</span> <span class="s2">&quot; but could import </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">. Original exception: </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_msg</span><span class="p">,</span>
+                                                              <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">tag_suffix</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try to figure out what the wrong field name was</span>
+            <span class="c1"># If we fail to do it, just fall back to giving the usual</span>
+            <span class="c1"># attribute error</span>
+            <span class="n">pieces</span> <span class="o">=</span> <span class="n">tag_suffix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pieces</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">field</span> <span class="o">=</span> <span class="n">pieces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">candidates</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="n">module</span><span class="p">))</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Could not evaluate </span><span class="si">{0}</span><span class="s2">. &quot;</span>
+                   <span class="s2">&quot;Did you mean </span><span class="si">{1}</span><span class="s2">? &quot;</span>
+                   <span class="s2">&quot;Original error was </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                       <span class="n">tag_suffix</span><span class="p">,</span> <span class="n">candidates</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                   <span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Attempt to decipher AttributeError failed&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Could not evaluate </span><span class="si">{0}</span><span class="s2">. &quot;</span> <span class="o">+</span>
+                                 <span class="s2">&quot;Original error was </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                     <span class="n">tag_suffix</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">def</span> <span class="nf">_initialize</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">IS_INITIALIZED</span>
+    <span class="n">yaml</span><span class="o">.</span><span class="n">add_multi_constructor</span><span class="p">(</span><span class="s2">&quot;!obj:&quot;</span><span class="p">,</span> <span class="n">_multi_constructor_obj</span><span class="p">)</span>
+    <span class="n">yaml</span><span class="o">.</span><span class="n">add_multi_constructor</span><span class="p">(</span><span class="s2">&quot;!import:&quot;</span><span class="p">,</span> <span class="n">_multi_constructor_import</span><span class="p">)</span>
+
+    <span class="n">yaml</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span><span class="s2">&quot;!import&quot;</span><span class="p">,</span> <span class="n">_constructor_import</span><span class="p">)</span>
+    <span class="n">yaml</span><span class="o">.</span><span class="n">add_constructor</span><span class="p">(</span><span class="s2">&quot;!float&quot;</span><span class="p">,</span> <span class="n">_constructor_float</span><span class="p">)</span>
+
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">SCIENTIFIC_NOTATION_REGEXP</span><span class="p">)</span>
+    <span class="n">yaml</span><span class="o">.</span><span class="n">add_implicit_resolver</span><span class="p">(</span><span class="s2">&quot;!float&quot;</span><span class="p">,</span>  <span class="n">pattern</span><span class="p">)</span>
+    <span class="n">IS_INITIALIZED</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_multi_constructor_obj</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">tag_suffix</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">yaml_src</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="n">_construct_mapping</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">construct_mapping</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="s1">&#39;keys&#39;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="s1">&#39;values&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Received non string object (</span><span class="si">{0}</span><span class="s2">) as key in mapping.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="p">))</span>
+    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_suffix</span><span class="p">:</span>
+        <span class="c1"># I&#39;m not sure how this was ever working without eval().</span>
+        <span class="n">callable</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">tag_suffix</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">callable</span> <span class="o">=</span> <span class="n">_try_to_import</span><span class="p">(</span><span class="n">tag_suffix</span><span class="p">)</span>
+    <span class="n">rval</span> <span class="o">=</span> <span class="n">_Proxy</span><span class="p">(</span><span class="n">callable</span><span class="o">=</span><span class="n">callable</span><span class="p">,</span> <span class="n">yaml_src</span><span class="o">=</span><span class="n">yaml_src</span><span class="p">,</span> <span class="n">positionals</span><span class="o">=</span><span class="p">(),</span>
+                  <span class="n">keywords</span><span class="o">=</span><span class="n">mapping</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rval</span>
+
+
+<span class="k">def</span> <span class="nf">_multi_constructor_import</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">tag_suffix</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for &quot;!import:&quot; tag.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag_suffix</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">(</span><span class="s2">&quot;!import: tag suffix contains no&#39;.&#39;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_try_to_import</span><span class="p">(</span><span class="n">tag_suffix</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_constructor_import</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for &quot;!import&quot;</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from`Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">construct_scalar</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">(</span><span class="s2">&quot;Import tag suffix contains no &#39;.&#39;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_try_to_import</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_constructor_float</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Callback for &quot;!float&quot;</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">construct_scalar</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_construct_mapping</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is a modified version of</span>
+<span class="sd">    `yaml.BaseConstructor._construct_mapping` only</span>
+<span class="sd">    permitting unique keys.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Taken (with minor changes) from `Pylearn2`_.</span>
+
+<span class="sd">    .. _Pylearn2: \</span>
+<span class="sd">    http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">MappingNode</span><span class="p">):</span>
+        <span class="n">const</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">constructor</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s2">&quot;Expected a mapping node, but found </span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">start_mark</span>
+            <span class="p">))</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">constructor</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">constructor</span><span class="o">.</span><span class="n">BaseConstructor</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key_node</span><span class="p">,</span> <span class="n">value_node</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">constructor</span><span class="o">.</span><span class="n">construct_object</span><span class="p">(</span><span class="n">key_node</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">hash</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">const</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">constructor</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;While constructing a mapping &quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">, found unacceptable &quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot;key (</span><span class="si">{1}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">node</span><span class="o">.</span><span class="n">start_mark</span><span class="p">,</span> <span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">key_node</span><span class="o">.</span><span class="n">start_mark</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+            <span class="n">const</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">constructor</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;While constructing a mapping &quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">, found duplicate &quot;</span> <span class="o">+</span>
+                            <span class="s2">&quot;key (</span><span class="si">{1}</span><span class="s2">).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">start_mark</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">constructor</span><span class="o">.</span><span class="n">construct_object</span><span class="p">(</span><span class="n">value_node</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">mapping</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">mapping</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Selene Contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+
+
+</body>
+</html>

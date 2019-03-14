@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg4683" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" sodipodi:docname="selene_icon_finished.svg" height="139.24mm" width="112.89mm" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" inkscape:version="0.91 r13725" viewBox="0 0 399.99999 493.36074" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd">
+ <defs id="defs4685">
+  <clipPath id="clipPath4675" clipPathUnits="userSpaceOnUse">
+   <path id="path4677" d="m182.88 685.22c-101.79 0-184.31 82.52-184.31 184.31 0.0009519 101.79 82.517 184.3 184.3 184.3 79.298-0.071 149.66-50.855 174.71-126.09-25.396 24.512-59.954 38.315-96.014 38.35-74.802 0.00035-135.44-58.06-135.44-129.68-0.00005-71.621 60.639-129.68 135.44-129.68 2.7691 0.0513 5.5359 0.18395 8.2965 0.3977-26.75-14.353-56.632-21.876-86.989-21.901z" sodipodi:nodetypes="cscccsccc" inkscape:connector-curvature="0" fill="#f9c755"/>
+  </clipPath>
+ </defs>
+ <sodipodi:namedview id="base" bordercolor="#666666" inkscape:pageshadow="2" inkscape:window-y="24" fit-margin-left="0" pagecolor="#ffffff" inkscape:window-height="1056" inkscape:window-maximized="1" inkscape:zoom="0.98994949" inkscape:window-x="0" showgrid="false" borderopacity="1.0" inkscape:current-layer="layer1" inkscape:cx="-449.15281" inkscape:cy="222.14592" fit-margin-top="0" fit-margin-right="0" fit-margin-bottom="0" inkscape:window-width="1920" inkscape:pageopacity="0.0" inkscape:document-units="px"/>
+ <metadata id="metadata4688">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="layer1" inkscape:label="Layer 1" inkscape:groupmode="layer" transform="translate(0 -559)">
+  <g id="g4679" inkscape:export-ydpi="90" inkscape:export-filename="/home/ecofer/path4587-9.png" transform="matrix(1.0939 0 0 1.0939 0 -98.798)" inkscape:export-xdpi="90" fill="#f05732">
+   <path id="path4211-2" d="m276.34 601.35c-31.612 0.12989-85.709 8.4883-108.22 60.652-4.0782 9.9809-4.6658 18.49-3.332 25.77-93.463 9.27-164.69 87.84-164.79 181.76 0.0006075 100.98 81.859 182.84 182.84 182.84 100.98-0.0006 182.83-81.859 182.83-182.84-0.0712-26.681-5.9809-53.023-17.314-77.178-7.0735-18.65-10.008-22.324-16.288-32.788-10.744-17.903-31.062-43.534-36.393-50.98-18.173-25.381-8.4205-49.411-8.4205-49.411s-9.7781 20.209-7.4283 37.356c3.1708 23.138 13.401 27.512 13.401 27.512s-6.7862-4.3717-21.48-28.914c-13.066-21.822-11-46.571-3.7773-61.359 13.713-28.078 32.465-30.836 32.465-30.836s-9.7247-1.6411-24.094-1.582z" sodipodi:nodetypes="scccsccascscsscs" inkscape:connector-curvature="0"/>
+   <ellipse id="path4587" rx="182.84" ry="182.84" cy="869.53" cx="182.84"/>
+  </g>
+  <ellipse id="path4587-9" clip-path="url(#clipPath4675)" inkscape:export-filename="/home/ecofer/path4587-9.png" rx="182.84" ry="182.84" stroke="#f9c755" transform="matrix(1.0939 0 0 1.0939 0 -98.798)" cy="869.53" cx="182.84" inkscape:export-ydpi="90" inkscape:export-xdpi="90" fill="#f9c755"/>
+ </g>
+</svg>

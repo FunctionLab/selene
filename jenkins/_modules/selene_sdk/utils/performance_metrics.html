@@ -1,0 +1,817 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>selene_sdk.utils.performance_metrics &mdash; Selene master documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/selene_docs_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Selene
+          
+
+          
+            
+            <img src="../../../_static/selene_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master (0.2.0)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/overview.html">Functional overview of the SDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#sampling">Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id3">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id5">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#id6">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#additional-note">Additional note</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#id13">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../overview/cli.html#id14">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../selene.html">selene_sdk</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../selene.html#evaluatemodel">EvaluateModel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../interpret.html">selene_sdk.interpret</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sequence-logo">sequence_logo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#heatmap">heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ismresult">ISMResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../predict.html">selene_sdk.predict</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.html">selene_sdk.samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#sampler">Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#onlinesampler">OnlineSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sequences.html">selene_sdk.sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#genome">Genome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#proteome">Proteome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../targets.html">selene_sdk.targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../targets.html#genomicfeatures">GenomicFeatures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">selene_sdk.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-logger">initialize_logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#load-path-for-config-yml">load_path (for config.yml)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#instantiate-configuration-object">instantiate (configuration object)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#initialize-model">initialize_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#parse-configs-and-run">parse_configs_and_run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../utils.html#execute-run-selene-operations">execute (run Selene operations)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Selene</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>selene_sdk.utils.performance_metrics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for selene_sdk.utils.performance_metrics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides the `PerformanceMetrics` class and supporting</span>
+<span class="sd">functionality for tracking and computing model performance.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">average_precision_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">precision_recall_curve</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_curve</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;selene&quot;</span><span class="p">)</span>
+
+
+<span class="n">Metric</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Metric&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;fn&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">])</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A tuple containing a metric function and the results from applying that</span>
+<span class="sd">metric to some values.</span>
+
+<span class="sd">Parameters</span>
+<span class="sd">----------</span>
+<span class="sd">fn : types.FunctionType</span>
+<span class="sd">    A metric.</span>
+<span class="sd">data : list(float)</span>
+<span class="sd">    A list holding the results from applying the metric.</span>
+
+<span class="sd">Attributes</span>
+<span class="sd">----------</span>
+<span class="sd">fn : types.FunctionType</span>
+<span class="sd">    A metric.</span>
+<span class="sd">data : list(float)</span>
+<span class="sd">    A list holding the results from applying the metric.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="visualize_roc_curves"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.visualize_roc_curves">[docs]</a><span class="k">def</span> <span class="nf">visualize_roc_curves</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span>
+                         <span class="n">target</span><span class="p">,</span>
+                         <span class="n">output_dir</span><span class="p">,</span>
+                         <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                         <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn-colorblind&quot;</span><span class="p">,</span>
+                         <span class="n">fig_title</span><span class="o">=</span><span class="s2">&quot;Feature ROC curves&quot;</span><span class="p">,</span>
+                         <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Output the ROC curves for each feature predicted by a model</span>
+<span class="sd">    as an SVG.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prediction : numpy.ndarray</span>
+<span class="sd">        Value predicted by user model.</span>
+<span class="sd">    target : numpy.ndarray</span>
+<span class="sd">        True value that the user model was trying to predict.</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        The path to the directory to output the figures. Directories that</span>
+<span class="sd">        do not currently exist will be automatically created.</span>
+<span class="sd">    report_gt_feature_n_positives : int, optional</span>
+<span class="sd">        Default is 50. Do not visualize an ROC curve for a feature with</span>
+<span class="sd">        less than 50 positive examples in `target`.</span>
+<span class="sd">    style : str, optional</span>
+<span class="sd">        Default is &quot;seaborn-colorblind&quot;. Specify a style available in</span>
+<span class="sd">        `matplotlib.pyplot.style.available` to use.</span>
+<span class="sd">    fig_title : str, optional</span>
+<span class="sd">        Default is &quot;Feature ROC curves&quot;. Set the figure title.</span>
+<span class="sd">    dpi : int, optional</span>
+<span class="sd">        Default is 500. Specify dots per inch (resolution) of the figure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Outputs the figure in `output_dir`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;inline&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">backend</span><span class="p">:</span>
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;SVG&quot;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feature_preds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+        <span class="n">feature_targets</span> <span class="o">=</span> <span class="n">target</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">report_gt_feature_n_positives</span><span class="p">:</span>
+            <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">,</span> <span class="n">feature_preds</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;False Positive Rate&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;True Positive Rate&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fig_title</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">fig_title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;roc_curves.svg&quot;</span><span class="p">),</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;svg&quot;</span><span class="p">,</span>
+                <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="visualize_precision_recall_curves"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.visualize_precision_recall_curves">[docs]</a><span class="k">def</span> <span class="nf">visualize_precision_recall_curves</span><span class="p">(</span>
+        <span class="n">prediction</span><span class="p">,</span>
+        <span class="n">target</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="p">,</span>
+        <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="s2">&quot;seaborn-colorblind&quot;</span><span class="p">,</span>
+        <span class="n">fig_title</span><span class="o">=</span><span class="s2">&quot;Feature precision-recall curves&quot;</span><span class="p">,</span>
+        <span class="n">dpi</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Output the precision-recall (PR) curves for each feature predicted by</span>
+<span class="sd">    a model as an SVG.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prediction : numpy.ndarray</span>
+<span class="sd">        Value predicted by user model.</span>
+<span class="sd">    target : numpy.ndarray</span>
+<span class="sd">        True value that the user model was trying to predict.</span>
+<span class="sd">    output_dir : str</span>
+<span class="sd">        The path to the directory to output the figures. Directories that</span>
+<span class="sd">        do not currently exist will be automatically created.</span>
+<span class="sd">    report_gt_feature_n_positives : int, optional</span>
+<span class="sd">        Default is 50. Do not visualize an PR curve for a feature with</span>
+<span class="sd">        less than 50 positive examples in `target`.</span>
+<span class="sd">    style : str, optional</span>
+<span class="sd">        Default is &quot;seaborn-colorblind&quot;. Specify a style available in</span>
+<span class="sd">        `matplotlib.pyplot.style.available` to use.</span>
+<span class="sd">    fig_title : str, optional</span>
+<span class="sd">        Default is &quot;Feature precision-recall curves&quot;. Set the figure title.</span>
+<span class="sd">    dpi : int, optional</span>
+<span class="sd">        Default is 500. Specify dots per inch (resolution) of the figure.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">        Outputs the figure in `output_dir`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># TODO: fix this</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+    <span class="n">backend</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">get_backend</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;inline&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">backend</span><span class="p">:</span>
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;SVG&quot;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feature_preds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+        <span class="n">feature_targets</span> <span class="o">=</span> <span class="n">target</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> \
+                <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">report_gt_feature_n_positives</span><span class="p">:</span>
+            <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span>
+                <span class="n">feature_targets</span><span class="p">,</span> <span class="n">feature_preds</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
+                <span class="n">recall</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="s1">&#39;r-&#39;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s2">&quot;post&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Recall&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Precision&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fig_title</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">fig_title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;precision_recall_curves.svg&quot;</span><span class="p">),</span>
+                <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;svg&quot;</span><span class="p">,</span>
+                <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">compute_score</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">metric_fn</span><span class="p">,</span>
+                  <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Using a user-specified metric, computes the distance between</span>
+<span class="sd">    two tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prediction : numpy.ndarray</span>
+<span class="sd">        Value predicted by user model.</span>
+<span class="sd">    target : numpy.ndarray</span>
+<span class="sd">        True value that the user model was trying to predict.</span>
+<span class="sd">    metric_fn : types.FunctionType</span>
+<span class="sd">        A metric that can measure the distance between the prediction</span>
+<span class="sd">        and target variables.</span>
+<span class="sd">    report_gt_feature_n_positives : int, optional</span>
+<span class="sd">        Default is 10. The minimum number of positive examples for a</span>
+<span class="sd">        feature in order to compute the score for it.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    average_score, feature_scores : tuple(float, numpy.ndarray)</span>
+<span class="sd">        A tuple containing the average of all feature scores, and a</span>
+<span class="sd">        vector containing the scores for each feature. If there were</span>
+<span class="sd">        no features meeting our filtering thresholds, will return</span>
+<span class="sd">        `(None, [])`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feature_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feature_preds</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prediction</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
+        <span class="n">feature_targets</span> <span class="o">=</span> <span class="n">target</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+               <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">feature_targets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">report_gt_feature_n_positives</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">feature_scores</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric_fn</span><span class="p">(</span>
+                    <span class="n">feature_targets</span><span class="p">,</span> <span class="n">feature_preds</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># do I need to make this more generic?</span>
+                <span class="k">continue</span>
+    <span class="n">valid_feature_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">feature_scores</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">s</span><span class="p">)]</span> <span class="c1"># Allow 0 or negative values.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_feature_scores</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">feature_scores</span>
+    <span class="n">average_score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">valid_feature_scores</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">average_score</span><span class="p">,</span> <span class="n">feature_scores</span>
+
+
+<span class="k">def</span> <span class="nf">get_feature_specific_scores</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">get_feature_from_index_fn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a dictionary mapping feature names to feature scores from</span>
+<span class="sd">    an intermediate representation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : list(tuple(int, float))</span>
+<span class="sd">        A list of tuples, where each tuple contains a feature&#39;s index</span>
+<span class="sd">        and the score for that feature.</span>
+<span class="sd">    get_feature_from_index_fn : types.FunctionType</span>
+<span class="sd">        A function that takes an index (`int`) and returns a feature</span>
+<span class="sd">        name (`str`).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        A dictionary mapping feature names (`str`) to scores (`float`).</span>
+<span class="sd">        If there was no score for a feature, its score will be set to</span>
+<span class="sd">        `None`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feature_score_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">get_feature_from_index_fn</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">score</span><span class="p">):</span>
+            <span class="n">feature_score_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">feature_score_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">feature_score_dict</span>
+
+
+<div class="viewcode-block" id="PerformanceMetrics"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics">[docs]</a><span class="k">class</span> <span class="nc">PerformanceMetrics</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tracks and calculates metrics to evaluate how closely a model&#39;s</span>
+<span class="sd">    predictions match the true values it was designed to predict.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    get_feature_from_index_fn : types.FunctionType</span>
+<span class="sd">        A function that takes an index (`int`) and returns a feature</span>
+<span class="sd">        name (`str`).</span>
+<span class="sd">    report_gt_feature_n_positives : int, optional</span>
+<span class="sd">        Default is 10. The minimum number of positive examples for a</span>
+<span class="sd">        feature in order to compute the score for it.</span>
+<span class="sd">    metrics : dict</span>
+<span class="sd">        A dictionary that maps metric names (`str`) to metric functions.</span>
+<span class="sd">        By default, this contains `&quot;roc_auc&quot;`, which maps to</span>
+<span class="sd">        `sklearn.metrics.roc_auc_score`, and `&quot;average_precision&quot;`,</span>
+<span class="sd">        which maps to `sklearn.metrics.average_precision_score`.</span>
+
+
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    skip_threshold : int</span>
+<span class="sd">        The minimum number of positive examples of a feature that must</span>
+<span class="sd">        be included in an update for a metric score to be</span>
+<span class="sd">        calculated for it.</span>
+<span class="sd">    get_feature_from_index : types.FunctionType</span>
+<span class="sd">        A function that takes an index (`int`) and returns a feature</span>
+<span class="sd">        name (`str`).</span>
+<span class="sd">    metrics : dict</span>
+<span class="sd">        A dictionary that maps metric names (`str`) to metric objects</span>
+<span class="sd">        (`Metric`). By default, this contains `&quot;roc_auc&quot;` and</span>
+<span class="sd">        `&quot;average_precision&quot;`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">get_feature_from_index_fn</span><span class="p">,</span>
+                 <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                 <span class="n">metrics</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">average_precision</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new object of the `PerformanceMetrics` class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_threshold</span> <span class="o">=</span> <span class="n">report_gt_feature_n_positives</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_feature_from_index</span> <span class="o">=</span> <span class="n">get_feature_from_index_fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">Metric</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">v</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[])</span>
+
+<div class="viewcode-block" id="PerformanceMetrics.add_metric"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics.add_metric">[docs]</a>    <span class="k">def</span> <span class="nf">add_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">metric_fn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Begins tracking of the specified metric.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the metric.</span>
+<span class="sd">        metric_fn : types.FunctionType</span>
+<span class="sd">            A metric function.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">Metric</span><span class="p">(</span><span class="n">fn</span><span class="o">=</span><span class="n">metric_fn</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[])</span></div>
+
+<div class="viewcode-block" id="PerformanceMetrics.remove_metric"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics.remove_metric">[docs]</a>    <span class="k">def</span> <span class="nf">remove_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ends the tracking of the specified metric, and returns the</span>
+<span class="sd">        previous scores associated with that metric.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of the metric.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list(float)</span>
+<span class="sd">            The list of feature-specific scores obtained by previous</span>
+<span class="sd">            uses of the specified metric.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="PerformanceMetrics.update"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates the tracked metrics on a model prediction and its</span>
+<span class="sd">        target value, and adds this to the metric histories.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prediction : numpy.ndarray</span>
+<span class="sd">            Value predicted by user model.</span>
+<span class="sd">        target : numpy.ndarray</span>
+<span class="sd">            True value that the user model was trying to predict.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary mapping each metric names (`str`) to the</span>
+<span class="sd">            average score of that metric across all features</span>
+<span class="sd">            (`float`).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">metric_scores</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">avg_score</span><span class="p">,</span> <span class="n">feature_scores</span> <span class="o">=</span> <span class="n">compute_score</span><span class="p">(</span>
+                <span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">metric</span><span class="o">.</span><span class="n">fn</span><span class="p">,</span>
+                <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_threshold</span><span class="p">)</span>
+            <span class="n">metric</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_scores</span><span class="p">)</span>
+            <span class="n">metric_scores</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_score</span>
+        <span class="k">return</span> <span class="n">metric_scores</span></div>
+
+<div class="viewcode-block" id="PerformanceMetrics.visualize"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics.visualize">[docs]</a>    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Outputs ROC and PR curves. Does not support other metrics</span>
+<span class="sd">        currently.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prediction : numpy.ndarray</span>
+<span class="sd">            Value predicted by user model.</span>
+<span class="sd">        target : numpy.ndarray</span>
+<span class="sd">            True value that the user model was trying to predict.</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            The path to the directory to output the figures. Directories that</span>
+<span class="sd">            do not currently exist will be automatically created.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Keyword arguments to pass to each visualization function. Each</span>
+<span class="sd">            function accepts the following args:</span>
+
+<span class="sd">                * style : str - Default is &quot;seaborn-colorblind&quot;. Specify a \</span>
+<span class="sd">                          style available in \</span>
+<span class="sd">                          `matplotlib.pyplot.style.available` to use.</span>
+<span class="sd">                * dpi : int - Default is 500. Specify dots per inch \</span>
+<span class="sd">                              (resolution) of the figure.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Outputs figures to `output_dir`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;roc_auc&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+            <span class="n">visualize_roc_curves</span><span class="p">(</span>
+                <span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span>
+                <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_threshold</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;average_precision&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+            <span class="n">visualize_precision_recall_curves</span><span class="p">(</span>
+                <span class="n">prediction</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span>
+                <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_threshold</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PerformanceMetrics.write_feature_scores_to_file"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics.write_feature_scores_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_feature_scores_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes each metric&#39;s score for each feature to a specified</span>
+<span class="sd">        file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_path : str</span>
+<span class="sd">            The path to the output file where performance metrics will</span>
+<span class="sd">            be written.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary mapping feature names (`str`) to</span>
+<span class="sd">            sub-dictionaries (`dict`). Each sub-dictionary then maps</span>
+<span class="sd">            metric names (`str`) to the score for that metric on the</span>
+<span class="sd">            given feature. If a metric was not evaluated on a given</span>
+<span class="sd">            feature, the score will be `None`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">feature_scores</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">feature_score_dict</span> <span class="o">=</span> <span class="n">get_feature_specific_scores</span><span class="p">(</span>
+                <span class="n">metric</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_feature_from_index</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">feature_score_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">feature_scores</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">feature_scores</span><span class="p">[</span><span class="n">feature</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+
+        <span class="n">metric_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;class&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">metric_cols</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+            <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">metric_scores</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">feature_scores</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_scores</span><span class="p">:</span>
+                    <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;NA&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_cols</span><span class="p">))))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">metric_score_cols</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span><span class="s2">&quot;</span><span class="si">{0:.4f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">metric_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+                    <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span>
+                                                          <span class="n">metric_score_cols</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">feature_scores</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Selene Contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+
+
+</body>
+</html>
