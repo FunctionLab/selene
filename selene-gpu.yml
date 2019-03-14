@@ -1,6 +1,6 @@
 name: selene-gpu
 channels:
-- soumith
+- pytorch
 - anaconda
 - bioconda
 - conda-forge
@@ -19,7 +19,8 @@ dependencies:
 - python=3.6.5
 - numpy=1.15.1
 - plotly=2.7.0
-- cuda80=1.0
-- pytorch=0.4.1
-- pyfaidx==0.5.5.2
-- seaborn==0.8.1
+- cudatoolkit=10.0.130=0
+- pytorch=1.0.1=py3.6_cuda10.0.130_cudnn7.4.2_2
+- torchvision=0.2.2=py_3
+- pyfaidx=0.5.5.2
+- seaborn=0.8.1
