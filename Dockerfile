@@ -4,7 +4,7 @@ RUN apt-get update && \
       make \
       gcc \
       libz-dev \
-      libgl1-mesa-swx11 \
+      libgl1-mesa-glx \
       && \
     apt-get autoremove --purge -y && \
     apt-get autoclean -y && \
