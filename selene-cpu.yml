@@ -5,14 +5,12 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - cython=0.27.3
+  - cython=0.29.3
   - docopt=0.6.2
   - h5py=2.9.0
   - matplotlib=2.0.2
   - numpy=1.15.1
   - pandas=0.20.3
-  - pillow=4.2.1
-  - pip=9.0.1
   - python=3.6.2
   - python-dateutil=2.6.1
   - pyyaml=3.12
@@ -24,10 +22,5 @@ dependencies:
   - yaml=0.1.7
   - pytorch=0.4.1
   - plotly=2.7.0
-  - pip:
-    - pyfaidx==0.5.3.1
-    - commonmark==0.5.4
-    - recommonmark==0.4.0
-    - sphinx-rtd-theme==0.4.0
-    - pytabix==0.1
-    - torch==0.4.1
+  - pyfaidx==0.5.5.2
+  - pytabix==0.0.2

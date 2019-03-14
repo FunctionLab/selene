@@ -6,8 +6,7 @@ model: {
     class_args: {
         arg1: val1,
         arg2: val2
-    },
-    non_strand_specific: mean
+    }
 }
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     trained_model_path: /path/to/trained/model.pth.tar,
@@ -29,7 +28,8 @@ variant_effect_prediction: {
     ], 
     save_data: [predictions, abs_diffs],
     output_dir: /path/to/output/predicts/dir,
-    output_format: hdf5
+    output_format: hdf5,
+    strand_index: 7
 }
 random_seed: 123
 ...
