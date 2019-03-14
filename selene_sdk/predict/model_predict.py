@@ -565,6 +565,9 @@ class AnalyzeSequences(object):
                   its predictions) and the matrix rows are the sequences.
                   Note that the row labels (chrom, pos, id, ref, alt) will be
                   output as a separate .txt file.
+        strand_index : int or None, optional.
+            Default is None. If applicable, specify the column index (0-based)
+            in the VCF file that contains strand information for each variant.
 
         Returns
         -------
@@ -584,7 +587,7 @@ class AnalyzeSequences(object):
             did not show up in the reference genome FASTA file.
 
         """
-        variants = read_vcf_file(vcf_file)
+        variants = read_vcf_file(vcf_file, strand_index=strand_index)
 
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)

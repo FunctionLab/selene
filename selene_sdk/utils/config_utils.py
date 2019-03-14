@@ -311,7 +311,7 @@ def parse_configs_and_run(configs,
               "to be initialized (e.g. Sampler, TrainModel) that require "
               "this parameter must have it specified in their individual "
               "parameter configuration.")
-    else:
+    elif "output_dir" in configs:
         current_run_output_dir = configs["output_dir"]
         os.makedirs(current_run_output_dir, exist_ok=True)
         if "create_subdirectory" in configs:
