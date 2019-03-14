@@ -2,6 +2,9 @@ import math
 
 import numpy as np
 
+from ._common import _truncate_sequence
+from ._common import predict
+
 
 VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 
@@ -112,7 +115,10 @@ def _process_alts(all_alts,
         ref_len = len(ref)
         alt_len = len(a)
         sequence = None
-        if ref_len == alt_len:  # substitution
+
+        if alt_len > start_radius + end_radius:
+            sequence = _truncate_sequence(a, start_radius + end_radius)
+        elif ref_len == alt_len:  # substitution
             start_pos = ref_seq_center - start_radius
             end_pos = ref_seq_center + end_radius
             sequence = reference_sequence.get_sequence_from_coords(
@@ -177,3 +183,53 @@ def _handle_long_ref(ref_encoding,
         seq_encoding = ref_encoding
     return references_match, seq_encoding, sequence_at_ref
 
+
+def _handle_ref_alt_predictions(model,
+                                batch_ref_seqs,
+                                batch_alt_seqs,
+                                batch_ids,
+                                reporters,
+                                warn=False,
+                                use_cuda=False):
+    """
+    Helper method for variant effect prediction. Gets the model
+    predictions and updates the reporters.
+
+    Parameters
+    ----------
+    model : torch.nn.Sequential
+        The model, on mode `eval`.
+    batch_ref_seqs : list(np.ndarray)
+        One-hot encoded sequences with the ref base(s).
+    batch_alt_seqs : list(np.ndarray)
+        One-hot encoded sequences with the alt base(s).
+    reporters : list(PredictionsHandler)
+        List of prediction handlers.
+    warn : bool, optional
+        Whether a warning was raised or not. If `warn`, directs handlers
+        to divert the predictions/scores to different files
+        (filename prefixed by 'warning.') so that users
+        know that Selene detected an issue with these variants.
+    use_cuda : bool, optional
+        Default is `False`. Specifies whether CUDA-enabled GPUs are available
+        for torch to use.
+
+
+    Returns
+    -------
+    None
+
+    """
+    batch_ref_seqs = np.array(batch_ref_seqs)
+    batch_alt_seqs = np.array(batch_alt_seqs)
+    ref_outputs = predict(model, batch_ref_seqs, use_cuda=use_cuda)
+    alt_outputs = predict(model, batch_alt_seqs, use_cuda=use_cuda)
+    for r in reporters:
+        if r.needs_base_pred and warn:
+            r.handle_warning(alt_outputs, batch_ids, ref_outputs)
+        elif r.needs_base_pred:
+            r.handle_batch_predictions(alt_outputs, batch_ids, ref_outputs)
+        elif warn:
+            r.handle_warning(alt_outputs, batch_ids)
+        else:
+            r.handle_batch_predictions(alt_outputs, batch_ids)

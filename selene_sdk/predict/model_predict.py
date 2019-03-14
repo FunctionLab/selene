@@ -10,13 +10,16 @@ import numpy as np
 import pyfaidx
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
+from ._common import _pad_sequence
+from ._common import _truncate_sequence
+from ._common import predict
 from ._in_silico_mutagenesis import _ism_sample_id
 from ._in_silico_mutagenesis import in_silico_mutagenesis_sequences
 from ._in_silico_mutagenesis import mutate_sequence
 from ._variant_effect_prediction import _handle_long_ref
 from ._variant_effect_prediction import _handle_standard_ref
+from ._variant_effect_prediction import _handle_ref_alt_predictions
 from ._variant_effect_prediction import _process_alts
 from ._variant_effect_prediction import read_vcf_file
 from .predict_handlers import AbsDiffScoreHandler
@@ -31,89 +34,6 @@ from ..utils import load_model_from_state_dict
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
 VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
-
-
-def predict(model, batch_sequences, use_cuda=False):
-    """
-    Return model predictions for a batch of sequences.
-
-    Parameters
-    ----------
-    model : torch.nn.Sequential
-        The model, on mode `eval`.
-    batch_sequences : numpy.ndarray
-        `batch_sequences` has the shape :math:`B \\times L \\times N`,
-        where :math:`B` is `batch_size`, :math:`L` is the sequence length,
-        :math:`N` is the size of the sequence type's alphabet.
-    use_cuda : bool, optional
-        Default is `False`. Specifies whether CUDA-enabled GPUs are available
-        for torch to use.
-
-    Returns
-    -------
-    numpy.ndarray
-        The model predictions of shape :math:`B \\times F`, where :math:`F`
-        is the number of features (classes) the model predicts.
-
-    """
-    inputs = torch.Tensor(batch_sequences)
-    if use_cuda:
-        inputs = inputs.cuda()
-    with torch.no_grad():
-        inputs = Variable(inputs)
-        outputs = model.forward(inputs.transpose(1, 2))
-        return outputs.data.cpu().numpy()
-
-
-def _handle_ref_alt_predictions(model,
-                                batch_ref_seqs,
-                                batch_alt_seqs,
-                                batch_ids,
-                                reporters,
-                                warn=False,
-                                use_cuda=False):
-    """
-    Helper method for variant effect prediction. Gets the model
-    predictions and updates the reporters.
-
-    Parameters
-    ----------
-    model : torch.nn.Sequential
-        The model, on mode `eval`.
-    batch_ref_seqs : list(np.ndarray)
-        One-hot encoded sequences with the ref base(s).
-    batch_alt_seqs : list(np.ndarray)
-        One-hot encoded sequences with the alt base(s).
-    reporters : list(PredictionsHandler)
-        List of prediction handlers.
-    warn : bool, optional
-        Whether a warning was raised or not. If `warn`, directs handlers
-        to divert the predictions/scores to different files
-        (filename prefixed by 'warning.') so that users
-        know that Selene detected an issue with these variants.
-    use_cuda : bool, optional
-        Default is `False`. Specifies whether CUDA-enabled GPUs are available
-        for torch to use.
-
-
-    Returns
-    -------
-    None
-
-    """
-    batch_ref_seqs = np.array(batch_ref_seqs)
-    batch_alt_seqs = np.array(batch_alt_seqs)
-    ref_outputs = predict(model, batch_ref_seqs, use_cuda=use_cuda)
-    alt_outputs = predict(model, batch_alt_seqs, use_cuda=use_cuda)
-    for r in reporters:
-        if r.needs_base_pred and warn:
-            r.handle_warning(alt_outputs, batch_ids, ref_outputs)
-        elif r.needs_base_pred:
-            r.handle_batch_predictions(alt_outputs, batch_ids, ref_outputs)
-        elif warn:
-            r.handle_warning(alt_outputs, batch_ids)
-        else:
-            r.handle_batch_predictions(alt_outputs, batch_ids)
 
 
 class AnalyzeSequences(object):
@@ -297,20 +217,6 @@ class AnalyzeSequences(object):
             reporters.append(WriteRefAltHandler(*constructor_args))
         return reporters
 
-    def _pad_sequence(self, sequence):
-        diff = (self.sequence_length - len(sequence)) / 2
-        pad_l = int(np.floor(diff))
-        pad_r = math.ceil(diff)
-        sequence = ((self.reference_sequence.UNK_BASE * pad_l) +
-                    sequence +
-                    (self.reference_sequence.UNK_BASE * pad_r))
-        return str.upper(sequence)
-
-    def _truncate_sequence(self, sequence):
-        start = int((len(sequence) - self.sequence_length) // 2)
-        end = int(start + self.sequence_length)
-        return str.upper(sequence[start:end])
-
     def get_predictions_for_fasta_file(self,
                                        input_path,
                                        output_dir,
@@ -373,9 +279,11 @@ class AnalyzeSequences(object):
             cur_sequence = str(fasta_record)
 
             if len(cur_sequence) < self.sequence_length:
-                cur_sequence = self._pad_sequence(cur_sequence)
+                cur_sequence = _pad_sequence(cur_sequence,
+                                             self.sequence_length,
+                                             self.reference_sequence.UNK_BASE)
             elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = self._truncate_sequence(cur_sequence)
+                cur_sequence = _truncate_sequence(cur_sequence, self._sequence_length)
 
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
@@ -575,9 +483,12 @@ class AnalyzeSequences(object):
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str.upper(str(fasta_record))
             if len(cur_sequence) < self.sequence_length:
-                cur_sequence = self._pad_sequence(cur_sequence)
+                cur_sequence = _pad_sequence(cur_sequence,
+                                             self.sequence_length,
+                                             self.reference_sequence.UNK_BASE)
             elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = self._truncate_sequence(cur_sequence)
+                cur_sequence = _truncate_sequence(
+                    cur_sequence, self.sequence_length)
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
