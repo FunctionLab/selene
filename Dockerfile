@@ -1,10 +1,10 @@
-FROM continuumio/anaconda3
+FROM continuumio/anaconda3:2018.12
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
       make \
       gcc \
       libz-dev \
-      libgl1-mesa-swx11 \
+      libgl1-mesa-glx \
       && \
     apt-get autoremove --purge -y && \
     apt-get autoclean -y && \
