@@ -19,13 +19,21 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
@@ -34,21 +42,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tutorials" href="tutorials.html" />
     <link rel="prev" title="Functional overview of the SDK" href="overview.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -131,21 +134,21 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id3">Additional notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id5">Optional parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id6">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cli.html#additional-note">Additional note</a></li>
 </ul>
 </li>
@@ -177,9 +180,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id13">Some notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id14">Some notes</a></li>
 </ul>
 </li>
 </ul>
@@ -322,17 +325,17 @@
            <div itemprop="articleBody">
             
   <div class="section" id="installation">
-<span id="installation"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>Users can either clone and build the repository locally or install Selene through conda. We previously supported installation through pip, but are refraining from releasing the latest version of Selene through pip due to some issues we are observing when using the pip-installed torch and torchvision dependencies.</p>
 <div class="section" id="installing-with-anaconda">
-<span id="installing-with-anaconda"></span><h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
+<h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
 <p>To install with conda (recommended for Linux users), run the following command in your terminal:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">bioconda</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="installing-from-source">
-<span id="installing-from-source"></span><h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
+<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
 <p>Selene can also be installed from source.
 First, download the latest commits from the source repository:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">FunctionLab</span><span class="o">/</span><span class="n">selene</span><span class="o">.</span><span class="n">git</span>
@@ -350,7 +353,7 @@ First, download the latest commits from the source repository:</p>
 </div>
 </div>
 <div class="section" id="additional-dependency-for-running-the-cli">
-<span id="additional-dependency-for-running-the-cli"></span><h2>Additional dependency for running the CLI<a class="headerlink" href="#additional-dependency-for-running-the-cli" title="Permalink to this headline">¶</a></h2>
+<h2>Additional dependency for running the CLI<a class="headerlink" href="#additional-dependency-for-running-the-cli" title="Permalink to this headline">¶</a></h2>
 <p>Please install <code class="docutils literal notranslate"><span class="pre">docopt</span></code> before running the command-line script <code class="docutils literal notranslate"><span class="pre">selene_cli.py</span></code> provided in the repository.</p>
 </div>
 </div>
@@ -366,7 +369,7 @@ First, download the latest commits from the source repository:</p>
         <a href="tutorials.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="overview.html" class="btn btn-neutral" title="Functional overview of the SDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Functional overview of the SDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -392,26 +395,16 @@ First, download the latest commits from the source repository:</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
+  
  
 
 

@@ -19,13 +19,21 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
@@ -34,21 +42,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="selene_sdk" href="../selene.html" />
     <link rel="prev" title="Selene CLI operations and outputs" href="cli.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -131,21 +134,21 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id3">Additional notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id5">Optional parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id6">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cli.html#additional-note">Additional note</a></li>
 </ul>
 </li>
@@ -177,9 +180,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id13">Some notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id14">Some notes</a></li>
 </ul>
 </li>
 </ul>
@@ -322,9 +325,9 @@
            <div itemprop="articleBody">
             
   <div class="section" id="faq-and-additional-resources">
-<span id="faq-and-additional-resources"></span><h1>FAQ and additional resources<a class="headerlink" href="#faq-and-additional-resources" title="Permalink to this headline">¶</a></h1>
+<h1>FAQ and additional resources<a class="headerlink" href="#faq-and-additional-resources" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="extending-selene">
-<span id="extending-selene"></span><h2>Extending Selene<a class="headerlink" href="#extending-selene" title="Permalink to this headline">¶</a></h2>
+<h2>Extending Selene<a class="headerlink" href="#extending-selene" title="Permalink to this headline">¶</a></h2>
 <p>The main modules that users may want to extend are</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.OnlineSampler</span></code></li>
@@ -336,12 +339,12 @@
 If you are interested in contributing new modules to Selene or requesting new functionality, please submit an issue to <a class="reference external" href="https://github.com/FunctionLab/selene/issues">Selene</a> or e-mail <a class="reference external" href="mailto:kchen&#37;&#52;&#48;flatironinstitute&#46;org">kchen<span>&#64;</span>flatironinstitute<span>&#46;</span>org</a>.</p>
 </div>
 <div class="section" id="exporting-a-selene-trained-model-to-kipoi">
-<span id="exporting-a-selene-trained-model-to-kipoi"></span><h2>Exporting a Selene-trained model to Kipoi<a class="headerlink" href="#exporting-a-selene-trained-model-to-kipoi" title="Permalink to this headline">¶</a></h2>
+<h2>Exporting a Selene-trained model to Kipoi<a class="headerlink" href="#exporting-a-selene-trained-model-to-kipoi" title="Permalink to this headline">¶</a></h2>
 <p>We have provided an example of how to prepare a model for upload to <a class="reference external" href="http://kipoi.org/">Kipoi’s model zoo</a> using a model trained during case study 2. You can use <a class="reference external" href="https://github.com/FunctionLab/selene/tree/master/manuscript/case2/3_kipoi_export">this example</a> as a starting point for preparing your own model for Kipoi. We have provided a script that can help to automate parts of the process.</p>
 <p>We are also working on an export function that will be built into Selene and accessible through the CLI.</p>
 </div>
 <div class="section" id="hyperparameter-optimization">
-<span id="hyperparameter-optimization"></span><h2>Hyperparameter optimization<a class="headerlink" href="#hyperparameter-optimization" title="Permalink to this headline">¶</a></h2>
+<h2>Hyperparameter optimization<a class="headerlink" href="#hyperparameter-optimization" title="Permalink to this headline">¶</a></h2>
 <p>Hyperparameter optimization is the process of finding the set of hyperparameters that yields an optimal model against a predefined score (e.g. minimizing a loss function).
 Hyperparameters are the variables that govern the training process (i.e. these parameters are constant during training, compared to model parameters which are optimized/”tuned” by the training process itself).
 Hyperparameter tuning works by running multiple trials of a single training run with different values for your chosen hyperparameters, set within some specified limit. Some examples of hyperparameters:</p>
@@ -376,7 +379,7 @@ For automatic hyperparameter optimization, you can look into grid search or rand
         <a href="../selene.html" class="btn btn-neutral float-right" title="selene_sdk" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="cli.html" class="btn btn-neutral" title="Selene CLI operations and outputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="cli.html" class="btn btn-neutral float-left" title="Selene CLI operations and outputs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -402,26 +405,16 @@ For automatic hyperparameter optimization, you can look into grid search or rand
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
+  
  
 
 

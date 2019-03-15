@@ -19,13 +19,21 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
@@ -33,21 +41,16 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="selene_sdk.targets" href="targets.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -130,21 +133,21 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="overview/cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id3">Additional notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id5">Optional parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id6">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
 </ul>
 </li>
@@ -176,9 +179,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id13">Some notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id14">Some notes</a></li>
 </ul>
 </li>
 </ul>
@@ -348,7 +351,7 @@ the non-strand specific prediction.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+b6b99fd ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
+<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+785c765 ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</li>
 <li><strong>mode</strong> (<em>{'mean'</em><em>, </em><em>'max'}</em>) – How to handle outputting a non-strand specific prediction.</li>
 </ul>
 </td>
@@ -827,7 +830,7 @@ True.</p>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+b6b99fd ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+b6b99fd ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+785c765 ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+785c765 ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>
@@ -934,7 +937,7 @@ to the dirs specified in each operation’s configuration.</p>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
       
-        <a href="targets.html" class="btn btn-neutral" title="selene_sdk.targets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="targets.html" class="btn btn-neutral float-left" title="selene_sdk.targets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -960,26 +963,16 @@ to the dirs specified in each operation’s configuration.</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
+  
  
 
 

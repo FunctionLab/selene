@@ -19,13 +19,21 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
@@ -34,21 +42,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="Selene documentation" href="../index.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -131,21 +134,21 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id3">Additional notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id5">Optional parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id6">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="cli.html#additional-note">Additional note</a></li>
 </ul>
 </li>
@@ -177,9 +180,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id13">Some notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id14">Some notes</a></li>
 </ul>
 </li>
 </ul>
@@ -322,28 +325,28 @@
            <div itemprop="articleBody">
             
   <div class="section" id="functional-overview-of-the-sdk">
-<span id="functional-overview-of-the-sdk"></span><h1>Functional overview of the SDK<a class="headerlink" href="#functional-overview-of-the-sdk" title="Permalink to this headline">¶</a></h1>
+<h1>Functional overview of the SDK<a class="headerlink" href="#functional-overview-of-the-sdk" title="Permalink to this headline">¶</a></h1>
 <p>The software development kit (SDK), formally known as <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code>, is an extensible Python package intended to ease development of new programs that leverage sequence-level models through code reuse.
 The package is composed of six submodules: <em>sequences</em>, <em>samplers</em>, <em>targets</em>, <em>predict</em>, <em>interpret</em>, and <em>utils</em>.
 It also provides two top-level classes: <em>TrainModel</em> and <em>EvaluateModel</em>.
 In the following sections, we briefly discuss each submodule and top-level class.</p>
 <div class="section" id="sampling">
-<span id="sampling"></span><h2>Sampling<a class="headerlink" href="#sampling" title="Permalink to this headline">¶</a></h2>
+<h2>Sampling<a class="headerlink" href="#sampling" title="Permalink to this headline">¶</a></h2>
 <p>We start with the modules for sampling data because both training and evaluting a model in Selene will require a user to specify the kind of sampler they want to use.</p>
 <div class="section" id="sequences-submodule-api">
-<span id="sequences-submodule-api"></span><h3><em>sequences</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/sequences.html">API</a>)<a class="headerlink" href="#sequences-submodule-api" title="Permalink to this headline">¶</a></h3>
+<h3><em>sequences</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/sequences.html">API</a>)<a class="headerlink" href="#sequences-submodule-api" title="Permalink to this headline">¶</a></h3>
 <p>The <em>sequences</em> submodule defines the <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> type, and includes implementations for several sub-classes.
 These sub-classes–<code class="docutils literal notranslate"><span class="pre">Genome</span></code> and <code class="docutils literal notranslate"><span class="pre">Proteome</span></code>–represent different kinds of biological sequences (e.g. DNA, RNA, amino acid sequences), and implement the <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> interface’s methods for reading the reference sequence from files (e.g. FASTA), querying subsequences of the reference sequence, and subsequently converting those queried subsequences into a numeric representation.
 Further, each sequence class specifies its own alphabet (e.g., nucleotides, amino acids) to represent query results as strings.</p>
 </div>
 <div class="section" id="targets-submodule-api">
-<span id="targets-submodule-api"></span><h3><em>targets</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/targets.html">API</a>)<a class="headerlink" href="#targets-submodule-api" title="Permalink to this headline">¶</a></h3>
+<h3><em>targets</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/targets.html">API</a>)<a class="headerlink" href="#targets-submodule-api" title="Permalink to this headline">¶</a></h3>
 <p>The <em>targets</em> submodule defines the <code class="docutils literal notranslate"><span class="pre">Target</span></code> class, which specifies the interface for classes to retrieve labels or “targets” for a given query sequence.
 At present, we supply a single implementation of this interface: <code class="docutils literal notranslate"><span class="pre">GenomicFeatures</span></code>.
 This class takes a tabix-indexed file of intervals for each label we want our model to predict, and uses this file to identify the labels for a given sequence drawn from the reference.</p>
 </div>
 <div class="section" id="samplers-submodule-api">
-<span id="samplers-submodule-api"></span><h3><em>samplers</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/samplers.html">API</a>)<a class="headerlink" href="#samplers-submodule-api" title="Permalink to this headline">¶</a></h3>
+<h3><em>samplers</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/samplers.html">API</a>)<a class="headerlink" href="#samplers-submodule-api" title="Permalink to this headline">¶</a></h3>
 <p>The <em>samplers</em> submodule provides methods and classes for randomly sampling and partitioning datasets for training and evaluation.
 The <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> interface defines the minimal requirements for a class fulfilling these functions.
 In particular, samplers must be able to partition data (i.e. into training, validation, and testing datasets), sample data from each partition, and, if needed, save the sampled data to a file.
@@ -362,7 +365,7 @@ This file can be subsequently loaded with the <code class="docutils literal notr
 </div>
 </div>
 <div class="section" id="training-a-model-api">
-<span id="training-a-model-api"></span><h2>Training a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#trainmodel">API</a>)<a class="headerlink" href="#training-a-model-api" title="Permalink to this headline">¶</a></h2>
+<h2>Training a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#trainmodel">API</a>)<a class="headerlink" href="#training-a-model-api" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class may be used for training and testing of sequence-based models, and provides the core functionality of the CLI’s train command.
 It relies on an <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code> (or a subclass of <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code>)  to automatically partition the dataset into subsets for training, validation, and testing.
 These subsets are then used to automatically train and validate performance for a user-specified number of steps.
@@ -372,13 +375,13 @@ The frequency of logging is provided by the user.
 At the end of evaluation, <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> logs the performance metrics for each feature predicted, and produces plots of the precision recall and receiver operating characteristic curves.</p>
 </div>
 <div class="section" id="evaluating-a-model-api">
-<span id="evaluating-a-model-api"></span><h2>Evaluating a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#evaluatemodel">API</a>)<a class="headerlink" href="#evaluating-a-model-api" title="Permalink to this headline">¶</a></h2>
+<h2>Evaluating a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#evaluatemodel">API</a>)<a class="headerlink" href="#evaluating-a-model-api" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> class is used to test the performance of a trained model.
 <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> uses an instance of <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> class or subclass to draw samples from a test set.
 After using the provided model to predict labels for said data, <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> logs the performance measures (as described in “Training a model”) and generates figures and a performance breakdown by feature.</p>
 </div>
 <div class="section" id="using-a-model-to-make-predictions-api">
-<span id="using-a-model-to-make-predictions-api"></span><h2>Using a model to make predictions (<a class="reference external" href="http://selene.flatironinstitute.org/predict.html">API</a>)<a class="headerlink" href="#using-a-model-to-make-predictions-api" title="Permalink to this headline">¶</a></h2>
+<h2>Using a model to make predictions (<a class="reference external" href="http://selene.flatironinstitute.org/predict.html">API</a>)<a class="headerlink" href="#using-a-model-to-make-predictions-api" title="Permalink to this headline">¶</a></h2>
 <p>Selene’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> submodule includes a number of methods and classes for making predictions with sequence-based models.
 The <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> class is the main class to use.
 It leverages a user-specified trained model to make predictions for sequences sequences in a FASTA file, apply <em>in silico</em> mutagenesis to sequences in a FASTA file, or perform variant effect prediction on variants in a VCF file.
@@ -386,13 +389,13 @@ In each case, the user can specify what <code class="docutils literal notranslat
 Note that the aforementioned “scores” can only be computed for <em>in silico</em> mutagenesis and variant effect prediction.</p>
 </div>
 <div class="section" id="visualizing-model-predictions-api">
-<span id="visualizing-model-predictions-api"></span><h2>Visualizing model predictions (<a class="reference external" href="http://selene.flatironinstitute.org/interpret.html">API</a>)<a class="headerlink" href="#visualizing-model-predictions-api" title="Permalink to this headline">¶</a></h2>
+<h2>Visualizing model predictions (<a class="reference external" href="http://selene.flatironinstitute.org/interpret.html">API</a>)<a class="headerlink" href="#visualizing-model-predictions-api" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">interpret</span></code> submodule of <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code> provides methods for visualizing a sequence-based model’s predictions made with <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code>.
 For example, <code class="docutils literal notranslate"><span class="pre">interpret</span></code> includes methods for processing variant effect predictions made with <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> and subsequently visualizing them with a heatmap or sequence logo.
 The functionality included in the <code class="docutils literal notranslate"><span class="pre">interpret</span></code> submodule is not heavily incorporated into the CLI, but is instead intended for incorporation into user code.</p>
 </div>
 <div class="section" id="the-utilities-submodule-api">
-<span id="the-utilities-submodule-api"></span><h2>The utilities submodule (<a class="reference external" href="http://selene.flatironinstitute.org/utils.html">API</a>)<a class="headerlink" href="#the-utilities-submodule-api" title="Permalink to this headline">¶</a></h2>
+<h2>The utilities submodule (<a class="reference external" href="http://selene.flatironinstitute.org/utils.html">API</a>)<a class="headerlink" href="#the-utilities-submodule-api" title="Permalink to this headline">¶</a></h2>
 <p>Unlike the aforementioned submodules designed around individual concepts, the <code class="docutils literal notranslate"><span class="pre">utils</span></code> submodule is a catch-all submodule intended to prevent cluttering of the <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code> top-level namespace.
 It provides diverse functionality at varying levels of flexibility.
 Some members of <code class="docutils literal notranslate"><span class="pre">utils</span></code> are general-purpose (e.g. configuration file parsing) while others have highly specific use cases (e.g. CLI logger initialization).</p>
@@ -410,7 +413,7 @@ Some members of <code class="docutils literal notranslate"><span class="pre">uti
         <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral" title="Selene documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Selene documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -436,26 +439,16 @@ Some members of <code class="docutils literal notranslate"><span class="pre">uti
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
+  
  
 
 

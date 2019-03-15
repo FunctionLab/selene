@@ -19,13 +19,21 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
@@ -34,21 +42,16 @@
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="FAQ and additional resources" href="faq.html" />
     <link rel="prev" title="Tutorials" href="tutorials.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -131,21 +134,21 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Additional notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Optional parameters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#prediction-on-sequences">Prediction on sequences</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#parameters">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id6">Parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#additional-note">Additional note</a></li>
 </ul>
 </li>
@@ -177,9 +180,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#some-notes">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">Some notes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#some-notes">Some notes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id14">Some notes</a></li>
 </ul>
 </li>
 </ul>
@@ -322,12 +325,12 @@
            <div itemprop="articleBody">
             
   <div class="section" id="selene-cli-operations-and-outputs">
-<span id="selene-cli-operations-and-outputs"></span><h1>Selene CLI operations and outputs<a class="headerlink" href="#selene-cli-operations-and-outputs" title="Permalink to this headline">¶</a></h1>
+<h1>Selene CLI operations and outputs<a class="headerlink" href="#selene-cli-operations-and-outputs" title="Permalink to this headline">¶</a></h1>
 <p>Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations. (See <a class="reference external" href="#operations">Operations</a> for more detail.)</p>
 <p>The sections that follow describe in detail how the various components that make up the configuration file are specified. For operation-specific sections (e.g. training, evaluation), we also explain what the expected outputs are.</p>
 <p>We strongly recommend you read through the first 4 sections (<a class="reference external" href="#overview">Overview</a>, <a class="reference external" href="#operations">Operations</a>, <a class="reference external" href="#general-configurations">General configurations</a>, and <a class="reference external" href="#model-architecture">Model architecture</a>) and then pick other sections based on your use case.</p>
 <div class="section" id="overview">
-<span id="overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>Selene’s CLI accepts configuration files in the <a class="reference external" href="https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html">YAML</a> format that are composed of 4 main (high-level) groups:</p>
 <ol class="simple">
 <li>list of operations</li>
@@ -348,7 +351,7 @@
 <p>There are also various configuration files associated with the Jupyter notebook <a class="reference external" href="https://github.com/FunctionLab/selene/tree/master/tutorials"><code class="docutils literal notranslate"><span class="pre">tutorials</span></code></a> and <a class="reference external" href="https://github.com/FunctionLab/selene/tree/master/manuscript"><code class="docutils literal notranslate"><span class="pre">manuscript</span></code></a> case studies that you may use as a starting point.</p>
 </div>
 <div class="section" id="operations">
-<span id="operations"></span><h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
+<h2>Operations<a class="headerlink" href="#operations" title="Permalink to this headline">¶</a></h2>
 <p>Every file should start with the operations that you want to run.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">evaluate</span><span class="p p-Indicator">,</span> <span class="nv">analyze</span><span class="p p-Indicator">]</span>
 </pre></div>
@@ -362,7 +365,7 @@
 <p><strong>Note</strong>: You should be able to use multiple operations (i.e. specify the necessary configuration keys for those operations in a single file). However, if <code class="docutils literal notranslate"><span class="pre">[train,</span> <span class="pre">evaluate]</span></code> are both specified, we expect that they will both rely on the same sampler. If you need to train and evaluate using different samplers, please create 2 separate YAML files.</p>
 </div>
 <div class="section" id="general-configurations">
-<span id="general-configurations"></span><h2>General configurations<a class="headerlink" href="#general-configurations" title="Permalink to this headline">¶</a></h2>
+<h2>General configurations<a class="headerlink" href="#general-configurations" title="Permalink to this headline">¶</a></h2>
 <p>In addition to the <code class="docutils literal notranslate"><span class="pre">ops</span></code> key, you can specify the following parameters:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">random_seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1337</span>
 <span class="nt">output_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/absolute/path/to/output/dir</span>
@@ -374,17 +377,17 @@
 <p>Note that there should not be any commas at the end of these lines.</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">random_seed</span></code>: Set a random seed for <code class="docutils literal notranslate"><span class="pre">torch</span></code> and <code class="docutils literal notranslate"><span class="pre">torch.cuda</span></code> (if using CUDA-enabled GPUs) for reproducibility.</li>
-<li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code>: The output directory to use for all operations. If no <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified, Selene assumes that the <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified in all relevant function-type values for operations in Selene. (More information on what function-type values are in <a class="reference external" href="#a-note-for-the-following-sections">later sections</a>.)</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code>: The output directory to use for all operations. If no <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified, Selene assumes that the <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is specified in all relevant function-type values for operations in Selene. (More information on what function-type values are in <a class="reference external" href="#a-note-for-the-following-sections">later sections</a>.) We recommend using this parameter for <code class="docutils literal notranslate"><span class="pre">train</span></code> and <code class="docutils literal notranslate"><span class="pre">evaluate</span></code> operations.</li>
 <li><code class="docutils literal notranslate"><span class="pre">create_subdirectory</span></code>: If True, creates a directory within <code class="docutils literal notranslate"><span class="pre">output_dir</span></code>   with the name formatted as <code class="docutils literal notranslate"><span class="pre">%Y-%m-%d-%H-%M-%S</span></code>—the date/time when Selene was run. (This is only applicable if <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> has been specified.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">lr</span></code>:  The learning rate. If you use our <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/selene_cli.py">CLI script</a>, you can pass this in as a command-line argument rather than having it specified in the configuration file.</li>
 <li><code class="docutils literal notranslate"><span class="pre">load_test_set</span></code>: This is only applicable if you have specified <code class="docutils literal notranslate"><span class="pre">ops:</span> <span class="pre">[train,</span> <span class="pre">evaluate]</span></code>. You can set this parameter to True (by default it is False and the test set is only loaded when training ends) if you would like to load the test set into memory before training begins—and therefore save the test data generated by a sampler to a .bed file. You would find this useful if you want to save a test dataset (see <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally">Samplers used for training</a>) and you do not know if your model will finish training and evaluation within the allotted time that your job is run. You should also be running Selene on a machine that can support such an increase in memory usage (on the order of GBs, depending on how many classes your model predicts, how large the test dataset is, etc.).</li>
 </ul>
 </div>
 <div class="section" id="model-architecture">
-<span id="model-architecture"></span><h2>Model architecture<a class="headerlink" href="#model-architecture" title="Permalink to this headline">¶</a></h2>
+<h2>Model architecture<a class="headerlink" href="#model-architecture" title="Permalink to this headline">¶</a></h2>
 <p>For all operations, Selene requires that you specify the model architecture, loss, and optimizer as inputs.</p>
 <div class="section" id="expected-input-class-and-methods">
-<span id="expected-input-class-and-methods"></span><h3>Expected input class and methods<a class="headerlink" href="#expected-input-class-and-methods" title="Permalink to this headline">¶</a></h3>
+<h3>Expected input class and methods<a class="headerlink" href="#expected-input-class-and-methods" title="Permalink to this headline">¶</a></h3>
 <p>There are two possible formats you can use to do this:</p>
 <ul class="simple">
 <li>single Python file: We expect that most people will start using Selene with model architectures in this format. In this case, you implement your architecture as a class and include 2 static methods, <code class="docutils literal notranslate"><span class="pre">criterion</span></code> and <code class="docutils literal notranslate"><span class="pre">get_optimizer</span></code> in the same file. See our <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/models/deepsea.py">DeepSEA model file</a> as an example.<ul>
@@ -396,7 +399,7 @@
 </ul>
 </div>
 <div class="section" id="model-architecture-configuration">
-<span id="model-architecture-configuration"></span><h3>Model architecture configuration<a class="headerlink" href="#model-architecture-configuration" title="Permalink to this headline">¶</a></h3>
+<h3>Model architecture configuration<a class="headerlink" href="#model-architecture-configuration" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
 <span class="nt">    path</span><span class="p">:</span> <span class="nv">/absolute/path/to/file_or_model</span><span class="p p-Indicator">,</span>
 <span class="nt">    class</span><span class="p">:</span> <span class="nv">ModelArchitectureClassName</span><span class="p p-Indicator">,</span>
@@ -418,12 +421,12 @@
 </div>
 </div>
 <div class="section" id="a-note-for-the-following-sections">
-<span id="a-note-for-the-following-sections"></span><h2>A note for the following sections<a class="headerlink" href="#a-note-for-the-following-sections" title="Permalink to this headline">¶</a></h2>
+<h2>A note for the following sections<a class="headerlink" href="#a-note-for-the-following-sections" title="Permalink to this headline">¶</a></h2>
 <p>For training, evaluation, and analysis [of sequences using trained models], Selene requires that specific keys in the YAML file correspond to function-type values. The function-type value is used to construct an object that is a class in <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code>. Our <a class="reference external" href="https://selene.flatironinstitute.org/">documentation website</a> is an important resource for debugging configuration-related errors when you run Selene via the CLI.</p>
 <p>We have covered the most common configurations in this document.</p>
 </div>
 <div class="section" id="train">
-<span id="train"></span><h2>Train<a class="headerlink" href="#train" title="Permalink to this headline">¶</a></h2>
+<h2>Train<a class="headerlink" href="#train" title="Permalink to this headline">¶</a></h2>
 <p>An example configuration for training:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">train_model</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.TrainModel</span> <span class="p p-Indicator">{</span>
 <span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
@@ -446,7 +449,7 @@
 </pre></div>
 </div>
 <div class="section" id="required-parameters">
-<span id="required-parameters"></span><h3>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">batch_size</span></code>:  Number of samples in one forward/backward pass (a single step).</li>
 <li><code class="docutils literal notranslate"><span class="pre">max_steps</span></code>: Total number of steps for which to train the model.</li>
@@ -454,7 +457,7 @@
 </ul>
 </div>
 <div class="section" id="optional-parameters">
-<span id="optional-parameters"></span><h3>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p class="first"><code class="docutils literal notranslate"><span class="pre">save_checkpoint_every_n_steps</span></code>: Default is 1000. The number of steps before Selene saves a new checkpoint model weights file. If this parameter is set to <code class="docutils literal notranslate"><span class="pre">None</span></code>, we will set it to the same value as <code class="docutils literal notranslate"><span class="pre">report_stats_every_n_steps</span></code>.</p>
 </li>
@@ -495,7 +498,7 @@
 </ul>
 </div>
 <div class="section" id="additional-notes">
-<span id="additional-notes"></span><h3>Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h3>
+<h3>Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h3>
 <p>Attentive readers might have noticed that in the <a class="reference external" href="https://selene.flatironinstitute.org/selene.html#trainmodel">documentation for the <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class</a> there are more input arguments than are required to instantiate the class through the CLI configuration file. This is because they are assumed to be carried through/retrieved from other configuration keys for consistency. Specifically:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code> can be specified as a top-level key in the configuration. You can specify it within each function-type constructor (e.g.  <code class="docutils literal notranslate"><span class="pre">!obj:selene_sdk.TrainModel</span></code>) if you prefer. If <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> exists as a top-level key, Selene does use the top-level <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> and ignores all other <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> keys. <strong>The <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is omitted in many of the configurations for this reason.</strong></li>
@@ -504,7 +507,7 @@
 </ul>
 </div>
 <div class="section" id="expected-outputs-for-training">
-<span id="expected-outputs-for-training"></span><h3>Expected outputs for training<a class="headerlink" href="#expected-outputs-for-training" title="Permalink to this headline">¶</a></h3>
+<h3>Expected outputs for training<a class="headerlink" href="#expected-outputs-for-training" title="Permalink to this headline">¶</a></h3>
 <p>These outputs will be written to <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> (a top-level parameter, can also  be specified within the function-type constructor, see above).</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">best_model.pth.tar</span></code>: the best performing model so far. IMPORTANT: for all <code class="docutils literal notranslate"><span class="pre">*.pth.tar</span></code> files output by Selene right now, we save additional information beyond the model’s state dictionary so that users may continue training these models through Selene if they wish. If you would like to save only the state dictionary, you can run <code class="docutils literal notranslate"><span class="pre">out</span> <span class="pre">=</span> <span class="pre">torch.load(&lt;*.pth.tar&gt;)</span></code> and then save only the <code class="docutils literal notranslate"><span class="pre">state_dict</span></code> key with <code class="docutils literal notranslate"><span class="pre">torch.save(out[&quot;state_dict&quot;],</span> <span class="pre">&lt;state_dict_only.pth.tar&gt;)</span></code>.</li>
@@ -523,7 +526,7 @@
 </div>
 </div>
 <div class="section" id="evaluate">
-<span id="evaluate"></span><h2>Evaluate<a class="headerlink" href="#evaluate" title="Permalink to this headline">¶</a></h2>
+<h2>Evaluate<a class="headerlink" href="#evaluate" title="Permalink to this headline">¶</a></h2>
 <p>An example configuration for evaluation:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">evaluate_model</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.EvaluateModel</span> <span class="p p-Indicator">{</span>
 <span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
@@ -537,15 +540,15 @@
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="required-parameters">
-<span id="id1"></span><h3>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id1">
+<h3>Required parameters<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">features</span></code>: The list of distinct features the model predicts. (<code class="docutils literal notranslate"><span class="pre">input_path</span></code> to the function-type value that loads the features as a list.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">trained_model_path</span></code>: Path to the trained model weights file, which should have been generated/saved using <code class="docutils literal notranslate"><span class="pre">torch.save</span></code>. (i.e. you can pass in the saved model file generated by Selene’s <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class.)</li>
 </ul>
 </div>
-<div class="section" id="optional-parameters">
-<span id="id2"></span><h3>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Optional parameters<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">batch_size</span></code>: Default is 64. Specify the batch size to process examples. Should be a power of 2.</li>
 <li><code class="docutils literal notranslate"><span class="pre">n_test_samples</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. Use <code class="docutils literal notranslate"><span class="pre">n_test_samples</span></code> if you want to limit the number of samples on which you evaluate your model. If you are using a sampler of type <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally"><code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.OnlineSampler</span></code></a>)—you must specify a test partition in this case—it will default to 640000 test samples if <code class="docutils literal notranslate"><span class="pre">n_test_samples</span> <span class="pre">=</span> <span class="pre">None</span></code>. If you are using a file sampler (<a class="reference external" href="#multiple-file-sampler">multiple-file sampler</a> or <a class="reference external" href="#bed-file-sampler">BED</a>/<a class="reference external" href="#matrix-file-sampler">matrix</a> file samplers), it will use all samples available in the file.</li>
@@ -554,13 +557,13 @@
 <li><code class="docutils literal notranslate"><span class="pre">data_parallel</span></code>: Default is False. Specify whether multiple GPUs are available for torch to use.</li>
 </ul>
 </div>
-<div class="section" id="additional-notes">
-<span id="id3"></span><h3>Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Additional notes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <p>Similar to the <code class="docutils literal notranslate"><span class="pre">train_model</span></code> configuration, any arguments that you find in <a class="reference external" href="https://selene.flatironinstitute.org/selene.html#evaluatemodel">the documentation</a> that are not present in the function-type value’s arguments are automatically instantiated and passed in by Selene.</p>
 <p>If you use a <a class="reference external" href="#samplers-used-for-training-and-evaluation-optionally">sampler with multiple data partitions</a> with the <code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> configuration, <strong>please make sure that your sampler configuration’s <code class="docutils literal notranslate"><span class="pre">mode</span></code> parameter is set to <code class="docutils literal notranslate"><span class="pre">test</span></code></strong>.</p>
 </div>
 <div class="section" id="expected-outputs-for-evaluation">
-<span id="expected-outputs-for-evaluation"></span><h3>Expected outputs for evaluation<a class="headerlink" href="#expected-outputs-for-evaluation" title="Permalink to this headline">¶</a></h3>
+<h3>Expected outputs for evaluation<a class="headerlink" href="#expected-outputs-for-evaluation" title="Permalink to this headline">¶</a></h3>
 <p>These outputs will be written to <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> (a top-level parameter, can also  be specified within the function-type constructor).</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">test_performance.txt</span></code>: columns are <code class="docutils literal notranslate"><span class="pre">class</span></code> and whatever other metrics you specified (defaults: <code class="docutils literal notranslate"><span class="pre">roc_auc</span></code> and <code class="docutils literal notranslate"><span class="pre">average_precision</span></code>). The breakdown of performance metrics by each class that the model predicts.</li>
@@ -573,7 +576,7 @@
 </div>
 </div>
 <div class="section" id="analyze-sequences">
-<span id="analyze-sequences"></span><h2>Analyze sequences<a class="headerlink" href="#analyze-sequences" title="Permalink to this headline">¶</a></h2>
+<h2>Analyze sequences<a class="headerlink" href="#analyze-sequences" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">analyze</span></code> operation allows you to apply a trained model to new sequences of interest. Currently, we support 3 “sub-operations” for <code class="docutils literal notranslate"><span class="pre">analyze</span></code>:</p>
 <ol class="simple">
 <li>Prediction on sequences: Output the model predictions for a list of sequences.</li>
@@ -604,16 +607,16 @@
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="required-parameters">
-<span id="id4"></span><h3>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Required parameters<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">trained_model_path</span></code>: Path to the trained model weights file, which should have been generated/saved using <code class="docutils literal notranslate"><span class="pre">torch.save</span></code>. (i.e. You can pass in the saved model file generated by Selene’s <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">sequence_length</span></code>: The sequence length the model is expecting for each input.</li>
 <li><code class="docutils literal notranslate"><span class="pre">features</span></code>: The list of distinct features the model predicts. (<code class="docutils literal notranslate"><span class="pre">input_path</span></code> to the function-type value that loads the features as a list.)</li>
 </ul>
 </div>
-<div class="section" id="optional-parameters">
-<span id="id5"></span><h3>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h3>Optional parameters<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">batch_size</span></code>: Default is 64. The size of the mini-batches to use.</li>
 <li><code class="docutils literal notranslate"><span class="pre">use_cuda</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>. Specify whether CUDA-enabled GPUs are available for torch to use.</li>
@@ -626,7 +629,7 @@
 </ul>
 </div>
 <div class="section" id="prediction-on-sequences">
-<span id="prediction-on-sequences"></span><h3>Prediction on sequences<a class="headerlink" href="#prediction-on-sequences" title="Permalink to this headline">¶</a></h3>
+<h3>Prediction on sequences<a class="headerlink" href="#prediction-on-sequences" title="Permalink to this headline">¶</a></h3>
 <p>For prediction on sequences, we require that a user specifies the path to a FASTA file.</p>
 <p>An example configuration for prediction on sequences:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">prediction</span><span class="p">:</span> <span class="p p-Indicator">{</span>
@@ -637,7 +640,7 @@
 </pre></div>
 </div>
 <div class="section" id="parameters">
-<span id="parameters"></span><h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">input_path</span></code>: Input path to the FASTA file.</li>
 <li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code>: Output directory to write the model predictions. The resulting file will have the same filename prefix (e.g. <code class="docutils literal notranslate"><span class="pre">example.fasta</span></code> will output <code class="docutils literal notranslate"><span class="pre">example_predictions.tsv</span></code>).</li>
@@ -646,11 +649,11 @@
 </div>
 </div>
 <div class="section" id="variant-effect-prediction">
-<span id="variant-effect-prediction"></span><h3>Variant effect prediction<a class="headerlink" href="#variant-effect-prediction" title="Permalink to this headline">¶</a></h3>
+<h3>Variant effect prediction<a class="headerlink" href="#variant-effect-prediction" title="Permalink to this headline">¶</a></h3>
 <p>Currently, we expect that all sequences passed as input to a model must be the same length <code class="docutils literal notranslate"><span class="pre">N</span></code>.</p>
 <ul class="simple">
 <li>For SNPs, Selene outputs the model predictions for the ref and alt sequences centered at the <code class="docutils literal notranslate"><span class="pre">(chr,</span> <span class="pre">pos)</span></code> specified.</li>
-<li>For indels, sequences are centered at <code class="docutils literal notranslate"><span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span></code>, for the inserted/deleted sequence of length <code class="docutils literal notranslate"><span class="pre">N_bases</span></code>. Selene queries for <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">-</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">+</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> to get the sequence of length <code class="docutils literal notranslate"><span class="pre">N</span></code>. This applies to the counterpart sequence as well. For example, if the sequence is completely deleted, the <code class="docutils literal notranslate"><span class="pre">alt</span></code> column has 0 bases. Selene queries for <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">-</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> to build the counterpart sequence since <code class="docutils literal notranslate"><span class="pre">N_bases</span></code> is 0.</li>
+<li>For indels, sequences are centered at <code class="docutils literal notranslate"><span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span></code>, for the reference sequence of length <code class="docutils literal notranslate"><span class="pre">N_bases</span></code>. Selene queries for <code class="docutils literal notranslate"><span class="pre">start</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">-</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">=</span> <span class="pre">pos</span> <span class="pre">+</span> <span class="pre">(N_bases</span> <span class="pre">/</span> <span class="pre">2)</span> <span class="pre">+</span> <span class="pre">(N</span> <span class="pre">/</span> <span class="pre">2)</span></code> to get the sequence of length <code class="docutils literal notranslate"><span class="pre">N</span></code>.</li>
 </ul>
 <p>An example configuration for variant effect prediction:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">variant_effect_prediction</span><span class="p">:</span> <span class="p p-Indicator">{</span>
@@ -661,21 +664,23 @@
     <span class="p p-Indicator">],</span>
 <span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">abs_diffs</span><span class="p p-Indicator">],</span>
 <span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predictions/dir</span><span class="p p-Indicator">,</span>
-<span class="nt">    output_format</span><span class="p">:</span> <span class="nv">hdf5</span>
+<span class="nt">    output_format</span><span class="p">:</span> <span class="nv">hdf5</span><span class="p p-Indicator">,</span>
+<span class="nt">    strand_index</span><span class="p">:</span> <span class="nv">7</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="parameters">
-<span id="id6"></span><h4>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id6">
+<h4>Parameters<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">vcf_files</span></code>: Path to a VCF file. Must contain the columns <code class="docutils literal notranslate"><span class="pre">[#CHROM,</span> <span class="pre">POS,</span> <span class="pre">ID,</span> <span class="pre">REF,</span> <span class="pre">ALT]</span></code>, in order. Column header does not need to be present. (All other columns in the file will be ignored.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">save_data</span></code>: A list of the data files to output. Must input 1 or more of the following options: <code class="docutils literal notranslate"><span class="pre">[abs_diffs,</span> <span class="pre">diffs,</span> <span class="pre">logits,</span> <span class="pre">predictions]</span></code>. (Note that the raw prediction values will not be outputted by default—you must specify <code class="docutils literal notranslate"><span class="pre">predictions</span></code> in the list if you want them.)</li>
 <li><code class="docutils literal notranslate"><span class="pre">output_dir</span></code>: Output directory to write the model predictions. The resulting file will have the same filename prefix.</li>
-<li><code class="docutils literal notranslate"><span class="pre">output_format</span></code>: Default is ‘tsv’. You may specify either ‘tsv’ or ‘hdf5’. ‘tsv’ is suitable if you do not have many variants (on the order of 10^4 or less) or your model does not predict very many classes (&lt;1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). ‘hdf5’ is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package <code class="docutils literal notranslate"><span class="pre">h5py</span></code>. Once the file is loaded, the full matrix is accessible under the key/name <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code>. Saving to TSV is much slower (more than 2x slower) than saving to HDF5. When the output is in HDF5 format, an additional .txt file of row labels (corresponding to the columns (chrom, pos, id, ref, alt)) will be output so that you can match up the data matrix rows with the particular variant. Columns of the matrix correpsond to the classes the model predicts.</li>
+<li><code class="docutils literal notranslate"><span class="pre">output_format</span></code>: Default is ‘tsv’. You may specify either ‘tsv’ or ‘hdf5’. ‘tsv’ is suitable if you do not have many variants (on the order of 10^4 or less) or your model does not predict very many classes (&lt;1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). ‘hdf5’ is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package <code class="docutils literal notranslate"><span class="pre">h5py</span></code>. Once the file is loaded, the full matrix is accessible under the key/name <code class="docutils literal notranslate"><span class="pre">&quot;data&quot;</span></code>. Saving to TSV is much slower (more than 2x slower) than saving to HDF5. When the output is in HDF5 format, an additional .txt file of row labels (corresponding to the columns (chrom, pos, id, ref, alt)) will be output so that you can match up the data matrix rows with the particular variant. Columns of the matrix correspond to the classes the model predicts.</li>
+<li><code class="docutils literal notranslate"><span class="pre">strand_index</span></code>: Default is None. If applicable, specify the column index (0-based) in the VCF file that contains strand information for each variant. Note that currently Selene assumes that, for multiple input VCF files, the strand column is the same for all the files.</li>
 </ul>
 </div>
 <div class="section" id="additional-note">
-<span id="additional-note"></span><h4>Additional note<a class="headerlink" href="#additional-note" title="Permalink to this headline">¶</a></h4>
+<h4>Additional note<a class="headerlink" href="#additional-note" title="Permalink to this headline">¶</a></h4>
 <p>You may find that there are more output files than you expect in <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> at the end of variant effect prediction. The following cases may occur:</p>
 <ul class="simple">
 <li><strong>NAs:</strong> for some variants, Selene may not be able to construct a reference sequence centered at <code class="docutils literal notranslate"><span class="pre">pos</span></code> of the specified sequence length. This is likely because <code class="docutils literal notranslate"><span class="pre">pos</span></code> is near the end or the beginning of the chromosome and the sequence length the model accepts as input is large. You will find a list of NA variants in a file that ends with the extension <code class="docutils literal notranslate"><span class="pre">.NA</span></code>.</li>
@@ -684,7 +689,7 @@
 </div>
 </div>
 <div class="section" id="in-silico-mutagenesis">
-<span id="in-silico-mutagenesis"></span><h3><em>In silico</em> mutagenesis<a class="headerlink" href="#in-silico-mutagenesis" title="Permalink to this headline">¶</a></h3>
+<h3><em>In silico</em> mutagenesis<a class="headerlink" href="#in-silico-mutagenesis" title="Permalink to this headline">¶</a></h3>
 <p>An example configuration for <em>in silico</em> mutagenesis when using a single sequence as input:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">in_silico_mutagenesis</span><span class="p">:</span> <span class="p p-Indicator">{</span>
 <span class="nt">    input_sequence</span><span class="p">:</span> <span class="nv">ATCGATAAAATTCTGGAG...</span><span class="p p-Indicator">,</span>
@@ -695,7 +700,7 @@
 </pre></div>
 </div>
 <div class="section" id="parameters-for-a-single-sequence-input">
-<span id="parameters-for-a-single-sequence-input"></span><h4>Parameters for a single sequence input<a class="headerlink" href="#parameters-for-a-single-sequence-input" title="Permalink to this headline">¶</a></h4>
+<h4>Parameters for a single sequence input<a class="headerlink" href="#parameters-for-a-single-sequence-input" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">sequence</span></code>: A sequence you are interested in. If the sequence length is less than or greater than the expected model’s input sequence length, Selene truncates or pads (with unknown base, e.g. <code class="docutils literal notranslate"><span class="pre">N</span></code>) the sequence for you.</li>
 <li><code class="docutils literal notranslate"><span class="pre">save_data</span></code>: A list of the data files to output. Must input 1 or more of the following options: <code class="docutils literal notranslate"><span class="pre">[abs_diffs,</span> <span class="pre">diffs,</span> <span class="pre">logits,</span> <span class="pre">predictions]</span></code>. (Note that the raw prediction values will not be outputted by default—you must specify <code class="docutils literal notranslate"><span class="pre">predictions</span></code> in the list if you want them.)</li>
@@ -714,7 +719,7 @@
 </div>
 </div>
 <div class="section" id="parameters-for-fasta-file-input">
-<span id="parameters-for-fasta-file-input"></span><h4>Parameters for FASTA file input:<a class="headerlink" href="#parameters-for-fasta-file-input" title="Permalink to this headline">¶</a></h4>
+<h4>Parameters for FASTA file input:<a class="headerlink" href="#parameters-for-fasta-file-input" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">input_path</span></code>: Input path to the FASTA file. If you have multiple FASTA files, you can replace this key with <code class="docutils literal notranslate"><span class="pre">fa_files</span></code> and submit an input list, the same way it is done in variant effect prediction.</li>
 <li><code class="docutils literal notranslate"><span class="pre">save_data</span></code>: A list of the data files to output. Must input 1 or more of the following options: <code class="docutils literal notranslate"><span class="pre">[abs_diffs,</span> <span class="pre">diffs,</span> <span class="pre">logits,</span> <span class="pre">predictions]</span></code>.</li>
@@ -730,14 +735,14 @@
 </div>
 </div>
 <div class="section" id="sampler-configurations">
-<span id="sampler-configurations"></span><h2>Sampler configurations<a class="headerlink" href="#sampler-configurations" title="Permalink to this headline">¶</a></h2>
+<h2>Sampler configurations<a class="headerlink" href="#sampler-configurations" title="Permalink to this headline">¶</a></h2>
 <p>Data sampling is used during model training and evaluation. You must specify the sampler in the configuration YAML file alongside the other operation-specific configurations (i.e. <code class="docutils literal notranslate"><span class="pre">train_model</span></code> or <code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code>).</p>
 <div class="section" id="samplers-used-for-training-and-evaluation-optionally">
-<span id="samplers-used-for-training-and-evaluation-optionally"></span><h3>Samplers used for training (and evaluation, optionally)<a class="headerlink" href="#samplers-used-for-training-and-evaluation-optionally" title="Permalink to this headline">¶</a></h3>
+<h3>Samplers used for training (and evaluation, optionally)<a class="headerlink" href="#samplers-used-for-training-and-evaluation-optionally" title="Permalink to this headline">¶</a></h3>
 <p>Training requires a sampler that specifies the data for training, validation, and (optionally) testing. While Selene can directly evaluate a trained model on a test dataset when training is finished, it is not a required step and so the test dataset specification is also optional. Here, we provide examples for the samplers we have implemented that can be used for training.</p>
 <p>There are 2 kinds of samplers implemented in Selene right now: “online” samplers and file samplers. Online samplers generate data samples on-the-fly and require you to pass in a reference sequence FASTA file and a tabix-indexed BED file so that Selene can query for an input sequence and its associated biological classes using genomic coordinates. The file sampler we use supports loading different <code class="docutils literal notranslate"><span class="pre">.mat</span></code> or <code class="docutils literal notranslate"><span class="pre">.bed</span></code> files (can support more formats upon request) for the training, validation, and test sets.</p>
 <div class="section" id="random-positions-sampler">
-<span id="random-positions-sampler"></span><h4>Random positions sampler<a class="headerlink" href="#random-positions-sampler" title="Permalink to this headline">¶</a></h4>
+<h4>Random positions sampler<a class="headerlink" href="#random-positions-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The random positions sampler will construct data samples by randomly selecting a position in the genome and then using the sequence and classes centered at that position as the input and targets for the model to predict.</p>
 <p>An example configuration for the random positions sampler:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.RandomPositionsSampler</span> <span class="p p-Indicator">{</span>
@@ -760,8 +765,8 @@
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="required-parameters">
-<span id="id7"></span><h5>Required parameters<a class="headerlink" href="#required-parameters" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id7">
+<h5>Required parameters<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h5>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">reference_sequence</span></code>: Path to a reference sequence FASTA file we can query to create our data samples.<ul>
 <li><code class="docutils literal notranslate"><span class="pre">blacklist_regions</span></code> is an optional argument for <code class="docutils literal notranslate"><span class="pre">selene_sdk.sequences.Genome</span></code> that allows you to specify the blacklist regions for the hg19 or hg38 reference sequence. The lists of blacklisted intervals are provided by <a class="reference external" href="https://sites.google.com/site/anshulkundaje/projects/blacklists">Anshul Kundaje for ENCODE</a> and support for more organisms can be included upon request.</li>
@@ -771,8 +776,8 @@
 <li><code class="docutils literal notranslate"><span class="pre">features</span></code>: The list of distinct features the model predicts. (<code class="docutils literal notranslate"><span class="pre">input_path</span></code> to the function-type value that loads the file of features as a list.)</li>
 </ul>
 </div>
-<div class="section" id="optional-parameters">
-<span id="id8"></span><h5>Optional parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id8">
+<h5>Optional parameters<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h5>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">seed</span></code>: Default is 436.</li>
 <li><code class="docutils literal notranslate"><span class="pre">validation_holdout</span></code>: Default is <code class="docutils literal notranslate"><span class="pre">[chr6,</span> <span class="pre">chr7]</span></code>. Holdout can be regional (i.e. chromosomal) or proportional.<ul>
@@ -797,7 +802,7 @@
 </div>
 </div>
 <div class="section" id="intervals-sampler">
-<span id="intervals-sampler"></span><h4>Intervals sampler<a class="headerlink" href="#intervals-sampler" title="Permalink to this headline">¶</a></h4>
+<h4>Intervals sampler<a class="headerlink" href="#intervals-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The intervals sampler will construct data samples by randomly selecting positions only in the regions specified by an intervals <code class="docutils literal notranslate"><span class="pre">.bed</span></code> file and then using the sequence and classes centered at that position as the input and targets for the model to predict.</p>
 <p>An example configuration for the intervals sampler:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.IntervalsSampler</span> <span class="p p-Indicator">{</span>
@@ -821,8 +826,8 @@
 <span class="nt">    save_datasets</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">test</span><span class="p p-Indicator">]</span>
 </pre></div>
 </div>
-<div class="section" id="parameters">
-<span id="id9"></span><h5>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id9">
+<h5>Parameters<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h5>
 <p>With the exception of <code class="docutils literal notranslate"><span class="pre">intervals_path</span></code> and <code class="docutils literal notranslate"><span class="pre">sample_negative</span></code>, all other parameters match those for the random positions sampler. Please see the previous section for more details on the other parameters.</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">intervals_path</span></code>: The path to the intervals file. Must have the columns <code class="docutils literal notranslate"><span class="pre">[chr,</span> <span class="pre">start,</span> <span class="pre">end]</span></code>, where values in <code class="docutils literal notranslate"><span class="pre">chr</span></code> should match the descriptions in the FASTA file. We constrain the regions from which we sample to the regions in this file instead of the using the whole genome.</li>
@@ -831,7 +836,7 @@
 </div>
 </div>
 <div class="section" id="multiple-file-sampler">
-<span id="multiple-file-sampler"></span><h4>Multiple-file sampler<a class="headerlink" href="#multiple-file-sampler" title="Permalink to this headline">¶</a></h4>
+<h4>Multiple-file sampler<a class="headerlink" href="#multiple-file-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The multi-file sampler loads in the training, validation, and optionally, the testing dataset.  The configuration for this therefore asks that you fill in some keys with the function-type constructors of type <code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_samplers.FileSampler</span></code>. Please consult the following sections for information about these file samplers.</p>
 <p>An example configuration for the multiple-file sampler:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.MultiFileSampler</span> <span class="p p-Indicator">{</span>
@@ -851,8 +856,8 @@
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="parameters">
-<span id="id10"></span><h5>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id10">
+<h5>Parameters<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h5>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">train_sampler</span></code>: Load your training data from either a <code class="docutils literal notranslate"><span class="pre">.bed</span></code> file (<code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_sampler.BedFileSampler</span></code>) or <code class="docutils literal notranslate"><span class="pre">.mat</span></code> file (<code class="docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_sampler.MatFileSampler</span></code>).</li>
 <li><code class="docutils literal notranslate"><span class="pre">validate_sampler</span></code>: Sample as <code class="docutils literal notranslate"><span class="pre">train_sampler</span></code>.</li>
@@ -864,14 +869,14 @@
 </div>
 </div>
 <div class="section" id="important-note">
-<span id="important-note"></span><h3>Important note<a class="headerlink" href="#important-note" title="Permalink to this headline">¶</a></h3>
+<h3>Important note<a class="headerlink" href="#important-note" title="Permalink to this headline">¶</a></h3>
 <p>If you use any of these samplers (that is, samplers with multiple data partitions) with the <a class="reference external" href="#evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate_model</span></code> configuration</a>, please make sure that your <code class="docutils literal notranslate"><span class="pre">mode</span></code> is set to <code class="docutils literal notranslate"><span class="pre">test</span></code>.</p>
 </div>
 <div class="section" id="samplers-used-for-evaluation">
-<span id="samplers-used-for-evaluation"></span><h3>Samplers used for evaluation<a class="headerlink" href="#samplers-used-for-evaluation" title="Permalink to this headline">¶</a></h3>
+<h3>Samplers used for evaluation<a class="headerlink" href="#samplers-used-for-evaluation" title="Permalink to this headline">¶</a></h3>
 <p>You can use all the samplers specified for training for evaluation as well (see note above). Additionally, you can use single-file samplers, which we describe below.</p>
 <div class="section" id="bed-file-sampler">
-<span id="bed-file-sampler"></span><h4>BED file sampler<a class="headerlink" href="#bed-file-sampler" title="Permalink to this headline">¶</a></h4>
+<h4>BED file sampler<a class="headerlink" href="#bed-file-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The BED file sampler loads a dataset from a <code class="docutils literal notranslate"><span class="pre">.bed</span></code> file. This can be generated by one of the online samplers in Selene with the <code class="docutils literal notranslate"><span class="pre">save_dataset</span></code> parameter.</p>
 <p>An example configuration for a BED file sampler:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.BedFileSampler</span> <span class="p p-Indicator">{</span>
@@ -886,8 +891,8 @@
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="parameters">
-<span id="id11"></span><h5>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id11">
+<h5>Parameters<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h5>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">filepath</span></code>: Path to the BED file.</li>
 <li><code class="docutils literal notranslate"><span class="pre">reference_sequence</span></code>: Path to a reference sequence FASTA file we can query to create our data samples.</li>
@@ -899,7 +904,7 @@
 </div>
 </div>
 <div class="section" id="matrix-file-sampler">
-<span id="matrix-file-sampler"></span><h4>Matrix file sampler<a class="headerlink" href="#matrix-file-sampler" title="Permalink to this headline">¶</a></h4>
+<h4>Matrix file sampler<a class="headerlink" href="#matrix-file-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The matrix file sampler loads a dataset from a matrix file.</p>
 <p>An example configuration for a matrix file sampler:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">sampler</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.samplers.file_samplers.MatFileSampler</span> <span class="p p-Indicator">{</span>
@@ -914,8 +919,8 @@
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
-<div class="section" id="parameters">
-<span id="id12"></span><h5>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id12">
+<h5>Parameters<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h5>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">filepath</span></code>: The path to the file from which to load the data.</li>
 <li><code class="docutils literal notranslate"><span class="pre">sequence_key</span></code>: The key for the sequences data matrix.</li>
@@ -931,10 +936,10 @@
 </div>
 </div>
 <div class="section" id="examples-of-full-configuration-files">
-<span id="examples-of-full-configuration-files"></span><h2>Examples of full configuration files<a class="headerlink" href="#examples-of-full-configuration-files" title="Permalink to this headline">¶</a></h2>
+<h2>Examples of full configuration files<a class="headerlink" href="#examples-of-full-configuration-files" title="Permalink to this headline">¶</a></h2>
 <p>We do have a more comprehensive set of <a class="reference external" href="https://github.com/FunctionLab/selene/blob/master/config_examples">examples on our Github</a> that you can review. We reproduce a few of these in this document to show how you can put all of the different configuration components together to create a YAML file that can be run by Selene’s CLI:</p>
 <div class="section" id="training-using-intervals-sampler">
-<span id="training-using-intervals-sampler"></span><h3>Training (using intervals sampler)<a class="headerlink" href="#training-using-intervals-sampler" title="Permalink to this headline">¶</a></h3>
+<h3>Training (using intervals sampler)<a class="headerlink" href="#training-using-intervals-sampler" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">train</span><span class="p p-Indicator">,</span> <span class="nv">evaluate</span><span class="p p-Indicator">]</span>
 <span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
@@ -984,7 +989,7 @@
 </pre></div>
 </div>
 <div class="section" id="some-notes">
-<span id="some-notes"></span><h4>Some notes<a class="headerlink" href="#some-notes" title="Permalink to this headline">¶</a></h4>
+<h4>Some notes<a class="headerlink" href="#some-notes" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>Ordering of the keys does not matter.</li>
 <li>We included many of the optional keys in this configuration. You do not need to specify these if you want to use their default values.</li>
@@ -994,7 +999,7 @@
 </div>
 </div>
 <div class="section" id="evaluate-using-matrix-file-sampler">
-<span id="evaluate-using-matrix-file-sampler"></span><h3>Evaluate (using matrix file sampler)<a class="headerlink" href="#evaluate-using-matrix-file-sampler" title="Permalink to this headline">¶</a></h3>
+<h3>Evaluate (using matrix file sampler)<a class="headerlink" href="#evaluate-using-matrix-file-sampler" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nn">---</span>
 <span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">evaluate</span><span class="p p-Indicator">]</span>
 <span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
@@ -1033,15 +1038,15 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="some-notes">
-<span id="id13"></span><h3>Some notes<a class="headerlink" href="#some-notes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h3>Some notes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>For the matrix file sampler, we assume that you know ahead of time the shape of the data matrix. That is, which dimension is the batch dimension? Sequence? Alphabet (should be size 4 for DNA/RNA)? You must specify the keys that end in <code class="docutils literal notranslate"><span class="pre">axis</span></code> unless the shape of the sequences matrix is <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_alphabet,</span> <span class="pre">n_sequence_length)</span></code> and the shape of the targets matrix is <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_targets)</span></code>.</li>
 <li>In this case, since <code class="docutils literal notranslate"><span class="pre">create_subdirectory</span></code> is False, all outputs from evaluate are written to <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> directly (as opposed to being written in a timestamped subdirectory). Be careful of overwriting files.</li>
 </ul>
 </div>
 <div class="section" id="analyze-sequences-variant-effect-prediction">
-<span id="analyze-sequences-variant-effect-prediction"></span><h3>Analyze sequences (variant effect prediction)<a class="headerlink" href="#analyze-sequences-variant-effect-prediction" title="Permalink to this headline">¶</a></h3>
+<h3>Analyze sequences (variant effect prediction)<a class="headerlink" href="#analyze-sequences-variant-effect-prediction" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ops</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">analyze</span><span class="p p-Indicator">]</span>
 <span class="nt">model</span><span class="p">:</span> <span class="p p-Indicator">{</span>
 <span class="nt">    path</span><span class="p">:</span> <span class="nv">/absolute/path/to/model/architecture.py</span><span class="p p-Indicator">,</span>
@@ -1071,13 +1076,15 @@
         <span class="nv">/path/to/file2.vcf</span>
     <span class="p p-Indicator">],</span>
 <span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">,</span> <span class="nv">abs_diffs</span><span class="p p-Indicator">],</span>
-<span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predicts/dir</span>
+<span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predicts/dir</span><span class="p p-Indicator">,</span>
+<span class="nt">    output_format</span><span class="p">:</span> <span class="nv">tsv</span><span class="p p-Indicator">,</span>
+<span class="nt">    strand_index</span><span class="p">:</span> <span class="nv">9</span>
 <span class="p p-Indicator">}</span>
 <span class="nt">random_seed</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">123</span>
 </pre></div>
 </div>
-<div class="section" id="some-notes">
-<span id="id14"></span><h4>Some notes<a class="headerlink" href="#some-notes" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id14">
+<h4>Some notes<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li>We ask that in all <code class="docutils literal notranslate"><span class="pre">analyze</span></code> cases, you specify the <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> (when applicable) within the sub-operation dictionary. This is because only the sub-operation generates output, so there is no need to share this parameter across multiple configurations.</li>
 <li>In this variant effect prediction example, Selene will go through each VCF file and get the model predictions for each variant (ref and alt). <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code> must have the parameter <code class="docutils literal notranslate"><span class="pre">reference_sequence</span></code> so that Selene can create sequences centered at each variant position by querying the reference sequence file.</li>
@@ -1103,7 +1110,7 @@
         <a href="faq.html" class="btn btn-neutral float-right" title="FAQ and additional resources" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="tutorials.html" class="btn btn-neutral" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1129,26 +1136,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
+  
  
 
 
