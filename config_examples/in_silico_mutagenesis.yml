@@ -25,6 +25,8 @@ in_silico_mutagenesis: {
     ],
     save_data: ["logits", "predictions"],
     output_dir: /path/to/output_dir,
+    # select whether to use the sequence name (description above each sequence
+    # in the FASTA file) as part of the resulting output file
     use_sequence_name: False
 }
 random_seed: 123

@@ -11,8 +11,8 @@ model: {
 }
 sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
     filepath: /path/to/test.mat, 
-    sequence_key: testxdata,
-    targets_key: testdata,
+    sequence_key: sequences,
+    targets_key: targets,
     random_seed: 456,
     shuffle: False,
     sequence_batch_axis: 0,

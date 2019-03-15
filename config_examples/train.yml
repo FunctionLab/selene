@@ -19,7 +19,7 @@ sampler: !obj:selene_sdk.samplers.IntervalsSampler {
         input_path: /path/to/distinct_features.txt
     },
     intervals_path: /path/to/intervals.bed,
-    sample_negative: True,  # train on samples with no targets present
+    sample_negative: True,  # generate samples with no targets present
     seed: 127,
     test_holdout: [chr8, chr9],  # can also be proportional, e.g. 0.10
     validation_holdout: [chr6, chr7],  # can also be proportional, e.g. 0.10
