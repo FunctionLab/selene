@@ -26,7 +26,7 @@ Selene contains some Cython files. You can build these by running
 python setup.py build_ext --inplace
 ```
 
-Otherwise, if you would like to locally install Selene, you can run
+If you would like to locally install Selene, you can run
 ```sh
 python setup.py install
 ```
