@@ -341,6 +341,8 @@ Training requires a sampler that specifies the data for training, validation, an
 
 There are 2 kinds of samplers implemented in Selene right now: "online" samplers and file samplers. Online samplers generate data samples on-the-fly and require you to pass in a reference sequence FASTA file and a tabix-indexed BED file so that Selene can query for an input sequence and its associated biological classes using genomic coordinates. The file sampler we use supports loading different `.mat` or `.bed` files (can support more formats upon request) for the training, validation, and test sets. 
 
+For increased efficiency during the training of large models, we would recommend using the online sampler to create datasets (.bed or .mat) and then loading the generated data with a file sampler. We are actively working to incorporate PyTorch dataloaders and other improvements to data sampling into Selene to reduce the time and memory requirements of training. Feel free to contact us through our [Github issues](https://github.com/FunctionLab/selene/issues) if you have comments or want to contribute to this effort! 
+
 #### Random positions sampler
 The random positions sampler will construct data samples by randomly selecting a position in the genome and then using the sequence and classes centered at that position as the input and targets for the model to predict. 
 

@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                master (0.2.0)
+                master (0.3.0)
               </div>
             
           
@@ -741,6 +741,7 @@
 <h3>Samplers used for training (and evaluation, optionally)<a class="headerlink" href="#samplers-used-for-training-and-evaluation-optionally" title="Permalink to this headline">¶</a></h3>
 <p>Training requires a sampler that specifies the data for training, validation, and (optionally) testing. While Selene can directly evaluate a trained model on a test dataset when training is finished, it is not a required step and so the test dataset specification is also optional. Here, we provide examples for the samplers we have implemented that can be used for training.</p>
 <p>There are 2 kinds of samplers implemented in Selene right now: “online” samplers and file samplers. Online samplers generate data samples on-the-fly and require you to pass in a reference sequence FASTA file and a tabix-indexed BED file so that Selene can query for an input sequence and its associated biological classes using genomic coordinates. The file sampler we use supports loading different <code class="docutils literal notranslate"><span class="pre">.mat</span></code> or <code class="docutils literal notranslate"><span class="pre">.bed</span></code> files (can support more formats upon request) for the training, validation, and test sets.</p>
+<p>For increased efficiency during the training of large models, we would recommend using the online sampler to create datasets (.bed or .mat) and then loading the generated data with a file sampler. We are actively working to incorporate PyTorch dataloaders and other improvements to data sampling into Selene to reduce the time and memory requirements of training. Feel free to contact us through our <a class="reference external" href="https://github.com/FunctionLab/selene/issues">Github issues</a> if you have comments or want to contribute to this effort!</p>
 <div class="section" id="random-positions-sampler">
 <h4>Random positions sampler<a class="headerlink" href="#random-positions-sampler" title="Permalink to this headline">¶</a></h4>
 <p>The random positions sampler will construct data samples by randomly selecting a position in the genome and then using the sequence and classes centered at that position as the input and targets for the model to predict.</p>
