@@ -50,11 +50,11 @@ setup(name="selene-sdk",
             "data/*"
         ]
       },
-      classifiers=(
+      classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
         "Topic :: Scientific/Engineering :: Bio-Informatics"
-      ),
+      ],
       ext_modules=ext_modules,
       cmdclass=cmdclass,
       install_requires=[
