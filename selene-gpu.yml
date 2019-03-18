@@ -1,16 +1,15 @@
 name: selene-gpu
 channels:
-- soumith
+- pytorch
 - anaconda
 - bioconda
 - conda-forge
 - defaults
 dependencies:
-- cython=0.27.3
+- cython=0.29.3
 - docopt=0.6.2
 - h5py=2.9.0
 - pandas=0.20.3
-- pip=9.0.1
 - pyyaml=3.12
 - scikit-learn=0.19.0
 - scipy=1.1.0
@@ -18,18 +17,10 @@ dependencies:
 - pytabix=0.0.2
 - matplotlib=2.2.2
 - python=3.6.5
-- ipykernel=4.8.2
-- ipython=6.4.0
-- jupyter=1.0.0
 - numpy=1.15.1
 - plotly=2.7.0
-- cuda80=1.0
-- pytorch=0.4.1
-- pip:
-  - commonmark==0.5.4
-  - pyfaidx==0.5.3.1
-  - recommonmark==0.4.0
-  - seaborn==0.8.1
-  - sphinx-rtd-theme==0.4.0
-  - torch==0.4.1
-
+- cudatoolkit=10.0.130=0
+- pytorch=1.0.1=py3.6_cuda10.0.130_cudnn7.4.2_2
+- torchvision=0.2.2=py_3
+- pyfaidx=0.5.5.2
+- seaborn=0.8.1

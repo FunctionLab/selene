@@ -34,7 +34,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
-      version="0.2.0",
+      version="0.3.0",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
@@ -50,11 +50,11 @@ setup(name="selene-sdk",
             "data/*"
         ]
       },
-      classifiers=(
+      classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
         "Topic :: Scientific/Engineering :: Bio-Informatics"
-      ),
+      ],
       ext_modules=ext_modules,
       cmdclass=cmdclass,
       install_requires=[

@@ -6,8 +6,7 @@ model: {
     class_args: {
         arg1: val1,
         arg2: val2
-    },
-    non_strand_specific: mean
+    }
 }
 analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     trained_model_path: /path/to/trained/model.pth.tar,
@@ -17,6 +16,8 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
     },
     batch_size: 64,
     use_cuda: True,
+    # reference sequence version should match the VCF files, not
+    # necessarily the version with which the model was trained
     reference_sequence: !obj:selene_sdk.sequences.Genome {
         input_path: /path/to/reference_sequence.fa
     },
@@ -29,7 +30,10 @@ variant_effect_prediction: {
     ], 
     save_data: [predictions, abs_diffs],
     output_dir: /path/to/output/predicts/dir,
-    output_format: hdf5
+    output_format: hdf5,
+    # specifying a strand index implies that the model detects differences
+    # between sequences on the forward and the reverse strands
+    strand_index: 7
 }
 random_seed: 123
 ...

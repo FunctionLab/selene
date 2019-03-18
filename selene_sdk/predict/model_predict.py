@@ -2,7 +2,6 @@
 This module provides the `AnalyzeSequences` class and supporting
 methods.
 """
-import itertools
 import math
 import os
 import warnings
@@ -11,12 +10,18 @@ import numpy as np
 import pyfaidx
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 
-from ._variant_effect_prediction import read_vcf_file
+from ._common import _pad_sequence
+from ._common import _truncate_sequence
+from ._common import predict
+from ._in_silico_mutagenesis import _ism_sample_id
+from ._in_silico_mutagenesis import in_silico_mutagenesis_sequences
+from ._in_silico_mutagenesis import mutate_sequence
 from ._variant_effect_prediction import _handle_long_ref
 from ._variant_effect_prediction import _handle_standard_ref
+from ._variant_effect_prediction import _handle_ref_alt_predictions
 from ._variant_effect_prediction import _process_alts
+from ._variant_effect_prediction import read_vcf_file
 from .predict_handlers import AbsDiffScoreHandler
 from .predict_handlers import DiffScoreHandler
 from .predict_handlers import LogitScoreHandler
@@ -29,199 +34,6 @@ from ..utils import load_model_from_state_dict
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
 VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
-
-
-def in_silico_mutagenesis_sequences(sequence,
-                                    mutate_n_bases=1,
-                                    reference_sequence=Genome):
-    """
-    Creates a list containing each mutation that occurs from an
-    *in silico* mutagenesis across the whole sequence.
-
-    Please note that we have not parallelized this function yet, so
-    runtime increases exponentially when you increase `mutate_n_bases`.
-
-    Parameters
-    ----------
-    sequence : str
-        A string containing the sequence we would like to mutate.
-    mutate_n_bases : int, optional
-        Default is 1. The number of base changes to make with each set of
-        mutations evaluated, e.g. `mutate_n_bases = 2` considers all
-        pairs of SNPs.
-    reference_sequence : class, optional
-        Default is `selene_sdk.sequences.Genome`. The type of sequence
-        that has been passed in.
-
-    Returns
-    -------
-    list(list(tuple))
-        A list of all possible mutations. Each element in the list is
-        itself a list of tuples, e.g. element = [(0, 'T')] when only mutating
-        1 base at a time. Each tuple is the position to mutate and the base
-        with which we are replacing the reference base.
-
-        For a sequence of length 1000, mutating 1 base at a time means that
-        we return a list with length of 3000-4000, depending on the number of
-        unknown bases in the input sequences.
-
-    """
-    sequence_alts = []
-    for index, ref in enumerate(sequence):
-        alts = []
-        for base in reference_sequence.BASES_ARR:
-            if base == ref:
-                continue
-            alts.append(base)
-        sequence_alts.append(alts)
-    all_mutated_sequences = []
-    for indices in itertools.combinations(
-            range(len(sequence)), mutate_n_bases):
-        pos_mutations = []
-        for i in indices:
-            pos_mutations.append(sequence_alts[i])
-        for mutations in itertools.product(*pos_mutations):
-            all_mutated_sequences.append(list(zip(indices, mutations)))
-    return all_mutated_sequences
-
-
-def _ism_sample_id(sequence, mutation_information):
-    """
-    TODO
-
-    Parameters
-    ----------
-    sequence : str
-        The input sequence to mutate.
-    mutation_information : list(tuple)
-        TODO
-
-    Returns
-    -------
-    TODO
-        TODO
-
-    """
-    positions = []
-    refs = []
-    alts = []
-    for (position, alt) in mutation_information:
-        positions.append(str(position))
-        refs.append(sequence[position])
-        alts.append(alt)
-    return (';'.join(positions), ';'.join(refs), ';'.join(alts))
-
-
-def mutate_sequence(encoding,
-                    mutation_information,
-                    reference_sequence=Genome):
-    """
-    Transforms a sequence with a set of mutations.
-
-    Parameters
-    ----------
-    encoding : numpy.ndarray
-        An :math:`L \\times N` array (where :math:`L` is the sequence's
-        length and :math:`N` is the size of the sequence type's
-        alphabet) holding the one-hot encoding of the
-        reference sequence.
-    mutation_information : list(tuple)
-        List of tuples of (`int`, `str`). Each tuple is the position to
-        mutate and the base to which to mutate that position in the
-        sequence.
-    reference_sequence : class, optional
-        Default is `selene_sdk.sequences.Genome`. A reference sequence
-        from which to retrieve smaller sequences..
-
-    Returns
-    -------
-    numpy.ndarray
-        An :math:`L \\times N` array holding the one-hot encoding of
-        the mutated sequence.
-
-    """
-    mutated_seq = np.copy(encoding)
-    for (position, alt) in mutation_information:
-        replace_base = reference_sequence.BASE_TO_INDEX[alt]
-        mutated_seq[position, :] = 0
-        mutated_seq[position, replace_base] = 1
-    return mutated_seq
-
-
-def predict(model, batch_sequences, use_cuda=False):
-    """
-    Return model predictions for a batch of sequences.
-
-    Parameters
-    ----------
-    model : torch.nn.Sequential
-    batch_sequences : numpy.ndarray
-        `batch_sequences` has the shape :math:`B \\times L \\times N`,
-        where :math:`B` is `batch_size`, :math:`L` is the sequence length,
-        :math:`N` is the size of the sequence type's alphabet.
-    use_cuda : bool, optional
-        Default is False.
-
-    Returns
-    -------
-    numpy.ndarray
-        The model predictions of shape :math:`B \\times F`, where :math:`F`
-        is the number of features (classes) the model predicts.
-
-    """
-    inputs = torch.Tensor(batch_sequences)
-    if use_cuda:
-        inputs = inputs.cuda()
-    with torch.no_grad():
-        inputs = Variable(inputs)
-        inputs = inputs.transpose(1, 2).unsqueeze_(2)
-        outputs = model.forward(inputs)
-        return outputs.data.cpu().numpy()
-
-
-def _handle_ref_alt_predictions(model,
-                                batch_ref_seqs,
-                                batch_alt_seqs,
-                                batch_ids,
-                                reporters,
-                                warn=False,
-                                use_cuda=False):
-    """
-    Helper method for variant effect prediction. Gets the model
-    predictions and updates the reporters.
-
-    Parameters
-    ----------
-    batch_ref_seqs : list(np.ndarray)
-        One-hot encoded sequences with the ref base(s).
-    batch_alt_seqs : list(np.ndarray)
-        One-hot encoded sequences with the alt base(s).
-    reporters : list(PredictionsHandler)
-        List of prediction handlers.
-    warn : bool
-        Whether a warning was raised or not. If `warn`, directs handlers
-        to divert the predictions/scores to different files
-        (filename prefixed by 'warning.') so that users
-        know that Selene detected an issue with these variants.
-
-    Returns
-    -------
-    None
-
-    """
-    batch_ref_seqs = np.array(batch_ref_seqs)
-    batch_alt_seqs = np.array(batch_alt_seqs)
-    ref_outputs = predict(model, batch_ref_seqs, use_cuda=use_cuda)
-    alt_outputs = predict(model, batch_alt_seqs, use_cuda=use_cuda)
-    for r in reporters:
-        if r.needs_base_pred and warn:
-            r.handle_warning(alt_outputs, batch_ids, ref_outputs)
-        elif r.needs_base_pred:
-            r.handle_batch_predictions(alt_outputs, batch_ids, ref_outputs)
-        elif warn:
-            r.handle_warning(alt_outputs, batch_ids)
-        else:
-            r.handle_batch_predictions(alt_outputs, batch_ids)
 
 
 class AnalyzeSequences(object):
@@ -405,20 +217,6 @@ class AnalyzeSequences(object):
             reporters.append(WriteRefAltHandler(*constructor_args))
         return reporters
 
-    def _pad_sequence(self, sequence):
-        diff = (self.sequence_length - len(sequence)) / 2
-        pad_l = int(np.floor(diff))
-        pad_r = math.ceil(diff)
-        sequence = ((self.reference_sequence.UNK_BASE * pad_l) +
-                    sequence +
-                    (self.reference_sequence.UNK_BASE * pad_r))
-        return str.upper(sequence)
-
-    def _truncate_sequence(self, sequence):
-        start = int((len(sequence) - self.sequence_length) // 2)
-        end = int(start + self.sequence_length)
-        return str.upper(sequence[start:end])
-
     def get_predictions_for_fasta_file(self,
                                        input_path,
                                        output_dir,
@@ -481,9 +279,11 @@ class AnalyzeSequences(object):
             cur_sequence = str(fasta_record)
 
             if len(cur_sequence) < self.sequence_length:
-                cur_sequence = self._pad_sequence(cur_sequence)
+                cur_sequence = _pad_sequence(cur_sequence,
+                                             self.sequence_length,
+                                             self.reference_sequence.UNK_BASE)
             elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = self._truncate_sequence(cur_sequence)
+                cur_sequence = _truncate_sequence(cur_sequence, self._sequence_length)
 
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
@@ -683,9 +483,12 @@ class AnalyzeSequences(object):
         for i, fasta_record in enumerate(fasta_file):
             cur_sequence = str.upper(str(fasta_record))
             if len(cur_sequence) < self.sequence_length:
-                cur_sequence = self._pad_sequence(cur_sequence)
+                cur_sequence = _pad_sequence(cur_sequence,
+                                             self.sequence_length,
+                                             self.reference_sequence.UNK_BASE)
             elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = self._truncate_sequence(cur_sequence)
+                cur_sequence = _truncate_sequence(
+                    cur_sequence, self.sequence_length)
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
@@ -762,6 +565,9 @@ class AnalyzeSequences(object):
                   its predictions) and the matrix rows are the sequences.
                   Note that the row labels (chrom, pos, id, ref, alt) will be
                   output as a separate .txt file.
+        strand_index : int or None, optional.
+            Default is None. If applicable, specify the column index (0-based)
+            in the VCF file that contains strand information for each variant.
 
         Returns
         -------
@@ -781,7 +587,7 @@ class AnalyzeSequences(object):
             did not show up in the reference genome FASTA file.
 
         """
-        variants = read_vcf_file(vcf_file)
+        variants = read_vcf_file(vcf_file, strand_index=strand_index)
 
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
@@ -824,19 +630,30 @@ class AnalyzeSequences(object):
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             all_alts = alt.split(',')
             alt_encodings = _process_alts(
-                all_alts, ref, chrom, pos, center, strand,
-                self._start_radius, self._end_radius, self.reference_sequence)
+                all_alts,
+                ref,
+                chrom,
+                pos,
+                center,
+                strand,
+                self._start_radius,
+                self._end_radius,
+                self.reference_sequence)
 
             match = True
             seq_at_ref = None
             if len(ref) < self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_standard_ref(
-                    ref_encoding, seq_encoding,
-                    self._start_radius, self.reference_sequence)
+                    ref_encoding,
+                    seq_encoding,
+                    self._start_radius,
+                    self.reference_sequence)
             else:
                 match, seq_encoding, seq_at_ref = _handle_long_ref(
-                    ref_encoding, seq_encoding,
-                    self._start_radius, self._end_radius,
+                    ref_encoding,
+                    seq_encoding,
+                    self._start_radius,
+                    self._end_radius,
                     self.reference_sequence)
             if not match:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}), "

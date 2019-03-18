@@ -156,7 +156,7 @@ class DiffScoreHandler(PredictionsHandler):
             features).
 
         """
-        diffs = baseline_predictions - batch_predictions
+        diffs = batch_predictions - baseline_predictions
         self._results.append(diffs)
         self._samples.append(batch_ids)
         if self._reached_mem_limit():

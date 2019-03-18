@@ -305,12 +305,13 @@ def parse_configs_and_run(configs,
               "({0}, not {1}).".format(lr, configs["lr"]))
 
     current_run_output_dir = None
-    if "output_dir" not in configs:
+    if "output_dir" not in configs and \
+            ("train" in operations or "evaluate" in operations):
         print("No top-level output directory specified. All constructors "
               "to be initialized (e.g. Sampler, TrainModel) that require "
               "this parameter must have it specified in their individual "
               "parameter configuration.")
-    else:
+    elif "output_dir" in configs:
         current_run_output_dir = configs["output_dir"]
         os.makedirs(current_run_output_dir, exist_ok=True)
         if "create_subdirectory" in configs:

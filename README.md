@@ -32,7 +32,7 @@ Selene contains some Cython files. You can build these by running
 python setup.py build_ext --inplace
 ```
 
-Otherwise, if you would like to locally install Selene, you can run
+If you would like to locally install Selene, you can run
 ```sh
 python setup.py install
 ```
@@ -67,8 +67,10 @@ In the case studies, we demonstrate more complex use cases (e.g. training on muc
 Further, we show how you can use the outputs of variant effect prediction in a subsequent statistical analysis (case 3).
 These examples reflect how we most often use Selene in our own projects, whereas the Jupyter notebooks survey the many different ways and contexts in which we can use Selene.
 
-In general, we recommend that the examples be run on a machine with a CUDA-enabled GPU. All examples take significantly longer when run on a CPU machine.
+We recommend that the examples be run on a machine with a CUDA-enabled GPU. All examples take significantly longer when run on a CPU machine.
 (See the following sections for time estimates.)
+
+**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) may not be compatible with the newer version of PyTorch. If you have trouble using one of our trained models on a CUDA-enabled GPU, it may be the result of differences in PyTorch or CUDA toolkit versions.  
 
 ### Tutorials
 
