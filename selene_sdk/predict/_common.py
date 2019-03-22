@@ -37,7 +37,7 @@ def predict(model, batch_sequences, use_cuda=False):
         inputs = inputs.cuda()
     with torch.no_grad():
         inputs = Variable(inputs)
-        outputs = model.forward(inputs.transpose(1, 2))
+        outputs = model.forward(inputs.transpose(1, 2).unsqueeze_(2))
         return outputs.data.cpu().numpy()
 
 
