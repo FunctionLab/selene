@@ -8,6 +8,7 @@ http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
 """
 import os
 import re
+import inspect
 import warnings
 import yaml
 import six
@@ -208,6 +209,17 @@ def _preprocess(string, environ=None):
     return rval
 
 
+def class_instantiate(classobj):
+    for attr, obj in classobj.__dict__.items():
+        is_module = getattr(obj, '__module__', None)
+        if is_module and attr != 'model':
+            print(is_module)
+            print(obj)
+            print(obj.__dict__)
+            class_instantiate(obj)
+    classobj.__init__(**classobj.__dict__)
+
+
 def instantiate(proxy, bindings=None):
     """Instantiate a hierarchy of proxy objects.
 
@@ -293,8 +305,7 @@ def load(stream, environ=None, instantiate=True, **kwargs):
         string = stream
     else:
         string = stream.read()
-
-    proxy_graph = yaml.load(string, **kwargs)
+    proxy_graph = yaml.load(string, Loader=yaml.UnsafeLoader, **kwargs)
     if instantiate:
         return instantiate(proxy_graph)
     else:

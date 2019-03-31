@@ -152,6 +152,7 @@ class AnalyzeSequences(object):
         self.reference_sequence = reference_sequence
 
         self._write_mem_limit = write_mem_limit
+        print(self._write_mem_limit)
 
     def _initialize_reporters(self,
                               save_data,

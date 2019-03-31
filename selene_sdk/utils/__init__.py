@@ -14,6 +14,7 @@ from .performance_metrics import visualize_roc_curves
 from .performance_metrics import visualize_precision_recall_curves
 from .config import load
 from .config import load_path
+from .config import class_instantiate
 from .config import instantiate
 from .config_utils import initialize_model
 from .config_utils import execute
@@ -27,6 +28,7 @@ __all__ = ["initialize_logger",
            "PerformanceMetrics",
            "load",
            "load_path",
+           "class_instantiate",
            "instantiate",
            "get_indices_and_probabilities",
            "visualize_roc_curves",
