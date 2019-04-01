@@ -606,7 +606,7 @@
                                              <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">UNK_BASE</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_sequence</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
-                <span class="n">cur_sequence</span> <span class="o">=</span> <span class="n">_truncate_sequence</span><span class="p">(</span><span class="n">cur_sequence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence_length</span><span class="p">)</span>
+                <span class="n">cur_sequence</span> <span class="o">=</span> <span class="n">_truncate_sequence</span><span class="p">(</span><span class="n">cur_sequence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
 
             <span class="n">cur_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">)</span>
