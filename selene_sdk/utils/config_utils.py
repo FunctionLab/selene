@@ -156,27 +156,25 @@ def execute(operations, configs, output_dir):
 
             sampler_info = configs["sampler"]
             if output_dir is not None:
-                sampler_info.bind(output_dir=output_dir)
+                sampler_info.output_dir = output_dir
+
+            #class_instantiate(sampler_info)
 
             train_model_info = configs["train_model"]
-
-            data_sampler = class_instantiate(sampler_info)
-
-            train_model_info.bind(
-                model=model,
-                data_sampler=data_sampler,
-                loss_criterion=loss,
-                optimizer_class=optim,
-                optimizer_kwargs=optim_kwargs)
+            train_model_info.model = model
+            train_model_info.data_sampler = sampler_info
+            train_model_info.loss_criterion = loss
+            train_model_info.optimizer_class = optim
+            train_model_info.optimizer_kwargs = optim_kwargs
             if output_dir is not None:
-                train_model_info.bind(output_dir=output_dir)
+                train_model_info.output_dir = output_dir
 
-            trainer = class_instantiate(train_model_info)
+            class_instantiate(train_model_info)
             # TODO: will find a better way to handle this in the future
             if "load_test_set" in configs and configs["load_test_set"] and \
                     "evaluate" in operations:
-                trainer.create_test_set()
-            trainer.train_and_validate()
+                train_model_info.create_test_set()
+            train_model_info.train_and_validate()
 
         elif op == "evaluate":
             if trainer is not None:

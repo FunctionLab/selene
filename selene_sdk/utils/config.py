@@ -210,13 +210,14 @@ def _preprocess(string, environ=None):
 
 
 def class_instantiate(classobj):
+    print("toplevel", classobj)
     for attr, obj in classobj.__dict__.items():
         is_module = getattr(obj, '__module__', None)
-        if is_module and attr != 'model':
-            print(is_module)
-            print(obj)
+        if is_module and "selene_sdk" in is_module and attr is not "model":
+            print(attr, is_module, obj)
             print(obj.__dict__)
             class_instantiate(obj)
+    print("try to initialize", classobj.__dict__.keys())
     classobj.__init__(**classobj.__dict__)
 
 
