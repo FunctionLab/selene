@@ -283,7 +283,7 @@ class AnalyzeSequences(object):
                                              self.sequence_length,
                                              self.reference_sequence.UNK_BASE)
             elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = _truncate_sequence(cur_sequence, self._sequence_length)
+                cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
 
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
