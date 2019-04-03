@@ -210,14 +210,10 @@ def _preprocess(string, environ=None):
 
 
 def class_instantiate(classobj):
-    print("toplevel", classobj)
     for attr, obj in classobj.__dict__.items():
         is_module = getattr(obj, '__module__', None)
         if is_module and "selene_sdk" in is_module and attr is not "model":
-            print(attr, is_module, obj)
-            print(obj.__dict__)
             class_instantiate(obj)
-    print("try to initialize", classobj.__dict__.keys())
     classobj.__init__(**classobj.__dict__)
 
 
@@ -306,11 +302,7 @@ def load(stream, environ=None, instantiate=True, **kwargs):
         string = stream
     else:
         string = stream.read()
-    proxy_graph = yaml.load(string, Loader=yaml.UnsafeLoader, **kwargs)
-    if instantiate:
-        return instantiate(proxy_graph)
-    else:
-        return proxy_graph
+    return yaml.load(string, Loader=yaml.UnsafeLoader, **kwargs)
 
 
 def load_path(path, environ=None, instantiate=False, **kwargs):

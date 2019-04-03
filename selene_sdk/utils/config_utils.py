@@ -11,7 +11,13 @@ import types
 
 import torch
 
-from . import class_instantiate
+
+def class_instantiate(classobj):
+    for attr, obj in classobj.__dict__.items():
+        is_module = getattr(obj, '__module__', None)
+        if is_module and "selene_sdk" in is_module and attr is not "model":
+            class_instantiate(obj)
+    classobj.__init__(**classobj.__dict__)
 
 
 def module_from_file(path):
@@ -158,8 +164,6 @@ def execute(operations, configs, output_dir):
             if output_dir is not None:
                 sampler_info.output_dir = output_dir
 
-            #class_instantiate(sampler_info)
-
             train_model_info = configs["train_model"]
             train_model_info.model = model
             train_model_info.data_sampler = sampler_info
@@ -188,15 +192,14 @@ def execute(operations, configs, output_dir):
 
                 evaluate_model_info = configs["evaluate_model"]
 
-                data_sampler = class_instantiate(sampler_info)
-                evaluate_model_info.bind(
-                    model=model,
-                    criterion=loss,
-                    data_sampler=data_sampler)
+                evaluate_model_info.model = model
+                evaluate_model_info.criterion = loss
+                evaluate_model_info.data_sampler = sampler_info
                 if output_dir is not None:
-                    evaluate_model_info.bind(output_dir=output_dir)
-                evaluator = class_instantiate(evaluate_model_info)
-                evaluator.evaluate()
+                    evaluate_model_info.output_dir = output_dir
+
+                class_instantiate(evaluate_model_info)
+                evaluate_model_info.evaluate()
 
         elif op == "analyze":
             if not model:
@@ -205,15 +208,8 @@ def execute(operations, configs, output_dir):
 
             analyze_seqs_info = configs["analyze_sequences"]
             analyze_seqs_info.model = model
-            #analyze_seqs_info.bind(model=model)
             class_instantiate(analyze_seqs_info)
             analyze_seqs = analyze_seqs_info
-            #analyze_seqs = analyze_seqs_info
-            #print(type(analyze_seqs))
-            #print(analyze_seqs.__dict__)
-            #analyze_seqs.__init__(**analyze_seqs.__dict__)
-            #print(analyze_seqs.dir())
-            #print(analyze_seqs._write_mem_limit)
             if "variant_effect_prediction" in configs:
                 vareff_info = configs["variant_effect_prediction"]
                 if "vcf_files" not in vareff_info:
