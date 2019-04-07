@@ -10,7 +10,7 @@ class SamplerDataset(data.Dataset):
         super(SamplerDataset, self).__init__()
         self.sampler = sampler
         self.size = size
-    
+
     def __getitem__(self, index):
         sequences, targets = self.sampler.sample(batch_size=1 if isinstance(index, int) else len(index))
         if sequences.shape[0]==1:
@@ -20,22 +20,26 @@ class SamplerDataset(data.Dataset):
     
     def __len__(self):
         return self.size
-    
 
 class SamplerDataLoader(DataLoader):
     def __init__(self,
                  sampler,
                  num_workers=1,
                  batch_size=1,
-                 size=sys.maxsize):
-         args = {
-             "batch_size": batch_size,
-             "num_workers": num_workers,
-             "pin_memory": True,
-             }
-         super(SamplerDataLoader, self).__init__(SamplerDataset(sampler, size=size),**args)
-    
+                 size=sys.maxsize,
+                 seed=436):
+                 
+        def worker_init_fn(worker_id):
+            np.random.seed(seed + worker_id)
+
+        args = {
+            "batch_size": batch_size,
+            "num_workers": num_workers,
+            "pin_memory": True,
+            "worker_init_fn": worker_init_fn
+            }
+        super(SamplerDataLoader, self).__init__(SamplerDataset(sampler, size=size),**args)
+
     def get_data_and_targets(self, batch_size, n_samples=None):
        return self.dataset.get_data_and_targets( batch_size, n_samples=n_samples)
-    
-    
+

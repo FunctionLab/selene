@@ -159,14 +159,23 @@ class RandomPositionsSampler(OnlineSampler):
 
         self.sample_from_intervals = []
         self.interval_lengths = []
+        self.initialized = False
 
-        if self._holdout_type == "chromosome":
-            self._partition_genome_by_chromosome()
-        else:
-            self._partition_genome_by_proportion()
+    def init(func):
+        #delay initlization to allow  multiprocessing
+        def dfunc(self, *args, **kwargs):
+            if not self.initialized:
+                if self._holdout_type == "chromosome":
+                    self._partition_genome_by_chromosome()
+                else:
+                     self._partition_genome_by_proportion()
 
-        for mode in self.modes:
-            self._update_randcache(mode=mode)
+                for mode in self.modes:
+                    self._update_randcache(mode=mode)
+                self.initialized = True
+            return func(self, *args, **kwargs)
+        return dfunc
+
 
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
@@ -292,6 +301,7 @@ class RandomPositionsSampler(OnlineSampler):
             p=self._sample_from_mode[mode].weights)
         self._randcache[mode]["sample_next"] = 0
 
+    @init
     def sample(self, batch_size=1):
         """
         Randomly draws a mini-batch of examples and their corresponding
