@@ -57,6 +57,8 @@ def read_vcf_file(input_path, strand_index=None):
             pos = int(cols[1])
             name = cols[2]
             ref = cols[3]
+            if ref == '-':
+                ref = ""
             alt = cols[4]
             strand = '+'
             if strand_index is not None and cols[strand_index] == '-':
@@ -110,7 +112,7 @@ def _process_alts(all_alts,
     """
     alt_encodings = []
     for a in all_alts:
-        if a == '*':   # indicates a deletion
+        if a == '*' or a == '-':   # indicates a deletion
             a = ''
         ref_len = len(ref)
         alt_len = len(a)

@@ -642,13 +642,13 @@ class AnalyzeSequences(object):
 
             match = True
             seq_at_ref = None
-            if len(ref) < self.sequence_length:
+            if len(ref) and len(ref) < self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_standard_ref(
                     ref_encoding,
                     seq_encoding,
                     self._start_radius,
                     self.reference_sequence)
-            else:
+            elif len(ref) >= self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_long_ref(
                     ref_encoding,
                     seq_encoding,
