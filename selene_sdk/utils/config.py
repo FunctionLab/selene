@@ -302,7 +302,7 @@ def load(stream, environ=None, instantiate=True, **kwargs):
         string = stream
     else:
         string = stream.read()
-    return yaml.load(string, Loader=yaml.UnsafeLoader, **kwargs)
+    return yaml.load(string, Loader=yaml.SafeLoader, **kwargs)
 
 
 def load_path(path, environ=None, instantiate=False, **kwargs):
@@ -428,11 +428,16 @@ def _initialize():
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
     """
     global IS_INITIALIZED
-    yaml.add_multi_constructor("!obj:", _multi_constructor_obj)
-    yaml.add_multi_constructor("!import:", _multi_constructor_import)
+    print("initialize")
+    yaml.add_multi_constructor(
+        "!obj:", _multi_constructor_obj, Loader=yaml.SafeLoader)
+    yaml.add_multi_constructor(
+        "!import:", _multi_constructor_import, Loader=yaml.SafeLoader)
 
-    yaml.add_constructor("!import", _constructor_import)
-    yaml.add_constructor("!float", _constructor_float)
+    yaml.add_constructor(
+        "!import", _constructor_import, Loader=yaml.SafeLoader)
+    yaml.add_constructor(
+        "!float", _constructor_float, Loader=yaml.SafeLoader)
 
     pattern = re.compile(SCIENTIFIC_NOTATION_REGEXP)
     yaml.add_implicit_resolver("!float",  pattern)
