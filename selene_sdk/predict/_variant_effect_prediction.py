@@ -129,6 +129,8 @@ def _process_alts(all_alts,
             sequence = reference_sequence.get_sequence_from_coords(
                 chrom, start_pos, end_pos, strand=strand)
             remove_ref_start = start_radius - ref_len // 2 - 1
+            if len(a) and strand == '-':
+                a = reference_sequence.COMPLEMENTARY_BASE_DICT[a]
             sequence = (sequence[:remove_ref_start] +
                         a +
                         sequence[remove_ref_start + ref_len:])
@@ -145,6 +147,8 @@ def _process_alts(all_alts,
                 pos - 1 + len(ref) + end_radius - math.ceil(alt_len / 2.),
                 strand=strand,
                 pad=True)
+            if len(a) and strand == '-':
+                a = reference_sequence.COMPLEMENTARY_BASE_DICT[a]
             sequence = seq_lhs + a + seq_rhs
         alt_encoding = reference_sequence.sequence_to_encoding(
             sequence)

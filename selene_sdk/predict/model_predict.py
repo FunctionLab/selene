@@ -33,7 +33,7 @@ from ..utils import load_model_from_state_dict
 
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
-VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
+VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand"]
 
 
 class AnalyzeSequences(object):
@@ -628,6 +628,9 @@ class AnalyzeSequences(object):
                 strand = '+'
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end, strand=strand)
+
+            if len(ref) and strand == '-':
+                ref = self.reference_sequence.COMPLEMENTARY_BASE_DICT[ref]
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             all_alts = alt.split(',')
             alt_encodings = _process_alts(
@@ -665,7 +668,7 @@ class AnalyzeSequences(object):
                               "sequence--will be written to files where the "
                               "filename is prefixed by 'warning.'".format(
                                   chrom, pos, name, ref, alt, seq_at_ref))
-                warn_batch_ids = [(chrom, pos, name, ref, a) for a in all_alts]
+                warn_batch_ids = [(chrom, pos, name, ref, a, strand) for a in all_alts]
                 warn_ref_seqs = [seq_encoding] * len(all_alts)
                 _handle_ref_alt_predictions(
                     self.model,
@@ -677,7 +680,7 @@ class AnalyzeSequences(object):
                     use_cuda=self.use_cuda)
                 continue
 
-            batch_ids += [(chrom, pos, name, ref, a) for a in all_alts]
+            batch_ids += [(chrom, pos, name, ref, a, strand) for a in all_alts]
             batch_ref_seqs += [seq_encoding] * len(all_alts)
             batch_alt_seqs += alt_encodings
 
