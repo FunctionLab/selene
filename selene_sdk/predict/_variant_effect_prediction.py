@@ -60,9 +60,13 @@ def read_vcf_file(input_path, strand_index=None):
             if ref == '-':
                 ref = ""
             alt = cols[4]
-            strand = '+'
+            strand = '.'
             if strand_index is not None and cols[strand_index] == '-':
                 strand = '-'
+            elif strand_index is not None and cols[strand_index] == '+':
+                strand = '+'
+            else:
+                continue
             variants.append((chrom, pos, name, ref, alt, strand))
     return variants
 

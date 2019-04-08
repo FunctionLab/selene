@@ -624,7 +624,8 @@ class AnalyzeSequences(object):
                 for r in reporters:
                     r.handle_NA((chrom, pos, name, ref, alt, strand))
                 continue
-
+            if strand == '.':
+                strand = '+'
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end, strand=strand)
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
