@@ -8,6 +8,15 @@ import torch
 from torch.autograd import Variable
 
 
+def get_reverse_complement(allele, reference_sequence):
+    if allele == '*' or allele == '-' or len(allele) == 0:
+        return '*'
+    a_complement = []
+    for a in allele:
+        c = reference_sequence.COMPLEMENTARY_BASE_DICT[a]
+        a_complement.append(c)
+    return ''.join(list(reversed(a_complement)))
+
 
 def predict(model, batch_sequences, use_cuda=False):
     """

@@ -13,6 +13,7 @@ import torch.nn as nn
 
 from ._common import _pad_sequence
 from ._common import _truncate_sequence
+from ._common import get_reverse_complement
 from ._common import predict
 from ._in_silico_mutagenesis import _ism_sample_id
 from ._in_silico_mutagenesis import in_silico_mutagenesis_sequences
@@ -588,7 +589,6 @@ class AnalyzeSequences(object):
 
         """
         variants = read_vcf_file(vcf_file, strand_index=strand_index)
-
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
         output_path_prefix = '.'.join(filename.split('.')[:-1])
@@ -615,8 +615,10 @@ class AnalyzeSequences(object):
             end = center + self._end_radius
 
             if isinstance(self.reference_sequence, Genome):
-                if "chr" not in chrom:
+                if "chr" not in chrom and "CHR" != chrom[:3]:
                     chrom = "chr" + chrom
+                elif "chr" not in chrom and "CHR" == chrom[:3]:
+                    chrom = "chr" + chrom[3:]
                 if "MT" in chrom:
                     chrom = chrom[:-1]
 
@@ -630,7 +632,11 @@ class AnalyzeSequences(object):
                 chrom, start, end, strand=strand)
 
             if len(ref) and strand == '-':
-                ref = self.reference_sequence.COMPLEMENTARY_BASE_DICT[ref]
+                ref = get_reverse_complement(ref, self.reference_sequence)
+                alt = ','.join(
+                    [get_reverse_complement(a, self.reference_sequence)
+                     for a in alt.split(',')])
+
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             all_alts = alt.split(',')
             alt_encodings = _process_alts(
@@ -660,14 +666,14 @@ class AnalyzeSequences(object):
                     self._end_radius,
                     self.reference_sequence)
             if not match:
-                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}), "
+                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
                               "reference does not match the reference genome. "
-                              "Reference genome contains {5} instead. "
+                              "Reference genome contains {6} instead. "
                               "Predictions/scores associated with this "
                               "variant--where we use '{3}' in the input "
                               "sequence--will be written to files where the "
                               "filename is prefixed by 'warning.'".format(
-                                  chrom, pos, name, ref, alt, seq_at_ref))
+                                  chrom, pos, name, ref, alt, strand, seq_at_ref))
                 warn_batch_ids = [(chrom, pos, name, ref, a, strand) for a in all_alts]
                 warn_ref_seqs = [seq_encoding] * len(all_alts)
                 _handle_ref_alt_predictions(
