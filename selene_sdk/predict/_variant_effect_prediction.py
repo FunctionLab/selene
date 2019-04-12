@@ -201,7 +201,6 @@ def _handle_ref_alt_predictions(model,
                                 batch_alt_seqs,
                                 batch_ids,
                                 reporters,
-                                warn=False,
                                 use_cuda=False):
     """
     Helper method for variant effect prediction. Gets the model
@@ -237,11 +236,7 @@ def _handle_ref_alt_predictions(model,
     ref_outputs = predict(model, batch_ref_seqs, use_cuda=use_cuda)
     alt_outputs = predict(model, batch_alt_seqs, use_cuda=use_cuda)
     for r in reporters:
-        if r.needs_base_pred and warn:
-            r.handle_warning(alt_outputs, batch_ids, ref_outputs)
-        elif r.needs_base_pred:
+        if r.needs_base_pred:
             r.handle_batch_predictions(alt_outputs, batch_ids, ref_outputs)
-        elif warn:
-            r.handle_warning(alt_outputs, batch_ids)
         else:
             r.handle_batch_predictions(alt_outputs, batch_ids)

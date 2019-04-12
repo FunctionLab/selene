@@ -34,7 +34,7 @@ from ..utils import load_model_from_state_dict
 
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
-VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand"]
+VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand", "ref_match"]
 
 
 class AnalyzeSequences(object):
@@ -676,7 +676,7 @@ class AnalyzeSequences(object):
                               "sequence--will be written to files where the "
                               "filename is prefixed by 'warning.'".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
-                warn_batch_ids = [(chrom, pos, name, ref, a, strand) for a in all_alts]
+                warn_batch_ids = [(chrom, pos, name, ref, a, strand, False) for a in all_alts]
                 warn_ref_seqs = [seq_encoding] * len(all_alts)
                 _handle_ref_alt_predictions(
                     self.model,
@@ -684,11 +684,10 @@ class AnalyzeSequences(object):
                     alt_encodings,
                     warn_batch_ids,
                     reporters,
-                    warn=True,
                     use_cuda=self.use_cuda)
                 continue
 
-            batch_ids += [(chrom, pos, name, ref, a, strand) for a in all_alts]
+            batch_ids += [(chrom, pos, name, ref, a, strand, True) for a in all_alts]
             batch_ref_seqs += [seq_encoding] * len(all_alts)
             batch_alt_seqs += alt_encodings
 
@@ -699,7 +698,6 @@ class AnalyzeSequences(object):
                     batch_alt_seqs,
                     batch_ids,
                     reporters,
-                    warn=False,
                     use_cuda=self.use_cuda)
                 batch_ref_seqs = []
                 batch_alt_seqs = []
@@ -712,7 +710,6 @@ class AnalyzeSequences(object):
                 batch_alt_seqs,
                 batch_ids,
                 reporters,
-                warn=False,
                 use_cuda=self.use_cuda)
 
         for r in reporters:

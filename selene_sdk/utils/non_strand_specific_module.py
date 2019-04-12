@@ -58,7 +58,7 @@ class NonStrandSpecific(Module):
 
     def forward(self, input):
         reverse_input = _flip(
-            _flip(torch.squeeze(input), 1), 2)
+            _flip(torch.squeeze(input, 2), 1), 2)
 
         output = self.model.forward(input)
         output_from_rev = self.model.forward(
