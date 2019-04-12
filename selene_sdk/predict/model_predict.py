@@ -657,14 +657,16 @@ class AnalyzeSequences(object):
                     ref_encoding,
                     seq_encoding,
                     self._start_radius,
-                    self.reference_sequence)
+                    self.reference_sequence,
+                    reverse=(strand == '-'))
             elif len(ref) >= self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_long_ref(
                     ref_encoding,
                     seq_encoding,
                     self._start_radius,
                     self._end_radius,
-                    self.reference_sequence)
+                    self.reference_sequence,
+                    reverse=(strand == '-'))
             if not match:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
                               "reference does not match the reference genome. "
