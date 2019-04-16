@@ -631,7 +631,7 @@ class AnalyzeSequences(object):
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end, strand=strand)
             print(chrom, start, end, strand)
-            print(self.reference_sequence.get_sequence_from_encoding(
+            print(self.reference_sequence.encoding_to_sequence(
                 seq_encoding))
             if len(ref) and strand == '-':
                 ref = get_reverse_complement(ref, self.reference_sequence)
