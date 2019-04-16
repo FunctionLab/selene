@@ -156,20 +156,6 @@ def _process_alts(all_alts,
                 sequence = rhs + a + lhs
             else:
                 sequence = lhs + a + rhs
-            rseq_lhs = reference_sequence.get_sequence_from_coords(
-                chrom, start, pos + 1, strand=strand, pad=True)
-            rseq_rhs = reference_sequence.get_sequence_from_coords(
-                chrom, pos + 1 + ref_len, end, strand=strand, pad=True)
-            if strand == '-':
-                seq1 = rseq_rhs + ref + rseq_lhs
-            else:
-                seq1 = rseq_lhs + ref + rseq_rhs
-            print(len(seq1))
-            print(wt_sequence == seq1)
-            print(wt_sequence)
-            print()
-            print(seq1)
-
         alt_encoding = reference_sequence.sequence_to_encoding(
             sequence)
         alt_encodings.append(alt_encoding)
