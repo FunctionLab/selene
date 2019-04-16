@@ -77,6 +77,7 @@ def _process_alts(all_alts,
                   pos,
                   ref_seq_center,
                   strand,
+                  sequence,
                   start_radius,
                   end_radius,
                   reference_sequence):
@@ -114,24 +115,23 @@ def _process_alts(all_alts,
         the center
 
     """
+    if strand == '-':
+        ref_seq_center += 1
     alt_encodings = []
     for a in all_alts:
         if a == '*' or a == '-':   # indicates a deletion
             a = ''
         ref_len = len(ref)
         alt_len = len(a)
-        sequence = None
         if alt_len > start_radius + end_radius:
             sequence = _truncate_sequence(a, start_radius + end_radius)
         elif ref_len == alt_len:  # substitution
-            start_pos = ref_seq_center - start_radius
-            end_pos = ref_seq_center + end_radius
-            sequence = reference_sequence.get_sequence_from_coords(
-                chrom, start_pos, end_pos, strand=strand)
-            remove_ref_start = start_radius - ref_len // 2 - 1
-            sequence = (sequence[:remove_ref_start] +
+            start_pos = start_radius - ref_len // 2
+            if strand == '+':
+                start_pos -= 1
+            sequence = (sequence[:start_pos] +
                         a +
-                        sequence[remove_ref_start + ref_len:])
+                        sequence[start_pos + ref_len:])
         else:  # insertion or deletion
             seq_lhs = reference_sequence.get_sequence_from_coords(
                 chrom,
@@ -145,6 +145,9 @@ def _process_alts(all_alts,
                 pos - 1 + len(ref) + end_radius - math.ceil(alt_len / 2.),
                 strand=strand,
                 pad=True)
+            start_pos = start_radius - ref_len // 2
+            if strand == '+':
+                start_pos -= 1
             sequence = seq_lhs + a + seq_rhs
         alt_encoding = reference_sequence.sequence_to_encoding(
             sequence)
