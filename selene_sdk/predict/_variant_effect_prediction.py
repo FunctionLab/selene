@@ -71,15 +71,27 @@ def read_vcf_file(input_path, strand_index=None):
     return variants
 
 
+def _get_ref_idxs(mid, strand, ref_len):
+    start_pos = mid
+    if strand == '-' and ref_len > 1:
+        start_pos = mid - (ref_len + 1) // 2 - 1
+    elif strand == '+' and ref_len == 1:
+        start_pos = mid - 1
+    elif strand == '+':
+        start_pos = mid - ref_len // 2 + 1
+    end_pos = start_pos + ref_len
+    return (start_pos, end_pos)
+
+
 def _process_alts(all_alts,
                   ref,
                   chrom,
                   pos,
-                  ref_seq_center,
+                  start,
+                  end,
                   strand,
-                  sequence,
+                  wt_sequence,
                   start_radius,
-                  end_radius,
                   reference_sequence):
     """
     Iterate through the alternate alleles of the variant and return
@@ -96,14 +108,10 @@ def _process_alts(all_alts,
         The chromosome the variant is in
     pos : int
         The position of the variant
-    ref_seq_center : int
-        The center position of the sequence containing the reference allele
     strand : {'+', '-'}
         The strand the variant is on
     start_radius : int
         The number of bases to query on the LHS of the variant.
-    end_radius : int
-        The number of bases to query on the RHS of the variant.
     reference_sequence : selene_sdk.sequences.Sequence
         The reference sequence Selene queries to retrieve the model input
         sequences based on variant coordinates.
@@ -115,40 +123,53 @@ def _process_alts(all_alts,
         the center
 
     """
-    if strand == '-':
-        ref_seq_center += 1
     alt_encodings = []
     for a in all_alts:
         if a == '*' or a == '-':   # indicates a deletion
             a = ''
         ref_len = len(ref)
         alt_len = len(a)
-        if alt_len > start_radius + end_radius:
-            sequence = _truncate_sequence(a, start_radius + end_radius)
+        if alt_len > len(wt_sequence):
+            sequence = _truncate_sequence(a, len(wt_sequence))
         elif ref_len == alt_len:  # substitution
-            start_pos = start_radius - ref_len // 2
-            if strand == '+':
-                start_pos -= 1
-            sequence = (sequence[:start_pos] +
-                        a +
-                        sequence[start_pos + ref_len:])
-        else:  # insertion or deletion
-            seq_lhs = reference_sequence.get_sequence_from_coords(
+            start_pos, end_pos = _get_ref_idxs(start_radius, strand, ref_len)
+            sequence = wt_sequence[:start_pos] + a + wt_sequence[end_pos:]
+        elif alt_len > ref_len:  # insertion
+            start_pos, end_pos = _get_ref_idxs(start_radius, strand, ref_len)
+            sequence = _truncate_sequence(
+                wt_sequence[:start_pos] + a + wt_sequence[start_pos + ref_len:],
+                len(wt_sequence))
+        else:  # deletion
+            lhs = reference_sequence.get_sequence_from_coords(
                 chrom,
-                pos - 1 - start_radius + alt_len // 2,
-                pos - 1,
+                start - ref_len // 2 + alt_len // 2,
+                pos + 1,
                 strand=strand,
                 pad=True)
-            seq_rhs = reference_sequence.get_sequence_from_coords(
+            rhs = reference_sequence.get_sequence_from_coords(
                 chrom,
-                pos - 1 + len(ref),
-                pos - 1 + len(ref) + end_radius - math.ceil(alt_len / 2.),
+                pos + 1 + ref_len,
+                end + math.ceil(ref_len / 2.) - math.ceil(alt_len / 2.),
                 strand=strand,
                 pad=True)
-            start_pos = start_radius - ref_len // 2
-            if strand == '+':
-                start_pos -= 1
-            sequence = seq_lhs + a + seq_rhs
+            if strand == '-':
+                sequence = rhs + a + lhs
+            else:
+                sequence = lhs + a + rhs
+            rseq_lhs = reference_sequence.get_sequence_from_coords(
+                chrom, start, pos + 1, strand=strand, pad=True)
+            rseq_rhs = reference_sequence.get_sequence_from_coords(
+                chrom, pos + 1 + ref_len, end, strand=strand, pad=True)
+            if strand == '-':
+                seq1 = rseq_rhs + ref + rseq_lhs
+            else:
+                seq1 = rseq_lhs + ref + rseq_rhs
+            print(len(seq1))
+            print(wt_sequence == seq1)
+            print(wt_sequence)
+            print()
+            print(seq1)
+
         alt_encoding = reference_sequence.sequence_to_encoding(
             sequence)
         alt_encodings.append(alt_encoding)
@@ -157,13 +178,13 @@ def _process_alts(all_alts,
 
 def _handle_standard_ref(ref_encoding,
                          seq_encoding,
-                         start_radius,
+                         mid,
                          reference_sequence,
-                         reverse=True):
+                         strand):
     ref_len = ref_encoding.shape[0]
-    start_pos = start_radius - ref_len // 2
-    if not reverse:
-        start_pos -= 1
+
+    start_pos, end_pos = _get_ref_idxs(mid, strand, ref_len)
+
     sequence_encoding_at_ref = seq_encoding[
         start_pos:start_pos + ref_len, :]
     sequence_at_ref = reference_sequence.encoding_to_sequence(
