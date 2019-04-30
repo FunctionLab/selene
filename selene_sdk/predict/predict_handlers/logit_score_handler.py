@@ -34,6 +34,9 @@ class LogitScoreHandler(PredictionsHandler):
         Specify the desired output format. TSV can be specified if you
         would like the final file to be easily perused. However, saving
         to a TSV file is much slower than saving to an HDF5 file.
+    output_size : int, optional
+        The total number of rows in the output. Must be specified when 
+        the output_format is hdf5.  
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
@@ -52,6 +55,7 @@ class LogitScoreHandler(PredictionsHandler):
                  columns_for_ids,
                  output_path_prefix,
                  output_format,
+                 output_size=None,
                  write_mem_limit=1500):
         """
         Constructs a new `LogitScoreHandler` object.
@@ -61,6 +65,7 @@ class LogitScoreHandler(PredictionsHandler):
             columns_for_ids,
             output_path_prefix,
             output_format,
+            output_size,
             write_mem_limit)
 
         self.needs_base_pred = True

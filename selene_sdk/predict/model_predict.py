@@ -159,6 +159,7 @@ class AnalyzeSequences(object):
                               output_path_prefix,
                               output_format,
                               colnames_for_ids,
+                              output_size=None,
                               mode="ism"):
         """
         Initialize the handlers to which Selene reports model predictions
@@ -182,6 +183,9 @@ class AnalyzeSequences(object):
             sequence for which Selene has made predictions (e.g. (chrom,
             pos, id, ref, alt) will be the column names for variant effect
             prediction outputs).
+        output_size : int, optional
+            The total number of rows in the output. Must be specified when 
+            the output_format is hdf5.         
         mode : {'prediction', 'ism', 'varianteffect'}
             If saving model predictions, the handler Selene chooses for the
             task is dependent on the mode. For example, the reporter for
@@ -205,6 +209,7 @@ class AnalyzeSequences(object):
                             colnames_for_ids,
                             output_path_prefix,
                             output_format,
+                            output_size,
                             self._write_mem_limit // len(save_data)]
         if "diffs" in save_data:
             reporters.append(DiffScoreHandler(*constructor_args))
@@ -265,13 +270,14 @@ class AnalyzeSequences(object):
         _, filename = os.path.split(input_path)
         output_prefix = '.'.join(filename.split('.')[:-1])
 
+        fasta_file = pyfaidx.Fasta(input_path)
         reporter = self._initialize_reporters(
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
             ["index", "name"],
+            output_size=len(fasta_file),
             mode="prediction")[0]
-        fasta_file = pyfaidx.Fasta(input_path)
         sequences = np.zeros((self.batch_size,
                               self.sequence_length,
                               len(self.reference_sequence.BASES_ARR)))
@@ -602,6 +608,7 @@ class AnalyzeSequences(object):
             output_path_prefix,
             output_format,
             VARIANTEFFECT_COLS,
+            output_size=len(variants),
             mode="varianteffect")
 
         batch_ref_seqs = []

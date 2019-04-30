@@ -8,7 +8,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 import os
 from sys import getsizeof
-
+import numpy as np
 
 def write_to_tsv_file(data_across_features, info_cols, output_handle, close=False):
     """
@@ -48,6 +48,7 @@ def write_to_hdf5_file(data_across_features,
                        info_cols,
                        hdf5_handle,
                        info_handle,
+                       start_index,
                        close=False):
     """
     Write samples with valid predictions/scores to an HDF5 file. The
@@ -78,18 +79,26 @@ def write_to_hdf5_file(data_across_features,
         Default is False. Set `close` to True if you are finished writing
         all data to the file..
 
+    Returns
+    -------
+    int
+    The updated start_index.
     """
     for info_batch in info_cols:
         for info in info_batch:
             info_str = '\t'.join([str(i) for i in info])
             info_handle.write("{0}\n".format(info_str))
+
     data = hdf5_handle["data"]
     for data_batch in data_across_features:
-        data.resize(data.shape[0] + data_batch.shape[0], axis=0)
-        data[-1 * data_batch.shape[0]:] = data_batch
+        data[start_index  : (start_index + data_batch.shape[0])] = data_batch
+        start_index = start_index + data_batch.shape[0]
+
     if close:
         info_handle.close()
         hdf5_handle.close()
+
+    return start_index
 
 def write_NAs_to_file(info_cols, column_names, output_path):
     """
@@ -200,6 +209,9 @@ class PredictionsHandler(metaclass=ABCMeta):
         file should be easily perused (e.g. viewed in a text editor/Excel).
         However, saving to a TSV file is much slower than saving to an HDF5
         file.
+    output_size : int, optional
+        The total number of rows in the output. Must be specified when 
+        the output_format is hdf5.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
@@ -217,6 +229,7 @@ class PredictionsHandler(metaclass=ABCMeta):
                  columns_for_ids,
                  output_path_prefix,
                  output_format,
+                 output_size=None,
                  write_mem_limit=1500):
         self.needs_base_pred = False
         self._results = []
@@ -227,6 +240,9 @@ class PredictionsHandler(metaclass=ABCMeta):
         self._columns_for_ids = columns_for_ids
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
+        self._output_size = output_size
+        if output_format == 'hdf5' and output_size is None:
+            raise ValueError("output_size must be specified when output_format is hdf5.")
 
         self._output_handle = None
         self._info_handle = None
@@ -257,9 +273,10 @@ class PredictionsHandler(metaclass=ABCMeta):
                 "{0}.h5".format(scores_filepath), 'w')
             self._output_handle.create_dataset(
                 "data",
-                (0, len(self._features)),
-                dtype='float64',
-                maxshape=(None, len(self._features)))
+                (self._output_size, len(self._features)),
+                dtype='float64')
+            self._hdf5_start_index = 0
+
             labels_filename = "row_labels.txt"
             if len(filename_prefix) > 0:
                 labels_filename = "{0}_{1}".format(
@@ -338,11 +355,12 @@ class PredictionsHandler(metaclass=ABCMeta):
                 self._info_handle.close()
             return None
         if self._info_handle is not None:
-            write_to_hdf5_file(
+            self._hdf5_start_index = write_to_hdf5_file(
                 self._results,
                 self._samples,
                 self._output_handle,
                 self._info_handle,
+                self._hdf5_start_index,
                 close=close)
         else:
             write_to_tsv_file(self._results,
