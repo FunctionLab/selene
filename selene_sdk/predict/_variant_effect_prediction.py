@@ -74,11 +74,11 @@ def read_vcf_file(input_path, strand_index=None):
 def _get_ref_idxs(mid, strand, ref_len):
     start_pos = mid
     if strand == '-' and ref_len > 1:
-        start_pos = mid - (ref_len + 1) // 2 - 1
+        start_pos = mid - (ref_len + 1) // 2 + 1
     elif strand == '+' and ref_len == 1:
         start_pos = mid - 1
     elif strand == '+':
-        start_pos = mid - ref_len // 2 + 1
+        start_pos = mid - ref_len // 2 - 1
     end_pos = start_pos + ref_len
     return (start_pos, end_pos)
 
