@@ -8,9 +8,10 @@ from abc import ABCMeta
 from abc import abstractmethod
 import os
 from sys import getsizeof
-import numpy as np
 
-def write_to_tsv_file(data_across_features, info_cols, output_handle, close=False):
+import h5py
+
+def write_to_tsv_file(data_across_features, info_cols, output_filepath):
     """
     Write samples with valid predictions/scores to a tab-delimited file.
 
@@ -29,27 +30,22 @@ def write_to_tsv_file(data_across_features, info_cols, output_handle, close=Fals
         the values in an element of `data_across_features`.
     output_handle : _io.TextIOWrapper
         File handle we use to write the information
-    close : bool, optional
-        Default is False. Set `close` to True if you are finished writing
-        to this file.
 
     """
-    for info_batch, preds_batch in zip(info_cols, data_across_features):
-        for info, preds in zip(info_batch, preds_batch):
-            preds_str = '\t'.join(
-                probabilities_to_string(list(preds)))
-            info_str = '\t'.join([str(i) for i in info])
-            output_handle.write("{0}\t{1}\n".format(info_str, preds_str))
-    if close:
-        output_handle.close()
+    with open(output_filepath, 'a') as output_handle:
+        for info_batch, preds_batch in zip(info_cols, data_across_features):
+            for info, preds in zip(info_batch, preds_batch):
+                preds_str = '\t'.join(
+                    probabilities_to_string(list(preds)))
+                info_str = '\t'.join([str(i) for i in info])
+                output_handle.write("{0}\t{1}\n".format(info_str, preds_str))
 
 
 def write_to_hdf5_file(data_across_features,
                        info_cols,
-                       hdf5_handle,
-                       info_handle,
-                       start_index,
-                       close=False):
+                       hdf5_filepath,
+                       info_filepath,
+                       start_index):
     """
     Write samples with valid predictions/scores to an HDF5 file. The
     dataset attached to this file will be accessed using the key "data".
@@ -75,28 +71,22 @@ def write_to_hdf5_file(data_across_features,
     info_handle : _io.TextIOWrapper
         File handle to write the elements of `info_cols` to a tab-separated
         .txt file.
-    close : bool, optional
-        Default is False. Set `close` to True if you are finished writing
-        all data to the file..
 
     Returns
     -------
     int
     The updated start_index.
     """
-    for info_batch in info_cols:
-        for info in info_batch:
-            info_str = '\t'.join([str(i) for i in info])
-            info_handle.write("{0}\n".format(info_str))
-
-    data = hdf5_handle["data"]
-    for data_batch in data_across_features:
-        data[start_index  : (start_index + data_batch.shape[0])] = data_batch
-        start_index = start_index + data_batch.shape[0]
-
-    if close:
-        info_handle.close()
-        hdf5_handle.close()
+    with open(info_filepath, 'a') as info_handle:
+        for info_batch in info_cols:
+            for info in info_batch:
+                info_str = '\t'.join([str(i) for i in info])
+                info_handle.write("{0}\n".format(info_str))
+    with h5py.File(hdf5_filepath, 'a') as hdf5_handle:
+        data = hdf5_handle["data"]
+        for data_batch in data_across_features:
+            data[start_index  : (start_index + data_batch.shape[0])] = data_batch
+            start_index = start_index + data_batch.shape[0]
 
     return start_index
 
@@ -147,43 +137,6 @@ def probabilities_to_string(probabilities):
     return ["{:.2e}".format(p) for p in probabilities]
 
 
-def _create_warning_handler(features,
-                            columns_for_ids,
-                            output_path_prefix,
-                            output_format,
-                            write_mem_limit,
-                            constructor):
-    """
-    Helper to create a predictions handler that stores the predictions/scores
-    for variants that have raised a warning.
-
-    Parameters
-    ----------
-    features : list(str)
-    columns_for_ids : list(str)
-    output_path_prefix : str
-    output_format : {'tsv', 'hdf5'}
-    write_mem_limit : int
-    constructor : abc.ABCMeta
-        The handler class. Should implement
-        selene_sdk.predict.predict_handlers.PredictionsHandler.
-
-    Returns
-    -------
-    selene_sdk.predict.predict_handlers.PredictionsHandler
-        The initialized warning handler object.
-    """
-    path, filename = os.path.split(output_path_prefix)
-    filepath = os.path.join(
-        path,
-        "warning.{0}".format(filename))
-    return constructor(features,
-                       columns_for_ids,
-                       filepath,
-                       output_format,
-                       write_mem_limit)
-
-
 class PredictionsHandler(metaclass=ABCMeta):
     """
     The abstract base class for handlers, which "handle" model
@@ -210,7 +163,7 @@ class PredictionsHandler(metaclass=ABCMeta):
         However, saving to a TSV file is much slower than saving to an HDF5
         file.
     output_size : int, optional
-        The total number of rows in the output. Must be specified when 
+        The total number of rows in the output. Must be specified when
         the output_format is hdf5.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
@@ -244,9 +197,8 @@ class PredictionsHandler(metaclass=ABCMeta):
         if output_format == 'hdf5' and output_size is None:
             raise ValueError("output_size must be specified when output_format is hdf5.")
 
-        self._output_handle = None
-        self._info_handle = None
-        self._warn_handle = None
+        self._output_filepath = None
+        self._labels_filepath = None
 
         self._write_mem_limit = write_mem_limit
 
@@ -262,27 +214,26 @@ class PredictionsHandler(metaclass=ABCMeta):
                 filename_prefix, handler_filename)
         scores_filepath = os.path.join(output_path, handler_filename)
         if self._output_format == "tsv":
-            self._output_handle = open(
-                "{0}.tsv".format(scores_filepath), 'w+')
-            column_names = self._columns_for_ids + self._features
-            self._output_handle.write("{0}\n".format(
-                '\t'.join(column_names)))
+            self._output_filepath = "{0}.tsv".format(scores_filepath)
+            with open(self._output_filepath, 'w+') as output_handle:
+                column_names = self._columns_for_ids + self._features
+                output_handle.write("{0}\n".format(
+                    '\t'.join(column_names)))
         elif self._output_format == "hdf5":
-            import h5py
-            self._output_handle = h5py.File(
-                "{0}.h5".format(scores_filepath), 'w')
-            self._output_handle.create_dataset(
-                "data",
-                (self._output_size, len(self._features)),
-                dtype='float64')
+            self._output_filepath = "{0}.h5".format(scores_filepath)
+            with h5py.File(self._output_filepath, 'w') as output_handle:
+                output_handle.create_dataset(
+                    "data",
+                    (self._output_size, len(self._features)),
+                    dtype='float64')
             self._hdf5_start_index = 0
 
             labels_filename = "row_labels.txt"
             if len(filename_prefix) > 0:
                 labels_filename = "{0}_{1}".format(
                     filename_prefix, labels_filename)
-            labels_filepath = os.path.join(output_path, labels_filename)
-            self._info_handle = open(labels_filepath, 'w+')
+            self._labels_filepath = os.path.join(output_path, labels_filename)
+            open(self._labels_filepath, 'w+')
 
     def _write_NAs_to_file(self,
                            output_path_prefix,
@@ -320,55 +271,32 @@ class PredictionsHandler(metaclass=ABCMeta):
         self._NA_samples.append(row_ids)
 
     @abstractmethod
-    def handle_warning(self, *args, **kwargs):
-        """
-        Must be able to handle a warning raised when processing
-        a batch of model predictions by diverting the output to
-        a different file.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def handle_batch_predictions(self, *args, **kwargs):
         """
         Must be able to handle a batch of model predictions.
         """
         raise NotImplementedError
 
-    def write_to_file(self, close=False):
+    def write_to_file(self):
         """
         Writes accumulated handler results to file.
 
-        Parameters
-        ----------
-        close : bool, optional
-            Whether to close the attached file handles or not at the end of
-            writing
         """
         self._write_NAs_to_file(
             self._output_path_prefix, self._columns_for_ids)
 
         if not self._results:
-            self._output_handle.close()
-            # a separate info handler exists for HDF5 outputs
-            if self._info_handle is not None:
-                self._info_handle.close()
             return None
-        if self._info_handle is not None:
+        if self._labels_filepath is not None:
             self._hdf5_start_index = write_to_hdf5_file(
                 self._results,
                 self._samples,
-                self._output_handle,
-                self._info_handle,
-                self._hdf5_start_index,
-                close=close)
+                self._output_filepath,
+                self._labels_filepath,
+                self._hdf5_start_index)
         else:
             write_to_tsv_file(self._results,
                               self._samples,
-                              self._output_handle,
-                              close=close)
+                              self._output_filepath)
         self._results = []
         self._samples = []
-
-        if self._warn_handle is not None:
-            self._warn_handle.write_to_file(close=close)

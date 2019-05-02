@@ -3,7 +3,6 @@ Handles computing and outputting the log fold change scores
 """
 from scipy.special import logit
 
-from .handler import _create_warning_handler
 from .handler import PredictionsHandler
 
 
@@ -35,8 +34,8 @@ class LogitScoreHandler(PredictionsHandler):
         would like the final file to be easily perused. However, saving
         to a TSV file is much slower than saving to an HDF5 file.
     output_size : int, optional
-        The total number of rows in the output. Must be specified when 
-        the output_format is hdf5.  
+        The total number of rows in the output. Must be specified when
+        the output_format is hdf5.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
@@ -81,8 +80,6 @@ class LogitScoreHandler(PredictionsHandler):
 
         self._create_write_handler("logits")
 
-        self._warn_handle = None
-
     def handle_NA(self, batch_ids):
         """
         TODO
@@ -94,21 +91,6 @@ class LogitScoreHandler(PredictionsHandler):
 
         """
         super().handle_NA(batch_ids)
-
-    def handle_warning(self,
-                       batch_predictions,
-                       batch_ids,
-                       baseline_predictions):
-        if self._warn_handle is None:
-            self._warn_handle = _create_warning_handler(
-                self._features,
-                self._columns_for_ids,
-                self._output_path_prefix,
-                self._output_format,
-                self._write_mem_limit,
-                LogitScoreHandler)
-        self._warn_handle.handle_batch_predictions(
-            batch_predictions, batch_ids, baseline_predictions)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
@@ -143,8 +125,8 @@ class LogitScoreHandler(PredictionsHandler):
         if self._reached_mem_limit():
             self.write_to_file()
 
-    def write_to_file(self, close=False):
+    def write_to_file(self):
         """
         TODO
         """
-        super().write_to_file(close=close)
+        super().write_to_file()
