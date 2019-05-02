@@ -21,7 +21,7 @@ from ._in_silico_mutagenesis import mutate_sequence
 from ._variant_effect_prediction import _handle_long_ref
 from ._variant_effect_prediction import _handle_standard_ref
 from ._variant_effect_prediction import _handle_ref_alt_predictions
-from ._variant_effect_prediction import _process_alts
+from ._variant_effect_prediction import _process_alt
 from ._variant_effect_prediction import read_vcf_file
 from .predict_handlers import AbsDiffScoreHandler
 from .predict_handlers import DiffScoreHandler
@@ -184,8 +184,8 @@ class AnalyzeSequences(object):
             pos, id, ref, alt) will be the column names for variant effect
             prediction outputs).
         output_size : int, optional
-            The total number of rows in the output. Must be specified when 
-            the output_format is hdf5.         
+            The total number of rows in the output. Must be specified when
+            the output_format is hdf5.
         mode : {'prediction', 'ism', 'varianteffect'}
             If saving model predictions, the handler Selene chooses for the
             task is dependent on the mode. For example, the reporter for
@@ -639,20 +639,11 @@ class AnalyzeSequences(object):
                 chrom, start, end, strand=strand)
             if len(ref) and strand == '-':
                 ref = get_reverse_complement(ref, self.reference_sequence)
-                alt = ','.join(
-                    [get_reverse_complement(a, self.reference_sequence)
-                     for a in alt.split(',')])
+                alt = get_reverse_complement(alt, self.reference_sequence)
 
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
-            all_alts = alt.split(',')
-            alt_encodings = _process_alts(
-                all_alts,
-                ref,
-                chrom,
-                pos,
-                start,
-                end,
-                strand,
+            alt_encoding = _process_alt(
+                chrom, pos, ref, alt, start, end, strand,
                 self.reference_sequence.encoding_to_sequence(
                     seq_encoding),
                 self._start_radius,
@@ -684,20 +675,13 @@ class AnalyzeSequences(object):
                               "sequence--will be written to files where the "
                               "filename is prefixed by 'warning.'".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
-                warn_batch_ids = [(chrom, pos, name, ref, a, strand, False) for a in all_alts]
-                warn_ref_seqs = [seq_encoding] * len(all_alts)
-                _handle_ref_alt_predictions(
-                    self.model,
-                    warn_ref_seqs,
-                    alt_encodings,
-                    warn_batch_ids,
-                    reporters,
-                    use_cuda=self.use_cuda)
+                batch_ids.append((chrom, pos, name, ref, alt, strand, False))
+                batch_ref_seqs.append(seq_encoding)
+                batch_alt_seqs.append(alt_encoding)
                 continue
-
-            batch_ids += [(chrom, pos, name, ref, a, strand, True) for a in all_alts]
-            batch_ref_seqs += [seq_encoding] * len(all_alts)
-            batch_alt_seqs += alt_encodings
+            batch_ids.append((chrom, pos, name, ref, alt, strand, True))
+            batch_ref_seqs.append(seq_encoding)
+            batch_alt_seqs.append(alt_encoding)
 
             if len(batch_ref_seqs) >= self.batch_size:
                 _handle_ref_alt_predictions(
