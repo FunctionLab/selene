@@ -103,11 +103,15 @@ def initialize_model(model_configs, train=True, lr=None):
     model_class = getattr(module, model_class_name)
 
     model = model_class(**model_configs["class_args"])
-
     if "non_strand_specific" in model_configs:
         from selene_sdk.utils import NonStrandSpecific
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"])
+
+    setattr(model, "from_lua", False)
+    for m in model.modules():
+        if "Conv2d" in m.__class__.__name__:
+            setattr(model, "from_lua", True)
     criterion = module.criterion()
     if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)

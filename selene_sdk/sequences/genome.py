@@ -172,7 +172,7 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path, blacklist_regions=None):
+    def __init__(self, input_path, blacklist_regions=None, bases_order=None):
         """
         Constructs a `Genome` object.
         """
@@ -194,6 +194,15 @@ class Genome(Sequence):
         elif blacklist_regions is not None:  # user-specified file
             self._blacklist_tabix = tabix.open(
                 blacklist_regions)
+
+        if bases_order is not None:
+            bases = [str.upper(b) for b in bases_order]
+            self.BASES_ARR = bases
+            lc_bases = [str.lower(b) for b in bases]
+            self.BASE_TO_INDEX = {
+                **{b: ix for (ix, b) in enumerate(bases)},
+                **{b: ix for (ix, b) in enumerate(lc_bases)}}
+            self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
 
     def get_chrs(self):
         """Gets the list of chromosome names.

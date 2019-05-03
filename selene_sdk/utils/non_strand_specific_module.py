@@ -57,12 +57,16 @@ class NonStrandSpecific(Module):
         self.mode = mode
 
     def forward(self, input):
-        reverse_input = _flip(
-            _flip(torch.squeeze(input, 2), 1), 2)
+        reverse_input = None
+        if self.from_lua:
+            reverse_input = _flip(
+                _flip(torch.squeeze(input, 2), 1), 2).unsqueeze_(2)
+        else:
+            reverse_input = _flip(_flip(input, 1), 2)
 
         output = self.model.forward(input)
-        output_from_rev = self.model.forward(
-            reverse_input.unsqueeze_(2))
+        output_from_rev = self.model.forward(reverse_input)
+
         if self.mode == "mean":
             return (output + output_from_rev) / 2
         else:
