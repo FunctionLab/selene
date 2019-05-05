@@ -623,13 +623,11 @@ class AnalyzeSequences(object):
             start = center - self._start_radius
             end = center + self._end_radius
 
-            if isinstance(self.reference_sequence, Genome):
-                if "chr" not in chrom and "CHR" != chrom[:3]:
-                    chrom = "chr" + chrom
-                elif "chr" not in chrom and "CHR" == chrom[:3]:
-                    chrom = "chr" + chrom[3:]
-                if "MT" in chrom:
-                    chrom = chrom[:-1]
+            chrom = chrom.replace('CHR', 'chr')
+            if "chr" not in chrom:
+                chrom = "chr" + chrom
+            if chrom == "chrMT":  # applicable to the current FASTA files we use
+                chrom = "chrM"
 
             if not self.reference_sequence.coords_in_bounds(chrom, start, end):
                 for r in reporters:
