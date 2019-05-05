@@ -4,6 +4,7 @@ methods.
 """
 import math
 import os
+from time import time
 import warnings
 
 import numpy as np
@@ -614,7 +615,8 @@ class AnalyzeSequences(object):
         batch_ref_seqs = []
         batch_alt_seqs = []
         batch_ids = []
-        for (chrom, pos, name, ref, alt, strand) in variants:
+        t_i = time()
+        for ix, (chrom, pos, name, ref, alt, strand) in enumerate(variants):
             # centers the sequence containing the ref allele based on the size
             # of ref
             center = pos + len(ref) // 2
@@ -694,6 +696,11 @@ class AnalyzeSequences(object):
                 batch_ref_seqs = []
                 batch_alt_seqs = []
                 batch_ids = []
+
+            if ix and ix % 10000 == 0:
+                print("[STEP {0}]: {1} s to process 10000 variants.".format(
+                    ix, time() - t_i))
+                t_i = time()
 
         if batch_ref_seqs:
             _handle_ref_alt_predictions(
