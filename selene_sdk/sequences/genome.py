@@ -63,10 +63,13 @@ def _get_sequence_from_coords(len_chrs,
     if chrom not in len_chrs:
         return ""
 
-    if start > len_chrs[chrom]:
+    if start >= len_chrs[chrom]:
         return ""
 
     if not pad and (end > len_chrs[chrom] or start < 0):
+        return ""
+
+    if start >= end:
         return ""
 
     if blacklist_tabix is not None:
@@ -85,7 +88,7 @@ def _get_sequence_from_coords(len_chrs,
     end_pad = 0
     start_pad = 0
     if end > len_chrs[chrom]:
-        end_pad = len_chrs[chrom] - end
+        end_pad = end - len_chrs[chrom]
         end = len_chrs[chrom]
     if start < 0:
         start_pad = -1 * start
@@ -259,12 +262,10 @@ class Genome(Sequence):
             in the input.
 
         """
-        if chrom not in self.len_chrs:
-            return False
-        if (start > self.len_chrs[chrom] or end > (self.len_chrs[chrom] + 1)
-                or start < 0):
-            return False
-        return True
+        is_chrom = chrom in self.len_chrs
+        in_bounds = (start >= 0 and start < self.len_chrs[chrom] and
+                     end <= self.len_chrs[chrom])
+        return is_chrom and in_bounds
 
     def get_sequence_from_coords(self,
                                  chrom,

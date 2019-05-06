@@ -10,7 +10,11 @@ VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 
 
 # TODO: Is this a general method that might belong in utils?
-def read_vcf_file(input_path, strand_index=None):
+def read_vcf_file(input_path,
+                  strand_index=None,
+                  NA_output=None,
+                  seq_context=None,
+                  reference_sequence=None):
     """
     Read the relevant columns for a variant call format (VCF) file to
     collect variants for variant effect prediction.
@@ -54,20 +58,37 @@ def read_vcf_file(input_path, strand_index=None):
             if len(cols) < 5:
                 continue
             chrom = str(cols[0])
+            chrom = chrom.replace('CHR', 'chr')
+            if "chr" not in chrom:
+                chrom = "chr" + chrom
+
+            # might remove this, just used as quick fix for FASTA files we use
+            if chrom == "chrMT":
+                chrom = "chrM"
+
             pos = int(cols[1])
             name = cols[2]
             ref = cols[3]
             if ref == '-':
                 ref = ""
             alt = cols[4]
-            strand = '.'
+            strand = '+'
             if strand_index is not None and cols[strand_index] == '-':
                 strand = '-'
-            elif strand_index is not None and (cols[strand_index] == '+' or
-                    cols[strand_index] == '.'):
-                strand = '+'
-            elif strand_index is not None:
-                continue
+
+            if reference_sequence and seq_context:
+                if isinstance(seq_context, int):
+                    seq_context = (seq_context, seq_context)
+                lhs_radius, rhs_radius = seq_context
+                start = pos + len(ref) // 2 - lhs_radius
+                end = pos + len(ref) // 2 + rhs_radius
+                if not reference_sequence.coords_in_bounds(chrom, start, end):
+                    if NA_output:
+                        with open(NA_output, 'a') as file_handle:
+                            file_handle.write(
+                                "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
+                                    chrom, pos, name, ref, alt, strand))
+                    continue
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
     return variants
@@ -131,14 +152,25 @@ def _process_alt(chrom,
     alt_len = len(alt)
     if alt_len > len(wt_sequence):
         sequence = _truncate_sequence(alt, len(wt_sequence))
-    elif ref_len == alt_len:  # substitution
+        return reference_sequence.sequence_to_encoding(
+            sequence)
+
+    alt_encoding = reference_sequence.sequence_to_encoding(alt)
+    if ref_len == alt_len:  # substitution
         start_pos, end_pos = _get_ref_idxs(start_radius, strand, ref_len)
-        sequence = wt_sequence[:start_pos] + alt + wt_sequence[end_pos:]
+        sequence = np.vstack([wt_sequence[:start_pos, :],
+                              alt_encoding,
+                              wt_sequence[end_pos:, :]])
+        return sequence
     elif alt_len > ref_len:  # insertion
         start_pos, end_pos = _get_ref_idxs(start_radius, strand, ref_len)
-        sequence = _truncate_sequence(
-            wt_sequence[:start_pos] + alt + wt_sequence[start_pos + ref_len:],
-            len(wt_sequence))
+        sequence = np.vstack([wt_sequence[:start_pos, :],
+                              alt_encoding,
+                              wt_sequence[end_pos:, :]])
+        trunc_s = (len(sequence) - wt_sequence.shape[0]) // 2
+        trunc_e = trunc_s + wt_sequence.shape[0]
+        sequence = sequence[trunc_s:trunc_e, :]
+        return sequence
     else:  # deletion
         lhs = reference_sequence.get_sequence_from_coords(
             chrom,
@@ -156,8 +188,8 @@ def _process_alt(chrom,
             sequence = rhs + alt + lhs
         else:
             sequence = lhs + alt + rhs
-    return reference_sequence.sequence_to_encoding(
-        sequence)
+        return reference_sequence.sequence_to_encoding(
+            sequence)
 
 
 def _handle_standard_ref(ref_encoding,
@@ -171,13 +203,15 @@ def _handle_standard_ref(ref_encoding,
 
     sequence_encoding_at_ref = seq_encoding[
         start_pos:start_pos + ref_len, :]
-    sequence_at_ref = reference_sequence.encoding_to_sequence(
-        sequence_encoding_at_ref)
     references_match = np.array_equal(
         sequence_encoding_at_ref, ref_encoding)
+
+    sequence_at_ref = None
     if not references_match:
         seq_encoding[start_pos:start_pos + ref_len, :] = \
             ref_encoding
+        sequence_at_ref = reference_sequence.encoding_to_sequence(
+            sequence_encoding_at_ref)
     return references_match, seq_encoding, sequence_at_ref
 
 
@@ -189,8 +223,6 @@ def _handle_long_ref(ref_encoding,
                      reverse=True):
     ref_len = ref_encoding.shape[0]
     sequence_encoding_at_ref = seq_encoding
-    sequence_at_ref = reference_sequence.encoding_to_sequence(
-        sequence_encoding_at_ref)
     ref_start = ref_len // 2 - start_radius
     ref_end = ref_len // 2 + end_radius
     if not reverse:
@@ -199,8 +231,12 @@ def _handle_long_ref(ref_encoding,
     ref_encoding = ref_encoding[ref_start:ref_end]
     references_match = np.array_equal(
         sequence_encoding_at_ref, ref_encoding)
+
+    sequence_at_ref = None
     if not references_match:
         seq_encoding = ref_encoding
+        sequence_at_ref = reference_sequence.encoding_to_sequence(
+            sequence_encoding_at_ref)
     return references_match, seq_encoding, sequence_at_ref
 
 

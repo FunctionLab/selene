@@ -595,7 +595,6 @@ class AnalyzeSequences(object):
             did not show up in the reference genome FASTA file.
 
         """
-        variants = read_vcf_file(vcf_file, strand_index=strand_index)
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
         output_path_prefix = '.'.join(filename.split('.')[:-1])
@@ -603,7 +602,15 @@ class AnalyzeSequences(object):
             os.makedirs(output_dir, exist_ok=True)
         else:
             output_dir = path
+
         output_path_prefix = os.path.join(output_dir, output_path_prefix)
+        variants = read_vcf_file(
+            vcf_file,
+            strand_index=strand_index,
+            NA_output="{0}.NA".format(output_path_prefix),
+            seq_context=(self._start_radius, self._end_radius),
+            reference_sequence=self.reference_sequence)
+
         reporters = self._initialize_reporters(
             save_data,
             output_path_prefix,
@@ -623,18 +630,6 @@ class AnalyzeSequences(object):
             start = center - self._start_radius
             end = center + self._end_radius
 
-            chrom = chrom.replace('CHR', 'chr')
-            if "chr" not in chrom:
-                chrom = "chr" + chrom
-            if chrom == "chrMT":  # applicable to the current FASTA files we use
-                chrom = "chrM"
-
-            if not self.reference_sequence.coords_in_bounds(chrom, start, end):
-                for r in reporters:
-                    r.handle_NA((chrom, pos, name, ref, alt, strand))
-                continue
-            if strand == '.':
-                strand = '+'
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end, strand=strand)
             if len(ref) and strand == '-':
@@ -644,8 +639,7 @@ class AnalyzeSequences(object):
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             alt_encoding = _process_alt(
                 chrom, pos, ref, alt, start, end, strand,
-                self.reference_sequence.encoding_to_sequence(
-                    seq_encoding),
+                seq_encoding,
                 self._start_radius,
                 self.reference_sequence)
 
@@ -672,8 +666,8 @@ class AnalyzeSequences(object):
                               "Reference genome contains {6} instead. "
                               "Predictions/scores associated with this "
                               "variant--where we use '{3}' in the input "
-                              "sequence--will be written to files where the "
-                              "filename is prefixed by 'warning.'".format(
+                              "sequence--will be marked in the row labels .txt "
+                              "file with `ref_match=False`".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
                 batch_ids.append((chrom, pos, name, ref, alt, strand, False))
                 batch_ref_seqs.append(seq_encoding)
@@ -710,4 +704,4 @@ class AnalyzeSequences(object):
                 use_cuda=self.use_cuda)
 
         for r in reporters:
-            r.write_to_file(close=True)
+            r.write_to_file()
