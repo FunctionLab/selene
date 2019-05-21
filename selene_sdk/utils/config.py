@@ -8,7 +8,6 @@ http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
 """
 import os
 import re
-import inspect
 import warnings
 import yaml
 import six
@@ -420,7 +419,6 @@ def _initialize():
     http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py
     """
     global IS_INITIALIZED
-    print("initialize")
     yaml.add_multi_constructor(
         "!obj:", _multi_constructor_obj, Loader=yaml.SafeLoader)
     yaml.add_multi_constructor(
