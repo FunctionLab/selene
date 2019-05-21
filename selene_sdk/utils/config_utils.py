@@ -164,17 +164,9 @@ def execute(operations, configs, output_dir):
 
             sampler_info = configs["sampler"]
             if output_dir is not None:
-                #sampler_info.output_dir = output_dir
                 sampler_info.bind(output_dir=output_dir)
             sampler = instantiate(sampler_info)
             train_model_info = configs["train_model"]
-            """
-            train_model_info.model = model
-            train_model_info.data_sampler = sampler_info
-            train_model_info.loss_criterion = loss
-            train_model_info.optimizer_class = optim
-            train_model_info.optimizer_kwargs = optim_kwargs
-            """
             train_model_info.bind(model=model,
                                   data_sampler=sampler,
                                   loss_criterion=loss,
@@ -182,9 +174,7 @@ def execute(operations, configs, output_dir):
                                   optimizer_kwargs=optim_kwargs)
             if output_dir is not None:
                 train_model_info.bind(output_dir=output_dir)
-                #train_model_info.output_dir = output_dir
 
-            #class_instantiate(train_model_info)
             train_model = instantiate(train_model_info)
             # TODO: will find a better way to handle this in the future
             if "load_test_set" in configs and configs["load_test_set"] and \
@@ -203,14 +193,13 @@ def execute(operations, configs, output_dir):
                 sampler_info = configs["sampler"]
 
                 evaluate_model_info = configs["evaluate_model"]
-
-                evaluate_model_info.model = model
-                evaluate_model_info.criterion = loss
-                evaluate_model_info.data_sampler = sampler_info
+                evaluate_model_info.bind(
+                    model=model,
+                    criterion=loss,
+                    data_sampler=sampler_info)
                 if output_dir is not None:
-                    evaluate_model_info.output_dir = output_dir
+                    evaluate_model_info.bind(output_dir=output_dir)
 
-                class_instantiate(evaluate_model_info)
                 evaluate_model_info.evaluate()
 
         elif op == "analyze":
@@ -218,9 +207,7 @@ def execute(operations, configs, output_dir):
                 model, _ = initialize_model(
                     configs["model"], train=False)
             analyze_seqs_info = configs["analyze_sequences"]
-            #analyze_seqs_info.model = model
             analyze_seqs_info.bind(model=model)
-            #class_instantiate(analyze_seqs_info)
 
             analyze_seqs = instantiate(analyze_seqs_info)
             if "variant_effect_prediction" in configs:
