@@ -15,6 +15,9 @@ from . import instantiate
 
 
 def class_instantiate(classobj):
+    """Not used currently, but might be useful later for recursive
+    class instantiation
+    """
     for attr, obj in classobj.__dict__.items():
         is_module = getattr(obj, '__module__', None)
         if is_module and "selene_sdk" in is_module and attr is not "model":
