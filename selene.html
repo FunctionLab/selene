@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                master (0.3.0)
+                master (0.3.1)
               </div>
             
           
@@ -347,122 +347,102 @@ ROC AUC). The columns in these files can be used to quickly visualize
 training history (e.g. you can use <cite>matplotlib</cite>, <cite>plt.plot(auc_list)</cite>)
 and see, for example, whether the model is still improving, if there are
 signs of overfitting, etc.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first">
-<li><p class="first"><strong>model</strong> (<em>torch.nn.Module</em>) – The model to train.</p>
-</li>
-<li><p class="first"><strong>data_sampler</strong> (<em>selene_sdk.samplers.Sampler</em>) – The example generator.</p>
-</li>
-<li><p class="first"><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p>
-</li>
-<li><p class="first"><strong>optimizer_class</strong> (<em>torch.optim.Optimizer</em>) – The optimizer to minimize loss with.</p>
-</li>
-<li><p class="first"><strong>optimizer_kwargs</strong> (<em>dict</em>) – The dictionary of keyword arguments to pass to the optimizer’s
-constructor.</p>
-</li>
-<li><p class="first"><strong>batch_size</strong> (<em>int</em>) – Specify the batch size to process examples. Should be a power of 2.</p>
-</li>
-<li><p class="first"><strong>max_steps</strong> (<em>int</em>) – The maximum number of mini-batches to iterate over.</p>
-</li>
-<li><p class="first"><strong>report_stats_every_n_steps</strong> (<em>int</em>) – The frequency with which to report summary statistics. You can
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul>
+<li><p><strong>model</strong> (<em>torch.nn.Module</em>) – The model to train.</p></li>
+<li><p><strong>data_sampler</strong> (<em>selene_sdk.samplers.Sampler</em>) – The example generator.</p></li>
+<li><p><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
+<li><p><strong>optimizer_class</strong> (<em>torch.optim.Optimizer</em>) – The optimizer to minimize loss with.</p></li>
+<li><p><strong>optimizer_kwargs</strong> (<em>dict</em>) – The dictionary of keyword arguments to pass to the optimizer’s
+constructor.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Specify the batch size to process examples. Should be a power of 2.</p></li>
+<li><p><strong>max_steps</strong> (<em>int</em>) – The maximum number of mini-batches to iterate over.</p></li>
+<li><p><strong>report_stats_every_n_steps</strong> (<em>int</em>) – The frequency with which to report summary statistics. You can
 set this value to be equivalent to a training epoch
 (<cite>n_steps * batch_size</cite>) being the total number of samples
 seen by the model so far. Selene evaluates the model on the validation
 dataset every <cite>report_stats_every_n_steps</cite> and, if the model obtains
 the best performance so far (based on the user-specified loss function),
 Selene saves the model state to a file called <cite>best_model.pth.tar</cite> in
-<cite>output_dir</cite>.</p>
-</li>
-<li><p class="first"><strong>output_dir</strong> (<em>str</em>) – The output directory to save model checkpoints and logs in.</p>
-</li>
-<li><p class="first"><strong>save_checkpoint_every_n_steps</strong> (<em>int or None, optional</em>) – Default is 1000. If None, set to the same value as
-<cite>report_stats_every_n_steps</cite></p>
-</li>
-<li><p class="first"><strong>save_new_checkpoints_after_n_steps</strong> (<em>int or None, optional</em>) – Default is None. The number of steps after which Selene will
+<cite>output_dir</cite>.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em>) – The output directory to save model checkpoints and logs in.</p></li>
+<li><p><strong>save_checkpoint_every_n_steps</strong> (<em>int or None, optional</em>) – Default is 1000. If None, set to the same value as
+<cite>report_stats_every_n_steps</cite></p></li>
+<li><p><strong>save_new_checkpoints_after_n_steps</strong> (<em>int or None, optional</em>) – Default is None. The number of steps after which Selene will
 continually save new checkpoint model weights files
 (<cite>checkpoint-&lt;TIMESTAMP&gt;.pth.tar</cite>) every
 <cite>save_checkpoint_every_n_steps</cite>. Before this point,
 the file <cite>checkpoint.pth.tar</cite> is overwritten every
-<cite>save_checkpoint_every_n_steps</cite> to limit the memory requirements.</p>
-</li>
-<li><p class="first"><strong>n_validation_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of validation samples in the
+<cite>save_checkpoint_every_n_steps</cite> to limit the memory requirements.</p></li>
+<li><p><strong>n_validation_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of validation samples in the
 validation set. If <cite>n_validation_samples</cite> is <cite>None</cite> and the data sampler
 used is the <cite>selene_sdk.samplers.IntervalsSampler</cite> or
 <cite>selene_sdk.samplers.RandomSampler</cite>, we will retrieve 32000
 validation samples. If <cite>None</cite> and using
 <cite>selene_sdk.samplers.MultiFileSampler</cite>, we will use all
-available validation samples from the appropriate data file.</p>
-</li>
-<li><p class="first"><strong>n_test_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of test samples in the test set.
+available validation samples from the appropriate data file.</p></li>
+<li><p><strong>n_test_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of test samples in the test set.
 If <cite>n_test_samples</cite> is <cite>None</cite> and</p>
 <blockquote>
 <div><ul class="simple">
-<li>the sampler you specified has no test partition, you should not
+<li><p>the sampler you specified has no test partition, you should not
 specify <cite>evaluate</cite> as one of the operations in the <cite>ops</cite> list.
 That is, Selene will not automatically evaluate your trained
 model on a test dataset, because the sampler you are using does
-not have any test data.</li>
-<li>the sampler you use is of type <cite>selene_sdk.samplers.OnlineSampler</cite>
+not have any test data.</p></li>
+<li><p>the sampler you use is of type <cite>selene_sdk.samplers.OnlineSampler</cite>
 (and the test partition exists), we will retrieve 640000 test
-samples.</li>
-<li>the sampler you use is of type
+samples.</p></li>
+<li><p>the sampler you use is of type
 <cite>selene_sdk.samplers.MultiFileSampler</cite> (and the test partition
 exists), we will use all the test samples available in the
-appropriate data file.</li>
+appropriate data file.</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first"><strong>cpu_n_threads</strong> (<em>int, optional</em>) – Default is 1. Sets the number of OpenMP threads used for parallelizing
-CPU operations.</p>
-</li>
-<li><p class="first"><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether a CUDA-enabled GPU is available
-for torch to use during training.</p>
-</li>
-<li><p class="first"><strong>data_parallel</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether multiple GPUs are available
-for torch to use during training.</p>
-</li>
-<li><p class="first"><strong>logging_verbosity</strong> (<em>{0, 1, 2}, optional</em>) –</p>
+<li><p><strong>cpu_n_threads</strong> (<em>int, optional</em>) – Default is 1. Sets the number of OpenMP threads used for parallelizing
+CPU operations.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether a CUDA-enabled GPU is available
+for torch to use during training.</p></li>
+<li><p><strong>data_parallel</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether multiple GPUs are available
+for torch to use during training.</p></li>
+<li><p><strong>logging_verbosity</strong> (<em>{0, 1, 2}, optional</em>) –</p>
 <p>Default is 2. Set the logging verbosity level.</p>
 <blockquote>
 <div><ul class="simple">
-<li>0 - Only warnings will be logged.</li>
-<li>1 - Information and warnings will be logged.</li>
-<li>2 - Debug messages, information, and warnings will all be                  logged.</li>
+<li><p>0 - Only warnings will be logged.</p></li>
+<li><p>1 - Information and warnings will be logged.</p></li>
+<li><p>2 - Debug messages, information, and warnings will all be                  logged.</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first"><strong>checkpoint_resume</strong> (<em>str or None, optional</em>) – Default is <cite>None</cite>. If <cite>checkpoint_resume</cite> is not None, it should be the
+<li><p><strong>checkpoint_resume</strong> (<em>str or None, optional</em>) – Default is <cite>None</cite>. If <cite>checkpoint_resume</cite> is not None, it should be the
 path to a model file generated by <cite>torch.save</cite> that can now be read
-using <cite>torch.load</cite>.</p>
-</li>
+using <cite>torch.load</cite>.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+af93354 ))"><em>torch.nn.Module</em></a>) – The model to train.</li>
-<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</li>
-<li><strong>loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</li>
-<li><strong>optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.1.0a0+af93354 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</li>
-<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batch to use during training.</li>
-<li><strong>max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</li>
-<li><strong>nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to report summary statistics.</li>
-<li><strong>nth_step_save_checkpoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to save a model checkpoint.</li>
-<li><strong>use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</li>
-<li><strong>data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</li>
-<li><strong>output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The directory to save model checkpoints and logs.</li>
-<li><strong>training_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – The current training loss.</li>
-<li><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+70ecddf ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
+<li><p><strong>~TrainModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
+<li><p><strong>~TrainModel.loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
+<li><p><strong>~TrainModel.optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.1.0a0+70ecddf ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
+<li><p><strong>~TrainModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batch to use during training.</p></li>
+<li><p><strong>~TrainModel.max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</p></li>
+<li><p><strong>~TrainModel.nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to report summary statistics.</p></li>
+<li><p><strong>~TrainModel.nth_step_save_checkpoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The frequency with which to save a model checkpoint.</p></li>
+<li><p><strong>~TrainModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
+<li><p><strong>~TrainModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
+<li><p><strong>~TrainModel.output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The directory to save model checkpoints and logs.</p></li>
+<li><p><strong>~TrainModel.training_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – The current training loss.</p></li>
+<li><p><strong>~TrainModel.metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
 By default, this contains <cite>“roc_auc”</cite>, which maps to
 <cite>sklearn.metrics.roc_auc_score</cite>, and <cite>“average_precision”</cite>,
-which maps to <cite>sklearn.metrics.average_precision_score</cite>.</li>
+which maps to <cite>sklearn.metrics.average_precision_score</cite>.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.TrainModel.create_test_set">
 <code class="descname">create_test_set</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.create_test_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.create_test_set" title="Permalink to this definition">¶</a></dt>
@@ -477,34 +457,30 @@ evaluated.</p>
 <dt id="selene_sdk.TrainModel.evaluate">
 <code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures the model test performance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dictionary, where keys are the names of the loss metrics,
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary, where keys are the names of the loss metrics,
 and the values are the average value for that metric over
-the test set.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+the test set.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.TrainModel.train">
 <code class="descname">train</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model on a batch of data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The training loss.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The training loss.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -517,18 +493,16 @@ the test set.</td>
 <dt id="selene_sdk.TrainModel.validate">
 <code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures model validation performance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dictionary, where keys are the names of the loss metrics,
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary, where keys are the names of the loss metrics,
 and the values are the average value for that metric over
-the validation set.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+the validation set.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -541,66 +515,60 @@ the validation set.</td>
 <em class="property">class </em><code class="descclassname">selene_sdk.</code><code class="descname">EvaluateModel</code><span class="sig-paren">(</span><em>model</em>, <em>criterion</em>, <em>data_sampler</em>, <em>features</em>, <em>trained_model_path</em>, <em>output_dir</em>, <em>batch_size=64</em>, <em>n_test_samples=None</em>, <em>report_gt_feature_n_positives=10</em>, <em>use_cuda=False</em>, <em>data_parallel=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Evaluate model on a test set of sequences with known targets.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>model</strong> (<em>torch.nn.Module</em>) – The model architecture.</li>
-<li><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The loss function that was optimized during training.</li>
-<li><strong>data_sampler</strong> (<em>selene_sdk.samplers.Sampler</em>) – Used to retrieve samples from the test set for evaluation.</li>
-<li><strong>features</strong> (<em>list(str)</em>) – List of distinct features the model predicts.</li>
-<li><strong>trained_model_path</strong> (<em>str</em>) – Path to the trained model file, saved using <cite>torch.save</cite>.</li>
-<li><strong>output_dir</strong> (<em>str</em>) – The output directory in which to save model evaluation and logs.</li>
-<li><strong>batch_size</strong> (<em>int, optional</em>) – Default is 64. Specify the batch size to process examples.
-Should be a power of 2.</li>
-<li><strong>n_test_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Use <cite>n_test_samples</cite> if you want to limit the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>torch.nn.Module</em>) – The model architecture.</p></li>
+<li><p><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The loss function that was optimized during training.</p></li>
+<li><p><strong>data_sampler</strong> (<em>selene_sdk.samplers.Sampler</em>) – Used to retrieve samples from the test set for evaluation.</p></li>
+<li><p><strong>features</strong> (<em>list(str)</em>) – List of distinct features the model predicts.</p></li>
+<li><p><strong>trained_model_path</strong> (<em>str</em>) – Path to the trained model file, saved using <cite>torch.save</cite>.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em>) – The output directory in which to save model evaluation and logs.</p></li>
+<li><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 64. Specify the batch size to process examples.
+Should be a power of 2.</p></li>
+<li><p><strong>n_test_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Use <cite>n_test_samples</cite> if you want to limit the
 number of samples on which you evaluate your model. If you are
 using a sampler of type <cite>selene_sdk.samplers.OnlineSampler</cite>,
-by default it will draw 640000 samples if <cite>n_test_samples</cite> is <cite>None</cite>.</li>
-<li><strong>report_gt_feature_n_positives</strong> (<em>int, optional</em>) – Default is 10. In the final test set, each class/feature must have
+by default it will draw 640000 samples if <cite>n_test_samples</cite> is <cite>None</cite>.</p></li>
+<li><p><strong>report_gt_feature_n_positives</strong> (<em>int, optional</em>) – Default is 10. In the final test set, each class/feature must have
 more than <cite>report_gt_feature_n_positives</cite> positive samples in order to
 be considered in the test performance computation. The output file that
 states each class’ performance will report ‘NA’ for classes that do
-not have enough positive samples.</li>
-<li><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether a CUDA-enabled GPU is available
-for torch to use during training.</li>
-<li><strong>data_parallel</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether multiple GPUs are available
-for torch to use during training.</li>
+not have enough positive samples.</p></li>
+<li><p><strong>use_cuda</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether a CUDA-enabled GPU is available
+for torch to use during training.</p></li>
+<li><p><strong>data_parallel</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Specify whether multiple GPUs are available
+for torch to use during training.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+af93354 ))"><em>torch.nn.Module</em></a>) – The trained model.</li>
-<li><strong>criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</li>
-<li><strong>sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</li>
-<li><strong>features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</li>
-<li><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The batch size to process examples. Should be a power of 2.</li>
-<li><strong>use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</li>
-<li><strong>data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</li>
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.1.0a0+70ecddf ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
+<li><p><strong>~EvaluateModel.criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</p></li>
+<li><p><strong>~EvaluateModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
+<li><p><strong>~EvaluateModel.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</p></li>
+<li><p><strong>~EvaluateModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The batch size to process examples. Should be a power of 2.</p></li>
+<li><p><strong>~EvaluateModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
+<li><p><strong>~EvaluateModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.EvaluateModel.evaluate">
 <code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Passes all samples retrieved from the sampler to the model in
 batches and returns the predictions. Also reports the model’s
 performance on these examples.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dictionary, where keys are the features and the values are
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary, where keys are the features and the values are
 each a dict of the performance metrics (currently ROC AUC and
-AUPR) reported for each feature the model predicts.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
+AUPR) reported for each feature the model predicts.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

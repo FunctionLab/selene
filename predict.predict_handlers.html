@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                master (0.3.0)
+                master (0.3.1)
               </div>
             
           
@@ -337,47 +337,40 @@ predictions. Handlers are responsible for accepting predictions,
 storing these predictions or scores derived from the predictions,
 and then returning them in a user-specified output format (Selene
 currently supports TSV and HDF5 file outputs)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
-model will return its predictions.</li>
-<li><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that will help to identify the sequence
-or variant to which the model prediction scores correspond.</li>
-<li><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the absolute difference
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
+model will return its predictions.</p></li>
+<li><p><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that will help to identify the sequence
+or variant to which the model prediction scores correspond.</p></li>
+<li><p><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the absolute difference
 scores. The path may contain a filename prefix. Selene will append
-a handler-specific name to the end of the path/prefix.</li>
-<li><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if the final
+a handler-specific name to the end of the path/prefix.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if the final
 file should be easily perused (e.g. viewed in a text editor/Excel).
 However, saving to a TSV file is much slower than saving to an HDF5
-file.</li>
-<li><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
+file.</p></li>
+<li><p><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
 storing model predictions/scores for this particular handler, in MB.
-Handler will write to file whenever this memory limit is reached.</li>
+Handler will write to file whenever this memory limit is reached.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><p class="first last"><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>~PredictionsHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA">
 <code class="descname">handle_NA</code><span class="sig-paren">(</span><em>row_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle rows without data. Will store the identifiers where predictions
 were not available in a separate list.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>row_ids</strong> (<em>arraylike(str)</em>) – The list of row IDs</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>row_ids</strong> (<em>arraylike(str)</em>) – The list of row IDs</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -398,15 +391,12 @@ a different file.</p>
 <dt id="selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file">
 <code class="descname">write_to_file</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes accumulated handler results to file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>close</strong> (<em>bool, optional</em>) – Whether to close the attached file handles or not at the end of
-writing</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>close</strong> (<em>bool, optional</em>) – Whether to close the attached file handles or not at the end of
+writing</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -420,48 +410,41 @@ writing</td>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>The “diff score” is the difference between <cite>alt</cite> and <cite>ref</cite>
 predictions.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
-model will return its predictions.</li>
-<li><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence or
-variant to which the model prediction scores correspond.</li>
-<li><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the difference scores.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
+model will return its predictions.</p></li>
+<li><p><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence or
+variant to which the model prediction scores correspond.</p></li>
+<li><p><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the difference scores.
 The path may contain a filename prefix. Selene will append <cite>diffs</cite>
 to the end of the prefix if specified (otherwise the file will be
-named <cite>diffs.tsv</cite>/<cite>.h5</cite>).</li>
-<li><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
+named <cite>diffs.tsv</cite>/<cite>.h5</cite>).</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
 would like the final file to be easily perused (e.g. viewed in a text
 editor/Excel). However, saving to a TSV file is much slower than
-saving to an HDF5 file.</li>
-<li><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
+saving to an HDF5 file.</p></li>
+<li><p><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
 storing model predictions/scores for this particular handler, in MB.
-Handler will write to file whenever this memory limit is reached.</li>
+Handler will write to file whenever this memory limit is reached.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><p class="first last"><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>~DiffScoreHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler.handle_NA">
 <code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles batch sequence/variant IDs where a full sequence context
 could not be fetched (N/A)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_ids</strong> (<em>list(str)</em>) – List of sequence/variant identifiers</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_ids</strong> (<em>list(str)</em>) – List of sequence/variant identifiers</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -471,29 +454,25 @@ could not be fetched (N/A)</p>
 difference between the predictions for 1 or a batch of reference
 sequences and a batch of alternate sequences (i.e. sequences slightly
 changed/mutated from the reference).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
 dimensions of <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is the
 size of the mini-batch and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
-<li><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
+features).</p></li>
+<li><p><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
 because it may contain more than one column (written to
 file) that together make up a unique identifier for a
-sequence.</li>
-<li><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the diff scores.
+sequence.</p></li>
+<li><p><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the diff scores.
 Must either be a vector of dimension <span class="math notranslate nohighlight">\(N\)</span> values or a
 matrix of dimensions <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is
 the size of the mini-batch, and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
+features).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -503,44 +482,37 @@ features).</li>
 variant ‘ref’ base(s) did not match those at the specified (chr, pos)
 in the reference genome). Scores will still be computed for these
 variants, but the output will be written to separate file(s).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
 dimensions of <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is the
 size of the mini-batch and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
-<li><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
+features).</p></li>
+<li><p><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
 because it may contain more than one column (written to
 file) that together make up a unique identifier for a
-sequence.</li>
-<li><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the diff scores.
+sequence.</p></li>
+<li><p><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the diff scores.
 Must either be a vector of dimension <span class="math notranslate nohighlight">\(N\)</span> values or a
 matrix of dimensions <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is
 the size of the mini-batch, and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
+features).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file">
 <code class="descname">write_to_file</code><span class="sig-paren">(</span><em>close=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/diff_score_handler.html#DiffScoreHandler.write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.DiffScoreHandler.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes stored scores to a file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>close</strong> (<em>bool, optional</em>) – Default is False. Set <cite>close</cite> to True if you’d like to close
-the file handle at the end of this operation.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>close</strong> (<em>bool, optional</em>) – Default is False. Set <cite>close</cite> to True if you’d like to close
+the file handle at the end of this operation.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -559,74 +531,63 @@ then the log-odds is the logit of <cite>p</cite>, or</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{logit}(p) = \log\left(\frac{p}{1 - p}\right) =
 \log(p) - \log(1 - p)\]</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>features</strong> (<em>list of str</em>) – List of sequence-level features, in the same order that the
-model will return its predictions.</li>
-<li><strong>columns_for_ids</strong> (<em>list of str</em>) – Columns in the file that help to identify the input sequence to
-which the features data corresponds.</li>
-<li><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the absolute difference
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> (<em>list of str</em>) – List of sequence-level features, in the same order that the
+model will return its predictions.</p></li>
+<li><p><strong>columns_for_ids</strong> (<em>list of str</em>) – Columns in the file that help to identify the input sequence to
+which the features data corresponds.</p></li>
+<li><p><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the absolute difference
 scores. The path may contain a filename prefix. Selene will append
-<cite>logits</cite> to the end of the prefix.</li>
-<li><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
+<cite>logits</cite> to the end of the prefix.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
 would like the final file to be easily perused. However, saving
-to a TSV file is much slower than saving to an HDF5 file.</li>
-<li><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
+to a TSV file is much slower than saving to an HDF5 file.</p></li>
+<li><p><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
 storing model predictions/scores for this particular handler, in MB.
-Handler will write to file whenever this memory limit is reached.</li>
+Handler will write to file whenever this memory limit is reached.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><p class="first last"><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>~LogitScoreHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_NA">
 <code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_ids</strong> (<em># TODO</em>) – # TODO</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_ids</strong> (<em># TODO</em>) – # TODO</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions">
 <code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>baseline_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/logit_score_handler.html#LogitScoreHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.LogitScoreHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p># TODO</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
 dimensions of <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is the
 size of the mini-batch and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
-<li><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
+features).</p></li>
+<li><p><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
 because it may contain more than one column (written to
 file) that together make up a unique identifier for a
-sequence.</li>
-<li><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the logit scores.
+sequence.</p></li>
+<li><p><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the logit scores.
 This must either be a vector of <span class="math notranslate nohighlight">\(N\)</span> values, or a
 matrix of shape <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is
 the size of the mini-batch, and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
+features).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -646,69 +607,58 @@ features).</li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.predict.predict_handlers.handler.PredictionsHandler</span></code></p>
 <p>Collects batches of model predictions and writes all of them
 to file at the end.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
-model will return its predictions.</li>
-<li><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence to
-which the features data corresponds.</li>
-<li><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the absolute difference
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
+model will return its predictions.</p></li>
+<li><p><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence to
+which the features data corresponds.</p></li>
+<li><p><strong>output_path_prefix</strong> (<em>str</em>) – Path to the file to which Selene will write the absolute difference
 scores. The path may contain a filename prefix. Selene will append
-<cite>predictions</cite> to the end of the prefix.</li>
-<li><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
+<cite>predictions</cite> to the end of the prefix.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
 would like the final file to be easily perused. However, saving
-to a TSV file is much slower than saving to an HDF5 file.</li>
-<li><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
+to a TSV file is much slower than saving to an HDF5 file.</p></li>
+<li><p><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
 storing model predictions/scores for this particular handler, in MB.
-Handler will write to file whenever this memory limit is reached.</li>
+Handler will write to file whenever this memory limit is reached.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><p class="first last"><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>~WritePredictionsHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_NA">
 <code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_ids</strong> (<em># TODO</em>) – # TODO</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_ids</strong> (<em># TODO</em>) – # TODO</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions">
 <code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_predictions_handler.html#WritePredictionsHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
 dimensions of <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is the
 size of the mini-batch and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
-<li><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
+features).</p></li>
+<li><p><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
 because it may contain more than one column (written to
 file) that together make up a unique identifier for a
-sequence.</li>
+sequence.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -729,76 +679,65 @@ sequence.</li>
 <p>Used during variant effect prediction. This handler records the
 predicted values for the reference and alternate sequences, and
 stores these values in two separate files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
-model will return its predictions.</li>
-<li><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence
-to which the features data corresponds.</li>
-<li><strong>output_path_prefix</strong> (<em>str</em>) – Path for the file(s) to which Selene will write the ref alt
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> (<em>list(str)</em>) – List of sequence-level features, in the same order that the
+model will return its predictions.</p></li>
+<li><p><strong>columns_for_ids</strong> (<em>list(str)</em>) – Columns in the file that help to identify the input sequence
+to which the features data corresponds.</p></li>
+<li><p><strong>output_path_prefix</strong> (<em>str</em>) – Path for the file(s) to which Selene will write the ref alt
 predictions. The path may contain a filename prefix. Selene will
 append <cite>ref_predictions</cite> and <cite>alt_predictions</cite> to the end of the
 prefix to distinguish between reference and alternate predictions
-files written.</li>
-<li><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
+files written.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – Specify the desired output format. TSV can be specified if you
 would like the final file to be easily perused. However, saving
-to a TSV file is much slower than saving to an HDF5 file.</li>
-<li><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
+to a TSV file is much slower than saving to an HDF5 file.</p></li>
+<li><p><strong>write_mem_limit</strong> (<em>int, optional</em>) – Default is 1500. Specify the amount of memory you can allocate to
 storing model predictions/scores for this particular handler, in MB.
-Handler will write to file whenever this memory limit is reached.</li>
+Handler will write to file whenever this memory limit is reached.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><p class="first last"><strong>needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>~WriteRefAltHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_NA">
 <code class="descname">handle_NA</code><span class="sig-paren">(</span><em>batch_ids</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.handle_NA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_NA" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_ids</strong> (<em>TODO</em>) – TODO</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_ids</strong> (<em>TODO</em>) – TODO</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions">
 <code class="descname">handle_batch_predictions</code><span class="sig-paren">(</span><em>batch_predictions</em>, <em>batch_ids</em>, <em>base_predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/write_ref_alt_handler.html#WriteRefAltHandler.handle_batch_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.WriteRefAltHandler.handle_batch_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>TODO</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_predictions</strong> (<em>arraylike</em>) – The predictions for a batch of sequences. This should have
 dimensions of <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is the
 size of the mini-batch and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
-<li><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
+features).</p></li>
+<li><p><strong>batch_ids</strong> (<em>list(arraylike)</em>) – Batch of sequence identifiers. Each element is <cite>arraylike</cite>
 because it may contain more than one column (written to
 file) that together make up a unique identifier for a
-sequence.</li>
-<li><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the logit scores.
+sequence.</p></li>
+<li><p><strong>base_predictions</strong> (<em>arraylike</em>) – The baseline prediction(s) used to compute the logit scores.
 This must either be a vector of <span class="math notranslate nohighlight">\(N\)</span> values, or a
 matrix of shape <span class="math notranslate nohighlight">\(B \times N\)</span> (where <span class="math notranslate nohighlight">\(B\)</span> is
 the size of the mini-batch, and <span class="math notranslate nohighlight">\(N\)</span> is the number of
-features).</li>
+features).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

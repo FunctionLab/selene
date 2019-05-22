@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                master (0.3.0)
+                master (0.3.1)
               </div>
             
           
@@ -335,82 +335,74 @@ examples from files.</p>
 <em class="property">class </em><code class="descclassname">selene_sdk.samplers.file_samplers.</code><code class="descname">BedFileSampler</code><span class="sig-paren">(</span><em>filepath</em>, <em>reference_sequence</em>, <em>n_samples</em>, <em>sequence_length=None</em>, <em>targets_avail=False</em>, <em>n_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_samplers.file_sampler.FileSampler</span></code></p>
 <p>A sampler for which the dataset is loaded directly from a <cite>*.bed</cite> file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filepath</strong> (<em>str</em>) – The path to the file to load the data from.</li>
-<li><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Sequence</em>) – A reference sequence from which to create examples.</li>
-<li><strong>n_samples</strong> (<em>int</em>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</li>
-<li><strong>sequence_length</strong> (<em>int or None, optional</em>) – Default is None. If the coordinates of each sample in the BED file
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – The path to the file to load the data from.</p></li>
+<li><p><strong>reference_sequence</strong> (<em>selene_sdk.sequences.Sequence</em>) – A reference sequence from which to create examples.</p></li>
+<li><p><strong>n_samples</strong> (<em>int</em>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</p></li>
+<li><p><strong>sequence_length</strong> (<em>int or None, optional</em>) – Default is None. If the coordinates of each sample in the BED file
 already account for the full sequence (that is,
 <cite>end - start = sequence_length</cite>), there is no need to specify
 the sequence length. If <cite>sequence_length</cite> is not None, the length
 of each sample will be checked to determine whether the sample
 coordinates need to be truncated or expanded to reach the
-sequence length specified in the model architecture.</li>
-<li><strong>targets_avail</strong> (<em>bool, optional</em>) – Default is False. If <cite>targets_avail</cite>, assumes that it is the
+sequence length specified in the model architecture.</p></li>
+<li><p><strong>targets_avail</strong> (<em>bool, optional</em>) – Default is False. If <cite>targets_avail</cite>, assumes that it is the
 last column of the <cite>*.bed</cite> file. The last column should contain
 the indices, separated by semicolons, of features (classes) found
 within a given sample’s coordinates (e.g. 0;1;45;60). This assumes
 that we are only looking for the absence/presence of each feature
-within the interval.</li>
-<li><strong>n_features</strong> (<em>int or None, optional</em>) – Default is None. If <cite>targets_avail</cite> is True, must specify
-<cite>n_features</cite>, the total number of features (classes).</li>
+within the interval.</p></li>
+<li><p><strong>n_features</strong> (<em>int or None, optional</em>) – Default is None. If <cite>targets_avail</cite> is True, must specify
+<cite>n_features</cite>, the total number of features (classes).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file to load the data from.</li>
-<li><strong>reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.Sequence"><em>selene_sdk.sequences.Sequence</em></a>) – A reference sequence from which to create examples.</li>
-<li><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</li>
-<li><strong>sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If the coordinates of each sample in the BED file
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>~BedFileSampler.filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file to load the data from.</p></li>
+<li><p><strong>~BedFileSampler.reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.Sequence"><em>selene_sdk.sequences.Sequence</em></a>) – A reference sequence from which to create examples.</p></li>
+<li><p><strong>~BedFileSampler.n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</p></li>
+<li><p><strong>~BedFileSampler.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If the coordinates of each sample in the BED file
 already account for the full sequence (that is,
 <cite>end - start = sequence_length</cite>), there is no need to specify
 the sequence length. If <cite>sequence_length</cite> is not None, the length
 of each sample will be checked to determine whether the sample
 coordinates need to be truncated or expanded to reach the
-sequence length specified in the model architecture.</li>
-<li><strong>targets_avail</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <cite>targets_avail</cite>, assumes that it is the last column of the <cite>*.bed</cite>
+sequence length specified in the model architecture.</p></li>
+<li><p><strong>~BedFileSampler.targets_avail</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <cite>targets_avail</cite>, assumes that it is the last column of the <cite>*.bed</cite>
 file. The last column should contain the indices, separated by
 semicolons, of features (classes) found within a given sample’s
 coordinates (e.g. 0;1;45;60). This assumes that we are only looking
-or the absence/presence of each feature within the interval.</li>
-<li><strong>n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – If <cite>targets_avail</cite> is True, must specify
-<cite>n_features</cite>, the total number of features (classes).</li>
+or the absence/presence of each feature within the interval.</p></li>
+<li><p><strong>~BedFileSampler.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – If <cite>targets_avail</cite> is True, must specify
+<cite>n_features</cite>, the total number of features (classes).</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.samplers.file_samplers.BedFileSampler.get_data">
 <code class="descname">get_data</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
-<li><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
+<li><p><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences</strong> – The list of sequences grouped into batches.
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences</strong> – The list of sequences grouped into batches.
 An element in the <cite>sequences</cite> list is of
 the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span>
 is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
 and <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(np.ndarray)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(np.ndarray)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -418,17 +410,15 @@ and <span class="math notranslate nohighlight">\(N\)</span> is the size of the s
 <code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the sequence data and
 targets from the sampler, divided into batches.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
-<li><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
+<li><p><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
 as a single matrix with all targets in the same order.
 Note that <cite>sequences_and_targets</cite>’s sequence elements are of
 the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
@@ -438,13 +428,11 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
 <cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -452,26 +440,25 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws a mini-batch of examples and their corresponding
 labels.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
-mini-batch.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
 sequence examples and their corresponding labels. The
 shape of <cite>sequences</cite> will be
 <span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is
 <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length, and
 <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.
 The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
-where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</td>
-</tr>
-</tbody>
-</table>
+where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -484,55 +471,47 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <em class="property">class </em><code class="descclassname">selene_sdk.samplers.file_samplers.</code><code class="descname">MatFileSampler</code><span class="sig-paren">(</span><em>filepath</em>, <em>sequence_key</em>, <em>targets_key=None</em>, <em>random_seed=436</em>, <em>shuffle=True</em>, <em>sequence_batch_axis=0</em>, <em>sequence_alphabet_axis=1</em>, <em>targets_batch_axis=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_samplers.file_sampler.FileSampler</span></code></p>
 <p>A sampler for which the dataset is loaded directly from a <cite>*.mat</cite> file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filepath</strong> (<em>str</em>) – The path to the file to load the data from.</li>
-<li><strong>sequence_key</strong> (<em>str</em>) – The key for the sequences data matrix.</li>
-<li><strong>targets_key</strong> (<em>str, optional</em>) – Default is None. The key for the targets data matrix.</li>
-<li><strong>random_seed</strong> (<em>int, optional</em>) – Default is 436. Sets the random seed for sampling.</li>
-<li><strong>shuffle</strong> (<em>bool, optional</em>) – Default is True. Shuffle the order of the samples in the matrix
-before sampling from it.</li>
-<li><strong>sequence_batch_axis</strong> (<em>int, optional</em>) – Default is 0. Specify the batch axis.</li>
-<li><strong>sequence_alphabet_axis</strong> (<em>int, optional</em>) – Default is 1. Specify the alphabet axis.</li>
-<li><strong>targets_batch_axis</strong> (<em>int, optional</em>) – Default is 0. Speciy the batch axis.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath</strong> (<em>str</em>) – The path to the file to load the data from.</p></li>
+<li><p><strong>sequence_key</strong> (<em>str</em>) – The key for the sequences data matrix.</p></li>
+<li><p><strong>targets_key</strong> (<em>str, optional</em>) – Default is None. The key for the targets data matrix.</p></li>
+<li><p><strong>random_seed</strong> (<em>int, optional</em>) – Default is 436. Sets the random seed for sampling.</p></li>
+<li><p><strong>shuffle</strong> (<em>bool, optional</em>) – Default is True. Shuffle the order of the samples in the matrix
+before sampling from it.</p></li>
+<li><p><strong>sequence_batch_axis</strong> (<em>int, optional</em>) – Default is 0. Specify the batch axis.</p></li>
+<li><p><strong>sequence_alphabet_axis</strong> (<em>int, optional</em>) – Default is 1. Specify the alphabet axis.</p></li>
+<li><p><strong>targets_batch_axis</strong> (<em>int, optional</em>) – Default is 0. Speciy the batch axis.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><p class="first last"><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of samples in the data matrix.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><p><strong>~MatFileSampler.n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of samples in the data matrix.</p>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.samplers.file_samplers.MatFileSampler.get_data">
 <code class="descname">get_data</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
-<li><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
+<li><p><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences</strong> – The list of sequences grouped into batches.
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences</strong> – The list of sequences grouped into batches.
 An element in the <cite>sequences</cite> list is of
 the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span>
 is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
 and <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(np.ndarray)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(np.ndarray)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -540,17 +519,15 @@ and <span class="math notranslate nohighlight">\(N\)</span> is the size of the s
 <code class="descname">get_data_and_targets</code><span class="sig-paren">(</span><em>batch_size</em>, <em>n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the sequence data and
 targets from the sampler, divided into batches.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</li>
-<li><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
+<li><p><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of samples to retrieve.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
 as a single matrix with all targets in the same order.
 Note that <cite>sequences_and_targets</cite>’s sequence elements are of
 the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
@@ -560,13 +537,11 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
 <cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -574,26 +549,25 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <code class="descname">sample</code><span class="sig-paren">(</span><em>batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws a mini-batch of examples and their corresponding
 labels.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
-mini-batch.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
 sequence examples and their corresponding labels. The
 shape of <cite>sequences</cite> will be
 <span class="math notranslate nohighlight">\(B \times L \times N\)</span>, where <span class="math notranslate nohighlight">\(B\)</span> is
 <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length, and
 <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.
 The shape of <cite>targets</cite> will be <span class="math notranslate nohighlight">\(B \times F\)</span>,
-where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</td>
-</tr>
-</tbody>
-</table>
+where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

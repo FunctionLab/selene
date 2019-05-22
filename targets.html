@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                master (0.3.0)
+                master (0.3.1)
               </div>
             
           
@@ -362,48 +362,45 @@ in order:</p>
 <p>Note that <cite>chrom</cite> is interchangeable with any sort of region (e.g.
 a protein in a FAA file). Further, <cite>start</cite> is 0-based. Lastly, any
 addition columns following the five shown above will be ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>input_path</strong> (<em>str</em>) – Path to the tabix-indexed dataset. Note that for the file to
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> (<em>str</em>) – Path to the tabix-indexed dataset. Note that for the file to
 be tabix-indexed, it must have been compressed with <cite>bgzip</cite>.
 Thus, <cite>input_path</cite> should be a <cite>*.gz</cite> file with a
-corresponding <cite>*.tbi</cite> file in the same directory.</li>
-<li><strong>features</strong> (<em>list(str)</em>) – The non-redundant list of genomic features (i.e. labels)
-that will be predicted.</li>
-<li><strong>feature_thresholds</strong> (<em>float or dict or types.FunctionType or None</em>) – Default is None. A genomic region is determined to be a
+corresponding <cite>*.tbi</cite> file in the same directory.</p></li>
+<li><p><strong>features</strong> (<em>list(str)</em>) – The non-redundant list of genomic features (i.e. labels)
+that will be predicted.</p></li>
+<li><p><strong>feature_thresholds</strong> (<em>float or dict or types.FunctionType or None</em>) – Default is None. A genomic region is determined to be a
 positive sample if at least one genomic feature peak takes
 up a proportion of the region greater than or equal to
-the threshold specified for that feature.<ul>
-<li><cite>None</cite> - No thresholds specified. All features found in                   a query region are annotated to that region.</li>
-<li><cite>float</cite> - A single threshold applies to all the features                    in the dataset.</li>
-<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to                    threshold values (<cite>float</cite>), which thereby assigns                   different thresholds to different features. If a                   feature’s threshold is not specified in this                    dictionary, then we assume that a key <cite>“default”</cite>                   exists in the dictionary that has the default                    threshold value we should assign to the feature                    name that is absent from the dictionary keys.</li>
-<li><cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</li>
+the threshold specified for that feature.</p>
+<ul>
+<li><p><cite>None</cite> - No thresholds specified. All features found in                   a query region are annotated to that region.</p></li>
+<li><p><cite>float</cite> - A single threshold applies to all the features                    in the dataset.</p></li>
+<li><p><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to                    threshold values (<cite>float</cite>), which thereby assigns                   different thresholds to different features. If a                   feature’s threshold is not specified in this                    dictionary, then we assume that a key <cite>“default”</cite>                   exists in the dictionary that has the default                    threshold value we should assign to the feature                    name that is absent from the dictionary keys.</p></li>
+<li><p><cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</p></li>
 </ul>
 </li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>tabix.open</em>) – The data stored in a tabix-indexed <cite>*.bed</cite> file.</li>
-<li><strong>n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of distinct features.</li>
-<li><strong>feature_index_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to indices (<cite>int</cite>),
-where the index is the position of the feature in <cite>features</cite>.</li>
-<li><strong>index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
+</dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>~GenomicFeatures.data</strong> (<em>tabix.open</em>) – The data stored in a tabix-indexed <cite>*.bed</cite> file.</p></li>
+<li><p><strong>~GenomicFeatures.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of distinct features.</p></li>
+<li><p><strong>~GenomicFeatures.feature_index_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to indices (<cite>int</cite>),
+where the index is the position of the feature in <cite>features</cite>.</p></li>
+<li><p><strong>~GenomicFeatures.index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
 where the index is the position of the feature in the input
-features.</li>
-<li><strong>feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – <ul>
-<li><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds        (<cite>float</cite>), where the threshold is the minimum overlap that a        feature annotation must have with a query region to be        considered a positive example of that feature.</li>
-<li><cite>None</cite> - No threshold specifications. Assumes that all features        returned by a tabix query are annotated to the query region.</li>
+features.</p></li>
+<li><p><strong>~GenomicFeatures.feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – <ul>
+<li><p><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds        (<cite>float</cite>), where the threshold is the minimum overlap that a        feature annotation must have with a query region to be        considered a positive example of that feature.</p></li>
+<li><p><cite>None</cite> - No threshold specifications. Assumes that all features        returned by a tabix query are annotated to the query region.</p></li>
 </ul>
-</li>
+</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <dl class="method">
 <dt id="selene_sdk.targets.GenomicFeatures.get_feature_data">
 <code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
@@ -413,29 +410,25 @@ instance, for <cite>n_features</cite>, each position in that sequence will
 have a binary vector specifying whether the genomic feature’s
 coordinates overlap with that position.
 &#64;TODO: Clarify with an example, as this is hard to read right now.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>chrom</strong> (<em>str</em>) – The name of the region (e.g. ‘1’, ‘2’, …, ‘X’, ‘Y’).</li>
-<li><strong>start</strong> (<em>int</em>) – The 0-based first position in the region.</li>
-<li><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the region.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> (<em>str</em>) – The name of the region (e.g. ‘1’, ‘2’, …, ‘X’, ‘Y’).</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – The 0-based first position in the region.</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the region.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><span class="math notranslate nohighlight">\(L \times N\)</span> array, where <span class="math notranslate nohighlight">\(L = end - start\)</span>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(L \times N\)</span> array, where <span class="math notranslate nohighlight">\(L = end - start\)</span>
 and <span class="math notranslate nohighlight">\(N =\)</span> <cite>self.n_features</cite>. Note that if we catch a
 <cite>tabix.TabixError</cite>, we assume the error was the result of
 there being no features present in the queried region and
 return a <cite>numpy.ndarray</cite> of zeros.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.16)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -444,29 +437,25 @@ return a <cite>numpy.ndarray</cite> of zeros.</p>
 <dd><p>Determines whether the query the <cite>chrom</cite> queried contains any
 genomic features within the <span class="math notranslate nohighlight">\([start, end)\)</span> region. If so,
 the query is considered positive.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>chrom</strong> (<em>str</em>) – The name of the region (e.g. ‘1’, ‘2’, …, ‘X’, ‘Y’).</li>
-<li><strong>start</strong> (<em>int</em>) – The 0-based first position in the region.</li>
-<li><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the region.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> (<em>str</em>) – The name of the region (e.g. ‘1’, ‘2’, …, ‘X’, ‘Y’).</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – The 0-based first position in the region.</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the region.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><cite>True</cite> if this meets the criterion for a positive example,
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>True</cite> if this meets the criterion for a positive example,
 <cite>False</cite> otherwise.
 Note that if we catch a <cite>tabix.TabixError</cite> exception, we
 assume the error was the result of no features being present
 in the queried region and return <cite>False</cite>.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
