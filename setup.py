@@ -34,7 +34,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext} if USING_CYTHON else {}
 
 setup(name="selene-sdk",
-      version="0.3.0",
+      version="0.3.1",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
@@ -66,7 +66,7 @@ setup(name="selene-sdk",
         "plotly",
         "pyfaidx",
         "pytabix",
-        "pyyaml==3.13",
+        "pyyaml>=5.1",
         "scikit-learn",
         "scipy",
         "seaborn",
