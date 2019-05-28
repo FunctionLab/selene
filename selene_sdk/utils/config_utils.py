@@ -15,6 +15,9 @@ from . import instantiate
 
 
 def class_instantiate(classobj):
+    """Not used currently, but might be useful later for recursive
+    class instantiation
+    """
     for attr, obj in classobj.__dict__.items():
         is_module = getattr(obj, '__module__', None)
         if is_module and "selene_sdk" in is_module and attr is not "model":
@@ -195,12 +198,12 @@ def execute(operations, configs, output_dir):
                     configs["model"], train=False)
             if "evaluate_model" in configs:
                 sampler_info = configs["sampler"]
-                data_sampler = instantiate(sampler_info)
+                sampler = instantiate(sampler_info)
                 evaluate_model_info = configs["evaluate_model"]
                 evaluate_model_info.bind(
                     model=model,
                     criterion=loss,
-                    data_sampler=data_sampler)
+                    data_sampler=sampler)
                 if output_dir is not None:
                     evaluate_model_info.bind(output_dir=output_dir)
 
