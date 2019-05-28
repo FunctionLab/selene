@@ -119,6 +119,12 @@ class LogitScoreHandler(PredictionsHandler):
             features).
 
         """
+        baseline_predictions[baseline_predictions == 0] = 1e-24
+        baseline_predictions[baseline_predictions >= 1] = 0.999999
+
+        batch_predictions[batch_predictions == 0] = 1e-24
+        batch_predictions[batch_predictions >= 1] = 0.999999
+
         logits = logit(baseline_predictions) - logit(batch_predictions)
         self._results.append(logits)
         self._samples.append(batch_ids)

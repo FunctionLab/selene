@@ -58,7 +58,8 @@ def read_vcf_file(input_path,
             if len(cols) < 5:
                 continue
             chrom = str(cols[0])
-            chrom = chrom.replace('CHR', 'chr')
+            if 'CHR' == chrom[:3]:
+                chrom = chrom.replace('CHR', 'chr')
             if "chr" not in chrom:
                 chrom = "chr" + chrom
 

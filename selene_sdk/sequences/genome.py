@@ -206,6 +206,17 @@ class Genome(Sequence):
                 **{b: ix for (ix, b) in enumerate(bases)},
                 **{b: ix for (ix, b) in enumerate(lc_bases)}}
             self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
+            self.update_bases_order(bases)
+
+    @classmethod
+    def update_bases_order(cls, bases):
+        cls.BASES_ARR = bases
+        lc_bases = [str.lower(b) for b in bases]
+        cls.BASE_TO_INDEX = {
+            **{b: ix for (ix, b) in enumerate(bases)},
+            **{b: ix for (ix, b) in enumerate(lc_bases)}}
+        cls.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
+
 
     def get_chrs(self):
         """Gets the list of chromosome names.
@@ -262,10 +273,9 @@ class Genome(Sequence):
             in the input.
 
         """
-        is_chrom = chrom in self.len_chrs
-        in_bounds = (start >= 0 and start < self.len_chrs[chrom] and
-                     end <= self.len_chrs[chrom])
-        return is_chrom and in_bounds
+        return chrom in self.len_chrs and \
+            (start >= 0 and start < self.len_chrs[chrom] and
+             end <= self.len_chrs[chrom])
 
     def get_sequence_from_coords(self,
                                  chrom,

@@ -91,8 +91,12 @@ class EvaluateModel(object):
 
         trained_model = torch.load(
             trained_model_path, map_location=lambda storage, location: storage)
-        self.model = load_model_from_state_dict(
-            trained_model["state_dict"], model)
+        if 'state_dict' in trained_model:
+            self.model = load_model_from_state_dict(
+                trained_model["state_dict"], model)
+        else:
+            self.model = load_model_from_state_dict(
+                trained_model, model)
         self.model.eval()
 
         self.sampler = data_sampler
@@ -168,7 +172,8 @@ class EvaluateModel(object):
                 inputs = Variable(inputs)
                 targets = Variable(targets)
 
-                predictions = self.model(inputs.transpose(1, 2))
+                inputs = inputs.transpose(1, 2).unsqueeze_(2)
+                predictions = self.model(inputs)
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(predictions.data.cpu().numpy())
