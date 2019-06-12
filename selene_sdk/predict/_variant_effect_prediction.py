@@ -12,7 +12,7 @@ VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 # TODO: Is this a general method that might belong in utils?
 def read_vcf_file(input_path,
                   strand_index=None,
-                  NA_output=None,
+                  output_NAs_to_file=None,
                   seq_context=None,
                   reference_sequence=None):
     """
@@ -29,11 +29,27 @@ def read_vcf_file(input_path,
         model is strand-specific, you may want to specify the column number
         (0-based) in the VCF file that includes the strand corresponding
         to each variant.
+    output_NAs_to_file : str or None, optional
+        Default is None. Only used if `reference_sequence` and `seq_context`
+        are also not None. Specify a filepath to which invalid variants are
+        written. Invalid = sequences that cannot be fetched, either because
+        the exact chromosome cannot be found in the `reference_sequence` FASTA
+        file or because the sequence retrieved based on the specified
+        `seq_context` is out of bounds.
+    seq_context : int or tuple(int, int) or None, optional
+        Default is None. Only used if `reference_sequence` is not None.
+        Specifies the sequence context in which the variant is centered.
+        `seq_context` accepts a tuple of ints specifying the start and end
+        radius surrounding the variant position or a single int if the
+        start and end radius are the same length.
+    reference_sequence : selene_sdk.sequences.Genome or None, optional
+        Default is None. Only used if `seq_context` is not None.
+        The reference genome.
 
     Returns
     -------
     list(tuple)
-        List of variants. Tuple = (chrom, position, id, ref, alt)
+        List of variants. Tuple = (chrom, position, id, ref, alt, strand)
 
     """
     variants = []
@@ -60,11 +76,11 @@ def read_vcf_file(input_path,
             chrom = str(cols[0])
             if 'CHR' == chrom[:3]:
                 chrom = chrom.replace('CHR', 'chr')
-            if "chr" not in chrom:
+            elif "chr" not in chrom:
                 chrom = "chr" + chrom
 
-            # might remove this, just used as quick fix for FASTA files we use
-            if chrom == "chrMT":
+            if chrom == "chrMT" and \
+                    chrom not in reference_sequence.get_chrs():
                 chrom = "chrM"
 
             pos = int(cols[1])
@@ -83,12 +99,12 @@ def read_vcf_file(input_path,
                 lhs_radius, rhs_radius = seq_context
                 start = pos + len(ref) // 2 - lhs_radius
                 end = pos + len(ref) // 2 + rhs_radius
-                if not reference_sequence.coords_in_bounds(chrom, start, end):
-                    if NA_output:
-                        with open(NA_output, 'a') as file_handle:
-                            file_handle.write(
-                                "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
-                                    chrom, pos, name, ref, alt, strand))
+                if not reference_sequence.coords_in_bounds(chrom, start, end) \
+                        and output_NAs_to_file:
+                    with open(output_NAs_to_file, 'a') as file_handle:
+                        file_handle.write(
+                            "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
+                                chrom, pos, name, ref, alt, strand))
                     continue
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
@@ -118,22 +134,23 @@ def _process_alt(chrom,
                  start_radius,
                  reference_sequence):
     """
-    Iterate through the alternate alleles of the variant and return
-    the encoded sequences centered at those alleles for input into
+    Return the encoded sequence centered at a given allele for input into
     the model.
 
     Parameters
     ----------
-    all_alts : list(str)
-        The list of alternate alleles corresponding to the variant
-    ref : str
-        The reference allele of the variant
     chrom : str
         The chromosome the variant is in
     pos : int
         The position of the variant
+    ref : str
+        The reference allele of the variant
+    alt : str
+        The alternate allele
     strand : {'+', '-'}
         The strand the variant is on
+    wt_sequence : numpy.ndarray
+        The reference sequence encoding
     start_radius : int
         The number of bases to query on the LHS of the variant.
     reference_sequence : selene_sdk.sequences.Sequence
@@ -261,11 +278,6 @@ def _handle_ref_alt_predictions(model,
         One-hot encoded sequences with the alt base(s).
     reporters : list(PredictionsHandler)
         List of prediction handlers.
-    warn : bool, optional
-        Whether a warning was raised or not. If `warn`, directs handlers
-        to divert the predictions/scores to different files
-        (filename prefixed by 'warning.') so that users
-        know that Selene detected an issue with these variants.
     use_cuda : bool, optional
         Default is `False`. Specifies whether CUDA-enabled GPUs are available
         for torch to use.

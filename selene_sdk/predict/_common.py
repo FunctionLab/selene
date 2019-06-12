@@ -7,6 +7,8 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
+from ..utils import _is_lua_trained_model
+
 
 def get_reverse_complement(allele, reference_sequence):
     if allele == '*' or allele == '-' or len(allele) == 0:
@@ -47,12 +49,7 @@ def predict(model, batch_sequences, use_cuda=False):
     with torch.no_grad():
         inputs = Variable(inputs)
 
-        from_lua = False
-        if hasattr(model, 'module'):
-            from_lua = model.module.from_lua
-        else:
-            from_lua = model.from_lua
-        if from_lua:
+        if _is_lua_trained_model(model):
             outputs = model.forward(inputs.transpose(1, 2).unsqueeze_(2))
         else:
             outputs = model.forward(inputs.transpose(1, 2))

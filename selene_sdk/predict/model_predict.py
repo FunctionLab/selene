@@ -277,7 +277,7 @@ class AnalyzeSequences(object):
             os.path.join(output_dir, output_prefix),
             output_format,
             ["index", "name"],
-            output_size=len(fasta_file),
+            output_size=len(fasta_file.keys()),
             mode="prediction")[0]
         sequences = np.zeros((self.batch_size,
                               self.sequence_length,
@@ -608,7 +608,7 @@ class AnalyzeSequences(object):
         variants = read_vcf_file(
             vcf_file,
             strand_index=strand_index,
-            NA_output="{0}.NA".format(output_path_prefix),
+            output_NAs_to_file="{0}.NA".format(output_path_prefix),
             seq_context=(self._start_radius, self._end_radius),
             reference_sequence=self.reference_sequence)
 

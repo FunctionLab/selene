@@ -85,7 +85,7 @@ def write_to_hdf5_file(data_across_features,
     with h5py.File(hdf5_filepath, 'a') as hdf5_handle:
         data = hdf5_handle["data"]
         for data_batch in data_across_features:
-            data[start_index  : (start_index + data_batch.shape[0])] = data_batch
+            data[start_index :(start_index + data_batch.shape[0])] = data_batch
             start_index = start_index + data_batch.shape[0]
 
     return start_index
