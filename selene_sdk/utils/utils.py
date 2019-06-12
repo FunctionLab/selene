@@ -11,6 +11,13 @@ import numpy as np
 import sys
 
 
+def _is_lua_trained_model(model):
+    if hasattr(model, 'module'):
+        return model.module.from_lua
+    else:
+        return model.from_lua
+
+
 def get_indices_and_probabilities(interval_lengths, indices):
     """
     Given a list of different interval lengths and the indices of

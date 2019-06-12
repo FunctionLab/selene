@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+from .utils import _is_lua_trained_model
 from .utils import initialize_logger
 from .utils import load_model_from_state_dict
 from .utils import PerformanceMetrics
@@ -91,7 +92,7 @@ class EvaluateModel(object):
 
         trained_model = torch.load(
             trained_model_path, map_location=lambda storage, location: storage)
-        if 'state_dict' in trained_model:
+        if "state_dict" in trained_model:
             self.model = load_model_from_state_dict(
                 trained_model["state_dict"], model)
         else:
@@ -172,8 +173,13 @@ class EvaluateModel(object):
                 inputs = Variable(inputs)
                 targets = Variable(targets)
 
-                inputs = inputs.transpose(1, 2).unsqueeze_(2)
-                predictions = self.model(inputs)
+                predictions = None
+                if _is_lua_trained_model(self.model):
+                    predictions = self.model.forward(
+                        inputs.transpose(1, 2).unsqueeze_(2))
+                else:
+                    predictions = self.model.forward(
+                        inputs.transpose(1, 2))
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(predictions.data.cpu().numpy())

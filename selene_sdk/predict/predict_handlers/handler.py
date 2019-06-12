@@ -221,11 +221,12 @@ class PredictionsHandler(metaclass=ABCMeta):
                     '\t'.join(column_names)))
         elif self._output_format == "hdf5":
             self._output_filepath = "{0}.h5".format(scores_filepath)
-            with h5py.File(self._output_filepath, 'w') as output_handle:
-                output_handle.create_dataset(
-                    "data",
-                    (self._output_size, len(self._features)),
-                    dtype='float64')
+            with h5py.File(self._output_filepath, 'a') as output_handle:
+                if 'data' not in output_handle:
+                    output_handle.create_dataset(
+                        "data",
+                        (self._output_size, len(self._features)),
+                        dtype='float64')
             self._hdf5_start_index = 0
 
             labels_filename = "row_labels.txt"

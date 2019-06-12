@@ -5,6 +5,7 @@ functionality cannot be appropriately confined to just one module, and
 thus is included here.
 
 """
+from .utils import _is_lua_trained_model
 from .utils import get_indices_and_probabilities
 from .utils import initialize_logger
 from .utils import load_features_list
@@ -21,7 +22,8 @@ from .config_utils import parse_configs_and_run
 from .non_strand_specific_module import NonStrandSpecific
 from .example_model import DeeperDeepSEA
 
-__all__ = ["initialize_logger",
+__all__ = ["_is_lua_trained_model",
+           "initialize_logger",
            "load_features_list",
            "load_model_from_state_dict",
            "PerformanceMetrics",
