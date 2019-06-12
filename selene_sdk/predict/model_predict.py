@@ -302,6 +302,7 @@ class AnalyzeSequences(object):
                 sequences = np.zeros((
                     self.batch_size, *cur_sequence_encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
+                batch_ids = []
 
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
 
