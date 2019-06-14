@@ -11,6 +11,7 @@ from sys import getsizeof
 
 import h5py
 
+
 def write_to_tsv_file(data_across_features, info_cols, output_filepath):
     """
     Write samples with valid predictions/scores to a tab-delimited file.
@@ -28,8 +29,8 @@ def write_to_tsv_file(data_across_features, info_cols, output_filepath):
         in `info_cols` corresponds to each row that will be written to the
         file. All columns in an element of `info_cols` will be prepended to
         the values in an element of `data_across_features`.
-    output_handle : _io.TextIOWrapper
-        File handle we use to write the information
+    output_filepath : str
+        Filepath to which to write outputs
 
     """
     with open(output_filepath, 'a') as output_handle:
@@ -44,8 +45,8 @@ def write_to_tsv_file(data_across_features, info_cols, output_filepath):
 def write_to_hdf5_file(data_across_features,
                        info_cols,
                        hdf5_filepath,
-                       info_filepath,
-                       start_index):
+                       start_index,
+                       info_filepath=None):
     """
     Write samples with valid predictions/scores to an HDF5 file. The
     dataset attached to this file will be accessed using the key "data".
@@ -66,22 +67,26 @@ def write_to_hdf5_file(data_across_features,
         in `info_cols` is the label information for each row that is written
         to the file. All values in an element of `info_cols` will be written
         to a separate .txt file.
-    hdf5_handle : h5py._hl.files.File
-        File handle we use to write the data to the HDF5 file.
-    info_handle : _io.TextIOWrapper
-        File handle to write the elements of `info_cols` to a tab-separated
-        .txt file.
+    hdf5_filepath : str
+        HDF5 filepath to which to write the data.
+    start_index : int
+        The row index in the HDF5 matrix to which to start writing the data
+    info_handle : str or None, optional
+        Default is None. .txt filepath to which to write the labels.
+        Can be None if multiple handlers were initialized--only 1
+        needs to write to the labels file.
 
     Returns
     -------
     int
     The updated start_index.
     """
-    with open(info_filepath, 'a') as info_handle:
-        for info_batch in info_cols:
-            for info in info_batch:
-                info_str = '\t'.join([str(i) for i in info])
-                info_handle.write("{0}\n".format(info_str))
+    if info_filepath is not None:
+        with open(info_filepath, 'a') as info_handle:
+            for info_batch in info_cols:
+                for info in info_batch:
+                    info_str = '\t'.join([str(i) for i in info])
+                    info_handle.write("{0}\n".format(info_str))
     with h5py.File(hdf5_filepath, 'a') as hdf5_handle:
         data = hdf5_handle["data"]
         for data_batch in data_across_features:
@@ -89,34 +94,6 @@ def write_to_hdf5_file(data_across_features,
             start_index = start_index + data_batch.shape[0]
 
     return start_index
-
-def write_NAs_to_file(info_cols, column_names, output_path):
-    """
-    Writes samples with NA predictions or scores to a tab-delimited file.
-
-    Parameters
-    ----------
-    info_cols : list(arraylike)
-        NA entries should still have identifying information attached
-        to each entry. Each item in `info_cols` corresponds to each
-        row that will be written to the file. The item then, is the list
-        of column value that go in this row.
-    column_names : list(str)
-        Column names written as the first line of the file.
-    output_path : str
-        Path to the file where we should write the `NA`'s.
-
-    Returns
-    -------
-    None
-        Writes information to file
-    """
-    with open(output_path, 'w+') as file_handle:
-        file_handle.write("{columns}\n".format(
-            columns='\t'.join(column_names)))
-        for info in info_cols:
-            write_info = '\t'.join([str(i) for i in info])
-            file_handle.write("{0}\n".format(write_info))
 
 
 def probabilities_to_string(probabilities):
@@ -183,11 +160,11 @@ class PredictionsHandler(metaclass=ABCMeta):
                  output_path_prefix,
                  output_format,
                  output_size=None,
-                 write_mem_limit=1500):
+                 write_mem_limit=1500,
+                 write_labels=True):
         self.needs_base_pred = False
         self._results = []
         self._samples = []
-        self._NA_samples = []
 
         self._features = features
         self._columns_for_ids = columns_for_ids
@@ -195,21 +172,28 @@ class PredictionsHandler(metaclass=ABCMeta):
         self._output_format = output_format
         self._output_size = output_size
         if output_format == 'hdf5' and output_size is None:
-            raise ValueError("output_size must be specified when output_format is hdf5.")
+            raise ValueError("`output_size` must be specified when "
+                             "`output_format` is 'hdf5'.")
 
         self._output_filepath = None
         self._labels_filepath = None
 
         self._write_mem_limit = write_mem_limit
+        self._write_labels = write_labels
 
     def _create_write_handler(self, handler_filename):
         """
-        TODO
+        Initialize handlers for writing outputs to file.
 
         """
-        output_path, filename_prefix = os.path.split(
-            self._output_path_prefix)
-        if len(filename_prefix) > 0:
+        output_path = None
+        filename_prefix = None
+        if not os.path.isdir(self._output_path_prefix):
+            output_path, filename_prefix = os.path.split(
+                self._output_path_prefix)
+        else:
+            output_path = self._output_path_prefix
+        if filename_prefix is not None:
             handler_filename = "{0}_{1}".format(
                 filename_prefix, handler_filename)
         scores_filepath = os.path.join(output_path, handler_filename)
@@ -222,54 +206,31 @@ class PredictionsHandler(metaclass=ABCMeta):
         elif self._output_format == "hdf5":
             self._output_filepath = "{0}.h5".format(scores_filepath)
             with h5py.File(self._output_filepath, 'a') as output_handle:
-                if 'data' not in output_handle:
+                if "data" not in output_handle:
                     output_handle.create_dataset(
                         "data",
                         (self._output_size, len(self._features)),
                         dtype='float64')
             self._hdf5_start_index = 0
 
+            if not self._write_labels:
+                return
             labels_filename = "row_labels.txt"
-            if len(filename_prefix) > 0:
+            if filename_prefix is not None:
+                # always output same row labels filename
+                if filename_prefix[-4:] == '.ref' or \
+                        filename_prefix[-4:] == '.alt':
+                    filename_prefix = filename_prefix[:-4]
                 labels_filename = "{0}_{1}".format(
                     filename_prefix, labels_filename)
             self._labels_filepath = os.path.join(output_path, labels_filename)
+            # create the file
             open(self._labels_filepath, 'w+')
-
-    def _write_NAs_to_file(self,
-                           output_path_prefix,
-                           column_names):
-        if self._NA_samples:
-            output_path, prefix = os.path.split(output_path_prefix)
-            NA_filename = "predictions.NA"
-            if len(prefix) > 0:
-                if '.ref' in prefix:
-                    prefix, _ = prefix.split('.')
-                NA_filename = "{0}_{1}".format(prefix, NA_filename)
-            write_NAs_to_file(self._NA_samples,
-                              column_names,
-                              os.path.join(output_path, NA_filename))
-            self._NA_samples = []
 
     def _reached_mem_limit(self):
         mem_used = (self._results[0].nbytes * len(self._results) +
                     getsizeof(self._samples[0]) * len(self._samples))
-        if len(self._NA_samples) > 0:
-            mem_used += getsizeof(self._NA_samples[0]) * len(self._NA_samples)
         return mem_used / 10**6 >= self._write_mem_limit
-
-    def handle_NA(self, row_ids):
-        """
-        Handle rows without data. Will store the identifiers where predictions
-        were not available in a separate list.
-
-        Parameters
-        ----------
-        row_ids : arraylike(str)
-            The list of row IDs
-
-        """
-        self._NA_samples.append(row_ids)
 
     @abstractmethod
     def handle_batch_predictions(self, *args, **kwargs):
@@ -283,18 +244,15 @@ class PredictionsHandler(metaclass=ABCMeta):
         Writes accumulated handler results to file.
 
         """
-        self._write_NAs_to_file(
-            self._output_path_prefix, self._columns_for_ids)
-
         if not self._results:
             return None
-        if self._labels_filepath is not None:
+        if self._hdf5_start_index is not None:
             self._hdf5_start_index = write_to_hdf5_file(
                 self._results,
                 self._samples,
                 self._output_filepath,
-                self._labels_filepath,
-                self._hdf5_start_index)
+                self._hdf5_start_index,
+                info_filepath=self._labels_filepath)
         else:
             write_to_tsv_file(self._results,
                               self._samples,

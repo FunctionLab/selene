@@ -212,16 +212,25 @@ class AnalyzeSequences(object):
                             output_format,
                             output_size,
                             self._write_mem_limit // len(save_data)]
-        if "diffs" in save_data:
-            reporters.append(DiffScoreHandler(*constructor_args))
-        if "abs_diffs" in save_data:
-            reporters.append(AbsDiffScoreHandler(*constructor_args))
-        if "logits" in save_data:
-            reporters.append(LogitScoreHandler(*constructor_args))
-        if "predictions" in save_data and mode != "varianteffect":
-            reporters.append(WritePredictionsHandler(*constructor_args))
-        elif "predictions" in save_data and mode == "varianteffect":
-            reporters.append(WriteRefAltHandler(*constructor_args))
+        for i, s in enumerate(save_data):
+            write_labels = False
+            if i == 0:
+                write_labels = True
+            if "diffs" in s:
+                reporters.append(DiffScoreHandler(
+                    *constructor_args, write_labels=write_labels))
+            if "abs_diffs" in s:
+                reporters.append(AbsDiffScoreHandler(
+                    *constructor_args, write_labels=write_labels))
+            if "logits" in s:
+                reporters.append(LogitScoreHandler(
+                    *constructor_args, write_labels=write_labels))
+            if "predictions" in s and mode != "varianteffect":
+                reporters.append(WritePredictionsHandler(
+                    *constructor_args, write_labels=write_labels))
+            elif "predictions" in s and mode == "varianteffect":
+                reporters.append(WriteRefAltHandler(
+                    *constructor_args, write_labels=write_labels))
         return reporters
 
     def get_predictions_for_fasta_file(self,
@@ -583,11 +592,11 @@ class AnalyzeSequences(object):
         None
             Saves all files to `output_dir`. If any bases in the 'ref' column
             of the VCF do not match those at the specified position in the
-            reference genome, the scores/predictions will be output to a
-            file prefixed with `warning.`. If most of your variants show up
-            in these warning files, please check that the reference genome
-            you specified matches the one from which the VCF was created.
-            The warning files can be used directly if you have verified that
+            reference genome, the row labels .txt file will mark this variant
+            as `ref_match = False`. If most of your variants do not match
+            the reference genome, please check that the reference genome
+            you specified matches the version with which the variants were
+            called. The predictions can used directly if you have verified that
             the 'ref' bases specified for these variants are correct (Selene
             will have substituted these bases for those in the reference
             genome). Finally, some variants may show up in an 'NA' file.

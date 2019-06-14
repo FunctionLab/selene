@@ -53,7 +53,8 @@ class WriteRefAltHandler(PredictionsHandler):
                  output_path_prefix,
                  output_format,
                  output_size=None,
-                 write_mem_limit=1500):
+                 write_mem_limit=1500,
+                 write_labels=True):
         """
         Constructs a new `WriteRefAltHandler` object.
         """
@@ -62,8 +63,9 @@ class WriteRefAltHandler(PredictionsHandler):
             columns_for_ids,
             output_path_prefix,
             output_format,
-            output_size,
-            write_mem_limit)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit,
+            write_labels=write_labels)
 
         self.needs_base_pred = True
         self._features = features
@@ -71,6 +73,7 @@ class WriteRefAltHandler(PredictionsHandler):
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
         self._write_mem_limit = write_mem_limit
+        self._write_labels = write_labels
 
         output_path, prefix = os.path.split(output_path_prefix)
         ref_filename = "ref"
@@ -86,27 +89,18 @@ class WriteRefAltHandler(PredictionsHandler):
             columns_for_ids,
             ref_filepath,
             output_format,
-            output_size,
-            write_mem_limit // 2)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit // 2,
+            write_labels=write_labels)
+
         self._alt_writer = WritePredictionsHandler(
             features,
             columns_for_ids,
             alt_filepath,
             output_format,
-            output_size,
-            write_mem_limit // 2)
-
-    def handle_NA(self, batch_ids):
-        """
-        TODO
-
-        Parameters
-        ----------
-        batch_ids : TODO
-            TODO
-
-        """
-        self._ref_writer.handle_NA(batch_ids)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit // 2,
+            write_labels=False)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
