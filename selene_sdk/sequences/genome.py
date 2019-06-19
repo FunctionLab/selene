@@ -118,6 +118,10 @@ class Genome(Sequence):
         measurements. You can pass as input "hg19" or "hg38" to use the
         blacklist regions released by ENCODE. You can also pass in your own
         tabix-indexed .gz file.
+    bases_order : list(str) or None, optional
+        Default is None (use the default base ordering of
+        `['A', 'C', 'G', 'T']`). Specify a different ordering of
+        DNA bases for one-hot encoding.
 
     Attributes
     ----------
@@ -131,7 +135,7 @@ class Genome(Sequence):
 
     """
 
-    BASES_ARR = np.array(['A', 'G', 'C', 'T'])
+    BASES_ARR = np.array(['A', 'C', 'G', 'T'])
     """
     This is an array with the alphabet (i.e. all possible symbols
     that may occur in a sequence). We expect that
@@ -140,8 +144,8 @@ class Genome(Sequence):
     """
 
     BASE_TO_INDEX = {
-        'A': 0, 'C': 2, 'G': 1, 'T': 3,
-        'a': 0, 'c': 2, 'g': 1, 't': 3,
+        'A': 0, 'C': 1, 'G': 2, 'T': 3,
+        'a': 0, 'c': 1, 'g': 2, 't': 3,
     }
     """
     A dictionary mapping members of the alphabet (i.e. all
@@ -149,7 +153,7 @@ class Genome(Sequence):
     """
 
     INDEX_TO_BASE = {
-        0: 'A', 1: 'G', 2: 'C', 3: 'T'
+        0: 'A', 1: 'C', 2: 'G', 3: 'T'
     }
     """
     A dictionary mapping integers to members of the alphabet (i.e.

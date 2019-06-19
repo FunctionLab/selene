@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+from .sequences import Genome
 from .utils import _is_lua_trained_model
 from .utils import initialize_logger
 from .utils import load_model_from_state_dict
@@ -129,6 +130,10 @@ class EvaluateModel(object):
 
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
+
+        if type(self.reference_sequence) == Genome and \
+                _is_lua_trained_model(model):
+            Genome.update_bases_order(['A', 'G', 'C', 'T'])
 
     def _get_feature_from_index(self, index):
         """

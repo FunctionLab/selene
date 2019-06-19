@@ -12,6 +12,7 @@ VCF_REQUIRED_COLS = ["#CHROM", "POS", "ID", "REF", "ALT"]
 # TODO: Is this a general method that might belong in utils?
 def read_vcf_file(input_path,
                   strand_index=None,
+                  require_strand=False,
                   output_NAs_to_file=None,
                   seq_context=None,
                   reference_sequence=None):
@@ -29,6 +30,11 @@ def read_vcf_file(input_path,
         model is strand-specific, you may want to specify the column number
         (0-based) in the VCF file that includes the strand corresponding
         to each variant.
+    require_strand : bool, optional
+        Default is False. Whether strand can be specified as '.'. If False,
+        Selene accepts strand value to be '+', '-', or '.' and automatically
+        treats '.' as '+'. If True, Selene skips any variant with strand '.'.
+        This parameter assumes that `strand_index` has been set.
     output_NAs_to_file : str or None, optional
         Default is None. Only used if `reference_sequence` and `seq_context`
         are also not None. Specify a filepath to which invalid variants are
@@ -90,8 +96,11 @@ def read_vcf_file(input_path,
                 ref = ""
             alt = cols[4]
             strand = '+'
-            if strand_index is not None and cols[strand_index] == '-':
-                strand = '-'
+            if strand_index is not None:
+                if require_strand and cols[strand_index] == '.':
+                    continue
+                elif cols[strand_index] == '-':
+                    strand = '-'
 
             if reference_sequence and seq_context:
                 if isinstance(seq_context, int):

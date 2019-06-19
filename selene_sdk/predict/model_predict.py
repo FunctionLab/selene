@@ -30,6 +30,7 @@ from .predict_handlers import LogitScoreHandler
 from .predict_handlers import WritePredictionsHandler
 from .predict_handlers import WriteRefAltHandler
 from ..sequences import Genome
+from ..utils import _is_lua_trained_model
 from ..utils import load_model_from_state_dict
 
 
@@ -152,7 +153,9 @@ class AnalyzeSequences(object):
         self.batch_size = batch_size
         self.features = features
         self.reference_sequence = reference_sequence
-
+        if type(self.reference_sequence) == Genome and \
+                _is_lua_trained_model(model):
+            Genome.update_bases_order(['A', 'G', 'C', 'T'])
         self._write_mem_limit = write_mem_limit
 
     def _initialize_reporters(self,
@@ -545,7 +548,8 @@ class AnalyzeSequences(object):
                                   save_data,
                                   output_dir=None,
                                   output_format="tsv",
-                                  strand_index=None):
+                                  strand_index=None,
+                                  require_strand=False):
         """
         Get model predictions and scores for a list of variants.
 
@@ -586,6 +590,11 @@ class AnalyzeSequences(object):
         strand_index : int or None, optional.
             Default is None. If applicable, specify the column index (0-based)
             in the VCF file that contains strand information for each variant.
+        require_strand : bool, optional.
+            Default is False. Whether strand can be specified as '.'. If False,
+            Selene accepts strand value to be '+', '-', or '.' and automatically
+            treats '.' as '+'. If True, Selene skips any variant with strand '.'.
+            This parameter assumes that `strand_index` has been set.
 
         Returns
         -------
