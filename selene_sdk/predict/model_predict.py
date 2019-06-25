@@ -236,6 +236,124 @@ class AnalyzeSequences(object):
                     *constructor_args, write_labels=write_labels))
         return reporters
 
+    def get_sequences_from_bed_file(self,
+                                    input_path,
+                                    strand_index=None):
+        sequences = []
+        labels = []
+        with open(input_path, 'r') as read_handle:
+            for i, line in enumerate(read_handle):
+                cols = line.strip().split('\t')
+                if len(cols) < 3:
+                    continue
+                chrom = cols[0]
+                start = cols[1]
+                end = cols[2]
+                strand = '.'
+                if isinstance(strand_index, int) and len(cols) > strand_index:
+                    strand = cols[strand_index]
+                if 'chr' not in chrom:
+                    chrom = 'chr{0}'.format(chrom)
+                if not str.isdigit(start) or not str.isdigit(end) \
+                        or chrom not in self.reference_sequence.genome:
+                    continue  # TODO: divert to NA file?
+                start, end = int(start), int(end)
+                mid_pos = start + ((end - start) // 2)
+                seq_start = max(
+                    mid_pos - self._start_radius, 0)
+                seq_end = min(
+                    mid_pos + self._end_radius,
+                    self.reference_sequence.len_chrs[chrom])
+                sequences.append((chrom, seq_start, seq_end, strand))
+                labels.append((i, chrom, start, end, strand))
+        return sequences, labels
+
+    def get_predictions_for_bed_file(self,
+                                     input_path,
+                                     output_dir,
+                                     output_format="tsv",
+                                     strand_index=None):
+        """
+        Get model predictions for sequences specified as genome coordinates
+        in a BED file.
+
+        Parameters
+        ----------
+        input_path : str
+            Input path to the BED file.
+        output_dir : str
+            Output directory to write the model predictions.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package). Choose
+
+                * 'tsv' if your list of sequences is relatively small
+                  (:math:`10^4` or less in order of magnitude) and/or your
+                  model has a small number of features (<1000).
+                * 'hdf5' for anything larger and/or if you would like to
+                  access the predictions/scores as a matrix that you can
+                  easily filter, apply computations, or use in a subsequent
+                  classifier/model. In this case, you may access the matrix
+                  using `mat["data"]` after opening the HDF5 file using
+                  `mat = h5py.File("<output.h5>", 'r')`. The matrix columns
+                  are the features and will match the same ordering as your
+                  features .txt file (same as the order your model outputs
+                  its predictions) and the matrix rows are the sequences.
+                  Note that the row labels (FASTA description/IDs) will be
+                  output as a separate .txt file (should match the ordering
+                  of the sequences in the input FASTA).
+
+        strand_index : int or None, optional
+            Default is None. If the trained model makes strand-specific
+            predictions, your input file may include a column with strand
+            information (strand must be one of {'+', '-', '.'}). Specify
+            the index (0-based) to use it. Otherwise, by default '+' is used.
+
+        Returns
+        -------
+        None
+            Writes the output to file(s) in `output_dir`. Filename will
+            match that specified in the filepath.
+
+        """
+        seq_coords, labels = self.get_sequences_from_bed_file(
+            input_path, strand_index=strand_index)
+        _, filename = os.path.split(input_path)
+        output_prefix = '.'.join(filename.split('.')[:-1])
+        reporter = self._initialize_reporters(
+            ["predictions"],
+            os.path.join(output_dir, output_prefix),
+            output_format,
+            ["index", "chrom", "start", "end", "strand"],
+            output_size=len(labels),
+            mode="prediction")[0]
+        sequences = None
+        batch_ids = []
+        for i, (label, coords) in enumerate(zip(labels, seq_coords)):
+            encoding = self.reference_sequence.get_encoding_from_coords(
+                *coords, pad=True)
+            if sequences is None:
+                sequences = np.zeros((
+                    self.batch_size, *encoding.shape))
+            if i and i % self.batch_size == 0:
+                preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+                sequences = np.zeros((
+                    self.batch_size, *encoding.shape))
+                reporter.handle_batch_predictions(preds, batch_ids)
+                batch_ids = []
+            batch_ids.append(label)
+            sequences[i % self.batch_size, :, :] = encoding
+
+        if i % self.batch_size != 0:
+            sequences = sequences[:i % self.batch_size + 1, :, :]
+            preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+            reporter.handle_batch_predictions(preds, batch_ids)
+
+        reporter.write_to_file()
+
     def get_predictions_for_fasta_file(self,
                                        input_path,
                                        output_dir,
@@ -307,7 +425,6 @@ class AnalyzeSequences(object):
 
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
-            batch_ids.append([i, fasta_record.name])
 
             if i and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
@@ -316,6 +433,7 @@ class AnalyzeSequences(object):
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
+            batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
 
         if i % self.batch_size != 0:
@@ -324,8 +442,69 @@ class AnalyzeSequences(object):
             reporter.handle_batch_predictions(preds, batch_ids)
 
         fasta_file.close()
-        reporter.write_to_file(close=True)
+        reporter.write_to_file()
 
+
+    def get_predictions(self,
+                        input_path,
+                        output_dir,
+                        output_format="tsv",
+                        strand_index=None):
+        """
+        Get model predictions for sequences specified in a FASTA or BED file.
+
+        Parameters
+        ----------
+        input_path : str
+            Input path to the FASTA or BED file.
+        output_dir : str
+            Output directory to write the model predictions.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package). Choose
+
+                * 'tsv' if your list of sequences is relatively small
+                  (:math:`10^4` or less in order of magnitude) and/or your
+                  model has a small number of features (<1000).
+                * 'hdf5' for anything larger and/or if you would like to
+                  access the predictions/scores as a matrix that you can
+                  easily filter, apply computations, or use in a subsequent
+                  classifier/model. In this case, you may access the matrix
+                  using `mat["data"]` after opening the HDF5 file using
+                  `mat = h5py.File("<output.h5>", 'r')`. The matrix columns
+                  are the features and will match the same ordering as your
+                  features .txt file (same as the order your model outputs
+                  its predictions) and the matrix rows are the sequences.
+                  Note that the row labels (FASTA description/IDs) will be
+                  output as a separate .txt file (should match the ordering
+                  of the sequences in the input FASTA).
+
+        strand_index : int or None, optional
+            Default is None. If the trained model makes strand-specific
+            predictions, your input BED file may include a column with strand
+            information (strand must be one of {'+', '-', '.'}). Specify
+            the index (0-based) to use it. Otherwise, by default '+' is used.
+            (This parameter is ignored if FASTA file is used as input.)
+
+        Returns
+        -------
+        None
+            Writes the output to file(s) in `output_dir`. Filename will
+            match that specified in the filepath.
+
+        """
+        try:
+            self.get_predictions_for_fasta_file(
+                input_path, output_dir, output_format=output_format)
+        except pyfaidx.FastaIndexingError:
+            self.get_predictions_for_bed_file(
+                input_path,
+                output_dir,
+                output_format=output_format,
+                strand_index=strand_index)
 
     def in_silico_mutagenesis_predict(self,
                                       sequence,
@@ -388,7 +567,7 @@ class AnalyzeSequences(object):
                     r.handle_batch_predictions(outputs, batch_ids)
 
         for r in reporters:
-            r.write_to_file(close=True)
+            r.write_to_file()
 
     def in_silico_mutagenesis(self,
                               sequence,
@@ -447,17 +626,21 @@ class AnalyzeSequences(object):
         current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
             sequence)
 
-        base_encoding = current_sequence_encoding.reshape(
+        current_sequence_encoding = current_sequence_encoding.reshape(
             (1, *current_sequence_encoding.shape))
-        base_preds = predict(self.model, base_encoding, use_cuda=self.use_cuda)
+        current_sequence_preds = predict(
+            self.model, current_sequence_encoding, use_cuda=self.use_cuda)
 
         if "predictions" in save_data:
             predictions_reporter = reporters[-1]
             predictions_reporter.handle_batch_predictions(
-                base_preds, [["NA", "NA", "NA"]])
+                current_sequence_preds, [["NA", "NA", "NA"]])
 
         self.in_silico_mutagenesis_predict(
-            sequence, base_preds, mutated_sequences, reporters=reporters)
+            sequence,
+            current_sequence_preds,
+            mutated_sequences,
+            reporters=reporters)
 
     def in_silico_mutagenesis_from_file(self,
                                         input_path,
