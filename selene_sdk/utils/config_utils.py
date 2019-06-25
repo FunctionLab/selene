@@ -246,7 +246,7 @@ def execute(operations, configs, output_dir):
                                      "neither.")
             if "prediction" in configs:
                 predict_info = configs["prediction"]
-                analyze_seqs.get_predictions_for_fasta_file(**predict_info)
+                analyze_seqs.get_predictions(**predict_info)
 
 
 def parse_configs_and_run(configs,

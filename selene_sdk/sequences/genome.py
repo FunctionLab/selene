@@ -38,8 +38,9 @@ def _get_sequence_from_coords(len_chrs,
         The 0-based start coordinate of the sequence.
     end : int
         One past the last coordinate of the sequence.
-    strand : {'+', '-'}, optional
-        Default is '+'. The strand the sequence is located on.
+    strand : {'+', '-', '.'}, optional
+        Default is '+'. The strand the sequence is located on. '.' is treated
+        as '+'.
     pad : bool, optional
         Default is `False`. If the coordinates are out of bounds, make an
         in-bounds query and then pad the sequence to return the desired
@@ -80,9 +81,9 @@ def _get_sequence_from_coords(len_chrs,
         except tabix.TabixError:
             pass
 
-    if strand != '+' and strand != '-':
+    if strand != '+' and strand != '-' and strand != '.':
         raise ValueError(
-            "Strand must be one of '+' or '-'. Input was {0}".format(
+            "Strand must be one of '+', '-', or '.'. Input was {0}".format(
                 strand))
 
     end_pad = 0
@@ -251,7 +252,7 @@ class Genome(Sequence):
         return len_chrs
 
     def _genome_sequence(self, chrom, start, end, strand='+'):
-        if strand == '+':
+        if strand == '+' or strand == '.':
             return self.genome[chrom][start:end].seq
         else:
             return self.genome[chrom][start:end].reverse.complement.seq
@@ -298,8 +299,9 @@ class Genome(Sequence):
             The 0-based start coordinate of the sequence.
         end : int
             One past the 0-based last position in the sequence.
-        strand : {'+', '-'}, optional
-            Default is '+'. The strand the sequence is located on.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is
+            treated as '.'.
         pad : bool, optional
             Default is `False`. Pad the output sequence with 'N' if `start`
             and/or `end` are out of bounds to return a sequence of length
@@ -332,7 +334,12 @@ class Genome(Sequence):
                                          pad=pad,
                                          blacklist_tabix=self._blacklist_tabix)
 
-    def get_encoding_from_coords(self, chrom, start, end, strand='+'):
+    def get_encoding_from_coords(self,
+                                 chrom,
+                                 start,
+                                 end,
+                                 strand='+',
+                                 pad=False):
         """Gets the one-hot encoding of the genomic sequence at the
         queried coordinates.
 
@@ -345,8 +352,13 @@ class Genome(Sequence):
             sequence.
         end : int
             One past the 0-based last position in the sequence.
-        strand : {'+', '-'}, optional
-            Default is '+'. The strand the sequence is located on.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is
+            treated as '+'.
+        pad : bool, optional
+            Default is `False`. Pad the output sequence with 'N' if `start`
+            and/or `end` are out of bounds to return a sequence of length
+            `end - start`.
 
         Returns
         -------
@@ -367,7 +379,7 @@ class Genome(Sequence):
 
         """
         sequence = self.get_sequence_from_coords(
-            chrom, start, end, strand=strand)
+            chrom, start, end, strand=strand, pad=pad)
         encoding = self.sequence_to_encoding(sequence)
         return encoding
 
