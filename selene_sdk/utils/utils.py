@@ -12,10 +12,19 @@ import sys
 
 
 def _is_lua_trained_model(model):
-    if hasattr(model, 'module'):
-        return model.module.from_lua
-    else:
+    if hasattr(model, 'from_lua'):
         return model.from_lua
+
+    check_model = model
+    if hasattr(model, 'model'):
+        check_model = model.model
+    setattr(model, "from_lua", False)
+    setattr(check_model, "from_lua", False)
+    for m in check_model.modules():
+        if "Conv2d" in m.__class__.__name__:
+            setattr(model, "from_lua", True)
+            setattr(check_model, "from_lua", True)
+    return model.from_lua
 
 
 def get_indices_and_probabilities(interval_lengths, indices):
