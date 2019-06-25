@@ -275,7 +275,9 @@ class AnalyzeSequences(object):
                                      strand_index=None):
         """
         Get model predictions for sequences specified as genome coordinates
-        in a BED file.
+        in a BED file. Coordinates do not need to be the same length as the
+        model expected sequence input - predictions will be centered at the
+        midpoint of the specified start and end coordinates.
 
         Parameters
         ----------
