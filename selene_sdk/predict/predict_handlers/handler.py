@@ -177,6 +177,7 @@ class PredictionsHandler(metaclass=ABCMeta):
 
         self._output_filepath = None
         self._labels_filepath = None
+        self._hdf5_start_index = None
 
         self._write_mem_limit = write_mem_limit
         self._write_labels = write_labels
