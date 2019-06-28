@@ -235,10 +235,10 @@ def _handle_standard_ref(ref_encoding,
 
     sequence_at_ref = None
     if not references_match:
-        seq_encoding[start_pos:start_pos + ref_len, :] = \
-            ref_encoding
         sequence_at_ref = reference_sequence.encoding_to_sequence(
             sequence_encoding_at_ref)
+        seq_encoding[start_pos:start_pos + ref_len, :] = \
+            ref_encoding
     return references_match, seq_encoding, sequence_at_ref
 
 
@@ -261,9 +261,9 @@ def _handle_long_ref(ref_encoding,
 
     sequence_at_ref = None
     if not references_match:
-        seq_encoding = ref_encoding
         sequence_at_ref = reference_sequence.encoding_to_sequence(
             sequence_encoding_at_ref)
+        seq_encoding = ref_encoding
     return references_match, seq_encoding, sequence_at_ref
 
 
