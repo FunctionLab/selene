@@ -9,7 +9,8 @@ from .handler import PredictionsHandler
 class LogitScoreHandler(PredictionsHandler):
     """
     The logit score handler calculates and records the
-    difference between `logit(alt)` and `logit(ref)` predictions.
+    difference between `logit(alt)` and `logit(ref)` predictions
+    (`logit(alt) - logit(ref)`).
     For reference, if some event occurs with probability :math:`p`,
     then the log-odds is the logit of `p`, or
 
@@ -40,6 +41,11 @@ class LogitScoreHandler(PredictionsHandler):
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
         Handler will write to file whenever this memory limit is reached.
+    write_labels : bool, optional
+        Default is True. If you initialize multiple write handlers for the
+        same set of inputs with output format `hdf5`, set `write_label` to
+        False on all handlers except 1 so that only 1 handler writes the
+        row labels to an output file.
 
     Attributes
     ----------
@@ -87,7 +93,7 @@ class LogitScoreHandler(PredictionsHandler):
                                  batch_ids,
                                  baseline_predictions):
         """
-        # TODO
+        Handles the model predications for a batch of sequences.
 
         Parameters
         ----------
@@ -115,7 +121,7 @@ class LogitScoreHandler(PredictionsHandler):
         batch_predictions[batch_predictions == 0] = 1e-24
         batch_predictions[batch_predictions >= 1] = 0.999999
 
-        logits = logit(baseline_predictions) - logit(batch_predictions)
+        logits = logit(batch_predictions) - logit(baseline_predictions)
         self._results.append(logits)
         self._samples.append(batch_ids)
         if self._reached_mem_limit():
@@ -123,6 +129,7 @@ class LogitScoreHandler(PredictionsHandler):
 
     def write_to_file(self):
         """
-        TODO
+        Write the stored scores to file.
+
         """
         super().write_to_file()

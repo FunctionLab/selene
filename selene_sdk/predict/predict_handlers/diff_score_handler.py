@@ -7,7 +7,7 @@ from .handler import PredictionsHandler
 class DiffScoreHandler(PredictionsHandler):
     """
     The "diff score" is the difference between `alt` and `ref`
-    predictions.
+    predictions (`alt - ref`).
 
     Parameters
     ----------
@@ -34,6 +34,11 @@ class DiffScoreHandler(PredictionsHandler):
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
         Handler will write to file whenever this memory limit is reached.
+    write_labels : bool, optional
+        Default is True. If you initialize multiple write handlers for the
+        same set of inputs with output format `hdf5`, set `write_label` to
+        False on all handlers except 1 so that only 1 handler writes the
+        row labels to an output file.
 
     Attributes
     ----------
