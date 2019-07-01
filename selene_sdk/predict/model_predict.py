@@ -236,9 +236,33 @@ class AnalyzeSequences(object):
                     *constructor_args, write_labels=write_labels))
         return reporters
 
-    def get_sequences_from_bed_file(self,
-                                    input_path,
-                                    strand_index=None):
+    def _get_sequences_from_bed_file(self,
+                                     input_path,
+                                     strand_index=None):
+        """
+        Get the adjusted sequence coordinates and labels corresponding
+        to each row of coordinates in an input BED file. The coordinates
+        specified in each row are only used to find the center position
+        for the resulting sequence--all regions returned will have the
+        length expected by the model.
+
+        Parameters
+        ----------
+        input_path : str
+            Input filepath to BED file.
+        strand_index : int or None, optional
+            Default is None. If sequences must be strand-specific,
+            the input BED file may include a column specifying the
+            strand ({'+', '-', '.'}).
+
+        Returns
+        -------
+        list(tup), list(tup)
+            The sequence query information (chrom, start, end, strand)
+            and the labels (the index, genome coordinates, and sequence
+            specified in the BED file).
+
+        """
         sequences = []
         labels = []
         with open(input_path, 'r') as read_handle:
@@ -276,7 +300,7 @@ class AnalyzeSequences(object):
         """
         Get model predictions for sequences specified as genome coordinates
         in a BED file. Coordinates do not need to be the same length as the
-        model expected sequence input - predictions will be centered at the
+        model expected sequence input--predictions will be centered at the
         midpoint of the specified start and end coordinates.
 
         Parameters
@@ -321,7 +345,7 @@ class AnalyzeSequences(object):
             match that specified in the filepath.
 
         """
-        seq_coords, labels = self.get_sequences_from_bed_file(
+        seq_coords, labels = self._get_sequences_from_bed_file(
             input_path, strand_index=strand_index)
         _, filename = os.path.split(input_path)
         output_prefix = '.'.join(filename.split('.')[:-1])
@@ -338,12 +362,10 @@ class AnalyzeSequences(object):
             encoding = self.reference_sequence.get_encoding_from_coords(
                 *coords, pad=True)
             if sequences is None:
-                sequences = np.zeros((
-                    self.batch_size, *encoding.shape))
+                sequences = np.zeros((self.batch_size, *encoding.shape))
             if i and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-                sequences = np.zeros((
-                    self.batch_size, *encoding.shape))
+                sequences = np.zeros((self.batch_size, *encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
             batch_ids.append(label)
@@ -430,8 +452,8 @@ class AnalyzeSequences(object):
 
             if i and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-                sequences = np.zeros((
-                    self.batch_size, *cur_sequence_encoding.shape))
+                sequences = np.zeros(
+                    (self.batch_size, *cur_sequence_encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
@@ -625,8 +647,8 @@ class AnalyzeSequences(object):
         reporters = self._initialize_reporters(
             save_data, output_path_prefix, "tsv", ISM_COLS)
 
-        current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
-            sequence)
+        current_sequence_encoding = \
+            self.reference_sequence.sequence_to_encoding(sequence)
 
         current_sequence_encoding = current_sequence_encoding.reshape(
             (1, *current_sequence_encoding.shape))
@@ -698,7 +720,8 @@ class AnalyzeSequences(object):
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
-                cur_sequence, mutate_n_bases=mutate_n_bases,
+                cur_sequence,
+                mutate_n_bases=mutate_n_bases,
                 reference_sequence=self.reference_sequence)
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
@@ -837,8 +860,12 @@ class AnalyzeSequences(object):
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end, strand=strand)
             if len(ref) and strand == '-':
-                ref = get_reverse_complement(ref, self.reference_sequence)
-                alt = get_reverse_complement(alt, self.reference_sequence)
+                ref = get_reverse_complement(
+                    ref,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+                alt = get_reverse_complement(
+                    alt,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
 
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             alt_encoding = _process_alt(

@@ -10,13 +10,28 @@ from torch.autograd import Variable
 from ..utils import _is_lua_trained_model
 
 
-def get_reverse_complement(allele, reference_sequence):
+def get_reverse_complement(allele, complementary_base_dict):
+    """
+    Get the reverse complement of the input allele.
+
+    Parameters
+    ----------
+    allele : str
+        The sequence allele
+    complementary_base_dict : dict(str)
+        The dictionary that maps each base to its complement
+
+    Returns
+    -------
+    str
+        The reverse complement of the allele.
+
+    """
     if allele == '*' or allele == '-' or len(allele) == 0:
         return '*'
     a_complement = []
     for a in allele:
-        c = reference_sequence.COMPLEMENTARY_BASE_DICT[a]
-        a_complement.append(c)
+        a_complement.append(complementary_base_dict[a])
     return ''.join(list(reversed(a_complement)))
 
 
