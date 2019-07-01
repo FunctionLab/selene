@@ -6,9 +6,10 @@ across many of the packages modules.
 """
 from collections import OrderedDict
 import logging
+import sys
+import traceback
 
 import numpy as np
-import sys
 
 
 def _is_lua_trained_model(model):
@@ -92,20 +93,31 @@ def load_model_from_state_dict(state_dict, model):
     state_dict_keys = state_dict.keys()
 
     new_state_dict = OrderedDict()
+
+    if len(model_keys) != len(state_dict_keys):
+        raise ValueError("State dict does not have the same "
+            "number of modules as the specified model "
+            "architecture. Please check whether you are using "
+            "the expected model architecture and that your PyTorch "
+            "version matches the version in which the loaded model "
+            "was trained.\n\n"
+            "\tExpected modules:\n\t{0}\n\n"
+            "\tModules in the loaded model weights:\n\t{1}\n".format(
+                model_keys, state_dict_keys))
+
     for (k1, k2) in zip(model_keys, state_dict_keys):
         value = state_dict[k2]
-        if _is_lua_trained_model(model):
+        try:
             new_state_dict[k1] = value
-        elif k1 == k2 or ('module' in k1 and k2 in k1) \
-                or ('module' in k2 and k1 in k2):
-            new_state_dict[k1] = value
-        else:
-            raise ValueError("Model state dict keys do not match the keys "
-                             "specified in `state_dict` input. Cannot load "
-                             "state into the model:\n\n"
-                             "\tExpected keys:\n\t{0}\n\n"
-                             "\tKeys in the input state dict:\n\t{1}\n".format(
-                                model_keys, state_dict_keys))
+        except Exception:
+            raise ValueError(
+                "Failed to load weight from module {0} in model weights "
+                "into model architecture module {1}. (If module name "
+                "an additional prefix `model.` it is because the model is "
+                "wrapped in `selene_sdk.utils.NonStrandSpecific`. This "
+                "error was raised because the underlying module does "
+                "not match that expected by the loaded model:\n"
+                "{2}".format(k2, k1, traceback.print_exc()))
     model.load_state_dict(new_state_dict)
     return model
 

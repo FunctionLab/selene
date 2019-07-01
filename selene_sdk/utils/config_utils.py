@@ -11,6 +11,7 @@ import types
 
 import torch
 
+from . import _is_lua_trained_model
 from . import instantiate
 
 
@@ -119,10 +120,7 @@ def initialize_model(model_configs, train=True, lr=None):
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"])
 
-    setattr(model, "from_lua", False)
-    for m in model.modules():
-        if "Conv2d" in m.__class__.__name__:
-            setattr(model, "from_lua", True)
+    _is_lua_trained_model(model)
     criterion = module.criterion()
     if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)
