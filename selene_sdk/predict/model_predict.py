@@ -204,6 +204,7 @@ class AnalyzeSequences(object):
         """
         save_data = set(save_data) & set(
             ["diffs", "abs_diffs", "logits", "predictions"])
+        save_data = sorted(list(save_data))
         if len(save_data) == 0:
             raise ValueError("'save_data' parameter must be a list that "
                              "contains one of ['diffs', 'abs_diffs', "
@@ -219,19 +220,19 @@ class AnalyzeSequences(object):
             write_labels = False
             if i == 0:
                 write_labels = True
-            if "diffs" in s:
+            if "diffs" == s:
                 reporters.append(DiffScoreHandler(
                     *constructor_args, write_labels=write_labels))
-            if "abs_diffs" in s:
+            elif "abs_diffs" == s:
                 reporters.append(AbsDiffScoreHandler(
                     *constructor_args, write_labels=write_labels))
-            if "logits" in s:
+            elif "logits" == s:
                 reporters.append(LogitScoreHandler(
                     *constructor_args, write_labels=write_labels))
-            if "predictions" in s and mode != "varianteffect":
+            elif "predictions" == s and mode != "varianteffect":
                 reporters.append(WritePredictionsHandler(
                     *constructor_args, write_labels=write_labels))
-            elif "predictions" in s and mode == "varianteffect":
+            elif "predictions" == s and mode == "varianteffect":
                 reporters.append(WriteRefAltHandler(
                     *constructor_args, write_labels=write_labels))
         return reporters
