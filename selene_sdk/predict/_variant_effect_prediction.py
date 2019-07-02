@@ -120,7 +120,13 @@ def read_vcf_file(input_path,
     return variants
 
 
-def _get_ref_idxs(mid, strand, ref_len):
+def _get_ref_idxs(seq_len, strand, ref_len):
+    mid = None
+    if strand == '-':
+        mid = math.ceil(seq_len / 2)
+    else:
+        mid = seq_len // 2
+
     start_pos = mid
     if strand == '-' and ref_len > 1:
         start_pos = mid - (ref_len + 1) // 2 + 1
@@ -140,7 +146,6 @@ def _process_alt(chrom,
                  end,
                  strand,
                  wt_sequence,
-                 start_radius,
                  reference_sequence):
     """
     Return the encoded sequence centered at a given allele for input into
@@ -156,12 +161,14 @@ def _process_alt(chrom,
         The reference allele of the variant
     alt : str
         The alternate allele
+    start : int
+        The start coordinate for genome query
+    end : int
+        The end coordinate for genome query
     strand : {'+', '-'}
         The strand the variant is on
     wt_sequence : numpy.ndarray
         The reference sequence encoding
-    start_radius : int
-        The number of bases to query on the LHS of the variant.
     reference_sequence : selene_sdk.sequences.Sequence
         The reference sequence Selene queries to retrieve the model input
         sequences based on variant coordinates.
@@ -184,13 +191,13 @@ def _process_alt(chrom,
 
     alt_encoding = reference_sequence.sequence_to_encoding(alt)
     if ref_len == alt_len:  # substitution
-        start_pos, end_pos = _get_ref_idxs(start_radius, strand, ref_len)
+        start_pos, end_pos = _get_ref_idxs(len(wt_sequence), strand, ref_len)
         sequence = np.vstack([wt_sequence[:start_pos, :],
                               alt_encoding,
                               wt_sequence[end_pos:, :]])
         return sequence
     elif alt_len > ref_len:  # insertion
-        start_pos, end_pos = _get_ref_idxs(start_radius, strand, ref_len)
+        start_pos, end_pos = _get_ref_idxs(len(wt_sequence), strand, ref_len)
         sequence = np.vstack([wt_sequence[:start_pos, :],
                               alt_encoding,
                               wt_sequence[end_pos:, :]])
@@ -221,12 +228,12 @@ def _process_alt(chrom,
 
 def _handle_standard_ref(ref_encoding,
                          seq_encoding,
-                         mid,
+                         seq_length,
                          reference_sequence,
                          strand):
     ref_len = ref_encoding.shape[0]
 
-    start_pos, end_pos = _get_ref_idxs(mid, strand, ref_len)
+    start_pos, end_pos = _get_ref_idxs(seq_length, strand, ref_len)
 
     sequence_encoding_at_ref = seq_encoding[
         start_pos:start_pos + ref_len, :]

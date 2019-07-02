@@ -871,9 +871,7 @@ class AnalyzeSequences(object):
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
             alt_encoding = _process_alt(
                 chrom, pos, ref, alt, start, end, strand,
-                seq_encoding,
-                self._start_radius,
-                self.reference_sequence)
+                seq_encoding, self.reference_sequence)
 
             match = True
             seq_at_ref = None
@@ -881,7 +879,7 @@ class AnalyzeSequences(object):
                 match, seq_encoding, seq_at_ref = _handle_standard_ref(
                     ref_encoding,
                     seq_encoding,
-                    self._start_radius,
+                    self.sequence_length,
                     self.reference_sequence,
                     strand)
             elif len(ref) >= self.sequence_length:
