@@ -243,8 +243,8 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
 - `batch_size`: Default is 64. The size of the mini-batches to use.
 - `use_cuda`: Default is `False`. Specify whether CUDA-enabled GPUs are available for torch to use.  
 - `reference_sequence`: Default is the class `selene_sdk.sequences.Genome`. The type of sequence on which this analysis will be performed (must be type `selene.sequences.Sequence`).
-    - IMPORTANT: For variant effect prediction, the reference sequence version should correspond to the version used to specify the chromosome and position of each variant, NOT necessarily the one on which your model was trained. 
-    - For prediction on sequences and _in silico_ mutagenesis, the only thing that matters is the sequence type---that is, Selene uses the static variables in the class for information about the sequence alphabet and encoding. One problem with our current configuration file parsing is that it asks you to pass in a valid input FASTA file even though you do not need the reference sequence for these 2 sub-operations. We will see if this issue can be resolved in the future.
+    - IMPORTANT: For variant effect prediction and prediction on sequences in a BED file, the reference sequence version should correspond to the version used to specify the chromosome and position of each variant, NOT necessarily the one on which your model was trained. 
+    - For prediction on sequences in a FASTA file and _in silico_ mutagenesis, the only thing that matters is the sequence type---that is, Selene uses the static variables in the class for information about the sequence alphabet and encoding. One problem with our current configuration file parsing is that it asks you to pass in a valid input FASTA file even though you do not need the reference sequence for these 2 sub-operations. We aim to resolve this issue in the future.
 - `write_mem_limit`: Default is 5000. Specify, in MB, the amount of memory you want to allocate to storing model predictions/scores. When running one of the sub-operations in `analyze`, prediction/score handlers will accumulate data in memory and write this data to files periodically. By default, Selene will write to files when the **total amount** of data (that is, across all handlers) takes up 5000MB of space. Please keep in mind that Selene will not monitor the amount of memory needed to actually carry out a sub-operation (or load the model beforehand), so `write_mem_limit` must always be less than the total amount of CPU memory you have available on your machine. It is hard to recommend a specific proportion of memory you would allocate for `write_mem_limit` because it is dependent on your input file size (we may change this soon, but Selene currently loads all variants/sequences in a file into memory before running the sub-operation), the model size, and whether the model will run on CPU or GPU.  
 
 ### Prediction on sequences
@@ -269,7 +269,7 @@ prediction: {
 ### Variant effect prediction
 Currently, we expect that all sequences passed as input to a model must be the same length `N`. 
 - For SNPs, Selene outputs the model predictions for the ref and alt sequences centered at the `(chr, pos)` specified. 
-- For indels, sequences are centered at `pos + (N_bases / 2)`, for the reference sequence of length `N_bases`. Selene queries for `start = pos + (N_bases / 2) - (N / 2)` and `end = pos + (N_bases / 2) + (N / 2)` to get the sequence of length `N`. 
+- For indels, sequences are centered at `pos + (N_bases / 2)`, for the reference sequence of length `N_bases`. 
 
 An example configuration for variant effect prediction:
 ```YAML
