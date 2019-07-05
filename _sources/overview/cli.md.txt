@@ -243,31 +243,33 @@ analyze_sequences: !obj:selene_sdk.predict.AnalyzeSequences {
 - `batch_size`: Default is 64. The size of the mini-batches to use.
 - `use_cuda`: Default is `False`. Specify whether CUDA-enabled GPUs are available for torch to use.  
 - `reference_sequence`: Default is the class `selene_sdk.sequences.Genome`. The type of sequence on which this analysis will be performed (must be type `selene.sequences.Sequence`).
-    - IMPORTANT: For variant effect prediction, the reference sequence version should correspond to the version used to specify the chromosome and position of each variant, NOT necessarily the one on which your model was trained. 
-    - For prediction on sequences and _in silico_ mutagenesis, the only thing that matters is the sequence type---that is, Selene uses the static variables in the class for information about the sequence alphabet and encoding. One problem with our current configuration file parsing is that it asks you to pass in a valid input FASTA file even though you do not need the reference sequence for these 2 sub-operations. We will see if this issue can be resolved in the future.
+    - IMPORTANT: For variant effect prediction and prediction on sequences in a BED file, the reference sequence version should correspond to the version used to specify the chromosome and position of each variant, NOT necessarily the one on which your model was trained. 
+    - For prediction on sequences in a FASTA file and _in silico_ mutagenesis, the only thing that matters is the sequence type---that is, Selene uses the static variables in the class for information about the sequence alphabet and encoding. One problem with our current configuration file parsing is that it asks you to pass in a valid input FASTA file even though you do not need the reference sequence for these 2 sub-operations. We aim to resolve this issue in the future.
 - `write_mem_limit`: Default is 5000. Specify, in MB, the amount of memory you want to allocate to storing model predictions/scores. When running one of the sub-operations in `analyze`, prediction/score handlers will accumulate data in memory and write this data to files periodically. By default, Selene will write to files when the **total amount** of data (that is, across all handlers) takes up 5000MB of space. Please keep in mind that Selene will not monitor the amount of memory needed to actually carry out a sub-operation (or load the model beforehand), so `write_mem_limit` must always be less than the total amount of CPU memory you have available on your machine. It is hard to recommend a specific proportion of memory you would allocate for `write_mem_limit` because it is dependent on your input file size (we may change this soon, but Selene currently loads all variants/sequences in a file into memory before running the sub-operation), the model size, and whether the model will run on CPU or GPU.  
 
 ### Prediction on sequences
-For prediction on sequences, we require that a user specifies the path to a FASTA file.
+For prediction on sequences, we require that a user specifies the path to a FASTA file or BED file.
  
 An example configuration for prediction on sequences:
 ```YAML
 prediction: {
-    input_path: /path/to/sequences.fa,
+    input_path: /path/to/sequences.bed,
     output_dir: /path/to/output/dir,
-    output_format: tsv
+    output_format: tsv,
+    strand_index: 5
 }
 ```
 
 #### Parameters
-- `input_path`: Input path to the FASTA file.
+- `input_path`: Input path to the FASTA or BED file. For BED file input, we only use the genome regions specified in each row for finding the center position of the input sequence to the model. That is, the start and end of each coordinate does not need to be the same length as the expected model input sequence length--Selene will handle creating the correct sequence input for you.
 - `output_dir`: Output directory to write the model predictions. The resulting file will have the same filename prefix (e.g. `example.fasta` will output `example_predictions.tsv`).
 - `output_format`: Default is 'tsv'. You may specify either 'tsv' or 'hdf5'. 'tsv' is suitable if you do not have many sequences (<1000) or your model does not predict very many classes (<1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). 'hdf5' is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package `h5py`. Once the file is loaded, the full matrix is accessible under the key/name `"data"`. Saving to TSV is much slower (more than 2x slower) than saving to HDF5. An additional .txt file with the row labels (descriptions for each sequence in the FASTA) will be output for the HDF5 format as well. It should be ordered in the same way as your input file. The matrix rows will correspond to each sequence and the columns the classes the model predicts.  
+- `strand_index`: Default is None. If input is BED file, you may specify the column index (0-based) that contains strand information. Otherwise we assume all sequences passed into the model will be fetched from the forward strand. The reference and alternate alleles specified in the VCF should still be for the forward strand--Selene will apply reverse complement to those alleles when strand is '-'.
 
 ### Variant effect prediction
 Currently, we expect that all sequences passed as input to a model must be the same length `N`. 
 - For SNPs, Selene outputs the model predictions for the ref and alt sequences centered at the `(chr, pos)` specified. 
-- For indels, sequences are centered at `pos + (N_bases / 2)`, for the reference sequence of length `N_bases`. Selene queries for `start = pos + (N_bases / 2) - (N / 2)` and `end = pos + (N_bases / 2) + (N / 2)` to get the sequence of length `N`. 
+- For indels, sequences are centered at `pos + (N_bases / 2)`, for the reference sequence of length `N_bases`. 
 
 An example configuration for variant effect prediction:
 ```YAML
@@ -294,7 +296,7 @@ variant_effect_prediction: {
 #### Additional note
 You may find that there are more output files than you expect in `output_dir` at the end of variant effect prediction. The following cases may occur:
 - **NAs:** for some variants, Selene may not be able to construct a reference sequence centered at `pos` of the specified sequence length. This is likely because `pos` is near the end or the beginning of the chromosome and the sequence length the model accepts as input is large. You will find a list of NA variants in a file that ends with the extension `.NA`. 
-- **Warnings:** Selene may detect that the `ref` base(s) in a variant do not match with the bases specified in the reference sequence FASTA at the `(chrom, pos)`. In this case, Selene will use the `ref` base(s) specified in the VCF file in place of those in the reference genome and output predictions accordingly. However, the predictions will be diverted to a file prefixed with `warning.` so that you may review these variants and determine whether you still want to use those predictions/scores. If you find that most of the variants are showing up in the warning file, it may be that you have specified the wrong reference genome version---please check this before proceeding.  
+- **Warnings:** Selene may detect that the `ref` base(s) in a variant do not match with the bases specified in the reference sequence FASTA at the `(chrom, pos)`. In this case, Selene will use the `ref` base(s) specified in the VCF file in place of those in the reference genome and output predictions accordingly. These predictions will be distinguished by the row label column `ref_match` value `False`. You may review these variants and determine whether you still want to use those predictions/scores. If you find that most of the variants have `ref_match = False`, it may be that you have specified the wrong reference genome version---please check this before proceeding.  
 
 ### _In silico_ mutagenesis
 An example configuration for _in silico_ mutagenesis when using a single sequence as input:

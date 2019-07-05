@@ -332,8 +332,10 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="k">import</span> <span class="n">getsizeof</span>
 
+<span class="kn">import</span> <span class="nn">h5py</span>
 
-<span class="k">def</span> <span class="nf">write_to_tsv_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span> <span class="n">info_cols</span><span class="p">,</span> <span class="n">output_handle</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">write_to_tsv_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span> <span class="n">info_cols</span><span class="p">,</span> <span class="n">output_filepath</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Write samples with valid predictions/scores to a tab-delimited file.</span>
 
@@ -350,28 +352,24 @@
 <span class="sd">        in `info_cols` corresponds to each row that will be written to the</span>
 <span class="sd">        file. All columns in an element of `info_cols` will be prepended to</span>
 <span class="sd">        the values in an element of `data_across_features`.</span>
-<span class="sd">    output_handle : _io.TextIOWrapper</span>
-<span class="sd">        File handle we use to write the information</span>
-<span class="sd">    close : bool, optional</span>
-<span class="sd">        Default is False. Set `close` to True if you are finished writing</span>
-<span class="sd">        to this file.</span>
+<span class="sd">    output_filepath : str</span>
+<span class="sd">        Filepath to which to write outputs</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">info_batch</span><span class="p">,</span> <span class="n">preds_batch</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">info_cols</span><span class="p">,</span> <span class="n">data_across_features</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">info</span><span class="p">,</span> <span class="n">preds</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">info_batch</span><span class="p">,</span> <span class="n">preds_batch</span><span class="p">):</span>
-            <span class="n">preds_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">probabilities_to_string</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">preds</span><span class="p">)))</span>
-            <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
-            <span class="n">output_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info_str</span><span class="p">,</span> <span class="n">preds_str</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
-        <span class="n">output_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_handle</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">info_batch</span><span class="p">,</span> <span class="n">preds_batch</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">info_cols</span><span class="p">,</span> <span class="n">data_across_features</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">info</span><span class="p">,</span> <span class="n">preds</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">info_batch</span><span class="p">,</span> <span class="n">preds_batch</span><span class="p">):</span>
+                <span class="n">preds_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">probabilities_to_string</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">preds</span><span class="p">)))</span>
+                <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
+                <span class="n">output_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info_str</span><span class="p">,</span> <span class="n">preds_str</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">write_to_hdf5_file</span><span class="p">(</span><span class="n">data_across_features</span><span class="p">,</span>
                        <span class="n">info_cols</span><span class="p">,</span>
-                       <span class="n">hdf5_handle</span><span class="p">,</span>
-                       <span class="n">info_handle</span><span class="p">,</span>
-                       <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                       <span class="n">hdf5_filepath</span><span class="p">,</span>
+                       <span class="n">start_index</span><span class="p">,</span>
+                       <span class="n">info_filepath</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Write samples with valid predictions/scores to an HDF5 file. The</span>
 <span class="sd">    dataset attached to this file will be accessed using the key &quot;data&quot;.</span>
@@ -392,55 +390,33 @@
 <span class="sd">        in `info_cols` is the label information for each row that is written</span>
 <span class="sd">        to the file. All values in an element of `info_cols` will be written</span>
 <span class="sd">        to a separate .txt file.</span>
-<span class="sd">    hdf5_handle : h5py._hl.files.File</span>
-<span class="sd">        File handle we use to write the data to the HDF5 file.</span>
-<span class="sd">    info_handle : _io.TextIOWrapper</span>
-<span class="sd">        File handle to write the elements of `info_cols` to a tab-separated</span>
-<span class="sd">        .txt file.</span>
-<span class="sd">    close : bool, optional</span>
-<span class="sd">        Default is False. Set `close` to True if you are finished writing</span>
-<span class="sd">        all data to the file..</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">info_batch</span> <span class="ow">in</span> <span class="n">info_cols</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">info_batch</span><span class="p">:</span>
-            <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
-            <span class="n">info_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info_str</span><span class="p">))</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">hdf5_handle</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">data_batch</span> <span class="ow">in</span> <span class="n">data_across_features</span><span class="p">:</span>
-        <span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">data_batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">data_batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:]</span> <span class="o">=</span> <span class="n">data_batch</span>
-    <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
-        <span class="n">info_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">hdf5_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">write_NAs_to_file</span><span class="p">(</span><span class="n">info_cols</span><span class="p">,</span> <span class="n">column_names</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Writes samples with NA predictions or scores to a tab-delimited file.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    info_cols : list(arraylike)</span>
-<span class="sd">        NA entries should still have identifying information attached</span>
-<span class="sd">        to each entry. Each item in `info_cols` corresponds to each</span>
-<span class="sd">        row that will be written to the file. The item then, is the list</span>
-<span class="sd">        of column value that go in this row.</span>
-<span class="sd">    column_names : list(str)</span>
-<span class="sd">        Column names written as the first line of the file.</span>
-<span class="sd">    output_path : str</span>
-<span class="sd">        Path to the file where we should write the `NA`&#39;s.</span>
+<span class="sd">    hdf5_filepath : str</span>
+<span class="sd">        HDF5 filepath to which to write the data.</span>
+<span class="sd">    start_index : int</span>
+<span class="sd">        The row index in the HDF5 matrix to which to start writing the data</span>
+<span class="sd">    info_filepath : str or None, optional</span>
+<span class="sd">        Default is None. .txt filepath to which to write the labels.</span>
+<span class="sd">        Can be None if multiple handlers were initialized--only 1</span>
+<span class="sd">        needs to write to the labels file.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    None</span>
-<span class="sd">        Writes information to file</span>
+<span class="sd">    int</span>
+<span class="sd">        The updated start_index.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
-        <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{columns}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">column_names</span><span class="p">)))</span>
-        <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">info_cols</span><span class="p">:</span>
-            <span class="n">write_info</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
-            <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">write_info</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">info_filepath</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">info_filepath</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">info_handle</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">info_batch</span> <span class="ow">in</span> <span class="n">info_cols</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">info_batch</span><span class="p">:</span>
+                    <span class="n">info_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">info</span><span class="p">])</span>
+                    <span class="n">info_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">info_str</span><span class="p">))</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">hdf5_filepath</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdf5_handle</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">hdf5_handle</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">data_batch</span> <span class="ow">in</span> <span class="n">data_across_features</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">start_index</span> <span class="p">:(</span><span class="n">start_index</span> <span class="o">+</span> <span class="n">data_batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="n">data_batch</span>
+            <span class="n">start_index</span> <span class="o">=</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">data_batch</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">start_index</span>
 
 
 <span class="k">def</span> <span class="nf">probabilities_to_string</span><span class="p">(</span><span class="n">probabilities</span><span class="p">):</span>
@@ -459,43 +435,6 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{:.2e}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probabilities</span><span class="p">]</span>
-
-
-<span class="k">def</span> <span class="nf">_create_warning_handler</span><span class="p">(</span><span class="n">features</span><span class="p">,</span>
-                            <span class="n">columns_for_ids</span><span class="p">,</span>
-                            <span class="n">output_path_prefix</span><span class="p">,</span>
-                            <span class="n">output_format</span><span class="p">,</span>
-                            <span class="n">write_mem_limit</span><span class="p">,</span>
-                            <span class="n">constructor</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper to create a predictions handler that stores the predictions/scores</span>
-<span class="sd">    for variants that have raised a warning.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    features : list(str)</span>
-<span class="sd">    columns_for_ids : list(str)</span>
-<span class="sd">    output_path_prefix : str</span>
-<span class="sd">    output_format : {&#39;tsv&#39;, &#39;hdf5&#39;}</span>
-<span class="sd">    write_mem_limit : int</span>
-<span class="sd">    constructor : abc.ABCMeta</span>
-<span class="sd">        The handler class. Should implement</span>
-<span class="sd">        selene_sdk.predict.predict_handlers.PredictionsHandler.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    selene_sdk.predict.predict_handlers.PredictionsHandler</span>
-<span class="sd">        The initialized warning handler object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">output_path_prefix</span><span class="p">)</span>
-    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="n">path</span><span class="p">,</span>
-        <span class="s2">&quot;warning.</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">constructor</span><span class="p">(</span><span class="n">features</span><span class="p">,</span>
-                       <span class="n">columns_for_ids</span><span class="p">,</span>
-                       <span class="n">filepath</span><span class="p">,</span>
-                       <span class="n">output_format</span><span class="p">,</span>
-                       <span class="n">write_mem_limit</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="PredictionsHandler"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler">[docs]</a><span class="k">class</span> <span class="nc">PredictionsHandler</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
@@ -523,10 +462,18 @@
 <span class="sd">        file should be easily perused (e.g. viewed in a text editor/Excel).</span>
 <span class="sd">        However, saving to a TSV file is much slower than saving to an HDF5</span>
 <span class="sd">        file.</span>
+<span class="sd">    output_size : int, optional</span>
+<span class="sd">        The total number of rows in the output. Must be specified when</span>
+<span class="sd">        the output_format is hdf5.</span>
 <span class="sd">    write_mem_limit : int, optional</span>
 <span class="sd">        Default is 1500. Specify the amount of memory you can allocate to</span>
 <span class="sd">        storing model predictions/scores for this particular handler, in MB.</span>
 <span class="sd">        Handler will write to file whenever this memory limit is reached.</span>
+<span class="sd">    write_labels : bool, optional</span>
+<span class="sd">        Default is True. If you initialize multiple write handlers for the</span>
+<span class="sd">        same set of inputs with output format `hdf5`, set `write_label` to</span>
+<span class="sd">        False on all handlers except 1 so that only 1 handler writes the</span>
+<span class="sd">        row labels to an output file.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -540,99 +487,79 @@
                  <span class="n">columns_for_ids</span><span class="p">,</span>
                  <span class="n">output_path_prefix</span><span class="p">,</span>
                  <span class="n">output_format</span><span class="p">,</span>
-                 <span class="n">write_mem_limit</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
+                 <span class="n">output_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">write_mem_limit</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+                 <span class="n">write_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_columns_for_ids</span> <span class="o">=</span> <span class="n">columns_for_ids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span> <span class="o">=</span> <span class="n">output_path_prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">=</span> <span class="n">output_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_size</span> <span class="o">=</span> <span class="n">output_size</span>
+        <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;hdf5&#39;</span> <span class="ow">and</span> <span class="n">output_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`output_size` must be specified when &quot;</span>
+                             <span class="s2">&quot;`output_format` is &#39;hdf5&#39;.&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_info_handle</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels_filepath</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hdf5_start_index</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span> <span class="o">=</span> <span class="n">write_mem_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_labels</span> <span class="o">=</span> <span class="n">write_labels</span>
 
     <span class="k">def</span> <span class="nf">_create_write_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler_filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO</span>
+<span class="sd">        Initialize handlers for writing outputs to file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">output_path</span><span class="p">,</span> <span class="n">filename_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">filename_prefix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span><span class="p">):</span>
+            <span class="n">output_path</span><span class="p">,</span> <span class="n">filename_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span>
+        <span class="k">if</span> <span class="n">filename_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">handler_filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">filename_prefix</span><span class="p">,</span> <span class="n">handler_filename</span><span class="p">)</span>
         <span class="n">scores_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">handler_filename</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;tsv&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.tsv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scores_filepath</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
-            <span class="n">column_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns_for_ids</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">column_names</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.tsv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scores_filepath</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_handle</span><span class="p">:</span>
+                <span class="n">column_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns_for_ids</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span>
+                <span class="n">output_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">column_names</span><span class="p">)))</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;hdf5&quot;</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">h5py</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.h5&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scores_filepath</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
-                <span class="s2">&quot;data&quot;</span><span class="p">,</span>
-                <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">)),</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span>
-                <span class="n">maxshape</span><span class="o">=</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.h5&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scores_filepath</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_handle</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;data&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">output_handle</span><span class="p">:</span>
+                    <span class="n">output_handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+                        <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">)),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hdf5_start_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_labels</span><span class="p">:</span>
+                <span class="k">return</span>
             <span class="n">labels_filename</span> <span class="o">=</span> <span class="s2">&quot;row_labels.txt&quot;</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filename_prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">filename_prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># always output same row labels filename</span>
+                <span class="k">if</span> <span class="n">filename_prefix</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.ref&#39;</span> <span class="ow">or</span> \
+                        <span class="n">filename_prefix</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.alt&#39;</span><span class="p">:</span>
+                    <span class="n">filename_prefix</span> <span class="o">=</span> <span class="n">filename_prefix</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
                 <span class="n">labels_filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">filename_prefix</span><span class="p">,</span> <span class="n">labels_filename</span><span class="p">)</span>
-            <span class="n">labels_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">labels_filename</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_info_handle</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">labels_filepath</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_write_NAs_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                           <span class="n">output_path_prefix</span><span class="p">,</span>
-                           <span class="n">column_names</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">:</span>
-            <span class="n">output_path</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">output_path_prefix</span><span class="p">)</span>
-            <span class="n">NA_filename</span> <span class="o">=</span> <span class="s2">&quot;predictions.NA&quot;</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s1">&#39;.ref&#39;</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">:</span>
-                    <span class="n">prefix</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-                <span class="n">NA_filename</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">_</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">NA_filename</span><span class="p">)</span>
-            <span class="n">write_NAs_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">,</span>
-                              <span class="n">column_names</span><span class="p">,</span>
-                              <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">NA_filename</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_labels_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">labels_filename</span><span class="p">)</span>
+            <span class="c1"># create the file</span>
+            <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_filepath</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_reached_mem_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mem_used</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">nbytes</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span> <span class="o">+</span>
                     <span class="n">getsizeof</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">mem_used</span> <span class="o">+=</span> <span class="n">getsizeof</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mem_used</span> <span class="o">/</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span>
-
-<div class="viewcode-block" id="PredictionsHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_ids</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Handle rows without data. Will store the identifiers where predictions</span>
-<span class="sd">        were not available in a separate list.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        row_ids : arraylike(str)</span>
-<span class="sd">            The list of row IDs</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_ids</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="PredictionsHandler.handle_warning"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_warning">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">handle_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Must be able to handle a warning raised when processing</span>
-<span class="sd">        a batch of model predictions by diverting the output to</span>
-<span class="sd">        a different file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 <div class="viewcode-block" id="PredictionsHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.handle_batch_predictions">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">handle_batch_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -641,42 +568,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="PredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.PredictionsHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes accumulated handler results to file.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        close : bool, optional</span>
-<span class="sd">            Whether to close the attached file handles or not at the end of</span>
-<span class="sd">            writing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_NAs_to_file</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_columns_for_ids</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="c1"># a separate info handler exists for HDF5 outputs</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_info_handle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">write_to_hdf5_file</span><span class="p">(</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdf5_start_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hdf5_start_index</span> <span class="o">=</span> <span class="n">write_to_hdf5_file</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_info_handle</span><span class="p">,</span>
-                <span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_hdf5_start_index</span><span class="p">,</span>
+                <span class="n">info_filepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels_filepath</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">write_to_tsv_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span>
                               <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span><span class="p">,</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">_output_handle</span><span class="p">,</span>
-                              <span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_output_filepath</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span></div></div>
 </pre></div>
 
            </div>

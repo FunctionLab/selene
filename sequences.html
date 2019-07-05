@@ -498,7 +498,7 @@ the size of the sequence type’s alphabet.</p>
 <h2>Genome<a class="headerlink" href="#genome" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.sequences.Genome">
-<em class="property">class </em><code class="descclassname">selene_sdk.sequences.</code><code class="descname">Genome</code><span class="sig-paren">(</span><em>input_path</em>, <em>blacklist_regions=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">selene_sdk.sequences.</code><code class="descname">Genome</code><span class="sig-paren">(</span><em>input_path</em>, <em>blacklist_regions=None</em>, <em>bases_order=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.sequence.Sequence</span></code></p>
 <p>This class provides access to an organism’s genomic sequence.</p>
 <p>This class supports retrieving parts of the sequence and converting
@@ -516,6 +516,9 @@ we are not sampling from areas where we will never collect
 measurements. You can pass as input “hg19” or “hg38” to use the
 blacklist regions released by ENCODE. You can also pass in your own
 tabix-indexed .gz file.</p></li>
+<li><p><strong>bases_order</strong> (<em>list(str) or None, optional</em>) – Default is None (use the default base ordering of
+<cite>[‘A’, ‘C’, ‘G’, ‘T’]</cite>). Specify a different ordering of
+DNA bases for one-hot encoding.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
@@ -639,7 +642,7 @@ input array.</p>
 
 <dl class="method">
 <dt id="selene_sdk.sequences.Genome.get_encoding_from_coords">
-<code class="descname">get_encoding_from_coords</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em>, <em>strand='+'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_encoding_from_coords</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em>, <em>strand='+'</em>, <em>pad=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the one-hot encoding of the genomic sequence at the
 queried coordinates.</p>
 <dl class="field-list simple">
@@ -649,7 +652,11 @@ queried coordinates.</p>
 <li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the first position in the
 sequence.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
-<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘}, optional</em>) – Default is ‘+’. The strand the sequence is located on.</p></li>
+<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+treated as ‘+’.</p></li>
+<li><p><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
+and/or <cite>end</cite> are out of bounds to return a sequence of length
+<cite>end - start</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -681,7 +688,8 @@ region. In these cases, it will return an empty encoding–that is,
 <li><p><strong>chrom</strong> (<em>str</em>) – The name of the chromosomes, e.g. “chr1”.</p></li>
 <li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the sequence.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
-<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘}, optional</em>) – Default is ‘+’. The strand the sequence is located on.</p></li>
+<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+treated as ‘.’.</p></li>
 <li><p><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
 and/or <cite>end</cite> are out of bounds to return a sequence of length
 <cite>end - start</cite>.</p></li>

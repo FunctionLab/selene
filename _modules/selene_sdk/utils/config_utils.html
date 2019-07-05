@@ -334,6 +334,7 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_is_lua_trained_model</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">instantiate</span>
 
 
@@ -437,11 +438,12 @@
     <span class="n">model_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">)</span>
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;class_args&quot;</span><span class="p">])</span>
-
     <span class="k">if</span> <span class="s2">&quot;non_strand_specific&quot;</span> <span class="ow">in</span> <span class="n">model_configs</span><span class="p">:</span>
         <span class="kn">from</span> <span class="nn">selene_sdk.utils</span> <span class="k">import</span> <span class="n">NonStrandSpecific</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">NonStrandSpecific</span><span class="p">(</span>
             <span class="n">model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;non_strand_specific&quot;</span><span class="p">])</span>
+
+    <span class="n">_is_lua_trained_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="n">criterion</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">criterion</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">train</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">optim_class</span><span class="p">,</span> <span class="n">optim_kwargs</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_optimizer</span><span class="p">(</span><span class="n">lr</span><span class="p">)</span>
@@ -565,7 +567,7 @@
                                      <span class="s2">&quot;neither.&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;prediction&quot;</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">:</span>
                 <span class="n">predict_info</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">]</span>
-                <span class="n">analyze_seqs</span><span class="o">.</span><span class="n">get_predictions_for_fasta_file</span><span class="p">(</span><span class="o">**</span><span class="n">predict_info</span><span class="p">)</span></div>
+                <span class="n">analyze_seqs</span><span class="o">.</span><span class="n">get_predictions</span><span class="p">(</span><span class="o">**</span><span class="n">predict_info</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="parse_configs_and_run"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.parse_configs_and_run">[docs]</a><span class="k">def</span> <span class="nf">parse_configs_and_run</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span>

@@ -361,8 +361,9 @@
 <span class="sd">        The 0-based start coordinate of the sequence.</span>
 <span class="sd">    end : int</span>
 <span class="sd">        One past the last coordinate of the sequence.</span>
-<span class="sd">    strand : {&#39;+&#39;, &#39;-&#39;}, optional</span>
-<span class="sd">        Default is &#39;+&#39;. The strand the sequence is located on.</span>
+<span class="sd">    strand : {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}, optional</span>
+<span class="sd">        Default is &#39;+&#39;. The strand the sequence is located on. &#39;.&#39; is treated</span>
+<span class="sd">        as &#39;+&#39;.</span>
 <span class="sd">    pad : bool, optional</span>
 <span class="sd">        Default is `False`. If the coordinates are out of bounds, make an</span>
 <span class="sd">        in-bounds query and then pad the sequence to return the desired</span>
@@ -386,10 +387,13 @@
     <span class="k">if</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">len_chrs</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]:</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">pad</span> <span class="ow">and</span> <span class="p">(</span><span class="n">end</span> <span class="o">&gt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">or</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">end</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">blacklist_tabix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -400,15 +404,15 @@
         <span class="k">except</span> <span class="n">tabix</span><span class="o">.</span><span class="n">TabixError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-    <span class="k">if</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;+&#39;</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;+&#39;</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Strand must be one of &#39;+&#39; or &#39;-&#39;. Input was </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="s2">&quot;Strand must be one of &#39;+&#39;, &#39;-&#39;, or &#39;.&#39;. Input was </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">strand</span><span class="p">))</span>
 
     <span class="n">end_pad</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">start_pad</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]:</span>
-        <span class="n">end_pad</span> <span class="o">=</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">-</span> <span class="n">end</span>
+        <span class="n">end_pad</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">start_pad</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">start</span>
@@ -438,6 +442,10 @@
 <span class="sd">        measurements. You can pass as input &quot;hg19&quot; or &quot;hg38&quot; to use the</span>
 <span class="sd">        blacklist regions released by ENCODE. You can also pass in your own</span>
 <span class="sd">        tabix-indexed .gz file.</span>
+<span class="sd">    bases_order : list(str) or None, optional</span>
+<span class="sd">        Default is None (use the default base ordering of</span>
+<span class="sd">        `[&#39;A&#39;, &#39;C&#39;, &#39;G&#39;, &#39;T&#39;]`). Specify a different ordering of</span>
+<span class="sd">        DNA bases for one-hot encoding.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -495,7 +503,7 @@
 <span class="sd">    from the alphabet, but we are uncertain which.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">blacklist_regions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">blacklist_regions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bases_order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a `Genome` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -517,6 +525,26 @@
         <span class="k">elif</span> <span class="n">blacklist_regions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># user-specified file</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
                 <span class="n">blacklist_regions</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bases_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bases</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bases_order</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">BASES_ARR</span> <span class="o">=</span> <span class="n">bases</span>
+            <span class="n">lc_bases</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">BASE_TO_INDEX</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="o">**</span><span class="p">{</span><span class="n">b</span><span class="p">:</span> <span class="n">ix</span> <span class="k">for</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bases</span><span class="p">)},</span>
+                <span class="o">**</span><span class="p">{</span><span class="n">b</span><span class="p">:</span> <span class="n">ix</span> <span class="k">for</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lc_bases</span><span class="p">)}}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">INDEX_TO_BASE</span> <span class="o">=</span> <span class="p">{</span><span class="n">ix</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bases</span><span class="p">)}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_bases_order</span><span class="p">(</span><span class="n">bases</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">update_bases_order</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">bases</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">BASES_ARR</span> <span class="o">=</span> <span class="n">bases</span>
+        <span class="n">lc_bases</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">]</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">BASE_TO_INDEX</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="o">**</span><span class="p">{</span><span class="n">b</span><span class="p">:</span> <span class="n">ix</span> <span class="k">for</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bases</span><span class="p">)},</span>
+            <span class="o">**</span><span class="p">{</span><span class="n">b</span><span class="p">:</span> <span class="n">ix</span> <span class="k">for</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lc_bases</span><span class="p">)}}</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">INDEX_TO_BASE</span> <span class="o">=</span> <span class="p">{</span><span class="n">ix</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bases</span><span class="p">)}</span>
+
 
 <div class="viewcode-block" id="Genome.get_chrs"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_chrs">[docs]</a>    <span class="k">def</span> <span class="nf">get_chrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets the list of chromosome names.</span>
@@ -547,7 +575,7 @@
         <span class="k">return</span> <span class="n">len_chrs</span>
 
     <span class="k">def</span> <span class="nf">_genome_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">or</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">chrom</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">seq</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">chrom</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">reverse</span><span class="o">.</span><span class="n">complement</span><span class="o">.</span><span class="n">seq</span>
@@ -573,12 +601,9 @@
 <span class="sd">            in the input.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">start</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">or</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="k">return</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span> <span class="ow">and</span> \
+            <span class="p">(</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">and</span>
+             <span class="n">end</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="Genome.get_sequence_from_coords"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_sequence_from_coords">[docs]</a>    <span class="k">def</span> <span class="nf">get_sequence_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                  <span class="n">chrom</span><span class="p">,</span>
@@ -597,8 +622,9 @@
 <span class="sd">            The 0-based start coordinate of the sequence.</span>
 <span class="sd">        end : int</span>
 <span class="sd">            One past the 0-based last position in the sequence.</span>
-<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;}, optional</span>
-<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on. &#39;.&#39; is</span>
+<span class="sd">            treated as &#39;.&#39;.</span>
 <span class="sd">        pad : bool, optional</span>
 <span class="sd">            Default is `False`. Pad the output sequence with &#39;N&#39; if `start`</span>
 <span class="sd">            and/or `end` are out of bounds to return a sequence of length</span>
@@ -631,7 +657,12 @@
                                          <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">,</span>
                                          <span class="n">blacklist_tabix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Genome.get_encoding_from_coords"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_encoding_from_coords">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoding_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Genome.get_encoding_from_coords"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_encoding_from_coords">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoding_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                 <span class="n">chrom</span><span class="p">,</span>
+                                 <span class="n">start</span><span class="p">,</span>
+                                 <span class="n">end</span><span class="p">,</span>
+                                 <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
+                                 <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gets the one-hot encoding of the genomic sequence at the</span>
 <span class="sd">        queried coordinates.</span>
 
@@ -644,8 +675,13 @@
 <span class="sd">            sequence.</span>
 <span class="sd">        end : int</span>
 <span class="sd">            One past the 0-based last position in the sequence.</span>
-<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;}, optional</span>
-<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on. &#39;.&#39; is</span>
+<span class="sd">            treated as &#39;+&#39;.</span>
+<span class="sd">        pad : bool, optional</span>
+<span class="sd">            Default is `False`. Pad the output sequence with &#39;N&#39; if `start`</span>
+<span class="sd">            and/or `end` are out of bounds to return a sequence of length</span>
+<span class="sd">            `end - start`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -666,7 +702,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sequence_from_coords</span><span class="p">(</span>
-            <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">)</span>
+            <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">)</span>
         <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">encoding</span></div>
 

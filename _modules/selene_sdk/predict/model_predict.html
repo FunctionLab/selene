@@ -327,6 +327,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -336,6 +337,7 @@
 
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">_pad_sequence</span>
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">_truncate_sequence</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">get_reverse_complement</span>
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">predict</span>
 <span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">_ism_sample_id</span>
 <span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">in_silico_mutagenesis_sequences</span>
@@ -343,7 +345,7 @@
 <span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_handle_long_ref</span>
 <span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_handle_standard_ref</span>
 <span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_handle_ref_alt_predictions</span>
-<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_process_alts</span>
+<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_process_alt</span>
 <span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">read_vcf_file</span>
 <span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">AbsDiffScoreHandler</span>
 <span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">DiffScoreHandler</span>
@@ -351,12 +353,13 @@
 <span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">WritePredictionsHandler</span>
 <span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">WriteRefAltHandler</span>
 <span class="kn">from</span> <span class="nn">..sequences</span> <span class="k">import</span> <span class="n">Genome</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="k">import</span> <span class="n">_is_lua_trained_model</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="k">import</span> <span class="n">load_model_from_state_dict</span>
 
 
 <span class="c1"># TODO: MAKE THESE GENERIC:</span>
 <span class="n">ISM_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">]</span>
-<span class="n">VARIANTEFFECT_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">]</span>
+<span class="n">VARIANTEFFECT_COLS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">,</span> <span class="s2">&quot;strand&quot;</span><span class="p">,</span> <span class="s2">&quot;ref_match&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="AnalyzeSequences"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences">[docs]</a><span class="k">class</span> <span class="nc">AnalyzeSequences</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -473,7 +476,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span> <span class="o">=</span> <span class="n">reference_sequence</span>
-
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span> <span class="o">==</span> <span class="n">Genome</span> <span class="ow">and</span> \
+                <span class="n">_is_lua_trained_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+            <span class="n">Genome</span><span class="o">.</span><span class="n">update_bases_order</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span> <span class="o">=</span> <span class="n">write_mem_limit</span>
 
     <span class="k">def</span> <span class="nf">_initialize_reporters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -481,6 +486,7 @@
                               <span class="n">output_path_prefix</span><span class="p">,</span>
                               <span class="n">output_format</span><span class="p">,</span>
                               <span class="n">colnames_for_ids</span><span class="p">,</span>
+                              <span class="n">output_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                               <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;ism&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the handlers to which Selene reports model predictions</span>
@@ -504,6 +510,9 @@
 <span class="sd">            sequence for which Selene has made predictions (e.g. (chrom,</span>
 <span class="sd">            pos, id, ref, alt) will be the column names for variant effect</span>
 <span class="sd">            prediction outputs).</span>
+<span class="sd">        output_size : int, optional</span>
+<span class="sd">            The total number of rows in the output. Must be specified when</span>
+<span class="sd">            the output_format is hdf5.</span>
 <span class="sd">        mode : {&#39;prediction&#39;, &#39;ism&#39;, &#39;varianteffect&#39;}</span>
 <span class="sd">            If saving model predictions, the handler Selene chooses for the</span>
 <span class="sd">            task is dependent on the mode. For example, the reporter for</span>
@@ -518,6 +527,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">save_data</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">save_data</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span>
             <span class="p">[</span><span class="s2">&quot;diffs&quot;</span><span class="p">,</span> <span class="s2">&quot;abs_diffs&quot;</span><span class="p">,</span> <span class="s2">&quot;logits&quot;</span><span class="p">,</span> <span class="s2">&quot;predictions&quot;</span><span class="p">])</span>
+        <span class="n">save_data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">save_data</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">save_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;save_data&#39; parameter must be a list that &quot;</span>
                              <span class="s2">&quot;contains one of [&#39;diffs&#39;, &#39;abs_diffs&#39;, &quot;</span>
@@ -527,18 +537,170 @@
                             <span class="n">colnames_for_ids</span><span class="p">,</span>
                             <span class="n">output_path_prefix</span><span class="p">,</span>
                             <span class="n">output_format</span><span class="p">,</span>
+                            <span class="n">output_size</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">save_data</span><span class="p">)]</span>
-        <span class="k">if</span> <span class="s2">&quot;diffs&quot;</span> <span class="ow">in</span> <span class="n">save_data</span><span class="p">:</span>
-            <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DiffScoreHandler</span><span class="p">(</span><span class="o">*</span><span class="n">constructor_args</span><span class="p">))</span>
-        <span class="k">if</span> <span class="s2">&quot;abs_diffs&quot;</span> <span class="ow">in</span> <span class="n">save_data</span><span class="p">:</span>
-            <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AbsDiffScoreHandler</span><span class="p">(</span><span class="o">*</span><span class="n">constructor_args</span><span class="p">))</span>
-        <span class="k">if</span> <span class="s2">&quot;logits&quot;</span> <span class="ow">in</span> <span class="n">save_data</span><span class="p">:</span>
-            <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LogitScoreHandler</span><span class="p">(</span><span class="o">*</span><span class="n">constructor_args</span><span class="p">))</span>
-        <span class="k">if</span> <span class="s2">&quot;predictions&quot;</span> <span class="ow">in</span> <span class="n">save_data</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;varianteffect&quot;</span><span class="p">:</span>
-            <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">WritePredictionsHandler</span><span class="p">(</span><span class="o">*</span><span class="n">constructor_args</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="s2">&quot;predictions&quot;</span> <span class="ow">in</span> <span class="n">save_data</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;varianteffect&quot;</span><span class="p">:</span>
-            <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">WriteRefAltHandler</span><span class="p">(</span><span class="o">*</span><span class="n">constructor_args</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">save_data</span><span class="p">):</span>
+            <span class="n">write_labels</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">write_labels</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="s2">&quot;diffs&quot;</span> <span class="o">==</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DiffScoreHandler</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">constructor_args</span><span class="p">,</span> <span class="n">write_labels</span><span class="o">=</span><span class="n">write_labels</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="s2">&quot;abs_diffs&quot;</span> <span class="o">==</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AbsDiffScoreHandler</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">constructor_args</span><span class="p">,</span> <span class="n">write_labels</span><span class="o">=</span><span class="n">write_labels</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="s2">&quot;logits&quot;</span> <span class="o">==</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">LogitScoreHandler</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">constructor_args</span><span class="p">,</span> <span class="n">write_labels</span><span class="o">=</span><span class="n">write_labels</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="s2">&quot;predictions&quot;</span> <span class="o">==</span> <span class="n">s</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;varianteffect&quot;</span><span class="p">:</span>
+                <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">WritePredictionsHandler</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">constructor_args</span><span class="p">,</span> <span class="n">write_labels</span><span class="o">=</span><span class="n">write_labels</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="s2">&quot;predictions&quot;</span> <span class="o">==</span> <span class="n">s</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;varianteffect&quot;</span><span class="p">:</span>
+                <span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">WriteRefAltHandler</span><span class="p">(</span>
+                    <span class="o">*</span><span class="n">constructor_args</span><span class="p">,</span> <span class="n">write_labels</span><span class="o">=</span><span class="n">write_labels</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">reporters</span>
+
+    <span class="k">def</span> <span class="nf">_get_sequences_from_bed_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                     <span class="n">input_path</span><span class="p">,</span>
+                                     <span class="n">strand_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the adjusted sequence coordinates and labels corresponding</span>
+<span class="sd">        to each row of coordinates in an input BED file. The coordinates</span>
+<span class="sd">        specified in each row are only used to find the center position</span>
+<span class="sd">        for the resulting sequence--all regions returned will have the</span>
+<span class="sd">        length expected by the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_path : str</span>
+<span class="sd">            Input filepath to BED file.</span>
+<span class="sd">        strand_index : int or None, optional</span>
+<span class="sd">            Default is None. If sequences must be strand-specific,</span>
+<span class="sd">            the input BED file may include a column specifying the</span>
+<span class="sd">            strand ({&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list(tup), list(tup)</span>
+<span class="sd">            The sequence query information (chrom, start, end, strand)</span>
+<span class="sd">            and the labels (the index, genome coordinates, and sequence</span>
+<span class="sd">            specified in the BED file).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_handle</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">read_handle</span><span class="p">):</span>
+                <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">chrom</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strand_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">strand_index</span><span class="p">:</span>
+                    <span class="n">strand</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="n">strand_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;chr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
+                    <span class="n">chrom</span> <span class="o">=</span> <span class="s1">&#39;chr</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> \
+                        <span class="ow">or</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">genome</span><span class="p">:</span>
+                    <span class="k">continue</span>  <span class="c1"># TODO: divert to NA file?</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+                <span class="n">mid_pos</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">seq_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="n">mid_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">seq_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                    <span class="n">mid_pos</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">])</span>
+                <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">seq_start</span><span class="p">,</span> <span class="n">seq_end</span><span class="p">,</span> <span class="n">strand</span><span class="p">))</span>
+                <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">labels</span>
+
+<div class="viewcode-block" id="AnalyzeSequences.get_predictions_for_bed_file"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_predictions_for_bed_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                     <span class="n">input_path</span><span class="p">,</span>
+                                     <span class="n">output_dir</span><span class="p">,</span>
+                                     <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span>
+                                     <span class="n">strand_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get model predictions for sequences specified as genome coordinates</span>
+<span class="sd">        in a BED file. Coordinates do not need to be the same length as the</span>
+<span class="sd">        model expected sequence input--predictions will be centered at the</span>
+<span class="sd">        midpoint of the specified start and end coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_path : str</span>
+<span class="sd">            Input path to the BED file.</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            Output directory to write the model predictions.</span>
+<span class="sd">        output_format : {&#39;tsv&#39;, &#39;hdf5&#39;}, optional</span>
+<span class="sd">            Default is &#39;tsv&#39;. Choose whether to save TSV or HDF5 output files.</span>
+<span class="sd">            TSV is easier to access (i.e. open with text editor/Excel) and</span>
+<span class="sd">            quickly peruse, whereas HDF5 files must be accessed through</span>
+<span class="sd">            specific packages/viewers that support this format (e.g. h5py</span>
+<span class="sd">            Python package). Choose</span>
+
+<span class="sd">                * &#39;tsv&#39; if your list of sequences is relatively small</span>
+<span class="sd">                  (:math:`10^4` or less in order of magnitude) and/or your</span>
+<span class="sd">                  model has a small number of features (&lt;1000).</span>
+<span class="sd">                * &#39;hdf5&#39; for anything larger and/or if you would like to</span>
+<span class="sd">                  access the predictions/scores as a matrix that you can</span>
+<span class="sd">                  easily filter, apply computations, or use in a subsequent</span>
+<span class="sd">                  classifier/model. In this case, you may access the matrix</span>
+<span class="sd">                  using `mat[&quot;data&quot;]` after opening the HDF5 file using</span>
+<span class="sd">                  `mat = h5py.File(&quot;&lt;output.h5&gt;&quot;, &#39;r&#39;)`. The matrix columns</span>
+<span class="sd">                  are the features and will match the same ordering as your</span>
+<span class="sd">                  features .txt file (same as the order your model outputs</span>
+<span class="sd">                  its predictions) and the matrix rows are the sequences.</span>
+<span class="sd">                  Note that the row labels (FASTA description/IDs) will be</span>
+<span class="sd">                  output as a separate .txt file (should match the ordering</span>
+<span class="sd">                  of the sequences in the input FASTA).</span>
+
+<span class="sd">        strand_index : int or None, optional</span>
+<span class="sd">            Default is None. If the trained model makes strand-specific</span>
+<span class="sd">            predictions, your input file may include a column with strand</span>
+<span class="sd">            information (strand must be one of {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}). Specify</span>
+<span class="sd">            the index (0-based) to use it. Otherwise, by default &#39;+&#39; is used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Writes the output to file(s) in `output_dir`. Filename will</span>
+<span class="sd">            match that specified in the filepath.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seq_coords</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sequences_from_bed_file</span><span class="p">(</span>
+            <span class="n">input_path</span><span class="p">,</span> <span class="n">strand_index</span><span class="o">=</span><span class="n">strand_index</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+        <span class="n">output_prefix</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">reporter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">],</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">output_prefix</span><span class="p">),</span>
+            <span class="n">output_format</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;strand&quot;</span><span class="p">],</span>
+            <span class="n">output_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;prediction&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">coords</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">seq_coords</span><span class="p">)):</span>
+            <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
+                <span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sequences</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
+                <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+                <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
+                <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">sequences</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">encoding</span>
+
+        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
+            <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
+
+        <span class="n">reporter</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AnalyzeSequences.get_predictions_for_fasta_file"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_predictions_for_fasta_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                        <span class="n">input_path</span><span class="p">,</span>
@@ -587,13 +749,14 @@
         <span class="n">_</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
         <span class="n">output_prefix</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
+        <span class="n">fasta_file</span> <span class="o">=</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">Fasta</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
         <span class="n">reporter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
             <span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">],</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">output_prefix</span><span class="p">),</span>
             <span class="n">output_format</span><span class="p">,</span>
             <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">],</span>
+            <span class="n">output_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">fasta_file</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
             <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;prediction&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">fasta_file</span> <span class="o">=</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">Fasta</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
         <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
                               <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
                               <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">BASES_ARR</span><span class="p">)))</span>
@@ -610,15 +773,15 @@
 
             <span class="n">cur_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">)</span>
-            <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
-                <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">cur_sequence_encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+                <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">cur_sequence_encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
                 <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
                 <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
 
+            <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
             <span class="n">sequences</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cur_sequence_encoding</span>
 
         <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -627,8 +790,69 @@
             <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
 
         <span class="n">fasta_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">reporter</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="n">reporter</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>
 
+
+<div class="viewcode-block" id="AnalyzeSequences.get_predictions"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.get_predictions">[docs]</a>    <span class="k">def</span> <span class="nf">get_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">input_path</span><span class="p">,</span>
+                        <span class="n">output_dir</span><span class="p">,</span>
+                        <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span>
+                        <span class="n">strand_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get model predictions for sequences specified in a FASTA or BED file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input_path : str</span>
+<span class="sd">            Input path to the FASTA or BED file.</span>
+<span class="sd">        output_dir : str</span>
+<span class="sd">            Output directory to write the model predictions.</span>
+<span class="sd">        output_format : {&#39;tsv&#39;, &#39;hdf5&#39;}, optional</span>
+<span class="sd">            Default is &#39;tsv&#39;. Choose whether to save TSV or HDF5 output files.</span>
+<span class="sd">            TSV is easier to access (i.e. open with text editor/Excel) and</span>
+<span class="sd">            quickly peruse, whereas HDF5 files must be accessed through</span>
+<span class="sd">            specific packages/viewers that support this format (e.g. h5py</span>
+<span class="sd">            Python package). Choose</span>
+
+<span class="sd">                * &#39;tsv&#39; if your list of sequences is relatively small</span>
+<span class="sd">                  (:math:`10^4` or less in order of magnitude) and/or your</span>
+<span class="sd">                  model has a small number of features (&lt;1000).</span>
+<span class="sd">                * &#39;hdf5&#39; for anything larger and/or if you would like to</span>
+<span class="sd">                  access the predictions/scores as a matrix that you can</span>
+<span class="sd">                  easily filter, apply computations, or use in a subsequent</span>
+<span class="sd">                  classifier/model. In this case, you may access the matrix</span>
+<span class="sd">                  using `mat[&quot;data&quot;]` after opening the HDF5 file using</span>
+<span class="sd">                  `mat = h5py.File(&quot;&lt;output.h5&gt;&quot;, &#39;r&#39;)`. The matrix columns</span>
+<span class="sd">                  are the features and will match the same ordering as your</span>
+<span class="sd">                  features .txt file (same as the order your model outputs</span>
+<span class="sd">                  its predictions) and the matrix rows are the sequences.</span>
+<span class="sd">                  Note that the row labels (FASTA description/IDs) will be</span>
+<span class="sd">                  output as a separate .txt file (should match the ordering</span>
+<span class="sd">                  of the sequences in the input FASTA).</span>
+
+<span class="sd">        strand_index : int or None, optional</span>
+<span class="sd">            Default is None. If the trained model makes strand-specific</span>
+<span class="sd">            predictions, your input BED file may include a column with strand</span>
+<span class="sd">            information (strand must be one of {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}). Specify</span>
+<span class="sd">            the index (0-based) to use it. Otherwise, by default &#39;+&#39; is used.</span>
+<span class="sd">            (This parameter is ignored if FASTA file is used as input.)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">            Writes the output to file(s) in `output_dir`. Filename will</span>
+<span class="sd">            match that specified in the filepath.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_predictions_for_fasta_file</span><span class="p">(</span>
+                <span class="n">input_path</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="n">output_format</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">FastaIndexingError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_predictions_for_bed_file</span><span class="p">(</span>
+                <span class="n">input_path</span><span class="p">,</span>
+                <span class="n">output_dir</span><span class="p">,</span>
+                <span class="n">output_format</span><span class="o">=</span><span class="n">output_format</span><span class="p">,</span>
+                <span class="n">strand_index</span><span class="o">=</span><span class="n">strand_index</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AnalyzeSequences.in_silico_mutagenesis_predict"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict">[docs]</a>    <span class="k">def</span> <span class="nf">in_silico_mutagenesis_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                       <span class="n">sequence</span><span class="p">,</span>
@@ -691,7 +915,7 @@
                     <span class="n">r</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reporters</span><span class="p">:</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="n">r</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AnalyzeSequences.in_silico_mutagenesis"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis">[docs]</a>    <span class="k">def</span> <span class="nf">in_silico_mutagenesis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                               <span class="n">sequence</span><span class="p">,</span>
@@ -747,20 +971,24 @@
         <span class="n">reporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
             <span class="n">save_data</span><span class="p">,</span> <span class="n">output_path_prefix</span><span class="p">,</span> <span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="n">ISM_COLS</span><span class="p">)</span>
 
-        <span class="n">current_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
-            <span class="n">sequence</span><span class="p">)</span>
+        <span class="n">current_sequence_encoding</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
 
-        <span class="n">base_encoding</span> <span class="o">=</span> <span class="n">current_sequence_encoding</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="n">current_sequence_encoding</span> <span class="o">=</span> <span class="n">current_sequence_encoding</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
             <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="n">current_sequence_encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-        <span class="n">base_preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">base_encoding</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
+        <span class="n">current_sequence_preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">current_sequence_encoding</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s2">&quot;predictions&quot;</span> <span class="ow">in</span> <span class="n">save_data</span><span class="p">:</span>
             <span class="n">predictions_reporter</span> <span class="o">=</span> <span class="n">reporters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">predictions_reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span>
-                <span class="n">base_preds</span><span class="p">,</span> <span class="p">[[</span><span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="s2">&quot;NA&quot;</span><span class="p">]])</span>
+                <span class="n">current_sequence_preds</span><span class="p">,</span> <span class="p">[[</span><span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="s2">&quot;NA&quot;</span><span class="p">]])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">in_silico_mutagenesis_predict</span><span class="p">(</span>
-            <span class="n">sequence</span><span class="p">,</span> <span class="n">base_preds</span><span class="p">,</span> <span class="n">mutated_sequences</span><span class="p">,</span> <span class="n">reporters</span><span class="o">=</span><span class="n">reporters</span><span class="p">)</span></div>
+            <span class="n">sequence</span><span class="p">,</span>
+            <span class="n">current_sequence_preds</span><span class="p">,</span>
+            <span class="n">mutated_sequences</span><span class="p">,</span>
+            <span class="n">reporters</span><span class="o">=</span><span class="n">reporters</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AnalyzeSequences.in_silico_mutagenesis_from_file"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">in_silico_mutagenesis_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                         <span class="n">input_path</span><span class="p">,</span>
@@ -816,7 +1044,8 @@
 
             <span class="c1"># Generate mut sequences and base preds.</span>
             <span class="n">mutated_sequences</span> <span class="o">=</span> <span class="n">in_silico_mutagenesis_sequences</span><span class="p">(</span>
-                <span class="n">cur_sequence</span><span class="p">,</span> <span class="n">mutate_n_bases</span><span class="o">=</span><span class="n">mutate_n_bases</span><span class="p">,</span>
+                <span class="n">cur_sequence</span><span class="p">,</span>
+                <span class="n">mutate_n_bases</span><span class="o">=</span><span class="n">mutate_n_bases</span><span class="p">,</span>
                 <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
             <span class="n">cur_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">)</span>
@@ -851,7 +1080,8 @@
                                   <span class="n">save_data</span><span class="p">,</span>
                                   <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                   <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span>
-                                  <span class="n">strand_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                                  <span class="n">strand_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">require_strand</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get model predictions and scores for a list of variants.</span>
 
@@ -892,17 +1122,22 @@
 <span class="sd">        strand_index : int or None, optional.</span>
 <span class="sd">            Default is None. If applicable, specify the column index (0-based)</span>
 <span class="sd">            in the VCF file that contains strand information for each variant.</span>
+<span class="sd">        require_strand : bool, optional.</span>
+<span class="sd">            Default is False. Whether strand can be specified as &#39;.&#39;. If False,</span>
+<span class="sd">            Selene accepts strand value to be &#39;+&#39;, &#39;-&#39;, or &#39;.&#39; and automatically</span>
+<span class="sd">            treats &#39;.&#39; as &#39;+&#39;. If True, Selene skips any variant with strand &#39;.&#39;.</span>
+<span class="sd">            This parameter assumes that `strand_index` has been set.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
 <span class="sd">            Saves all files to `output_dir`. If any bases in the &#39;ref&#39; column</span>
 <span class="sd">            of the VCF do not match those at the specified position in the</span>
-<span class="sd">            reference genome, the scores/predictions will be output to a</span>
-<span class="sd">            file prefixed with `warning.`. If most of your variants show up</span>
-<span class="sd">            in these warning files, please check that the reference genome</span>
-<span class="sd">            you specified matches the one from which the VCF was created.</span>
-<span class="sd">            The warning files can be used directly if you have verified that</span>
+<span class="sd">            reference genome, the row labels .txt file will mark this variant</span>
+<span class="sd">            as `ref_match = False`. If most of your variants do not match</span>
+<span class="sd">            the reference genome, please check that the reference genome</span>
+<span class="sd">            you specified matches the version with which the variants were</span>
+<span class="sd">            called. The predictions can used directly if you have verified that</span>
 <span class="sd">            the &#39;ref&#39; bases specified for these variants are correct (Selene</span>
 <span class="sd">            will have substituted these bases for those in the reference</span>
 <span class="sd">            genome). Finally, some variants may show up in an &#39;NA&#39; file.</span>
@@ -911,8 +1146,6 @@
 <span class="sd">            did not show up in the reference genome FASTA file.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">variants</span> <span class="o">=</span> <span class="n">read_vcf_file</span><span class="p">(</span><span class="n">vcf_file</span><span class="p">,</span> <span class="n">strand_index</span><span class="o">=</span><span class="n">strand_index</span><span class="p">)</span>
-
         <span class="c1"># TODO: GIVE USER MORE CONTROL OVER PREFIX.</span>
         <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">vcf_file</span><span class="p">)</span>
         <span class="n">output_path_prefix</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -920,89 +1153,82 @@
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">output_dir</span> <span class="o">=</span> <span class="n">path</span>
+
         <span class="n">output_path_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">output_path_prefix</span><span class="p">)</span>
+        <span class="n">variants</span> <span class="o">=</span> <span class="n">read_vcf_file</span><span class="p">(</span>
+            <span class="n">vcf_file</span><span class="p">,</span>
+            <span class="n">strand_index</span><span class="o">=</span><span class="n">strand_index</span><span class="p">,</span>
+            <span class="n">output_NAs_to_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.NA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_path_prefix</span><span class="p">),</span>
+            <span class="n">seq_context</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">),</span>
+            <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
+
         <span class="n">reporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
             <span class="n">save_data</span><span class="p">,</span>
             <span class="n">output_path_prefix</span><span class="p">,</span>
             <span class="n">output_format</span><span class="p">,</span>
             <span class="n">VARIANTEFFECT_COLS</span><span class="p">,</span>
+            <span class="n">output_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">variants</span><span class="p">),</span>
             <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;varianteffect&quot;</span><span class="p">)</span>
 
         <span class="n">batch_ref_seqs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">batch_alt_seqs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span> <span class="ow">in</span> <span class="n">variants</span><span class="p">:</span>
+        <span class="n">t_i</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">variants</span><span class="p">):</span>
             <span class="c1"># centers the sequence containing the ref allele based on the size</span>
             <span class="c1"># of ref</span>
             <span class="n">center</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span>
             <span class="n">end</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span>
 
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span> <span class="n">Genome</span><span class="p">):</span>
-                <span class="k">if</span> <span class="s2">&quot;chr&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
-                    <span class="n">chrom</span> <span class="o">=</span> <span class="s2">&quot;chr&quot;</span> <span class="o">+</span> <span class="n">chrom</span>
-                <span class="k">if</span> <span class="s2">&quot;MT&quot;</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
-                    <span class="n">chrom</span> <span class="o">=</span> <span class="n">chrom</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">coords_in_bounds</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reporters</span><span class="p">:</span>
-                    <span class="n">r</span><span class="o">.</span><span class="n">handle_NA</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">))</span>
-                <span class="k">continue</span>
-
             <span class="n">seq_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
                 <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">ref</span> <span class="o">=</span> <span class="n">get_reverse_complement</span><span class="p">(</span>
+                    <span class="n">ref</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">COMPLEMENTARY_BASE_DICT</span><span class="p">)</span>
+                <span class="n">alt</span> <span class="o">=</span> <span class="n">get_reverse_complement</span><span class="p">(</span>
+                    <span class="n">alt</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">COMPLEMENTARY_BASE_DICT</span><span class="p">)</span>
+
             <span class="n">ref_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
-            <span class="n">all_alts</span> <span class="o">=</span> <span class="n">alt</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
-            <span class="n">alt_encodings</span> <span class="o">=</span> <span class="n">_process_alts</span><span class="p">(</span>
-                <span class="n">all_alts</span><span class="p">,</span>
-                <span class="n">ref</span><span class="p">,</span>
-                <span class="n">chrom</span><span class="p">,</span>
-                <span class="n">pos</span><span class="p">,</span>
-                <span class="n">center</span><span class="p">,</span>
-                <span class="n">strand</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
+            <span class="n">alt_encoding</span> <span class="o">=</span> <span class="n">_process_alt</span><span class="p">(</span>
+                <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span>
+                <span class="n">seq_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
 
             <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
                 <span class="n">match</span><span class="p">,</span> <span class="n">seq_encoding</span><span class="p">,</span> <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="n">_handle_standard_ref</span><span class="p">(</span>
                     <span class="n">ref_encoding</span><span class="p">,</span>
                     <span class="n">seq_encoding</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span>
+                    <span class="n">strand</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
                 <span class="n">match</span><span class="p">,</span> <span class="n">seq_encoding</span><span class="p">,</span> <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="n">_handle_long_ref</span><span class="p">(</span>
                     <span class="n">ref_encoding</span><span class="p">,</span>
                     <span class="n">seq_encoding</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span>
+                    <span class="n">strand</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;For variant (</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">, </span><span class="si">{4}</span><span class="s2">), &quot;</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;For variant (</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">, </span><span class="si">{4}</span><span class="s2">, </span><span class="si">{5}</span><span class="s2">), &quot;</span>
                               <span class="s2">&quot;reference does not match the reference genome. &quot;</span>
-                              <span class="s2">&quot;Reference genome contains </span><span class="si">{5}</span><span class="s2"> instead. &quot;</span>
+                              <span class="s2">&quot;Reference genome contains </span><span class="si">{6}</span><span class="s2"> instead. &quot;</span>
                               <span class="s2">&quot;Predictions/scores associated with this &quot;</span>
                               <span class="s2">&quot;variant--where we use &#39;</span><span class="si">{3}</span><span class="s2">&#39; in the input &quot;</span>
-                              <span class="s2">&quot;sequence--will be written to files where the &quot;</span>
-                              <span class="s2">&quot;filename is prefixed by &#39;warning.&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                  <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">seq_at_ref</span><span class="p">))</span>
-                <span class="n">warn_batch_ids</span> <span class="o">=</span> <span class="p">[(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">all_alts</span><span class="p">]</span>
-                <span class="n">warn_ref_seqs</span> <span class="o">=</span> <span class="p">[</span><span class="n">seq_encoding</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_alts</span><span class="p">)</span>
-                <span class="n">_handle_ref_alt_predictions</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-                    <span class="n">warn_ref_seqs</span><span class="p">,</span>
-                    <span class="n">alt_encodings</span><span class="p">,</span>
-                    <span class="n">warn_batch_ids</span><span class="p">,</span>
-                    <span class="n">reporters</span><span class="p">,</span>
-                    <span class="n">warn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
+                              <span class="s2">&quot;sequence--will be marked in the row labels .txt &quot;</span>
+                              <span class="s2">&quot;file with `ref_match=False`&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                  <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="n">seq_at_ref</span><span class="p">))</span>
+                <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                <span class="n">batch_ref_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq_encoding</span><span class="p">)</span>
+                <span class="n">batch_alt_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt_encoding</span><span class="p">)</span>
                 <span class="k">continue</span>
-
-            <span class="n">batch_ids</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">all_alts</span><span class="p">]</span>
-            <span class="n">batch_ref_seqs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">seq_encoding</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_alts</span><span class="p">)</span>
-            <span class="n">batch_alt_seqs</span> <span class="o">+=</span> <span class="n">alt_encodings</span>
+            <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="n">batch_ref_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq_encoding</span><span class="p">)</span>
+            <span class="n">batch_alt_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt_encoding</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_ref_seqs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">:</span>
                 <span class="n">_handle_ref_alt_predictions</span><span class="p">(</span>
@@ -1011,11 +1237,15 @@
                     <span class="n">batch_alt_seqs</span><span class="p">,</span>
                     <span class="n">batch_ids</span><span class="p">,</span>
                     <span class="n">reporters</span><span class="p">,</span>
-                    <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
                 <span class="n">batch_ref_seqs</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">batch_alt_seqs</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="n">ix</span> <span class="ow">and</span> <span class="n">ix</span> <span class="o">%</span> <span class="mi">10000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[STEP </span><span class="si">{0}</span><span class="s2">]: </span><span class="si">{1}</span><span class="s2"> s to process 10000 variants.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">ix</span><span class="p">,</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t_i</span><span class="p">))</span>
+                <span class="n">t_i</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">batch_ref_seqs</span><span class="p">:</span>
             <span class="n">_handle_ref_alt_predictions</span><span class="p">(</span>
@@ -1024,11 +1254,10 @@
                 <span class="n">batch_alt_seqs</span><span class="p">,</span>
                 <span class="n">batch_ids</span><span class="p">,</span>
                 <span class="n">reporters</span><span class="p">,</span>
-                <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reporters</span><span class="p">:</span>
-            <span class="n">r</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+            <span class="n">r</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>

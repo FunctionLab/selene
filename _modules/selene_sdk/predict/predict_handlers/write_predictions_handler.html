@@ -324,7 +324,6 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Handles outputting the model predictions</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">.handler</span> <span class="k">import</span> <span class="n">_create_warning_handler</span>
 <span class="kn">from</span> <span class="nn">.handler</span> <span class="k">import</span> <span class="n">PredictionsHandler</span>
 
 
@@ -349,10 +348,18 @@
 <span class="sd">        Specify the desired output format. TSV can be specified if you</span>
 <span class="sd">        would like the final file to be easily perused. However, saving</span>
 <span class="sd">        to a TSV file is much slower than saving to an HDF5 file.</span>
+<span class="sd">    output_size : int, optional</span>
+<span class="sd">        The total number of rows in the output. Must be specified when</span>
+<span class="sd">        the output_format is hdf5.</span>
 <span class="sd">    write_mem_limit : int, optional</span>
 <span class="sd">        Default is 1500. Specify the amount of memory you can allocate to</span>
 <span class="sd">        storing model predictions/scores for this particular handler, in MB.</span>
 <span class="sd">        Handler will write to file whenever this memory limit is reached.</span>
+<span class="sd">    write_labels : bool, optional</span>
+<span class="sd">        Default is True. If you initialize multiple write handlers for the</span>
+<span class="sd">        same set of inputs with output format `hdf5`, set `write_label` to</span>
+<span class="sd">        False on all handlers except 1 so that only 1 handler writes the</span>
+<span class="sd">        row labels to an output file.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -367,7 +374,9 @@
                  <span class="n">columns_for_ids</span><span class="p">,</span>
                  <span class="n">output_path_prefix</span><span class="p">,</span>
                  <span class="n">output_format</span><span class="p">,</span>
-                 <span class="n">write_mem_limit</span><span class="o">=</span><span class="mi">1500</span><span class="p">):</span>
+                 <span class="n">output_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">write_mem_limit</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+                 <span class="n">write_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `WritePredictionsHandler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -376,52 +385,28 @@
             <span class="n">columns_for_ids</span><span class="p">,</span>
             <span class="n">output_path_prefix</span><span class="p">,</span>
             <span class="n">output_format</span><span class="p">,</span>
-            <span class="n">write_mem_limit</span><span class="p">)</span>
+            <span class="n">output_size</span><span class="o">=</span><span class="n">output_size</span><span class="p">,</span>
+            <span class="n">write_mem_limit</span><span class="o">=</span><span class="n">write_mem_limit</span><span class="p">,</span>
+            <span class="n">write_labels</span><span class="o">=</span><span class="n">write_labels</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">needs_base_pred</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_NA_samples</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_columns_for_ids</span> <span class="o">=</span> <span class="n">columns_for_ids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span> <span class="o">=</span> <span class="n">output_path_prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">=</span> <span class="n">output_format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span> <span class="o">=</span> <span class="n">write_mem_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_labels</span> <span class="o">=</span> <span class="n">write_labels</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_write_handler</span><span class="p">(</span><span class="s2">&quot;predictions&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span> <span class="o">=</span> <span class="kc">None</span>
-
-<div class="viewcode-block" id="WritePredictionsHandler.handle_NA"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_NA">[docs]</a>    <span class="k">def</span> <span class="nf">handle_NA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        batch_ids : # TODO</span>
-<span class="sd">            # TODO</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">handle_NA</span><span class="p">(</span><span class="n">batch_ids</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">handle_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_predictions</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span> <span class="o">=</span> <span class="n">_create_warning_handler</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_columns_for_ids</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_output_path_prefix</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span><span class="p">,</span>
-                <span class="n">WritePredictionsHandler</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_warn_handle</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span>
-            <span class="n">batch_predictions</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
 
 <div class="viewcode-block" id="WritePredictionsHandler.handle_batch_predictions"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.handle_batch_predictions">[docs]</a>    <span class="k">def</span> <span class="nf">handle_batch_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                  <span class="n">batch_predictions</span><span class="p">,</span>
                                  <span class="n">batch_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO</span>
+<span class="sd">        Handles the predictions for a batch of sequences.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -441,11 +426,12 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reached_mem_limit</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="WritePredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="WritePredictionsHandler.write_to_file"><a class="viewcode-back" href="../../../../predict.predict_handlers.html#selene_sdk.predict.predict_handlers.WritePredictionsHandler.write_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        TODO</span>
+<span class="sd">        Writes the stored scores to a file.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">(</span><span class="n">close</span><span class="o">=</span><span class="n">close</span><span class="p">)</span></div></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>
