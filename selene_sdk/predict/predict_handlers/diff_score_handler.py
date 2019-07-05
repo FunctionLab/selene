@@ -1,14 +1,13 @@
 """
 Handles computing and outputting the difference scores
 """
-from .handler import _create_warning_handler
 from .handler import PredictionsHandler
 
 
 class DiffScoreHandler(PredictionsHandler):
     """
     The "diff score" is the difference between `alt` and `ref`
-    predictions.
+    predictions (`alt - ref`).
 
     Parameters
     ----------
@@ -28,10 +27,18 @@ class DiffScoreHandler(PredictionsHandler):
         would like the final file to be easily perused (e.g. viewed in a text
         editor/Excel). However, saving to a TSV file is much slower than
         saving to an HDF5 file.
+    output_size : int, optional
+        The total number of rows in the output. Must be specified when
+        the output_format is hdf5.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
         Handler will write to file whenever this memory limit is reached.
+    write_labels : bool, optional
+        Default is True. If you initialize multiple write handlers for the
+        same set of inputs with output format `hdf5`, set `write_label` to
+        False on all handlers except 1 so that only 1 handler writes the
+        row labels to an output file.
 
     Attributes
     ----------
@@ -46,7 +53,9 @@ class DiffScoreHandler(PredictionsHandler):
                  columns_for_ids,
                  output_path_prefix,
                  output_format,
-                 write_mem_limit=1500):
+                 output_size=None,
+                 write_mem_limit=1500,
+                 write_labels=True):
         """
         Constructs a new `DiffScoreHandler` object.
         """
@@ -55,76 +64,22 @@ class DiffScoreHandler(PredictionsHandler):
             columns_for_ids,
             output_path_prefix,
             output_format,
-            write_mem_limit)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit,
+            write_labels=write_labels)
 
         self.needs_base_pred = True
         self._results = []
         self._samples = []
-        self._NA_samples = []
 
         self._features = features
         self._columns_for_ids = columns_for_ids
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
         self._write_mem_limit = write_mem_limit
+        self._write_labels = write_labels
 
         self._create_write_handler("diffs")
-
-        self._warn_handle = None
-
-    def handle_NA(self, batch_ids):
-        """
-        Handles batch sequence/variant IDs where a full sequence context
-        could not be fetched (N/A)
-
-        Parameters
-        ----------
-        batch_ids : list(str)
-            List of sequence/variant identifiers
-
-        """
-        super().handle_NA(batch_ids)
-
-    def handle_warning(self,
-                       batch_predictions,
-                       batch_ids,
-                       baseline_predictions):
-        """
-        Handles batch sequence/variant IDs that raised a warning (e.g. the
-        variant 'ref' base(s) did not match those at the specified (chr, pos)
-        in the reference genome). Scores will still be computed for these
-        variants, but the output will be written to separate file(s).
-
-        Parameters
-        ----------
-        batch_predictions : arraylike
-            The predictions for a batch of sequences. This should have
-            dimensions of :math:`B \\times N` (where :math:`B` is the
-            size of the mini-batch and :math:`N` is the number of
-            features).
-        batch_ids : list(arraylike)
-            Batch of sequence identifiers. Each element is `arraylike`
-            because it may contain more than one column (written to
-            file) that together make up a unique identifier for a
-            sequence.
-        base_predictions : arraylike
-            The baseline prediction(s) used to compute the diff scores.
-            Must either be a vector of dimension :math:`N` values or a
-            matrix of dimensions :math:`B \\times N` (where :math:`B` is
-            the size of the mini-batch, and :math:`N` is the number of
-            features).
-
-        """
-        if self._warn_handle is None:
-            self._warn_handle = _create_warning_handler(
-                self._features,
-                self._columns_for_ids,
-                self._output_path_prefix,
-                self._output_format,
-                self._write_mem_limit,
-                DiffScoreHandler)
-        self._warn_handle.handle_batch_predictions(
-            batch_predictions, batch_ids, baseline_predictions)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
@@ -156,21 +111,15 @@ class DiffScoreHandler(PredictionsHandler):
             features).
 
         """
-        diffs = baseline_predictions - batch_predictions
+        diffs = batch_predictions - baseline_predictions
         self._results.append(diffs)
         self._samples.append(batch_ids)
         if self._reached_mem_limit():
             self.write_to_file()
 
-    def write_to_file(self, close=False):
+    def write_to_file(self):
         """
         Writes stored scores to a file.
 
-        Parameters
-        ----------
-        close : bool, optional
-            Default is False. Set `close` to True if you'd like to close
-            the file handle at the end of this operation.
-
         """
-        super().write_to_file(close=close)
+        super().write_to_file()

@@ -7,6 +7,32 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 
+from ..utils import _is_lua_trained_model
+
+
+def get_reverse_complement(allele, complementary_base_dict):
+    """
+    Get the reverse complement of the input allele.
+
+    Parameters
+    ----------
+    allele : str
+        The sequence allele
+    complementary_base_dict : dict(str)
+        The dictionary that maps each base to its complement
+
+    Returns
+    -------
+    str
+        The reverse complement of the allele.
+
+    """
+    if allele == '*' or allele == '-' or len(allele) == 0:
+        return '*'
+    a_complement = []
+    for a in allele:
+        a_complement.append(complementary_base_dict[a])
+    return ''.join(list(reversed(a_complement)))
 
 
 def predict(model, batch_sequences, use_cuda=False):
@@ -37,7 +63,11 @@ def predict(model, batch_sequences, use_cuda=False):
         inputs = inputs.cuda()
     with torch.no_grad():
         inputs = Variable(inputs)
-        outputs = model.forward(inputs.transpose(1, 2))
+
+        if _is_lua_trained_model(model):
+            outputs = model.forward(inputs.transpose(1, 2).unsqueeze_(2))
+        else:
+            outputs = model.forward(inputs.transpose(1, 2))
         return outputs.data.cpu().numpy()
 
 

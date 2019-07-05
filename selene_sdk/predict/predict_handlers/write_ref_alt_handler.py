@@ -3,7 +3,6 @@ Handles writing the ref and alt predictions
 """
 import os
 
-from .handler import _create_warning_handler
 from .handler import PredictionsHandler
 from .write_predictions_handler import WritePredictionsHandler
 
@@ -32,10 +31,18 @@ class WriteRefAltHandler(PredictionsHandler):
         Specify the desired output format. TSV can be specified if you
         would like the final file to be easily perused. However, saving
         to a TSV file is much slower than saving to an HDF5 file.
+    output_size : int, optional
+        The total number of rows in the output. Must be specified when
+        the output_format is hdf5.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
         Handler will write to file whenever this memory limit is reached.
+    write_labels : bool, optional
+        Default is True. If you initialize multiple write handlers for the
+        same set of inputs with output format `hdf5`, set `write_label` to
+        False on all handlers except 1 so that only 1 handler writes the
+        row labels to an output file.
 
     Attributes
     ----------
@@ -50,7 +57,9 @@ class WriteRefAltHandler(PredictionsHandler):
                  columns_for_ids,
                  output_path_prefix,
                  output_format,
-                 write_mem_limit=1500):
+                 output_size=None,
+                 write_mem_limit=1500,
+                 write_labels=True):
         """
         Constructs a new `WriteRefAltHandler` object.
         """
@@ -59,7 +68,9 @@ class WriteRefAltHandler(PredictionsHandler):
             columns_for_ids,
             output_path_prefix,
             output_format,
-            write_mem_limit)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit,
+            write_labels=write_labels)
 
         self.needs_base_pred = True
         self._features = features
@@ -67,8 +78,7 @@ class WriteRefAltHandler(PredictionsHandler):
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
         self._write_mem_limit = write_mem_limit
-
-        self._warn_handle = None
+        self._write_labels = write_labels
 
         output_path, prefix = os.path.split(output_path_prefix)
         ref_filename = "ref"
@@ -84,47 +94,25 @@ class WriteRefAltHandler(PredictionsHandler):
             columns_for_ids,
             ref_filepath,
             output_format,
-            write_mem_limit // 2)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit // 2,
+            write_labels=write_labels)
+
         self._alt_writer = WritePredictionsHandler(
             features,
             columns_for_ids,
             alt_filepath,
             output_format,
-            write_mem_limit // 2)
-
-    def handle_NA(self, batch_ids):
-        """
-        TODO
-
-        Parameters
-        ----------
-        batch_ids : TODO
-            TODO
-
-        """
-        self._ref_writer.handle_NA(batch_ids)
-
-    def handle_warning(self,
-                       batch_predictions,
-                       batch_ids,
-                       base_predictions):
-        if self._warn_handle is None:
-            self._warn_handle = _create_warning_handler(
-                self._features,
-                self._columns_for_ids,
-                self._output_path_prefix,
-                self._output_format,
-                self._write_mem_limit,
-                WriteRefAltHandler)
-        self._warn_handle.handle_batch_predictions(
-            batch_predictions, batch_ids, base_predictions)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit // 2,
+            write_labels=False)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
                                  batch_ids,
                                  base_predictions):
         """
-        TODO
+        Handles the predictions for a batch of sequences.
 
         Parameters
         ----------
@@ -150,11 +138,10 @@ class WriteRefAltHandler(PredictionsHandler):
         self._alt_writer.handle_batch_predictions(
             batch_predictions, batch_ids)
 
-    def write_to_file(self, close=False):
+    def write_to_file(self):
         """
-        TODO
+        Writes the stored scores to 2 files (1 for ref, 1 for alt).
+
         """
-        self._ref_writer.write_to_file(close=close)
-        self._alt_writer.write_to_file(close=close)
-        if self._warn_handle is not None:
-            self._warn_handle.write_to_file()
+        self._ref_writer.write_to_file()
+        self._alt_writer.write_to_file()

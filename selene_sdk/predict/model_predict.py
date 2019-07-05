@@ -4,6 +4,7 @@ methods.
 """
 import math
 import os
+from time import time
 import warnings
 
 import numpy as np
@@ -13,6 +14,7 @@ import torch.nn as nn
 
 from ._common import _pad_sequence
 from ._common import _truncate_sequence
+from ._common import get_reverse_complement
 from ._common import predict
 from ._in_silico_mutagenesis import _ism_sample_id
 from ._in_silico_mutagenesis import in_silico_mutagenesis_sequences
@@ -20,7 +22,7 @@ from ._in_silico_mutagenesis import mutate_sequence
 from ._variant_effect_prediction import _handle_long_ref
 from ._variant_effect_prediction import _handle_standard_ref
 from ._variant_effect_prediction import _handle_ref_alt_predictions
-from ._variant_effect_prediction import _process_alts
+from ._variant_effect_prediction import _process_alt
 from ._variant_effect_prediction import read_vcf_file
 from .predict_handlers import AbsDiffScoreHandler
 from .predict_handlers import DiffScoreHandler
@@ -28,12 +30,13 @@ from .predict_handlers import LogitScoreHandler
 from .predict_handlers import WritePredictionsHandler
 from .predict_handlers import WriteRefAltHandler
 from ..sequences import Genome
+from ..utils import _is_lua_trained_model
 from ..utils import load_model_from_state_dict
 
 
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
-VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt"]
+VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand", "ref_match"]
 
 
 class AnalyzeSequences(object):
@@ -150,7 +153,9 @@ class AnalyzeSequences(object):
         self.batch_size = batch_size
         self.features = features
         self.reference_sequence = reference_sequence
-
+        if type(self.reference_sequence) == Genome and \
+                _is_lua_trained_model(model):
+            Genome.update_bases_order(['A', 'G', 'C', 'T'])
         self._write_mem_limit = write_mem_limit
 
     def _initialize_reporters(self,
@@ -158,6 +163,7 @@ class AnalyzeSequences(object):
                               output_path_prefix,
                               output_format,
                               colnames_for_ids,
+                              output_size=None,
                               mode="ism"):
         """
         Initialize the handlers to which Selene reports model predictions
@@ -181,6 +187,9 @@ class AnalyzeSequences(object):
             sequence for which Selene has made predictions (e.g. (chrom,
             pos, id, ref, alt) will be the column names for variant effect
             prediction outputs).
+        output_size : int, optional
+            The total number of rows in the output. Must be specified when
+            the output_format is hdf5.
         mode : {'prediction', 'ism', 'varianteffect'}
             If saving model predictions, the handler Selene chooses for the
             task is dependent on the mode. For example, the reporter for
@@ -195,6 +204,7 @@ class AnalyzeSequences(object):
         """
         save_data = set(save_data) & set(
             ["diffs", "abs_diffs", "logits", "predictions"])
+        save_data = sorted(list(save_data))
         if len(save_data) == 0:
             raise ValueError("'save_data' parameter must be a list that "
                              "contains one of ['diffs', 'abs_diffs', "
@@ -204,18 +214,170 @@ class AnalyzeSequences(object):
                             colnames_for_ids,
                             output_path_prefix,
                             output_format,
+                            output_size,
                             self._write_mem_limit // len(save_data)]
-        if "diffs" in save_data:
-            reporters.append(DiffScoreHandler(*constructor_args))
-        if "abs_diffs" in save_data:
-            reporters.append(AbsDiffScoreHandler(*constructor_args))
-        if "logits" in save_data:
-            reporters.append(LogitScoreHandler(*constructor_args))
-        if "predictions" in save_data and mode != "varianteffect":
-            reporters.append(WritePredictionsHandler(*constructor_args))
-        elif "predictions" in save_data and mode == "varianteffect":
-            reporters.append(WriteRefAltHandler(*constructor_args))
+        for i, s in enumerate(save_data):
+            write_labels = False
+            if i == 0:
+                write_labels = True
+            if "diffs" == s:
+                reporters.append(DiffScoreHandler(
+                    *constructor_args, write_labels=write_labels))
+            elif "abs_diffs" == s:
+                reporters.append(AbsDiffScoreHandler(
+                    *constructor_args, write_labels=write_labels))
+            elif "logits" == s:
+                reporters.append(LogitScoreHandler(
+                    *constructor_args, write_labels=write_labels))
+            elif "predictions" == s and mode != "varianteffect":
+                reporters.append(WritePredictionsHandler(
+                    *constructor_args, write_labels=write_labels))
+            elif "predictions" == s and mode == "varianteffect":
+                reporters.append(WriteRefAltHandler(
+                    *constructor_args, write_labels=write_labels))
         return reporters
+
+    def _get_sequences_from_bed_file(self,
+                                     input_path,
+                                     strand_index=None):
+        """
+        Get the adjusted sequence coordinates and labels corresponding
+        to each row of coordinates in an input BED file. The coordinates
+        specified in each row are only used to find the center position
+        for the resulting sequence--all regions returned will have the
+        length expected by the model.
+
+        Parameters
+        ----------
+        input_path : str
+            Input filepath to BED file.
+        strand_index : int or None, optional
+            Default is None. If sequences must be strand-specific,
+            the input BED file may include a column specifying the
+            strand ({'+', '-', '.'}).
+
+        Returns
+        -------
+        list(tup), list(tup)
+            The sequence query information (chrom, start, end, strand)
+            and the labels (the index, genome coordinates, and sequence
+            specified in the BED file).
+
+        """
+        sequences = []
+        labels = []
+        with open(input_path, 'r') as read_handle:
+            for i, line in enumerate(read_handle):
+                cols = line.strip().split('\t')
+                if len(cols) < 3:
+                    continue
+                chrom = cols[0]
+                start = cols[1]
+                end = cols[2]
+                strand = '.'
+                if isinstance(strand_index, int) and len(cols) > strand_index:
+                    strand = cols[strand_index]
+                if 'chr' not in chrom:
+                    chrom = 'chr{0}'.format(chrom)
+                if not str.isdigit(start) or not str.isdigit(end) \
+                        or chrom not in self.reference_sequence.genome:
+                    continue  # TODO: divert to NA file?
+                start, end = int(start), int(end)
+                mid_pos = start + ((end - start) // 2)
+                seq_start = max(
+                    mid_pos - self._start_radius, 0)
+                seq_end = min(
+                    mid_pos + self._end_radius,
+                    self.reference_sequence.len_chrs[chrom])
+                sequences.append((chrom, seq_start, seq_end, strand))
+                labels.append((i, chrom, start, end, strand))
+        return sequences, labels
+
+    def get_predictions_for_bed_file(self,
+                                     input_path,
+                                     output_dir,
+                                     output_format="tsv",
+                                     strand_index=None):
+        """
+        Get model predictions for sequences specified as genome coordinates
+        in a BED file. Coordinates do not need to be the same length as the
+        model expected sequence input--predictions will be centered at the
+        midpoint of the specified start and end coordinates.
+
+        Parameters
+        ----------
+        input_path : str
+            Input path to the BED file.
+        output_dir : str
+            Output directory to write the model predictions.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package). Choose
+
+                * 'tsv' if your list of sequences is relatively small
+                  (:math:`10^4` or less in order of magnitude) and/or your
+                  model has a small number of features (<1000).
+                * 'hdf5' for anything larger and/or if you would like to
+                  access the predictions/scores as a matrix that you can
+                  easily filter, apply computations, or use in a subsequent
+                  classifier/model. In this case, you may access the matrix
+                  using `mat["data"]` after opening the HDF5 file using
+                  `mat = h5py.File("<output.h5>", 'r')`. The matrix columns
+                  are the features and will match the same ordering as your
+                  features .txt file (same as the order your model outputs
+                  its predictions) and the matrix rows are the sequences.
+                  Note that the row labels (FASTA description/IDs) will be
+                  output as a separate .txt file (should match the ordering
+                  of the sequences in the input FASTA).
+
+        strand_index : int or None, optional
+            Default is None. If the trained model makes strand-specific
+            predictions, your input file may include a column with strand
+            information (strand must be one of {'+', '-', '.'}). Specify
+            the index (0-based) to use it. Otherwise, by default '+' is used.
+
+        Returns
+        -------
+        None
+            Writes the output to file(s) in `output_dir`. Filename will
+            match that specified in the filepath.
+
+        """
+        seq_coords, labels = self._get_sequences_from_bed_file(
+            input_path, strand_index=strand_index)
+        _, filename = os.path.split(input_path)
+        output_prefix = '.'.join(filename.split('.')[:-1])
+        reporter = self._initialize_reporters(
+            ["predictions"],
+            os.path.join(output_dir, output_prefix),
+            output_format,
+            ["index", "chrom", "start", "end", "strand"],
+            output_size=len(labels),
+            mode="prediction")[0]
+        sequences = None
+        batch_ids = []
+        for i, (label, coords) in enumerate(zip(labels, seq_coords)):
+            encoding = self.reference_sequence.get_encoding_from_coords(
+                *coords, pad=True)
+            if sequences is None:
+                sequences = np.zeros((self.batch_size, *encoding.shape))
+            if i and i % self.batch_size == 0:
+                preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+                sequences = np.zeros((self.batch_size, *encoding.shape))
+                reporter.handle_batch_predictions(preds, batch_ids)
+                batch_ids = []
+            batch_ids.append(label)
+            sequences[i % self.batch_size, :, :] = encoding
+
+        if i % self.batch_size != 0:
+            sequences = sequences[:i % self.batch_size + 1, :, :]
+            preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+            reporter.handle_batch_predictions(preds, batch_ids)
+
+        reporter.write_to_file()
 
     def get_predictions_for_fasta_file(self,
                                        input_path,
@@ -264,13 +426,14 @@ class AnalyzeSequences(object):
         _, filename = os.path.split(input_path)
         output_prefix = '.'.join(filename.split('.')[:-1])
 
+        fasta_file = pyfaidx.Fasta(input_path)
         reporter = self._initialize_reporters(
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
             ["index", "name"],
+            output_size=len(fasta_file.keys()),
             mode="prediction")[0]
-        fasta_file = pyfaidx.Fasta(input_path)
         sequences = np.zeros((self.batch_size,
                               self.sequence_length,
                               len(self.reference_sequence.BASES_ARR)))
@@ -287,15 +450,15 @@ class AnalyzeSequences(object):
 
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
-            batch_ids.append([i, fasta_record.name])
 
             if i and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-                sequences = np.zeros((
-                    self.batch_size, *cur_sequence_encoding.shape))
+                sequences = np.zeros(
+                    (self.batch_size, *cur_sequence_encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
+            batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
 
         if i % self.batch_size != 0:
@@ -304,8 +467,69 @@ class AnalyzeSequences(object):
             reporter.handle_batch_predictions(preds, batch_ids)
 
         fasta_file.close()
-        reporter.write_to_file(close=True)
+        reporter.write_to_file()
 
+
+    def get_predictions(self,
+                        input_path,
+                        output_dir,
+                        output_format="tsv",
+                        strand_index=None):
+        """
+        Get model predictions for sequences specified in a FASTA or BED file.
+
+        Parameters
+        ----------
+        input_path : str
+            Input path to the FASTA or BED file.
+        output_dir : str
+            Output directory to write the model predictions.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
+            TSV is easier to access (i.e. open with text editor/Excel) and
+            quickly peruse, whereas HDF5 files must be accessed through
+            specific packages/viewers that support this format (e.g. h5py
+            Python package). Choose
+
+                * 'tsv' if your list of sequences is relatively small
+                  (:math:`10^4` or less in order of magnitude) and/or your
+                  model has a small number of features (<1000).
+                * 'hdf5' for anything larger and/or if you would like to
+                  access the predictions/scores as a matrix that you can
+                  easily filter, apply computations, or use in a subsequent
+                  classifier/model. In this case, you may access the matrix
+                  using `mat["data"]` after opening the HDF5 file using
+                  `mat = h5py.File("<output.h5>", 'r')`. The matrix columns
+                  are the features and will match the same ordering as your
+                  features .txt file (same as the order your model outputs
+                  its predictions) and the matrix rows are the sequences.
+                  Note that the row labels (FASTA description/IDs) will be
+                  output as a separate .txt file (should match the ordering
+                  of the sequences in the input FASTA).
+
+        strand_index : int or None, optional
+            Default is None. If the trained model makes strand-specific
+            predictions, your input BED file may include a column with strand
+            information (strand must be one of {'+', '-', '.'}). Specify
+            the index (0-based) to use it. Otherwise, by default '+' is used.
+            (This parameter is ignored if FASTA file is used as input.)
+
+        Returns
+        -------
+        None
+            Writes the output to file(s) in `output_dir`. Filename will
+            match that specified in the filepath.
+
+        """
+        try:
+            self.get_predictions_for_fasta_file(
+                input_path, output_dir, output_format=output_format)
+        except pyfaidx.FastaIndexingError:
+            self.get_predictions_for_bed_file(
+                input_path,
+                output_dir,
+                output_format=output_format,
+                strand_index=strand_index)
 
     def in_silico_mutagenesis_predict(self,
                                       sequence,
@@ -368,7 +592,7 @@ class AnalyzeSequences(object):
                     r.handle_batch_predictions(outputs, batch_ids)
 
         for r in reporters:
-            r.write_to_file(close=True)
+            r.write_to_file()
 
     def in_silico_mutagenesis(self,
                               sequence,
@@ -424,20 +648,24 @@ class AnalyzeSequences(object):
         reporters = self._initialize_reporters(
             save_data, output_path_prefix, "tsv", ISM_COLS)
 
-        current_sequence_encoding = self.reference_sequence.sequence_to_encoding(
-            sequence)
+        current_sequence_encoding = \
+            self.reference_sequence.sequence_to_encoding(sequence)
 
-        base_encoding = current_sequence_encoding.reshape(
+        current_sequence_encoding = current_sequence_encoding.reshape(
             (1, *current_sequence_encoding.shape))
-        base_preds = predict(self.model, base_encoding, use_cuda=self.use_cuda)
+        current_sequence_preds = predict(
+            self.model, current_sequence_encoding, use_cuda=self.use_cuda)
 
         if "predictions" in save_data:
             predictions_reporter = reporters[-1]
             predictions_reporter.handle_batch_predictions(
-                base_preds, [["NA", "NA", "NA"]])
+                current_sequence_preds, [["NA", "NA", "NA"]])
 
         self.in_silico_mutagenesis_predict(
-            sequence, base_preds, mutated_sequences, reporters=reporters)
+            sequence,
+            current_sequence_preds,
+            mutated_sequences,
+            reporters=reporters)
 
     def in_silico_mutagenesis_from_file(self,
                                         input_path,
@@ -493,7 +721,8 @@ class AnalyzeSequences(object):
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
-                cur_sequence, mutate_n_bases=mutate_n_bases,
+                cur_sequence,
+                mutate_n_bases=mutate_n_bases,
                 reference_sequence=self.reference_sequence)
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
@@ -528,7 +757,8 @@ class AnalyzeSequences(object):
                                   save_data,
                                   output_dir=None,
                                   output_format="tsv",
-                                  strand_index=None):
+                                  strand_index=None,
+                                  require_strand=False):
         """
         Get model predictions and scores for a list of variants.
 
@@ -569,17 +799,22 @@ class AnalyzeSequences(object):
         strand_index : int or None, optional.
             Default is None. If applicable, specify the column index (0-based)
             in the VCF file that contains strand information for each variant.
+        require_strand : bool, optional.
+            Default is False. Whether strand can be specified as '.'. If False,
+            Selene accepts strand value to be '+', '-', or '.' and automatically
+            treats '.' as '+'. If True, Selene skips any variant with strand '.'.
+            This parameter assumes that `strand_index` has been set.
 
         Returns
         -------
         None
             Saves all files to `output_dir`. If any bases in the 'ref' column
             of the VCF do not match those at the specified position in the
-            reference genome, the scores/predictions will be output to a
-            file prefixed with `warning.`. If most of your variants show up
-            in these warning files, please check that the reference genome
-            you specified matches the one from which the VCF was created.
-            The warning files can be used directly if you have verified that
+            reference genome, the row labels .txt file will mark this variant
+            as `ref_match = False`. If most of your variants do not match
+            the reference genome, please check that the reference genome
+            you specified matches the version with which the variants were
+            called. The predictions can used directly if you have verified that
             the 'ref' bases specified for these variants are correct (Selene
             will have substituted these bases for those in the reference
             genome). Finally, some variants may show up in an 'NA' file.
@@ -588,8 +823,6 @@ class AnalyzeSequences(object):
             did not show up in the reference genome FASTA file.
 
         """
-        variants = read_vcf_file(vcf_file, strand_index=strand_index)
-
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
         path, filename = os.path.split(vcf_file)
         output_path_prefix = '.'.join(filename.split('.')[:-1])
@@ -597,89 +830,82 @@ class AnalyzeSequences(object):
             os.makedirs(output_dir, exist_ok=True)
         else:
             output_dir = path
+
         output_path_prefix = os.path.join(output_dir, output_path_prefix)
+        variants = read_vcf_file(
+            vcf_file,
+            strand_index=strand_index,
+            output_NAs_to_file="{0}.NA".format(output_path_prefix),
+            seq_context=(self._start_radius, self._end_radius),
+            reference_sequence=self.reference_sequence)
+
         reporters = self._initialize_reporters(
             save_data,
             output_path_prefix,
             output_format,
             VARIANTEFFECT_COLS,
+            output_size=len(variants),
             mode="varianteffect")
 
         batch_ref_seqs = []
         batch_alt_seqs = []
         batch_ids = []
-        for (chrom, pos, name, ref, alt, strand) in variants:
+        t_i = time()
+        for ix, (chrom, pos, name, ref, alt, strand) in enumerate(variants):
             # centers the sequence containing the ref allele based on the size
             # of ref
             center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
 
-            if isinstance(self.reference_sequence, Genome):
-                if "chr" not in chrom:
-                    chrom = "chr" + chrom
-                if "MT" in chrom:
-                    chrom = chrom[:-1]
-
-            if not self.reference_sequence.coords_in_bounds(chrom, start, end):
-                for r in reporters:
-                    r.handle_NA((chrom, pos, name, ref, alt, strand))
-                continue
-
             seq_encoding = self.reference_sequence.get_encoding_from_coords(
                 chrom, start, end, strand=strand)
+            if len(ref) and strand == '-':
+                ref = get_reverse_complement(
+                    ref,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+                alt = get_reverse_complement(
+                    alt,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
-            all_alts = alt.split(',')
-            alt_encodings = _process_alts(
-                all_alts,
-                ref,
-                chrom,
-                pos,
-                center,
-                strand,
-                self._start_radius,
-                self._end_radius,
-                self.reference_sequence)
+            alt_encoding = _process_alt(
+                chrom, pos, ref, alt, start, end, strand,
+                seq_encoding, self.reference_sequence)
 
             match = True
             seq_at_ref = None
-            if len(ref) < self.sequence_length:
+            if len(ref) and len(ref) < self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_standard_ref(
                     ref_encoding,
                     seq_encoding,
-                    self._start_radius,
-                    self.reference_sequence)
-            else:
+                    self.sequence_length,
+                    self.reference_sequence,
+                    strand)
+            elif len(ref) >= self.sequence_length:
                 match, seq_encoding, seq_at_ref = _handle_long_ref(
                     ref_encoding,
                     seq_encoding,
                     self._start_radius,
                     self._end_radius,
-                    self.reference_sequence)
+                    self.reference_sequence,
+                    strand)
             if not match:
-                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}), "
+                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
                               "reference does not match the reference genome. "
-                              "Reference genome contains {5} instead. "
+                              "Reference genome contains {6} instead. "
                               "Predictions/scores associated with this "
                               "variant--where we use '{3}' in the input "
-                              "sequence--will be written to files where the "
-                              "filename is prefixed by 'warning.'".format(
-                                  chrom, pos, name, ref, alt, seq_at_ref))
-                warn_batch_ids = [(chrom, pos, name, ref, a) for a in all_alts]
-                warn_ref_seqs = [seq_encoding] * len(all_alts)
-                _handle_ref_alt_predictions(
-                    self.model,
-                    warn_ref_seqs,
-                    alt_encodings,
-                    warn_batch_ids,
-                    reporters,
-                    warn=True,
-                    use_cuda=self.use_cuda)
+                              "sequence--will be marked in the row labels .txt "
+                              "file with `ref_match=False`".format(
+                                  chrom, pos, name, ref, alt, strand, seq_at_ref))
+                batch_ids.append((chrom, pos, name, ref, alt, strand, False))
+                batch_ref_seqs.append(seq_encoding)
+                batch_alt_seqs.append(alt_encoding)
                 continue
-
-            batch_ids += [(chrom, pos, name, ref, a) for a in all_alts]
-            batch_ref_seqs += [seq_encoding] * len(all_alts)
-            batch_alt_seqs += alt_encodings
+            batch_ids.append((chrom, pos, name, ref, alt, strand, True))
+            batch_ref_seqs.append(seq_encoding)
+            batch_alt_seqs.append(alt_encoding)
 
             if len(batch_ref_seqs) >= self.batch_size:
                 _handle_ref_alt_predictions(
@@ -688,11 +914,15 @@ class AnalyzeSequences(object):
                     batch_alt_seqs,
                     batch_ids,
                     reporters,
-                    warn=False,
                     use_cuda=self.use_cuda)
                 batch_ref_seqs = []
                 batch_alt_seqs = []
                 batch_ids = []
+
+            if ix and ix % 10000 == 0:
+                print("[STEP {0}]: {1} s to process 10000 variants.".format(
+                    ix, time() - t_i))
+                t_i = time()
 
         if batch_ref_seqs:
             _handle_ref_alt_predictions(
@@ -701,8 +931,7 @@ class AnalyzeSequences(object):
                 batch_alt_seqs,
                 batch_ids,
                 reporters,
-                warn=False,
                 use_cuda=self.use_cuda)
 
         for r in reporters:
-            r.write_to_file(close=True)
+            r.write_to_file()

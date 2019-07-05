@@ -1,7 +1,6 @@
 """
 Handles outputting the model predictions
 """
-from .handler import _create_warning_handler
 from .handler import PredictionsHandler
 
 
@@ -26,10 +25,18 @@ class WritePredictionsHandler(PredictionsHandler):
         Specify the desired output format. TSV can be specified if you
         would like the final file to be easily perused. However, saving
         to a TSV file is much slower than saving to an HDF5 file.
+    output_size : int, optional
+        The total number of rows in the output. Must be specified when
+        the output_format is hdf5.
     write_mem_limit : int, optional
         Default is 1500. Specify the amount of memory you can allocate to
         storing model predictions/scores for this particular handler, in MB.
         Handler will write to file whenever this memory limit is reached.
+    write_labels : bool, optional
+        Default is True. If you initialize multiple write handlers for the
+        same set of inputs with output format `hdf5`, set `write_label` to
+        False on all handlers except 1 so that only 1 handler writes the
+        row labels to an output file.
 
     Attributes
     ----------
@@ -44,7 +51,9 @@ class WritePredictionsHandler(PredictionsHandler):
                  columns_for_ids,
                  output_path_prefix,
                  output_format,
-                 write_mem_limit=1500):
+                 output_size=None,
+                 write_mem_limit=1500,
+                 write_labels=True):
         """
         Constructs a new `WritePredictionsHandler` object.
         """
@@ -53,52 +62,28 @@ class WritePredictionsHandler(PredictionsHandler):
             columns_for_ids,
             output_path_prefix,
             output_format,
-            write_mem_limit)
+            output_size=output_size,
+            write_mem_limit=write_mem_limit,
+            write_labels=write_labels)
 
         self.needs_base_pred = False
         self._results = []
         self._samples = []
-        self._NA_samples = []
 
         self._features = features
         self._columns_for_ids = columns_for_ids
         self._output_path_prefix = output_path_prefix
         self._output_format = output_format
         self._write_mem_limit = write_mem_limit
+        self._write_labels = write_labels
 
         self._create_write_handler("predictions")
-
-        self._warn_handle = None
-
-    def handle_NA(self, batch_ids):
-        """
-        TODO
-
-        Parameters
-        ----------
-        batch_ids : # TODO
-            # TODO
-
-        """
-        super().handle_NA(batch_ids)
-
-    def handle_warning(self, batch_predictions, batch_ids):
-        if self._warn_handle is None:
-            self._warn_handle = _create_warning_handler(
-                self._features,
-                self._columns_for_ids,
-                self._output_path_prefix,
-                self._output_format,
-                self._write_mem_limit,
-                WritePredictionsHandler)
-        self._warn_handle.handle_batch_predictions(
-            batch_predictions, batch_ids)
 
     def handle_batch_predictions(self,
                                  batch_predictions,
                                  batch_ids):
         """
-        TODO
+        Handles the predictions for a batch of sequences.
 
         Parameters
         ----------
@@ -118,8 +103,9 @@ class WritePredictionsHandler(PredictionsHandler):
         if self._reached_mem_limit():
             self.write_to_file()
 
-    def write_to_file(self, close=False):
+    def write_to_file(self):
         """
-        TODO
+        Writes the stored scores to a file.
+
         """
-        super().write_to_file(close=close)
+        super().write_to_file()

@@ -38,8 +38,9 @@ def _get_sequence_from_coords(len_chrs,
         The 0-based start coordinate of the sequence.
     end : int
         One past the last coordinate of the sequence.
-    strand : {'+', '-'}, optional
-        Default is '+'. The strand the sequence is located on.
+    strand : {'+', '-', '.'}, optional
+        Default is '+'. The strand the sequence is located on. '.' is treated
+        as '+'.
     pad : bool, optional
         Default is `False`. If the coordinates are out of bounds, make an
         in-bounds query and then pad the sequence to return the desired
@@ -63,10 +64,13 @@ def _get_sequence_from_coords(len_chrs,
     if chrom not in len_chrs:
         return ""
 
-    if start > len_chrs[chrom]:
+    if start >= len_chrs[chrom]:
         return ""
 
     if not pad and (end > len_chrs[chrom] or start < 0):
+        return ""
+
+    if start >= end:
         return ""
 
     if blacklist_tabix is not None:
@@ -77,15 +81,15 @@ def _get_sequence_from_coords(len_chrs,
         except tabix.TabixError:
             pass
 
-    if strand != '+' and strand != '-':
+    if strand != '+' and strand != '-' and strand != '.':
         raise ValueError(
-            "Strand must be one of '+' or '-'. Input was {0}".format(
+            "Strand must be one of '+', '-', or '.'. Input was {0}".format(
                 strand))
 
     end_pad = 0
     start_pad = 0
     if end > len_chrs[chrom]:
-        end_pad = len_chrs[chrom] - end
+        end_pad = end - len_chrs[chrom]
         end = len_chrs[chrom]
     if start < 0:
         start_pad = -1 * start
@@ -115,6 +119,10 @@ class Genome(Sequence):
         measurements. You can pass as input "hg19" or "hg38" to use the
         blacklist regions released by ENCODE. You can also pass in your own
         tabix-indexed .gz file.
+    bases_order : list(str) or None, optional
+        Default is None (use the default base ordering of
+        `['A', 'C', 'G', 'T']`). Specify a different ordering of
+        DNA bases for one-hot encoding.
 
     Attributes
     ----------
@@ -172,7 +180,7 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path, blacklist_regions=None):
+    def __init__(self, input_path, blacklist_regions=None, bases_order=None):
         """
         Constructs a `Genome` object.
         """
@@ -194,6 +202,26 @@ class Genome(Sequence):
         elif blacklist_regions is not None:  # user-specified file
             self._blacklist_tabix = tabix.open(
                 blacklist_regions)
+
+        if bases_order is not None:
+            bases = [str.upper(b) for b in bases_order]
+            self.BASES_ARR = bases
+            lc_bases = [str.lower(b) for b in bases]
+            self.BASE_TO_INDEX = {
+                **{b: ix for (ix, b) in enumerate(bases)},
+                **{b: ix for (ix, b) in enumerate(lc_bases)}}
+            self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
+            self.update_bases_order(bases)
+
+    @classmethod
+    def update_bases_order(cls, bases):
+        cls.BASES_ARR = bases
+        lc_bases = [str.lower(b) for b in bases]
+        cls.BASE_TO_INDEX = {
+            **{b: ix for (ix, b) in enumerate(bases)},
+            **{b: ix for (ix, b) in enumerate(lc_bases)}}
+        cls.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
+
 
     def get_chrs(self):
         """Gets the list of chromosome names.
@@ -224,7 +252,7 @@ class Genome(Sequence):
         return len_chrs
 
     def _genome_sequence(self, chrom, start, end, strand='+'):
-        if strand == '+':
+        if strand == '+' or strand == '.':
             return self.genome[chrom][start:end].seq
         else:
             return self.genome[chrom][start:end].reverse.complement.seq
@@ -250,12 +278,9 @@ class Genome(Sequence):
             in the input.
 
         """
-        if chrom not in self.len_chrs:
-            return False
-        if (start > self.len_chrs[chrom] or end > (self.len_chrs[chrom] + 1)
-                or start < 0):
-            return False
-        return True
+        return chrom in self.len_chrs and \
+            (start >= 0 and start < self.len_chrs[chrom] and
+             end <= self.len_chrs[chrom])
 
     def get_sequence_from_coords(self,
                                  chrom,
@@ -274,8 +299,9 @@ class Genome(Sequence):
             The 0-based start coordinate of the sequence.
         end : int
             One past the 0-based last position in the sequence.
-        strand : {'+', '-'}, optional
-            Default is '+'. The strand the sequence is located on.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is
+            treated as '.'.
         pad : bool, optional
             Default is `False`. Pad the output sequence with 'N' if `start`
             and/or `end` are out of bounds to return a sequence of length
@@ -308,7 +334,12 @@ class Genome(Sequence):
                                          pad=pad,
                                          blacklist_tabix=self._blacklist_tabix)
 
-    def get_encoding_from_coords(self, chrom, start, end, strand='+'):
+    def get_encoding_from_coords(self,
+                                 chrom,
+                                 start,
+                                 end,
+                                 strand='+',
+                                 pad=False):
         """Gets the one-hot encoding of the genomic sequence at the
         queried coordinates.
 
@@ -321,8 +352,13 @@ class Genome(Sequence):
             sequence.
         end : int
             One past the 0-based last position in the sequence.
-        strand : {'+', '-'}, optional
-            Default is '+'. The strand the sequence is located on.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is
+            treated as '+'.
+        pad : bool, optional
+            Default is `False`. Pad the output sequence with 'N' if `start`
+            and/or `end` are out of bounds to return a sequence of length
+            `end - start`.
 
         Returns
         -------
@@ -343,7 +379,7 @@ class Genome(Sequence):
 
         """
         sequence = self.get_sequence_from_coords(
-            chrom, start, end, strand=strand)
+            chrom, start, end, strand=strand, pad=pad)
         encoding = self.sequence_to_encoding(sequence)
         return encoding
 

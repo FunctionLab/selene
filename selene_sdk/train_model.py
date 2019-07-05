@@ -262,6 +262,10 @@ class TrainModel(object):
             checkpoint = torch.load(
                 checkpoint_resume,
                 map_location=lambda storage, location: storage)
+            if "state_dict" not in checkpoint:
+                raise ValueError("Selene does not support continued "
+                    "training of models that were not originally "
+                    "trained using Selene.")
 
             self.model = load_model_from_state_dict(
                 checkpoint["state_dict"], self.model)
@@ -289,8 +293,6 @@ class TrainModel(object):
                 "{0}.validation".format(__name__), self.output_dir)
 
         self._train_logger.info("loss")
-        # TODO: this makes the assumption that all models will report ROC AUC,
-        # which is not the case.
         self._validation_logger.info("\t".join(["loss"] +
             sorted([x for x in self._validation_metrics.metrics.keys()])))
 
@@ -498,8 +500,7 @@ class TrainModel(object):
                 inputs = Variable(inputs)
                 targets = Variable(targets)
 
-                predictions = self.model(
-                    inputs.transpose(1, 2))
+                predictions = self.model(inputs.transpose(1, 2))
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(

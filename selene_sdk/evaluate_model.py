@@ -9,6 +9,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+from .sequences import Genome
+from .utils import _is_lua_trained_model
 from .utils import initialize_logger
 from .utils import load_model_from_state_dict
 from .utils import PerformanceMetrics
@@ -91,8 +93,12 @@ class EvaluateModel(object):
 
         trained_model = torch.load(
             trained_model_path, map_location=lambda storage, location: storage)
-        self.model = load_model_from_state_dict(
-            trained_model["state_dict"], model)
+        if "state_dict" in trained_model:
+            self.model = load_model_from_state_dict(
+                trained_model["state_dict"], model)
+        else:
+            self.model = load_model_from_state_dict(
+                trained_model, model)
         self.model.eval()
 
         self.sampler = data_sampler
@@ -124,6 +130,10 @@ class EvaluateModel(object):
 
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
+
+        if type(self.reference_sequence) == Genome and \
+                _is_lua_trained_model(model):
+            Genome.update_bases_order(['A', 'G', 'C', 'T'])
 
     def _get_feature_from_index(self, index):
         """
@@ -168,7 +178,13 @@ class EvaluateModel(object):
                 inputs = Variable(inputs)
                 targets = Variable(targets)
 
-                predictions = self.model(inputs.transpose(1, 2))
+                predictions = None
+                if _is_lua_trained_model(self.model):
+                    predictions = self.model.forward(
+                        inputs.transpose(1, 2).unsqueeze_(2))
+                else:
+                    predictions = self.model.forward(
+                        inputs.transpose(1, 2))
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(predictions.data.cpu().numpy())

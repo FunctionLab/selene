@@ -11,6 +11,7 @@ import types
 
 import torch
 
+from . import _is_lua_trained_model
 from . import instantiate
 
 
@@ -114,11 +115,12 @@ def initialize_model(model_configs, train=True, lr=None):
     model_class = getattr(module, model_class_name)
 
     model = model_class(**model_configs["class_args"])
-
     if "non_strand_specific" in model_configs:
         from selene_sdk.utils import NonStrandSpecific
         model = NonStrandSpecific(
             model, mode=model_configs["non_strand_specific"])
+
+    _is_lua_trained_model(model)
     criterion = module.criterion()
     if train and isinstance(lr, float):
         optim_class, optim_kwargs = module.get_optimizer(lr)
@@ -242,7 +244,7 @@ def execute(operations, configs, output_dir):
                                      "neither.")
             if "prediction" in configs:
                 predict_info = configs["prediction"]
-                analyze_seqs.get_predictions_for_fasta_file(**predict_info)
+                analyze_seqs.get_predictions(**predict_info)
 
 
 def parse_configs_and_run(configs,

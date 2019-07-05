@@ -4,6 +4,8 @@ This module provides the NonStrandSpecific class.
 import torch
 from torch.nn.modules import Module
 
+from . import _is_lua_trained_model
+
 
 def _flip(x, dim):
     """
@@ -55,14 +57,19 @@ class NonStrandSpecific(Module):
             raise ValueError("Mode should be one of 'mean' or 'max' but was"
                              "{0}.".format(mode))
         self.mode = mode
+        self.from_lua = _is_lua_trained_model(model)
 
     def forward(self, input):
-        reverse_input = _flip(
-            _flip(input, 1), 2)
+        reverse_input = None
+        if self.from_lua:
+            reverse_input = _flip(
+                _flip(torch.squeeze(input, 2), 1), 2).unsqueeze_(2)
+        else:
+            reverse_input = _flip(_flip(input, 1), 2)
 
         output = self.model.forward(input)
-        output_from_rev = self.model.forward(
-            reverse_input)
+        output_from_rev = self.model.forward(reverse_input)
+
         if self.mode == "mean":
             return (output + output_from_rev) / 2
         else:
