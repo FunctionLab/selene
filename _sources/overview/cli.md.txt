@@ -282,7 +282,8 @@ variant_effect_prediction: {
     save_data: [abs_diffs],
     output_dir: /path/to/output/predictions/dir,
     output_format: hdf5,
-    strand_index: 7
+    strand_index: 7,
+    require_strand: True
 }
 ```
 
@@ -291,7 +292,8 @@ variant_effect_prediction: {
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. (Note that the raw prediction values will not be outputted by default---you must specify `predictions` in the list if you want them.)
 - `output_dir`: Output directory to write the model predictions. The resulting file will have the same filename prefix.
 - `output_format`: Default is 'tsv'. You may specify either 'tsv' or 'hdf5'. 'tsv' is suitable if you do not have many variants (on the order of 10^4 or less) or your model does not predict very many classes (<1000) and you want to be able to view the full set of predictions quickly and easily (via a text editor or Excel). 'hdf5' is suitable for downstream analysis. You can access the data in the HDF5 file using the Python package `h5py`. Once the file is loaded, the full matrix is accessible under the key/name `"data"`. Saving to TSV is much slower (more than 2x slower) than saving to HDF5. When the output is in HDF5 format, an additional .txt file of row labels (corresponding to the columns (chrom, pos, id, ref, alt)) will be output so that you can match up the data matrix rows with the particular variant. Columns of the matrix correspond to the classes the model predicts.
-- `strand_index`: Default is None. If applicable, specify the column index (0-based) in the VCF file that contains strand information for each variant. Note that currently Selene assumes that, for multiple input VCF files, the strand column is the same for all the files. 
+- `strand_index`: Default is None. If applicable, specify the column index (0-based) in the VCF file that contains strand information for each variant. Note that currently Selene assumes that, for multiple input VCF files, the strand column is the same for all the files. Importantly, the VCF file ref and alt alleles should still be specified for the forward strand--Selene will take the reverse complement for both if strand = '-'. 
+- `require_strand`: Default is False. If `strand_index` is not None, `require_strand = True` means that Selene will skip all variants with strand specified as '.' (that is, only keep variants with strand column value being '+' or '-'). If `require_strand = False`, variants with strand specified as '.' will be treated as being on the '+' strand.
 
 #### Additional note
 You may find that there are more output files than you expect in `output_dir` at the end of variant effect prediction. The following cases may occur:

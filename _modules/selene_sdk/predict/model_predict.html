@@ -1158,6 +1158,7 @@
         <span class="n">variants</span> <span class="o">=</span> <span class="n">read_vcf_file</span><span class="p">(</span>
             <span class="n">vcf_file</span><span class="p">,</span>
             <span class="n">strand_index</span><span class="o">=</span><span class="n">strand_index</span><span class="p">,</span>
+            <span class="n">require_strand</span><span class="o">=</span><span class="n">require_strand</span><span class="p">,</span>
             <span class="n">output_NAs_to_file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.NA&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_path_prefix</span><span class="p">),</span>
             <span class="n">seq_context</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">),</span>
             <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
