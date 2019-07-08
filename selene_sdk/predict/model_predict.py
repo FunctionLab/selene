@@ -835,6 +835,7 @@ class AnalyzeSequences(object):
         variants = read_vcf_file(
             vcf_file,
             strand_index=strand_index,
+            require_strand=require_strand,
             output_NAs_to_file="{0}.NA".format(output_path_prefix),
             seq_context=(self._start_radius, self._end_radius),
             reference_sequence=self.reference_sequence)
