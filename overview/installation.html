@@ -110,7 +110,10 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-with-anaconda">Installing with Anaconda</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-selene-with-pip">Installing selene with pip:</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
 </ul>
@@ -326,12 +329,20 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Users can either clone and build the repository locally or install Selene through conda. We previously supported installation through pip, but are refraining from releasing the latest version of Selene through pip due to some issues we are observing when using the pip-installed torch and torchvision dependencies.</p>
+<p>Users can clone and build the repository locally or install Selene through conda/pip.</p>
 <div class="section" id="installing-with-anaconda">
 <h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
 <p>To install with conda (recommended for Linux users), run the following command in your terminal:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">bioconda</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
 </pre></div>
+</div>
+<div class="section" id="installing-selene-with-pip">
+<h3>Installing selene with pip:<a class="headerlink" href="#installing-selene-with-pip" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install selene-sdk
+</pre></div>
+</div>
+<p>Note that we do not recommend pip-installing older versions of Selene (below 0.4.0), as these releases were less stable.</p>
+<p>We currently only have a source distribution available for pip-installation. We are looking into releasing wheels in the future.</p>
 </div>
 </div>
 <div class="section" id="installing-from-source">
