@@ -17,7 +17,7 @@ First, download the latest commits from the source repository:
 git clone https://github.com/FunctionLab/selene.git
 ```
 
-The `setup.py` script requires NumPy. Please make sure you have this already installed.
+The `setup.py` script requires NumPy, Cython, and setuptools. Please make sure you have these already installed.
 
 If you plan on working in the `selene` repository directly, we recommend [setting up a conda environment](https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) using `selene-cpu.yml` or `selene-gpu.yml` (if CUDA is enabled on your machine) and activating it.
 
