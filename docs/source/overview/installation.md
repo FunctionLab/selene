@@ -1,6 +1,6 @@
 # Installation
 
-Users can either clone and build the repository locally or install Selene through conda. We previously supported installation through pip, but are refraining from releasing the latest version of Selene through pip due to some issues we are observing when using the pip-installed torch and torchvision dependencies.
+Users can clone and build the repository locally or install Selene through conda/pip. 
 
 ## Installing with Anaconda
 
@@ -8,6 +8,16 @@ To install with conda (recommended for Linux users), run the following command i
 ```
 conda install -c bioconda selene-sdk
 ```
+
+### Installing selene with pip:
+
+```sh
+pip install selene-sdk
+```
+
+Note that we do not recommend pip-installing older versions of Selene (below 0.4.0), as these releases were less stable. 
+
+We currently only have a source distribution available for pip-installation. We are looking into releasing wheels in the future. 
 
 ## Installing from source
 
