@@ -452,7 +452,6 @@ class AnalyzeSequences(object):
                 cur_sequence)
 
             if i and i > 0 and i % self.batch_size == 0:
-                print("PREDICTING EARLY")
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
                 sequences = np.zeros(
                     (self.batch_size, *cur_sequence_encoding.shape))
