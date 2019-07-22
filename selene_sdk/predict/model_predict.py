@@ -451,7 +451,8 @@ class AnalyzeSequences(object):
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
-            if i and i % self.batch_size == 0:
+            if i and i > 0 and i % self.batch_size == 0:
+                print("PREDICTING EARLY")
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
                 sequences = np.zeros(
                     (self.batch_size, *cur_sequence_encoding.shape))
@@ -460,8 +461,7 @@ class AnalyzeSequences(object):
 
             batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
-
-        if i % self.batch_size != 0:
+        if (batch_ids and i == 0) or i % self.batch_size != 0):
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
             reporter.handle_batch_predictions(preds, batch_ids)
