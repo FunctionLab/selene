@@ -451,7 +451,7 @@ class AnalyzeSequences(object):
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
-            if i and i % self.batch_size == 0:
+            if i and i > 0 and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
                 sequences = np.zeros(
                     (self.batch_size, *cur_sequence_encoding.shape))
@@ -460,8 +460,7 @@ class AnalyzeSequences(object):
 
             batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
-
-        if i % self.batch_size != 0:
+        if (batch_ids and i == 0) or i % self.batch_size != 0):
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
             reporter.handle_batch_predictions(preds, batch_ids)
@@ -598,7 +597,8 @@ class AnalyzeSequences(object):
                               sequence,
                               save_data,
                               output_path_prefix="ism",
-                              mutate_n_bases=1):
+                              mutate_n_bases=1,
+                              output_format="tsv"):
         """
         Applies *in silico* mutagenesis to a sequence.
 
@@ -616,6 +616,9 @@ class AnalyzeSequences(object):
             The number of bases to mutate at one time. We recommend leaving
             this parameter set to `1` at this time, as we have not yet
             optimized operations for double and triple mutations.
+        output_format : {'tsv', 'hdf5'}
+            The desired output format. Currently Selene supports TSV and HDF5
+            formats.
 
         Returns
         -------
@@ -646,7 +649,7 @@ class AnalyzeSequences(object):
             reference_sequence=self.reference_sequence)
 
         reporters = self._initialize_reporters(
-            save_data, output_path_prefix, "tsv", ISM_COLS)
+            save_data, output_path_prefix, output_format, ISM_COLS)
 
         current_sequence_encoding = \
             self.reference_sequence.sequence_to_encoding(sequence)
@@ -672,7 +675,8 @@ class AnalyzeSequences(object):
                                         save_data,
                                         output_dir,
                                         mutate_n_bases=1,
-                                        use_sequence_name=True):
+                                        use_sequence_name=True,
+                                        output_format="tsv"):
         """
         Apply *in silico* mutagenesis to all sequences in a FASTA file.
 
@@ -699,6 +703,10 @@ class AnalyzeSequences(object):
             underscores '_'. If not `use_sequence_name`, output files are
             prefixed with an index :math:`i` (starting with 0) corresponding
             to the :math:`i`th sequence in the FASTA file.
+        output_format : {'tsv', 'hdf5'}
+            The desired output format. Currently Selene supports TSV and HDF5
+            formats.
+
 
         Returns
         -------
@@ -740,7 +748,7 @@ class AnalyzeSequences(object):
                     output_dir, str(i))
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
-                save_data, file_prefix, "tsv", ISM_COLS)
+                save_data, file_prefix, output_format, ISM_COLS)
 
             if "predictions" in save_data:
                 predictions_reporter = reporters[-1]
