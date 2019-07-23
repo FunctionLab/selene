@@ -2,6 +2,10 @@
 
 Users can clone and build the repository locally or install Selene through conda/pip. 
 
+Please use Selene with Python 3.6+.
+
+**Install [PyTorch](https://pytorch.org/get-started/locally/).** If you have an NVIDIA GPU, install a version of PyTorch that supports it--Selene will run much faster with a discrete GPU.
+
 ## Installing with Anaconda
 
 To install with conda (recommended for Linux users), run the following command in your terminal:
