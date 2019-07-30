@@ -777,7 +777,7 @@
             <span class="n">cur_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
                 <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">cur_sequence_encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
@@ -786,8 +786,7 @@
 
             <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
             <span class="n">sequences</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cur_sequence_encoding</span>
-
-        <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">batch_ids</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
             <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
@@ -924,7 +923,8 @@
                               <span class="n">sequence</span><span class="p">,</span>
                               <span class="n">save_data</span><span class="p">,</span>
                               <span class="n">output_path_prefix</span><span class="o">=</span><span class="s2">&quot;ism&quot;</span><span class="p">,</span>
-                              <span class="n">mutate_n_bases</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                              <span class="n">mutate_n_bases</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                              <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies *in silico* mutagenesis to a sequence.</span>
 
@@ -942,6 +942,9 @@
 <span class="sd">            The number of bases to mutate at one time. We recommend leaving</span>
 <span class="sd">            this parameter set to `1` at this time, as we have not yet</span>
 <span class="sd">            optimized operations for double and triple mutations.</span>
+<span class="sd">        output_format : {&#39;tsv&#39;, &#39;hdf5&#39;}</span>
+<span class="sd">            The desired output format. Currently Selene supports TSV and HDF5</span>
+<span class="sd">            formats.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -972,7 +975,7 @@
             <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
 
         <span class="n">reporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
-            <span class="n">save_data</span><span class="p">,</span> <span class="n">output_path_prefix</span><span class="p">,</span> <span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="n">ISM_COLS</span><span class="p">)</span>
+            <span class="n">save_data</span><span class="p">,</span> <span class="n">output_path_prefix</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">ISM_COLS</span><span class="p">)</span>
 
         <span class="n">current_sequence_encoding</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
@@ -998,7 +1001,8 @@
                                         <span class="n">save_data</span><span class="p">,</span>
                                         <span class="n">output_dir</span><span class="p">,</span>
                                         <span class="n">mutate_n_bases</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                                        <span class="n">use_sequence_name</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                                        <span class="n">use_sequence_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply *in silico* mutagenesis to all sequences in a FASTA file.</span>
 
@@ -1025,6 +1029,10 @@
 <span class="sd">            underscores &#39;_&#39;. If not `use_sequence_name`, output files are</span>
 <span class="sd">            prefixed with an index :math:`i` (starting with 0) corresponding</span>
 <span class="sd">            to the :math:`i`th sequence in the FASTA file.</span>
+<span class="sd">        output_format : {&#39;tsv&#39;, &#39;hdf5&#39;}</span>
+<span class="sd">            The desired output format. Currently Selene supports TSV and HDF5</span>
+<span class="sd">            formats.</span>
+
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1066,7 +1074,7 @@
                     <span class="n">output_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
             <span class="c1"># Write base to file, and make mut preds.</span>
             <span class="n">reporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
-                <span class="n">save_data</span><span class="p">,</span> <span class="n">file_prefix</span><span class="p">,</span> <span class="s2">&quot;tsv&quot;</span><span class="p">,</span> <span class="n">ISM_COLS</span><span class="p">)</span>
+                <span class="n">save_data</span><span class="p">,</span> <span class="n">file_prefix</span><span class="p">,</span> <span class="n">output_format</span><span class="p">,</span> <span class="n">ISM_COLS</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;predictions&quot;</span> <span class="ow">in</span> <span class="n">save_data</span><span class="p">:</span>
                 <span class="n">predictions_reporter</span> <span class="o">=</span> <span class="n">reporters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>

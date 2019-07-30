@@ -381,7 +381,7 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.2.0a0+535c554 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
+<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.2.0a0+16da355 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
 <li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
 <li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
 <li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
@@ -542,7 +542,7 @@ of the sequences in the input FASTA).</p></li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis">
-<code class="descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em>sequence</em>, <em>save_data</em>, <em>output_path_prefix='ism'</em>, <em>mutate_n_bases=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em>sequence</em>, <em>save_data</em>, <em>output_path_prefix='ism'</em>, <em>mutate_n_bases=1</em>, <em>output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies <em>in silico</em> mutagenesis to a sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -555,6 +555,8 @@ the path do not yet exist they will be automatically created.</p></li>
 <li><p><strong>mutate_n_bases</strong> (<em>int, optional</em>) – The number of bases to mutate at one time. We recommend leaving
 this parameter set to <cite>1</cite> at this time, as we have not yet
 optimized operations for double and triple mutations.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – The desired output format. Currently Selene supports TSV and HDF5
+formats.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -569,7 +571,7 @@ optimized operations for double and triple mutations.</p></li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">
-<code class="descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>save_data</em>, <em>output_dir</em>, <em>mutate_n_bases=1</em>, <em>use_sequence_name=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em>input_path</em>, <em>save_data</em>, <em>output_dir</em>, <em>mutate_n_bases=1</em>, <em>use_sequence_name=True</em>, <em>output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply <em>in silico</em> mutagenesis to all sequences in a FASTA file.</p>
 <p>Please note that we have not parallelized this function yet, so runtime
 increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
@@ -589,6 +591,8 @@ in the FASTA file. Spaces in the sequence name are replaced with
 underscores ‘_’. If not <cite>use_sequence_name</cite>, output files are
 prefixed with an index <span class="math notranslate nohighlight">\(i\)</span> (starting with 0) corresponding
 to the :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>i`th sequence in the FASTA file.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – The desired output format. Currently Selene supports TSV and HDF5
+formats.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
