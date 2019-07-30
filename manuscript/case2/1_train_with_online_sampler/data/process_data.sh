@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# Run this after running ../download_data.sh
+# Chromatin profiles download. ENCODE/Roadmap Epigenomics .bed files used
+# in DeepSEA (Zhou & Troyanskaya, 2015).
+wget https://zenodo.org/record/2214970/files/chromatin_profiles.tar.gz
+tar -xzvf chromatin_profiles.tar.gz
 
 python process_chromatin_profiles.py chromatin_profiles/deepsea__919_features_.txt \
                                      chromatin_profiles/ENCODE_DNase/ \
