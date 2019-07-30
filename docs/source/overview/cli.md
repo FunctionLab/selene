@@ -5,6 +5,8 @@ The sections that follow describe in detail how the various components that make
 
 We strongly recommend you read through the first 4 sections ([Overview](#overview), [Operations](#operations), [General configurations](#general-configurations), and [Model architecture](#model-architecture)) and then pick other sections based on your use case. 
 
+Join our [Google group](https://groups.google.com/forum/#!forum/selene-sdk) if you have questions about the package, case studies, or model development.
+
 ## Overview
 Selene's CLI accepts configuration files in the [YAML](https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html) format that are composed of 4 main (high-level) groups:
 1. list of operations

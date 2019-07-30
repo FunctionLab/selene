@@ -62,6 +62,12 @@ For a more detailed overview of the components in the Selene software developmen
 
 ![summary figure](docs/source/_static/img/selene_overview.png)
 
+### Help
+
+Please post bugs or feature requests to our Github [issues](https://github.com/FunctionLab/selene/issues).
+
+Join our [Google group](https://groups.google.com/forum/#!forum/selene-sdk) if you have questions about the package, case studies, or model development.
+
 ## Documentation
 
 The documentation for Selene is available [here](https://selene.flatironinstitute.org/).
