@@ -8,7 +8,9 @@ The main modules that users may want to extend are
 - `selene_sdk.targets.Target`
 
 Please refer to the documentation for these classes.
-If you are interested in contributing new modules to Selene or requesting new functionality, please submit an issue to [Selene](https://github.com/FunctionLab/selene/issues) or e-mail <kchen@flatironinstitute.org>.
+If you are encounter a bug or have a feature request, please post to our Github [issues](https://github.com/FunctionLab/selene/issues). E-mail <kchen@flatironinstitute.org> if you are interested in being a contributor to Selene.
+
+Join our [Google group](https://groups.google.com/forum/#!forum/selene-sdk) if you have questions about the package, case studies, or model development.
 
 ## Exporting a Selene-trained model to Kipoi
 We have provided an example of how to prepare a model for upload to [Kipoi's model zoo](http://kipoi.org/) using a model trained during case study 2. You can use [this example](https://github.com/FunctionLab/selene/tree/master/manuscript/case2/3_kipoi_export) as a starting point for preparing your own model for Kipoi. We have provided a script that can help to automate parts of the process.

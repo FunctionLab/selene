@@ -77,3 +77,6 @@ Unlike the aforementioned submodules designed around individual concepts, the `u
 It provides diverse functionality at varying levels of flexibility. 
 Some members of `utils` are general-purpose (e.g. configuration file parsing) while others have highly specific use cases (e.g. CLI logger initialization).
 
+# Help
+
+Join our [Google group](https://groups.google.com/forum/#!forum/selene-sdk) if you have questions about the package, case studies, or model development.
