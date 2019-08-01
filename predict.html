@@ -382,7 +382,7 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.2.0a0+fd61cc9 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
+<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.2.0a0+7ac41b1 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
 <li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
 <li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
 <li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
@@ -556,13 +556,14 @@ the path do not yet exist they will be automatically created.</p></li>
 <li><p><strong>mutate_n_bases</strong> (<em>int, optional</em>) – The number of bases to mutate at one time. We recommend leaving
 this parameter set to <cite>1</cite> at this time, as we have not yet
 optimized operations for double and triple mutations.</p></li>
-<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – The desired output format. Currently Selene supports TSV and HDF5
-formats.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}, optional</em>) – Default is ‘tsv’. The desired output format.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Writes results to files corresponding to each reporter in
-<cite>reporters</cite>.</p>
+<dd class="field-even"><p>Outputs data files from <em>in silico</em> mutagenesis to <cite>output_dir</cite>.
+For HDF5 output and ‘predictions’ in <cite>save_data</cite>, an additional
+file named <cite>*_ref_predictions.h5</cite> will be outputted with the
+model prediction for the original input sequence.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
@@ -592,12 +593,17 @@ in the FASTA file. Spaces in the sequence name are replaced with
 underscores ‘_’. If not <cite>use_sequence_name</cite>, output files are
 prefixed with an index <span class="math notranslate nohighlight">\(i\)</span> (starting with 0) corresponding
 to the :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>i`th sequence in the FASTA file.</p></li>
-<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}</em>) – The desired output format. Currently Selene supports TSV and HDF5
-formats.</p></li>
+<li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}, optional</em>) – Default is ‘tsv’. The desired output format. Each sequence in
+the FASTA file will have its own set of output files, where
+the number of output files depends on the number of <cite>save_data</cite>
+predictions/scores specified.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Outputs data files from <em>in silico</em> mutagenesis to <cite>output_dir</cite>.</p>
+<dd class="field-even"><p>Outputs data files from <em>in silico</em> mutagenesis to <cite>output_dir</cite>.
+For HDF5 output and ‘predictions’ in <cite>save_data</cite>, an additional
+file named <cite>*_ref_predictions.h5</cite> will be outputted with the
+model prediction for the original input sequence.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
