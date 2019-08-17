@@ -161,7 +161,7 @@ def execute(operations, configs, output_dir):
 
     """
     model = None
-    trainer = None
+    train_model = None
     for op in operations:
         if op == "train":
             model, loss, optim, optim_kwargs = initialize_model(
@@ -188,8 +188,8 @@ def execute(operations, configs, output_dir):
             train_model.train_and_validate()
 
         elif op == "evaluate":
-            if trainer is not None:
-                trainer.evaluate()
+            if train_model is not None:
+                train_model.evaluate()
 
             if not model:
                 model, loss = initialize_model(
