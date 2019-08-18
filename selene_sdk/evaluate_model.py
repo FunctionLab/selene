@@ -131,7 +131,7 @@ class EvaluateModel(object):
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
 
-        if (hasattr(self.sampler, reference_sequence) and
+        if (hasattr(self.sampler, "reference_sequence") and
                 isinstance(self.sampler.reference_sequence, Genome) and
                 _is_lua_trained_model(model)):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
