@@ -370,7 +370,7 @@ class TrainModel(object):
         """
         min_loss = self._min_loss
         scheduler = ReduceLROnPlateau(
-            self.optimizer, 'max', patience=16, verbose=True,
+            self.optimizer, 'min', patience=16, verbose=True,
             factor=0.8)
 
         time_per_step = []
