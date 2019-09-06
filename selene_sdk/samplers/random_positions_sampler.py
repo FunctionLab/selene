@@ -329,12 +329,9 @@ class RandomPositionsSampler(OnlineSampler):
                 self._randcache[self.mode]["cache_indices"][sample_index]
             self._randcache[self.mode]["sample_next"] += 1
 
-            interval_info = self.sample_from_intervals[rand_interval_index]
-            interval_length = self.interval_lengths[rand_interval_index]
-
-            chrom = interval_info[0]
-            position = int(
-                interval_info[1] + random.uniform(0, 1) * interval_length)
+            chrom, cstart, cend = \
+                self.sample_from_intervals[rand_interval_index]
+            position = np.randint(cstart, cend)
 
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
