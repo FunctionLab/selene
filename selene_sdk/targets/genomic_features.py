@@ -164,7 +164,9 @@ def _define_feature_thresholds(feature_thresholds, features):
     """
     feature_thresholds_dict = {}
     feature_thresholds_vec = np.zeros(len(features))
-    if isinstance(feature_thresholds, float):
+    if (isinstance(feature_thresholds, float) or
+            isinstance(feature_thresholds, int)) and feature_thresholds <= 1 \
+            and feature_thresholds > 0:
         feature_thresholds_dict = dict.fromkeys(features, feature_thresholds)
         feature_thresholds_vec += feature_thresholds
     elif isinstance(feature_thresholds, dict):
