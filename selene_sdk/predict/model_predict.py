@@ -36,8 +36,7 @@ from ..utils import load_model_from_state_dict
 
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
-VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand", "ref_match"]
-
+VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand", "ref_match", "contains_unk"]
 
 class AnalyzeSequences(object):
     """
@@ -354,14 +353,16 @@ class AnalyzeSequences(object):
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
-            ["index", "chrom", "start", "end", "strand"],
+            ["index", "chrom", "start", "end", "strand","contains_unk"],
             output_size=len(labels),
             mode="prediction")[0]
         sequences = None
         batch_ids = []
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
-            encoding = self.reference_sequence.get_encoding_from_coords(
-                *coords, pad=True)
+            sequence = self.reference_sequence.get_sequence_from_coords(*coords,pad=True)
+            encoding = self.reference_sequence.sequence_to_encoding(sequence)
+            contains_unk = self.reference_sequence.UNK_BASE in sequence
+
             if sequences is None:
                 sequences = np.zeros((self.batch_size, *encoding.shape))
             if i and i % self.batch_size == 0:
@@ -369,8 +370,14 @@ class AnalyzeSequences(object):
                 sequences = np.zeros((self.batch_size, *encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
-            batch_ids.append(label)
+            batch_ids.append(label+(contains_unk,))
             sequences[i % self.batch_size, :, :] = encoding
+            if contains_unk:
+                warnings.warn("For region ({0}, {1}, {2}, {3}, {4}), "
+                                "reference sequence contains unknown base(s). "
+                                "--will be marked `True` in the `contains_unk` column "
+                                "of the .tsv or the row_labels .txt file.".format(
+                                  *label))
 
         if i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
@@ -431,7 +438,7 @@ class AnalyzeSequences(object):
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
-            ["index", "name"],
+            ["index", "name", "contains_unk"],
             output_size=len(fasta_file.keys()),
             mode="prediction")[0]
         sequences = np.zeros((self.batch_size,
@@ -448,6 +455,7 @@ class AnalyzeSequences(object):
             elif len(cur_sequence) > self.sequence_length:
                 cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
 
+            contains_unk = self.reference_sequence.UNK_BASE in cur_sequence
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
@@ -458,8 +466,14 @@ class AnalyzeSequences(object):
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
-            batch_ids.append([i, fasta_record.name])
+            batch_ids.append([i, fasta_record.name, contains_unk])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
+            if contains_unk:
+                warnings.warn("Sequence ({0},{1}) "
+                              " contains unknown base(s). "
+                              "--will be marked `True` in the `contains_unk` column "
+                              "of the .tsv or the row_labels .txt file.".format(
+                                  i, fasta_record.name ))
         if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
@@ -517,7 +531,9 @@ class AnalyzeSequences(object):
         -------
         None
             Writes the output to file(s) in `output_dir`. Filename will
-            match that specified in the filepath.
+            match that specified in the filepath. In addition, if any base
+            in the given or retrieved sequence, the row labels .txt file will
+            mark this sequence or region as `contains_unk = True`.
 
         """
         try:
@@ -825,8 +841,10 @@ class AnalyzeSequences(object):
             called. The predictions can used directly if you have verified that
             the 'ref' bases specified for these variants are correct (Selene
             will have substituted these bases for those in the reference
-            genome). Finally, some variants may show up in an 'NA' file.
-            This is because the surrounding sequence context ended up
+            genome). In addition, if any base in the retrieved reference
+            sequence is unknown, the row labels .txt file will mark this variant
+            as `contains_unk = True`. Finally, some variants may show up in an
+            'NA' file. This is because the surrounding sequence context ended up
             being out of bounds or the chromosome containing the variant
             did not show up in the reference genome FASTA file.
 
@@ -866,9 +884,9 @@ class AnalyzeSequences(object):
             center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
-
-            seq_encoding = self.reference_sequence.get_encoding_from_coords(
-                chrom, start, end, strand=strand)
+            sequence = self.reference_sequence.get_sequence_from_coords(chrom, start, end, strand=strand)
+            seq_encoding = self.reference_sequence.sequence_to_encoding(sequence)
+            contains_unk = self.reference_sequence.UNK_BASE in sequence
             if len(ref) and strand == '-':
                 ref = get_reverse_complement(
                     ref,
@@ -899,20 +917,27 @@ class AnalyzeSequences(object):
                     self._end_radius,
                     self.reference_sequence,
                     strand)
+
+            if contains_unk:
+                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
+                           "reference sequence contains unknown base(s)"
+                           "--will be marked `True` in the `contains_unk` column "
+                           "of the .tsv or the row_labels .txt file.".format(
+                             chrom, pos, name, ref, alt, strand))
             if not match:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
                               "reference does not match the reference genome. "
                               "Reference genome contains {6} instead. "
                               "Predictions/scores associated with this "
                               "variant--where we use '{3}' in the input "
-                              "sequence--will be marked in the row labels .txt "
-                              "file with `ref_match=False`".format(
+                              "sequence--will be marked `False` in the `ref_match` "
+                              "column of the .tsv or the row_labels .txt file".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
-                batch_ids.append((chrom, pos, name, ref, alt, strand, False))
+                batch_ids.append((chrom, pos, name, ref, alt, strand, False, contains_unk))
                 batch_ref_seqs.append(seq_encoding)
                 batch_alt_seqs.append(alt_encoding)
                 continue
-            batch_ids.append((chrom, pos, name, ref, alt, strand, True))
+            batch_ids.append((chrom, pos, name, ref, alt, strand, True, contains_unk))
             batch_ref_seqs.append(seq_encoding)
             batch_alt_seqs.append(alt_encoding)
 
