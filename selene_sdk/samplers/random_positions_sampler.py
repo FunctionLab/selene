@@ -331,7 +331,7 @@ class RandomPositionsSampler(OnlineSampler):
 
             chrom, cstart, cend = \
                 self.sample_from_intervals[rand_interval_index]
-            position = np.randint(cstart, cend)
+            position = np.random.randint(cstart, cend)
 
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
