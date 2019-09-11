@@ -9,15 +9,14 @@ import torch.nn as nn
 
 
 class DanQ(nn.Module):
-    def __init__(self, n_genomic_features, sequence_length):
+    def __init__(self, sequence_length, n_genomic_features):
         """
         Parameters
         ----------
-        n_genomic_features : int
-            Total number of features to predict
         sequence_length : int
             Input sequence length
-
+        n_genomic_features : int
+            Total number of features to predict
         """
         super(DanQ, self).__init__()
         self.nnet = nn.Sequential(
@@ -30,7 +29,6 @@ class DanQ(nn.Module):
         self.bdlstm = nn.Sequential(
             nn.LSTM(
                 320, 320, num_layers=1, batch_first=True, bidirectional=True))
-
 
         self._n_channels = math.floor(
             (sequence_length - 25 - 11) / 13) + 1
