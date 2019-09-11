@@ -89,6 +89,9 @@ def load_model_from_state_dict(state_dict, model):
         If model state dict keys do not match the keys in `state_dict`.
 
     """
+    if 'state_dict' in state_dict:
+        state_dict = state_dict['state_dict']
+
     model_keys = model.state_dict().keys()
     state_dict_keys = state_dict.keys()
 
