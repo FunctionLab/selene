@@ -890,7 +890,6 @@ class AnalyzeSequences(object):
             output_NAs_to_file="{0}.NA".format(output_path_prefix),
             seq_context=(self._start_radius, self._end_radius),
             reference_sequence=self.reference_sequence)
-        print(len(variants))
         reporters = self._initialize_reporters(
             save_data,
             output_path_prefix,

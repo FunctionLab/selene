@@ -308,7 +308,7 @@ class Genome(Sequence):
         start : int
             The 0-based start coordinate of the sequence.
         end : int
-            One past the 0-based last position in the sequence.'.
+            One past the 0-based last position in the sequence.
 
         Returns
         -------
