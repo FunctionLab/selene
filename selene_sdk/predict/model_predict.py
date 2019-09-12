@@ -283,11 +283,8 @@ class AnalyzeSequences(object):
                     continue  # TODO: divert to NA file?
                 start, end = int(start), int(end)
                 mid_pos = start + ((end - start) // 2)
-                seq_start = max(
-                    mid_pos - self._start_radius, 0)
-                seq_end = min(
-                    mid_pos + self._end_radius,
-                    self.reference_sequence.len_chrs[chrom])
+                seq_start = mid_pos - self._start_radius
+                seq_end = mid_pos + self._end_radius
                 sequences.append((chrom, seq_start, seq_end, strand))
                 labels.append((i, chrom, start, end, strand))
         return sequences, labels
