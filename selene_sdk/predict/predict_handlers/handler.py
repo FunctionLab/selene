@@ -231,7 +231,9 @@ class PredictionsHandler(metaclass=ABCMeta):
                     filename_prefix, labels_filename)
             self._labels_filepath = os.path.join(output_path, labels_filename)
             # create the file
-            open(self._labels_filepath, 'w+')
+            label_handle = open(self._labels_filepath, 'w+')
+            label_handle.write("{0}\n".format(
+                                '\t'.join(self._columns_for_ids)))
 
     def _reached_mem_limit(self):
         mem_used = (self._results[0].nbytes * len(self._results) +
