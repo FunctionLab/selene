@@ -45,7 +45,7 @@ class DanQ(nn.Module):
         out = self.nnet(x)
         reshape_out = out.transpose(0, 1).transpose(0, 2)
         out, _ = self.bdlstm(reshape_out)
-        out = out.transpose(0,1)
+        out = out.transpose(0, 1)
         reshape_out = out.contiguous().view(
             out.size(0), 640 * self._n_channels)
         predict = self.classifier(reshape_out)
