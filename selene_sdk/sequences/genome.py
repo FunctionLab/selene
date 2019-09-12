@@ -14,6 +14,60 @@ from .sequence import Sequence
 from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
 
+def _check_coords(len_chrs,
+                  chrom,
+                  start,
+                  end,
+                  blacklist_tabix=None):
+    """
+    Check if the input coordinates are valid.
+
+    Parameters
+    ----------
+    len_chrs : dict
+        A dictionary mapping chromosome names to lengths.
+    chrom : str
+        The name of the chromosomes, e.g. "chr1".
+    start : int
+        The 0-based start coordinate of the sequence.
+    end : int
+        One past the last coordinate of the sequence.
+    blacklist_tabix : tabix.open or None, optional
+        Default is `None`. Tabix file handle if a file of blacklisted regions
+        is available.
+        
+    Returns
+    -------
+    bool
+        True if the coordinates are valid (`start` and `end` are within 
+        chromosome boundaries and not overlaping with blacklist regions
+        (if specified). Otherwise, return False.
+
+    Raises
+    ------
+    ValueError
+        If the input char to `strand` is not one of the specified
+        choices.
+    """
+    if chrom not in len_chrs:
+        return False
+
+    if start >= len_chrs[chrom]:
+        return False
+
+    if start >= end:
+        return False
+
+    if blacklist_tabix is not None:
+        try:
+            rows = blacklist_tabix.query(chrom, start, end)
+            for row in rows:
+                return False
+        except tabix.TabixError:
+            pass
+            
+    return True
+
 
 def _get_sequence_from_coords(len_chrs,
                               genome_sequence,
@@ -61,25 +115,8 @@ def _get_sequence_from_coords(len_chrs,
         choices.
 
     """
-    if chrom not in len_chrs:
-        return ""
-
-    if start >= len_chrs[chrom]:
-        return ""
-
-    if not pad and (end > len_chrs[chrom] or start < 0):
-        return ""
-
-    if start >= end:
-        return ""
-
-    if blacklist_tabix is not None:
-        try:
-            rows = blacklist_tabix.query(chrom, start, end)
-            for row in rows:
-                return ""
-        except tabix.TabixError:
-            pass
+    if not _check_coords(len_chrs, chrom, start, end, blacklist_tabix):
+        return "" 
 
     if strand != '+' and strand != '-' and strand != '.':
         raise ValueError(
@@ -257,11 +294,13 @@ class Genome(Sequence):
         else:
             return self.genome[chrom][start:end].reverse.complement.seq
 
+
     def coords_in_bounds(self, chrom, start, end):
         """
         Check if the region we want to query is within the bounds of the
-        queried chromosome.
-
+        queried chromosome and non-overlapping with blacklist regions 
+        (if given).
+                
         Parameters
         ----------
         chrom : str
@@ -269,7 +308,7 @@ class Genome(Sequence):
         start : int
             The 0-based start coordinate of the sequence.
         end : int
-            One past the last coordinate of the sequence.
+            One past the 0-based last position in the sequence.'.
 
         Returns
         -------
@@ -278,10 +317,12 @@ class Genome(Sequence):
             in the input.
 
         """
-        return chrom in self.len_chrs and \
-            (start >= 0 and start < self.len_chrs[chrom] and
-             end <= self.len_chrs[chrom])
-
+        return _check_coords(self.len_chrs,
+                             chrom,
+                             start,
+                             end,
+                             blacklist_tabix=self._blacklist_tabix)
+  
     def get_sequence_from_coords(self,
                                  chrom,
                                  start,
