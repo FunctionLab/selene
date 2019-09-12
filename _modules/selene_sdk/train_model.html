@@ -697,7 +697,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">min_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_loss</span>
         <span class="n">scheduler</span> <span class="o">=</span> <span class="n">ReduceLROnPlateau</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
+            <span class="s1">&#39;min&#39;</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">factor</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
 
         <span class="n">time_per_step</span> <span class="o">=</span> <span class="p">[]</span>

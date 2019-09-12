@@ -656,12 +656,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">][</span><span class="n">sample_index</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-            <span class="n">interval_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="p">[</span><span class="n">rand_interval_index</span><span class="p">]</span>
-            <span class="n">interval_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span><span class="p">[</span><span class="n">rand_interval_index</span><span class="p">]</span>
-
-            <span class="n">chrom</span> <span class="o">=</span> <span class="n">interval_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-                <span class="n">interval_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">interval_length</span><span class="p">)</span>
+            <span class="n">chrom</span><span class="p">,</span> <span class="n">cstart</span><span class="p">,</span> <span class="n">cend</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="p">[</span><span class="n">rand_interval_index</span><span class="p">]</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">cstart</span><span class="p">,</span> <span class="n">cend</span><span class="p">)</span>
 
             <span class="n">retrieve_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">retrieve_output</span><span class="p">:</span>
