@@ -636,19 +636,21 @@ class AnalyzeSequences(object):
             The number of bases to mutate at one time. We recommend leaving
             this parameter set to `1` at this time, as we have not yet
             optimized operations for double and triple mutations.
-        output_format : {'tsv', 'hdf5'}
-            The desired output format. Currently Selene supports TSV and HDF5
-            formats.
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. The desired output format.
 
         Returns
         -------
         None
-            Writes results to files corresponding to each reporter in
-            `reporters`.
+            Outputs data files from *in silico* mutagenesis to `output_dir`.
+            For HDF5 output and 'predictions' in `save_data`, an additional
+            file named `*_ref_predictions.h5` will be outputted with the
+            model prediction for the original input sequence.
 
         """
         path_dirs, _ = os.path.split(output_path_prefix)
-        os.makedirs(path_dirs, exist_ok=True)
+        if path_dirs:
+            os.makedirs(path_dirs, exist_ok=True)
 
         n = len(sequence)
         if n < self.sequence_length: # Pad string length as necessary.
@@ -667,26 +669,36 @@ class AnalyzeSequences(object):
         mutated_sequences = in_silico_mutagenesis_sequences(
             sequence, mutate_n_bases=1,
             reference_sequence=self.reference_sequence)
-
         reporters = self._initialize_reporters(
-            save_data, output_path_prefix, output_format, ISM_COLS)
+            save_data,
+            output_path_prefix,
+            output_format,
+            ISM_COLS,
+            output_size=len(mutated_sequences))
 
         current_sequence_encoding = \
             self.reference_sequence.sequence_to_encoding(sequence)
 
         current_sequence_encoding = current_sequence_encoding.reshape(
             (1, *current_sequence_encoding.shape))
-        current_sequence_preds = predict(
+        base_preds = predict(
             self.model, current_sequence_encoding, use_cuda=self.use_cuda)
 
-        if "predictions" in save_data:
-            predictions_reporter = reporters[-1]
-            predictions_reporter.handle_batch_predictions(
-                current_sequence_preds, [["NA", "NA", "NA"]])
+        if "predictions" in save_data and output_format == 'hdf5':
+            ref_reporter = self._initialize_reporters(
+                ["predictions"],
+                "{0}_ref".format(output_path_prefix),
+                output_format, ["name"], output_size=1)[0]
+            ref_reporter.handle_batch_predictions(
+                base_preds, [["input_sequence"]])
+            ref_reporter.write_to_file()
+        elif "predictions" in save_data and output_format == 'tsv':
+            reporters[-1].handle_batch_predictions(
+                base_preds, [["input_sequence", "NA", "NA"]])
 
         self.in_silico_mutagenesis_predict(
             sequence,
-            current_sequence_preds,
+            base_preds,
             mutated_sequences,
             reporters=reporters)
 
@@ -723,15 +735,19 @@ class AnalyzeSequences(object):
             underscores '_'. If not `use_sequence_name`, output files are
             prefixed with an index :math:`i` (starting with 0) corresponding
             to the :math:`i`th sequence in the FASTA file.
-        output_format : {'tsv', 'hdf5'}
-            The desired output format. Currently Selene supports TSV and HDF5
-            formats.
-
+        output_format : {'tsv', 'hdf5'}, optional
+            Default is 'tsv'. The desired output format. Each sequence in
+            the FASTA file will have its own set of output files, where
+            the number of output files depends on the number of `save_data`
+            predictions/scores specified.
 
         Returns
         -------
         None
             Outputs data files from *in silico* mutagenesis to `output_dir`.
+            For HDF5 output and 'predictions' in `save_data`, an additional
+            file named `*_ref_predictions.h5` will be outputted with the
+            model prediction for the original input sequence.
 
         """
         os.makedirs(output_dir, exist_ok=True)
@@ -768,12 +784,23 @@ class AnalyzeSequences(object):
                     output_dir, str(i))
             # Write base to file, and make mut preds.
             reporters = self._initialize_reporters(
-                save_data, file_prefix, output_format, ISM_COLS)
+                save_data,
+                file_prefix,
+                output_format,
+                ISM_COLS,
+                output_size=len(mutated_sequences))
 
-            if "predictions" in save_data:
-                predictions_reporter = reporters[-1]
-                predictions_reporter.handle_batch_predictions(
-                    base_preds, [["NA", "NA", "NA"]])
+            if "predictions" in save_data and output_format == 'hdf5':
+                ref_reporter = self._initialize_reporters(
+                    ["predictions"],
+                    "{0}_ref".format(file_prefix),
+                    output_format, ["name"], output_size=1)[0]
+                ref_reporter.handle_batch_predictions(
+                    base_preds, [["input_sequence"]])
+                ref_reporter.write_to_file()
+            elif "predictions" in save_data and output_format == 'tsv':
+                reporters[-1].handle_batch_predictions(
+                    base_preds, [["input_sequence", "NA", "NA"]])
 
             self.in_silico_mutagenesis_predict(
                 cur_sequence, base_preds, mutated_sequences,
