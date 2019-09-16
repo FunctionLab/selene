@@ -37,6 +37,10 @@ class MultiModelWrapper(nn.Module):
         self.sub_models = sub_models
         self._concat_dim = concat_dim
 
+    def eval(self):
+        for sm in self.sub_models:
+            sm.eval()
+
     def forward(self, x):
         return torch.cat(
             [sm(x) for sm in self.sub_models], self._concat_dim)
