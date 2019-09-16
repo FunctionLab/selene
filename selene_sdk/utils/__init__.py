@@ -19,6 +19,7 @@ from .config import instantiate
 from .config_utils import initialize_model
 from .config_utils import execute
 from .config_utils import parse_configs_and_run
+from .multi_model_wrapper import MultiModelWrapper
 from .non_strand_specific_module import NonStrandSpecific
 from .example_model import DeeperDeepSEA
 
@@ -36,5 +37,6 @@ __all__ = ["_is_lua_trained_model",
            "initialize_model",
            "execute",
            "parse_configs_and_run",
+           "MultiModelWrapper",
            "NonStrandSpecific",
            "DeeperDeepSEA"]
