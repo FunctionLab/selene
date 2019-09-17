@@ -392,7 +392,7 @@ class AnalyzeSequences(object):
             batch_ids.append(label)
             sequences[i % self.batch_size, :, :] = encoding
 
-        if i % self.batch_size != 0:
+        if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
             reporter.handle_batch_predictions(preds, batch_ids)
