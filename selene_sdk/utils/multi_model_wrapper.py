@@ -15,14 +15,13 @@ class MultiModelWrapper(nn.Module):
         The multi-model wrapper class can be used to concatenate the
         outputs of multiple models along a pre-specified axis. The wrapper
         can be used to load and run multiple trained models during prediction
-        functions. We have not tested this class for use in simultaneous
-        training of multiple models. We also have not yet provided support
-        for using this class through the CLI.
+        functions. This class should not be used for training. We also have
+        not yet provided support for using this class through the CLI.
 
         This class can be used to initialize
         `selene_sdk.predict.AnalyzeSequences` with a corresponding list of
         `trained_model_path`s. Please ensure the ordering of the two lists
-        (the `sub_models` here and `trained_model_path` in AnalyzeSequences)
+        (`sub_models` here and `trained_model_path` in AnalyzeSequences)
         match.
 
         Parameters

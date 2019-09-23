@@ -54,9 +54,9 @@ class AnalyzeSequences(object):
         a list of paths, assumes that the `model` passed in is of type
         `selene_sdk.utils.MultiModelWrapper`, which takes in a list of
         models. The paths must be ordered the same way the models
-        are ordered in that list. Currently Selene's config file CLI does
-        NOT support using the MultiModelWrapper and will not accept a list
-        of model weights files as input to `trained_model_path`.
+        are ordered in that list. `list(str)` input is an API-only function--
+        Selene's config file CLI does not support the `MultiModelWrapper`
+        functionality at this time.
     sequence_length : int
         The length of sequences that the model is expecting.
     features : list(str)
