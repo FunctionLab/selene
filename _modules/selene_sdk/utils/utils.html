@@ -338,14 +338,18 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">.multi_model_wrapper</span> <span class="k">import</span> <span class="n">MultiModelWrapper</span>
+
 
 <span class="k">def</span> <span class="nf">_is_lua_trained_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;from_lua&#39;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">from_lua</span>
-
     <span class="n">check_model</span> <span class="o">=</span> <span class="n">model</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">):</span>
         <span class="n">check_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="n">MultiModelWrapper</span> <span class="ow">and</span> \
+            <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;sub_models&#39;</span><span class="p">):</span>
+        <span class="n">check_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">sub_models</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">setattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;from_lua&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="nb">setattr</span><span class="p">(</span><span class="n">check_model</span><span class="p">,</span> <span class="s2">&quot;from_lua&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">check_model</span><span class="o">.</span><span class="n">modules</span><span class="p">():</span>
@@ -416,6 +420,9 @@
 <span class="sd">        If model state dict keys do not match the keys in `state_dict`.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;state_dict&#39;</span> <span class="ow">in</span> <span class="n">state_dict</span><span class="p">:</span>
+        <span class="n">state_dict</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s1">&#39;state_dict&#39;</span><span class="p">]</span>
+
     <span class="n">model_keys</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
     <span class="n">state_dict_keys</span> <span class="o">=</span> <span class="n">state_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
