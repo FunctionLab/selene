@@ -48,9 +48,15 @@ class AnalyzeSequences(object):
     ----------
     model : torch.nn.Module
         A sequence-based model architecture.
-    trained_model_path : str
-        The path to the weights file for a trained sequence-based model.
-        Architecture must match `model`.
+    trained_model_path : str or list(str)
+        The path(s) to the weights file for a trained sequence-based model.
+        For a single path, the model architecture must match `model`. For
+        a list of paths, assumes that the `model` passed in is of type
+        `selene_sdk.utils.MultiModelWrapper`, which takes in a list of
+        models. The paths must be ordered the same way the models
+        are ordered in that list. `list(str)` input is an API-only function--
+        Selene's config file CLI does not support the `MultiModelWrapper`
+        functionality at this time.
     sequence_length : int
         The length of sequences that the model is expecting.
     features : list(str)
@@ -123,16 +129,30 @@ class AnalyzeSequences(object):
         """
         Constructs a new `AnalyzeSequences` object.
         """
-        trained_model = torch.load(
-            trained_model_path,
-            map_location=lambda storage, location: storage)
+        self.model = model
 
-        if "state_dict" not in trained_model:
-            self.model = load_model_from_state_dict(
-                trained_model, model)
+        if isinstance(trained_model_path, str):
+            trained_model = torch.load(
+                trained_model_path,
+                map_location=lambda storage, location: storage)
+
+            load_model_from_state_dict(
+                trained_model, self.model)
+        elif hasattr(trained_model_path, '__len__'):
+            state_dicts = []
+            for mp in trained_model_path:
+                state_dict = torch.load(
+                    mp, map_location=lambda storage, location: storage)
+                state_dicts.append(state_dict)
+
+            for (sd, sub_model) in zip(state_dicts, self.model.sub_models):
+                load_model_from_state_dict(sd, sub_model)
         else:
-            self.model = load_model_from_state_dict(
-                trained_model["state_dict"], model)
+            raise ValueError(
+                '`trained_model_path` should be a str or list of strs '
+                'specifying the full paths to model weights files, but was '
+                'type {0}.'.format(type(trained_model_path)))
+
         self.model.eval()
 
         self.data_parallel = data_parallel
@@ -372,7 +392,7 @@ class AnalyzeSequences(object):
             batch_ids.append(label)
             sequences[i % self.batch_size, :, :] = encoding
 
-        if i % self.batch_size != 0:
+        if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
             reporter.handle_batch_predictions(preds, batch_ids)

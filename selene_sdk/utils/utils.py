@@ -11,14 +11,18 @@ import traceback
 
 import numpy as np
 
+from .multi_model_wrapper import MultiModelWrapper
+
 
 def _is_lua_trained_model(model):
     if hasattr(model, 'from_lua'):
         return model.from_lua
-
     check_model = model
     if hasattr(model, 'model'):
         check_model = model.model
+    elif type(model) == MultiModelWrapper and \
+            hasattr(model, 'sub_models'):
+        check_model = model.sub_models[0]
     setattr(model, "from_lua", False)
     setattr(check_model, "from_lua", False)
     for m in check_model.modules():
@@ -89,6 +93,9 @@ def load_model_from_state_dict(state_dict, model):
         If model state dict keys do not match the keys in `state_dict`.
 
     """
+    if 'state_dict' in state_dict:
+        state_dict = state_dict['state_dict']
+
     model_keys = model.state_dict().keys()
     state_dict_keys = state_dict.keys()
 
