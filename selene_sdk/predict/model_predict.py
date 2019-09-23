@@ -560,16 +560,12 @@ class AnalyzeSequences(object):
         if input_path.endswith('.fa') or input_path.endswith('.fasta'):
             self.get_predictions_for_fasta_file(
                 input_path, output_dir, output_format=output_format)
-        elif input_path.endswith('.bed'):
+        else:
             self.get_predictions_for_bed_file(
                 input_path,
                 output_dir,
                 output_format=output_format,
                 strand_index=strand_index)
-        else:
-            raise ValueError("Unrecognized file extension for "
-                            "`input_path`. Supported file extensions are '.fa'"
-                            ", '.fasta', or '.bed'.")
 
     def in_silico_mutagenesis_predict(self,
                                       sequence,
