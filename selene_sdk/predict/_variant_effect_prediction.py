@@ -61,6 +61,9 @@ def read_vcf_file(input_path,
     variants = []
 
     with open(input_path, 'r') as file_handle:
+        if output_NAs_to_file:
+            na_file_handle =  open(output_NAs_to_file, 'w')
+    
         lines = file_handle.readlines()
         index = 0
         for index, line in enumerate(lines):
@@ -110,13 +113,14 @@ def read_vcf_file(input_path,
                 end = pos + len(ref) // 2 + rhs_radius
                 if not reference_sequence.coords_in_bounds(chrom, start, end):
                     if output_NAs_to_file:
-                        with open(output_NAs_to_file, 'w') as file_handle:
-                            file_handle.write(
-                                "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
-                                    chrom, pos, name, ref, alt, strand))
+                        na_file_handle.write(
+                            "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
+                                chrom, pos, name, ref, alt, strand))
                     continue
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
+        if output_NAs_to_file:
+            na_file_handle.close()
     return variants
 
 

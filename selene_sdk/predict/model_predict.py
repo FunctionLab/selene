@@ -277,6 +277,8 @@ class AnalyzeSequences(object):
         sequences = []
         labels = []
         with open(input_path, 'r') as read_handle:
+            if output_NAs_to_file:
+                na_file_handle = open(output_NAs_to_file, 'w')
             for i, line in enumerate(read_handle):
                 cols = line.strip().split('\t')
                 if len(cols) < 3:
@@ -299,13 +301,15 @@ class AnalyzeSequences(object):
                 if reference_sequence:
                     if not reference_sequence.coords_in_bounds(chrom, seq_start, seq_end):
                         if output_NAs_to_file:
-                            with open(output_NAs_to_file, 'w') as file_handle:
-                                file_handle.write(
-                                    "{0}\t{1}\t{2}\n".format(
-                                        chrom, seq_start, seq_end))
+                            na_file_handle.write(
+                                "{0}\t{1}\t{2}\n".format(
+                                    chrom, seq_start, seq_end))
                         continue
                 sequences.append((chrom, seq_start, seq_end, strand))
                 labels.append((i, chrom, start, end, strand))
+            if output_NAs_to_file:
+                na_file_handle.close()
+                
         return sequences, labels
 
     def get_predictions_for_bed_file(self,
@@ -378,7 +382,6 @@ class AnalyzeSequences(object):
             mode="prediction")[0]
         sequences = None
         batch_ids = []
-        n_skipped = 0
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
             sequence = self.reference_sequence.get_sequence_from_coords(*coords,pad=True)
             encoding = self.reference_sequence.sequence_to_encoding(sequence)
@@ -386,13 +389,13 @@ class AnalyzeSequences(object):
 
             if sequences is None:
                 sequences = np.zeros((self.batch_size, *encoding.shape))
-            if i and (i - n_skipped) % self.batch_size == 0:
+            if i and i  % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
                 sequences = np.zeros((self.batch_size, *encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
             batch_ids.append(label+(contains_unk,))
-            sequences[ (i - n_skipped) % self.batch_size, :, :] = encoding
+            sequences[ i % self.batch_size, :, :] = encoding
             if contains_unk:
                 warnings.warn("For region ({0}, {1}, {2}, {3}, {4}), "
                                 "reference sequence contains unknown base(s). "
@@ -400,8 +403,8 @@ class AnalyzeSequences(object):
                                 "of the .tsv or the row_labels .txt file.".format(
                                   *label))
 
-        if (i - n_skipped) % self.batch_size != 0:
-            sequences = sequences[:(i - n_skipped) % self.batch_size + 1, :, :]
+        if i % self.batch_size != 0:
+            sequences = sequences[:i  % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
             reporter.handle_batch_predictions(preds, batch_ids)
 
