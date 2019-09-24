@@ -299,7 +299,7 @@ class AnalyzeSequences(object):
                 if reference_sequence:
                     if not reference_sequence.coords_in_bounds(chrom, seq_start, seq_end):
                         if output_NAs_to_file:
-                            with open(output_NAs_to_file, 'a') as file_handle:
+                            with open(output_NAs_to_file, 'w') as file_handle:
                                 file_handle.write(
                                     "{0}\t{1}\t{2}\n".format(
                                         chrom, seq_start, seq_end))

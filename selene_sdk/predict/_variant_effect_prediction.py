@@ -110,7 +110,7 @@ def read_vcf_file(input_path,
                 end = pos + len(ref) // 2 + rhs_radius
                 if not reference_sequence.coords_in_bounds(chrom, start, end):
                     if output_NAs_to_file:
-                        with open(output_NAs_to_file, 'a') as file_handle:
+                        with open(output_NAs_to_file, 'w') as file_handle:
                             file_handle.write(
                                 "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
                                     chrom, pos, name, ref, alt, strand))
