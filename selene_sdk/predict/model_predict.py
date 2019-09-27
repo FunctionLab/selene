@@ -385,7 +385,9 @@ class AnalyzeSequences(object):
         sequences = None
         batch_ids = []
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
-            encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unknown(*coords, pad=True)
+            encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
+                    *coords,
+                    pad=True)
             if sequences is None:
                 sequences = np.zeros((self.batch_size, *encoding.shape))
             if i and i % self.batch_size == 0:
@@ -396,11 +398,11 @@ class AnalyzeSequences(object):
             batch_ids.append(label+(contains_unk,))
             sequences[ i % self.batch_size, :, :] = encoding
             if contains_unk:
-                warnings.warn("For region ({0}, {1}, {2}, {3}, {4}), "
+                warnings.warn("For region {0}, "
                                 "reference sequence contains unknown base(s). "
                                 "--will be marked `True` in the `contains_unk` column "
                                 "of the .tsv or the row_labels .txt file.".format(
-                                  *label))
+                                  label))
 
         if i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
@@ -907,7 +909,11 @@ class AnalyzeSequences(object):
             center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
-            seq_encoding, contains_unk  = self.reference_sequence.get_encoding_from_coords_check_unknown(chrom, start, end, strand=strand)
+            seq_encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
+                        chrom,
+                        start,
+                        end,
+                        strand=strand)
             if len(ref) and strand == '-':
                 ref = get_reverse_complement(
                     ref,
@@ -954,9 +960,7 @@ class AnalyzeSequences(object):
                               "sequence--will be marked `False` in the `ref_match` "
                               "column of the .tsv or the row_labels .txt file".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
-                batch_ids.append((chrom, pos, name, ref, alt, strand, False, contains_unk))
-            else:
-                batch_ids.append((chrom, pos, name, ref, alt, strand, True, contains_unk))
+            batch_ids.append((chrom, pos, name, ref, alt, strand, match, contains_unk))
             batch_ref_seqs.append(seq_encoding)
             batch_alt_seqs.append(alt_encoding)
 

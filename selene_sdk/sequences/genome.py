@@ -456,7 +456,7 @@ class Genome(Sequence):
         encoding = self.sequence_to_encoding(sequence)
         return encoding
 
-    def get_encoding_from_coords_check_unknown(self,
+    def get_encoding_from_coords_check_unk(self,
                                  chrom,
                                  start,
                                  end,
@@ -495,7 +495,6 @@ class Genome(Sequence):
             or (if a blacklist exists) the region overlaps with a blacklist
             region. In these cases, it will return an empty encoding--that is,
             `L` = 0 for the NumPy array returned.
-
             * `tuple[1]` is the boolean value that indicates whether the
             sequence contains any unknown base(s) specified in self.UNK_BASE
 
