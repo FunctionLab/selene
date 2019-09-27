@@ -14,6 +14,84 @@ from .sequence import Sequence
 from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
 
+def _not_blacklist_region(chrom, start, end, blacklist_tabix):
+    """
+    Check if the input coordinates are not overlapping with blacklist regions.
+    
+    Parameters
+    ----------
+    chrom : str
+        The name of the chromosomes, e.g. "chr1".
+    start : int
+        The 0-based start coordinate of the sequence.
+    end : int
+        One past the last coordinate of the sequence.
+    blacklist_tabix : tabix.open or None, optional
+        Default is `None`. Tabix file handle if a file of blacklist regions
+        is available.
+    
+    Returns
+    -------
+    bool
+        False if the coordinates are overlaping with blacklist regions
+        (if specified). Otherwise, return True.
+    
+    
+    """
+    if blacklist_tabix is not None:
+        try:
+            rows = blacklist_tabix.query(chrom, start, end)
+            for row in rows:
+                return False
+        except tabix.TabixError:
+            pass
+    return True
+
+
+def _check_coords(len_chrs,
+                  chrom,
+                  start,
+                  end,
+                  pad=False,
+                  blacklist_tabix=None):
+    """
+    Check if the input coordinates are valid.
+
+    Parameters
+    ----------
+    len_chrs : dict
+        A dictionary mapping chromosome names to lengths.
+    chrom : str
+        The name of the chromosomes, e.g. "chr1".
+    start : int
+        The 0-based start coordinate of the sequence.
+    end : int
+        One past the last coordinate of the sequence.
+    pad : bool, optional
+        Default is `False`. Allow coordinates that are partially
+        out of bounds.
+    blacklist_tabix : tabix.open or None, optional
+        Default is `None`. Tabix file handle if a file of blacklist regions
+        is available.
+
+    Returns
+    -------
+    bool
+        True if the coordinates are valid (`start` and `end` are within
+        chromosome boundaries and not overlaping with blacklist regions
+        (if specified). Otherwise, return False.
+
+
+    """
+    return chrom in len_chrs and \
+         start < len_chrs[chrom] and \
+         start < end and \
+         end > 0 and \
+         (start >= 0 if not pad else True) and \
+         (end <= len_chrs[chrom] if not pad else True) and \
+         _not_blacklist_region(chrom, start, end, blacklist_tabix)
+
+
 
 def _get_sequence_from_coords(len_chrs,
                               genome_sequence,
@@ -46,7 +124,7 @@ def _get_sequence_from_coords(len_chrs,
         in-bounds query and then pad the sequence to return the desired
         sequence length.
     blacklist_tabix : tabix.open or None, optional
-        Default is `None`. Tabix file handle if a file of blacklisted regions
+        Default is `None`. Tabix file handle if a file of blacklist regions
         is available.
 
     Returns
@@ -61,25 +139,14 @@ def _get_sequence_from_coords(len_chrs,
         choices.
 
     """
-    if chrom not in len_chrs:
-        return ""
 
-    if start >= len_chrs[chrom]:
+    if not _check_coords(len_chrs,
+        chrom,
+        start,
+        end,
+        pad=pad,
+        blacklist_tabix=blacklist_tabix):
         return ""
-
-    if not pad and (end > len_chrs[chrom] or start < 0):
-        return ""
-
-    if start >= end:
-        return ""
-
-    if blacklist_tabix is not None:
-        try:
-            rows = blacklist_tabix.query(chrom, start, end)
-            for row in rows:
-                return ""
-        except tabix.TabixError:
-            pass
 
     if strand != '+' and strand != '-' and strand != '.':
         raise ValueError(
@@ -257,10 +324,12 @@ class Genome(Sequence):
         else:
             return self.genome[chrom][start:end].reverse.complement.seq
 
+
     def coords_in_bounds(self, chrom, start, end):
         """
         Check if the region we want to query is within the bounds of the
-        queried chromosome.
+        queried chromosome and non-overlapping with blacklist regions
+        (if given).
 
         Parameters
         ----------
@@ -269,7 +338,7 @@ class Genome(Sequence):
         start : int
             The 0-based start coordinate of the sequence.
         end : int
-            One past the last coordinate of the sequence.
+            One past the 0-based last position in the sequence.
 
         Returns
         -------
@@ -278,9 +347,11 @@ class Genome(Sequence):
             in the input.
 
         """
-        return chrom in self.len_chrs and \
-            (start >= 0 and start < self.len_chrs[chrom] and
-             end <= self.len_chrs[chrom])
+        return _check_coords(self.len_chrs,
+                             chrom,
+                             start,
+                             end,
+                             blacklist_tabix=self._blacklist_tabix)
 
     def get_sequence_from_coords(self,
                                  chrom,
@@ -360,15 +431,17 @@ class Genome(Sequence):
             and/or `end` are out of bounds to return a sequence of length
             `end - start`.
 
+
         Returns
         -------
-        numpy.ndarray, dtype=bool
+        numpy.ndarray, dtype=numpy.float32
             The :math:`L \\times 4` encoding of the sequence, where
             :math:`L = end - start`, unless `chrom` cannot be found
             in the input FASTA, `start` or `end` are out of bounds,
-            or (if a blacklist exists) the region overlaps with a blacklisted
+            or (if a blacklist exists) the region overlaps with a blacklist
             region. In these cases, it will return an empty encoding--that is,
             `L` = 0 for the NumPy array returned.
+
 
         Raises
         ------
@@ -382,6 +455,62 @@ class Genome(Sequence):
             chrom, start, end, strand=strand, pad=pad)
         encoding = self.sequence_to_encoding(sequence)
         return encoding
+
+    def get_encoding_from_coords_check_unk(self,
+                                 chrom,
+                                 start,
+                                 end,
+                                 strand='+',
+                                 pad=False):
+        """Gets the one-hot encoding of the genomic sequence at the
+        queried coordinates and check whether the sequence contains 
+        unknown base(s).
+
+        Parameters
+        ----------
+        chrom : str
+            The name of the chromosome or region, e.g. "chr1".
+        start : int
+            The 0-based start coordinate of the first position in the
+            sequence.
+        end : int
+            One past the 0-based last position in the sequence.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is
+            treated as '+'.
+        pad : bool, optional
+            Default is `False`. Pad the output sequence with 'N' if `start`
+            and/or `end` are out of bounds to return a sequence of length
+            `end - start`.
+
+
+        Returns
+        -------
+        tuple(numpy.ndarray, bool)
+
+            * `tuple[0]` is the :math:`L \\times 4` encoding of the sequence
+            containing data of `numpy.float32` type, where
+            :math:`L = end - start`, unless `chrom` cannot be found
+            in the input FASTA, `start` or `end` are out of bounds,
+            or (if a blacklist exists) the region overlaps with a blacklist
+            region. In these cases, it will return an empty encoding--that is,
+            `L` = 0 for the NumPy array returned.
+            * `tuple[1]` is the boolean value that indicates whether the
+            sequence contains any unknown base(s) specified in self.UNK_BASE
+
+
+        Raises
+        ------
+        ValueError
+            If the input char to `strand` is not one of the specified
+            choices.
+            (Raised in the call to `self.get_sequence_from_coords`)
+        """
+        sequence = self.get_sequence_from_coords(
+            chrom, start, end, strand=strand, pad=pad)
+        encoding = self.sequence_to_encoding(sequence)
+        return encoding, self.UNK_BASE in sequence
+
 
     @classmethod
     def sequence_to_encoding(cls, sequence):

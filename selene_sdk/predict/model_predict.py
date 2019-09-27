@@ -36,8 +36,7 @@ from ..utils import load_model_from_state_dict
 
 # TODO: MAKE THESE GENERIC:
 ISM_COLS = ["pos", "ref", "alt"]
-VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand", "ref_match"]
-
+VARIANTEFFECT_COLS = ["chrom", "pos", "name", "ref", "alt", "strand", "ref_match", "contains_unk"]
 
 class AnalyzeSequences(object):
     """
@@ -259,7 +258,9 @@ class AnalyzeSequences(object):
 
     def _get_sequences_from_bed_file(self,
                                      input_path,
-                                     strand_index=None):
+                                     strand_index=None,
+                                     output_NAs_to_file=None,
+                                     reference_sequence=None):
         """
         Get the adjusted sequence coordinates and labels corresponding
         to each row of coordinates in an input BED file. The coordinates
@@ -275,6 +276,15 @@ class AnalyzeSequences(object):
             Default is None. If sequences must be strand-specific,
             the input BED file may include a column specifying the
             strand ({'+', '-', '.'}).
+        output_NAs_to_file : str or None, optional
+            Default is None. Only used if `reference_sequence` is also not None.
+            Specify a filepath to which invalid variants are written.
+            Invalid = sequences that cannot be fetched, either because
+            the exact chromosome cannot be found in the `reference_sequence` FASTA
+            file or because the sequence retrieved is out of bounds or overlapping
+            with any of the blacklist regions.
+        reference_sequence : selene_sdk.sequences.Genome or None, optional
+            Default is None. The reference genome.
 
         Returns
         -------
@@ -286,10 +296,12 @@ class AnalyzeSequences(object):
         """
         sequences = []
         labels = []
+        na_rows = []
         with open(input_path, 'r') as read_handle:
             for i, line in enumerate(read_handle):
                 cols = line.strip().split('\t')
                 if len(cols) < 3:
+                    na_rows.append(line)
                     continue
                 chrom = cols[0]
                 start = cols[1]
@@ -301,16 +313,24 @@ class AnalyzeSequences(object):
                     chrom = 'chr{0}'.format(chrom)
                 if not str.isdigit(start) or not str.isdigit(end) \
                         or chrom not in self.reference_sequence.genome:
-                    continue  # TODO: divert to NA file?
+                    na_rows.append(line)
+                    continue
                 start, end = int(start), int(end)
                 mid_pos = start + ((end - start) // 2)
-                seq_start = max(
-                    mid_pos - self._start_radius, 0)
-                seq_end = min(
-                    mid_pos + self._end_radius,
-                    self.reference_sequence.len_chrs[chrom])
+                seq_start = mid_pos - self._start_radius
+                seq_end = mid_pos + self._end_radius
+                if reference_sequence:
+                    if not reference_sequence.coords_in_bounds(chrom, seq_start, seq_end):
+                        na_rows.append(line)
+                        continue
                 sequences.append((chrom, seq_start, seq_end, strand))
                 labels.append((i, chrom, start, end, strand))
+
+        if reference_sequence and output_NAs_to_file:
+            with open(output_NAs_to_file, 'w') as file_handle:
+                for na_row in na_rows:
+                    file_handle.write(na_row)
+
         return sequences, labels
 
     def get_predictions_for_bed_file(self,
@@ -366,22 +386,28 @@ class AnalyzeSequences(object):
             match that specified in the filepath.
 
         """
-        seq_coords, labels = self._get_sequences_from_bed_file(
-            input_path, strand_index=strand_index)
         _, filename = os.path.split(input_path)
         output_prefix = '.'.join(filename.split('.')[:-1])
+
+        seq_coords, labels = self._get_sequences_from_bed_file(
+            input_path,
+            strand_index=strand_index,
+            output_NAs_to_file="{0}.NA".format(os.path.join(output_dir, output_prefix)),
+            reference_sequence=self.reference_sequence)
+
         reporter = self._initialize_reporters(
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
-            ["index", "chrom", "start", "end", "strand"],
+            ["index", "chrom", "start", "end", "strand", "contains_unk"],
             output_size=len(labels),
             mode="prediction")[0]
         sequences = None
         batch_ids = []
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
-            encoding = self.reference_sequence.get_encoding_from_coords(
-                *coords, pad=True)
+            encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
+                    *coords,
+                    pad=True)
             if sequences is None:
                 sequences = np.zeros((self.batch_size, *encoding.shape))
             if i and i % self.batch_size == 0:
@@ -389,8 +415,14 @@ class AnalyzeSequences(object):
                 sequences = np.zeros((self.batch_size, *encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
-            batch_ids.append(label)
-            sequences[i % self.batch_size, :, :] = encoding
+            batch_ids.append(label+(contains_unk,))
+            sequences[ i % self.batch_size, :, :] = encoding
+            if contains_unk:
+                warnings.warn("For region {0}, "
+                                "reference sequence contains unknown base(s). "
+                                "--will be marked `True` in the `contains_unk` column "
+                                "of the .tsv or the row_labels .txt file.".format(
+                                  label))
 
         if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
@@ -451,7 +483,7 @@ class AnalyzeSequences(object):
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
-            ["index", "name"],
+            ["index", "name", "contains_unk"],
             output_size=len(fasta_file.keys()),
             mode="prediction")[0]
         sequences = np.zeros((self.batch_size,
@@ -468,6 +500,7 @@ class AnalyzeSequences(object):
             elif len(cur_sequence) > self.sequence_length:
                 cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
 
+            contains_unk = self.reference_sequence.UNK_BASE in cur_sequence
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
@@ -478,8 +511,14 @@ class AnalyzeSequences(object):
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
-            batch_ids.append([i, fasta_record.name])
+            batch_ids.append([i, fasta_record.name, contains_unk])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
+            if contains_unk:
+                warnings.warn("Sequence ({0},{1}) "
+                              " contains unknown base(s). "
+                              "--will be marked `True` in the `contains_unk` column "
+                              "of the .tsv or the row_labels .txt file.".format(
+                                  i, fasta_record.name ))
         if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
@@ -537,13 +576,15 @@ class AnalyzeSequences(object):
         -------
         None
             Writes the output to file(s) in `output_dir`. Filename will
-            match that specified in the filepath.
+            match that specified in the filepath. In addition, if any base
+            in the given or retrieved sequence is unknown, the row labels .txt file
+            or .tsv file will mark this sequence or region as `contains_unk = True`.
 
         """
-        try:
+        if input_path.endswith('.fa') or input_path.endswith('.fasta'):
             self.get_predictions_for_fasta_file(
                 input_path, output_dir, output_format=output_format)
-        except pyfaidx.FastaIndexingError:
+        else:
             self.get_predictions_for_bed_file(
                 input_path,
                 output_dir,
@@ -872,10 +913,13 @@ class AnalyzeSequences(object):
             called. The predictions can used directly if you have verified that
             the 'ref' bases specified for these variants are correct (Selene
             will have substituted these bases for those in the reference
-            genome). Finally, some variants may show up in an 'NA' file.
-            This is because the surrounding sequence context ended up
-            being out of bounds or the chromosome containing the variant
-            did not show up in the reference genome FASTA file.
+            genome). In addition, if any base in the retrieved reference
+            sequence is unknown, the row labels .txt file will mark this variant
+            as `contains_unk = True`. Finally, some variants may show up in an
+            'NA' file. This is because the surrounding sequence context ended up
+            being out of bounds or overlapping with blacklist regions  or the
+            chromosome containing the variant did not show up in the reference
+            genome FASTA file.
 
         """
         # TODO: GIVE USER MORE CONTROL OVER PREFIX.
@@ -894,7 +938,6 @@ class AnalyzeSequences(object):
             output_NAs_to_file="{0}.NA".format(output_path_prefix),
             seq_context=(self._start_radius, self._end_radius),
             reference_sequence=self.reference_sequence)
-
         reporters = self._initialize_reporters(
             save_data,
             output_path_prefix,
@@ -913,9 +956,11 @@ class AnalyzeSequences(object):
             center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
-
-            seq_encoding = self.reference_sequence.get_encoding_from_coords(
-                chrom, start, end, strand=strand)
+            seq_encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
+                        chrom,
+                        start,
+                        end,
+                        strand=strand)
             if len(ref) and strand == '-':
                 ref = get_reverse_complement(
                     ref,
@@ -946,20 +991,23 @@ class AnalyzeSequences(object):
                     self._end_radius,
                     self.reference_sequence,
                     strand)
+
+            if contains_unk:
+                warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
+                           "reference sequence contains unknown base(s)"
+                           "--will be marked `True` in the `contains_unk` column "
+                           "of the .tsv or the row_labels .txt file.".format(
+                             chrom, pos, name, ref, alt, strand))
             if not match:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
                               "reference does not match the reference genome. "
                               "Reference genome contains {6} instead. "
                               "Predictions/scores associated with this "
                               "variant--where we use '{3}' in the input "
-                              "sequence--will be marked in the row labels .txt "
-                              "file with `ref_match=False`".format(
+                              "sequence--will be marked `False` in the `ref_match` "
+                              "column of the .tsv or the row_labels .txt file".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
-                batch_ids.append((chrom, pos, name, ref, alt, strand, False))
-                batch_ref_seqs.append(seq_encoding)
-                batch_alt_seqs.append(alt_encoding)
-                continue
-            batch_ids.append((chrom, pos, name, ref, alt, strand, True))
+            batch_ids.append((chrom, pos, name, ref, alt, strand, match, contains_unk))
             batch_ref_seqs.append(seq_encoding)
             batch_alt_seqs.append(alt_encoding)
 
