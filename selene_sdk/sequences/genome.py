@@ -463,8 +463,8 @@ class Genome(Sequence):
                                  strand='+',
                                  pad=False):
         """Gets the one-hot encoding of the genomic sequence at the
-        queried coordinates and check whether the output sequence
-        contains unknown base(s).
+        queried coordinates and check whether the sequence contains 
+        unknown base(s).
 
         Parameters
         ----------
