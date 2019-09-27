@@ -33,8 +33,8 @@ def _not_blacklist_region(chrom, start, end, blacklist_tabix):
     Returns
     -------
     bool
-        True if the coordinates are not overlaping with blacklist regions
-        (if specified). Otherwise, return False.
+        False if the coordinates are overlaping with blacklist regions
+        (if specified). Otherwise, return True.
     
     
     """
