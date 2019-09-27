@@ -41,7 +41,7 @@ def read_vcf_file(input_path,
         written. Invalid = sequences that cannot be fetched, either because
         the exact chromosome cannot be found in the `reference_sequence` FASTA
         file or because the sequence retrieved based on the specified
-        `seq_context` is out of bounds.
+        `seq_context` is out of bounds or overlapping with blacklist regions.
     seq_context : int or tuple(int, int) or None, optional
         Default is None. Only used if `reference_sequence` is not None.
         Specifies the sequence context in which the variant is centered.
@@ -59,11 +59,8 @@ def read_vcf_file(input_path,
 
     """
     variants = []
-
+    na_rows = []
     with open(input_path, 'r') as file_handle:
-        if output_NAs_to_file:
-            na_file_handle =  open(output_NAs_to_file, 'w')
-    
         lines = file_handle.readlines()
         index = 0
         for index, line in enumerate(lines):
@@ -81,6 +78,7 @@ def read_vcf_file(input_path,
         for line in lines[index:]:
             cols = line.strip().split('\t')
             if len(cols) < 5:
+                na_rows.append(line)
                 continue
             chrom = str(cols[0])
             if 'CHR' == chrom[:3]:
@@ -101,6 +99,7 @@ def read_vcf_file(input_path,
             strand = '+'
             if strand_index is not None:
                 if require_strand and cols[strand_index] == '.':
+                    na_rows.append(line)
                     continue
                 elif cols[strand_index] == '-':
                     strand = '-'
@@ -112,15 +111,15 @@ def read_vcf_file(input_path,
                 start = pos + len(ref) // 2 - lhs_radius
                 end = pos + len(ref) // 2 + rhs_radius
                 if not reference_sequence.coords_in_bounds(chrom, start, end):
-                    if output_NAs_to_file:
-                        na_file_handle.write(
-                            "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\n".format(
-                                chrom, pos, name, ref, alt, strand))
+                    na_rows.append(line)
                     continue
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
-        if output_NAs_to_file:
-            na_file_handle.close()
+                
+    if reference_sequence and seq_context and output_NAs_to_file:
+        with open(output_NAs_to_file, 'w') as file_handle:
+            for na_row in na_rows:
+                file_handle.write(na_row)
     return variants
 
 
