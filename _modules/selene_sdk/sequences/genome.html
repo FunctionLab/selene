@@ -341,6 +341,84 @@
 <span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">sequence_to_encoding</span>
 <span class="kn">from</span> <span class="nn">.sequence</span> <span class="k">import</span> <span class="n">encoding_to_sequence</span>
 
+<span class="k">def</span> <span class="nf">_not_blacklist_region</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">blacklist_tabix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the input coordinates are not overlapping with blacklist regions.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chrom : str</span>
+<span class="sd">        The name of the chromosomes, e.g. &quot;chr1&quot;.</span>
+<span class="sd">    start : int</span>
+<span class="sd">        The 0-based start coordinate of the sequence.</span>
+<span class="sd">    end : int</span>
+<span class="sd">        One past the last coordinate of the sequence.</span>
+<span class="sd">    blacklist_tabix : tabix.open or None, optional</span>
+<span class="sd">        Default is `None`. Tabix file handle if a file of blacklist regions</span>
+<span class="sd">        is available.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        False if the coordinates are overlaping with blacklist regions</span>
+<span class="sd">        (if specified). Otherwise, return True.</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">blacklist_tabix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">blacklist_tabix</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="n">tabix</span><span class="o">.</span><span class="n">TabixError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_check_coords</span><span class="p">(</span><span class="n">len_chrs</span><span class="p">,</span>
+                  <span class="n">chrom</span><span class="p">,</span>
+                  <span class="n">start</span><span class="p">,</span>
+                  <span class="n">end</span><span class="p">,</span>
+                  <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                  <span class="n">blacklist_tabix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the input coordinates are valid.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    len_chrs : dict</span>
+<span class="sd">        A dictionary mapping chromosome names to lengths.</span>
+<span class="sd">    chrom : str</span>
+<span class="sd">        The name of the chromosomes, e.g. &quot;chr1&quot;.</span>
+<span class="sd">    start : int</span>
+<span class="sd">        The 0-based start coordinate of the sequence.</span>
+<span class="sd">    end : int</span>
+<span class="sd">        One past the last coordinate of the sequence.</span>
+<span class="sd">    pad : bool, optional</span>
+<span class="sd">        Default is `False`. Allow coordinates that are partially</span>
+<span class="sd">        out of bounds.</span>
+<span class="sd">    blacklist_tabix : tabix.open or None, optional</span>
+<span class="sd">        Default is `None`. Tabix file handle if a file of blacklist regions</span>
+<span class="sd">        is available.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if the coordinates are valid (`start` and `end` are within</span>
+<span class="sd">        chromosome boundaries and not overlaping with blacklist regions</span>
+<span class="sd">        (if specified). Otherwise, return False.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">len_chrs</span> <span class="ow">and</span> \
+         <span class="n">start</span> <span class="o">&lt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">and</span> \
+         <span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span> <span class="ow">and</span> \
+         <span class="n">end</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+         <span class="p">(</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pad</span> <span class="k">else</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> \
+         <span class="p">(</span><span class="n">end</span> <span class="o">&lt;=</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">pad</span> <span class="k">else</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> \
+         <span class="n">_not_blacklist_region</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">blacklist_tabix</span><span class="p">)</span>
+
+
 
 <span class="k">def</span> <span class="nf">_get_sequence_from_coords</span><span class="p">(</span><span class="n">len_chrs</span><span class="p">,</span>
                               <span class="n">genome_sequence</span><span class="p">,</span>
@@ -373,7 +451,7 @@
 <span class="sd">        in-bounds query and then pad the sequence to return the desired</span>
 <span class="sd">        sequence length.</span>
 <span class="sd">    blacklist_tabix : tabix.open or None, optional</span>
-<span class="sd">        Default is `None`. Tabix file handle if a file of blacklisted regions</span>
+<span class="sd">        Default is `None`. Tabix file handle if a file of blacklist regions</span>
 <span class="sd">        is available.</span>
 
 <span class="sd">    Returns</span>
@@ -388,25 +466,14 @@
 <span class="sd">        choices.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">len_chrs</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_check_coords</span><span class="p">(</span><span class="n">len_chrs</span><span class="p">,</span>
+        <span class="n">chrom</span><span class="p">,</span>
+        <span class="n">start</span><span class="p">,</span>
+        <span class="n">end</span><span class="p">,</span>
+        <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">,</span>
+        <span class="n">blacklist_tabix</span><span class="o">=</span><span class="n">blacklist_tabix</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">pad</span> <span class="ow">and</span> <span class="p">(</span><span class="n">end</span> <span class="o">&gt;</span> <span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">or</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">end</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">blacklist_tabix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="n">blacklist_tabix</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-                <span class="k">return</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">except</span> <span class="n">tabix</span><span class="o">.</span><span class="n">TabixError</span><span class="p">:</span>
-            <span class="k">pass</span>
 
     <span class="k">if</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;+&#39;</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -584,10 +651,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">genome</span><span class="p">[</span><span class="n">chrom</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">reverse</span><span class="o">.</span><span class="n">complement</span><span class="o">.</span><span class="n">seq</span>
 
+
 <div class="viewcode-block" id="Genome.coords_in_bounds"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.coords_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">coords_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Check if the region we want to query is within the bounds of the</span>
-<span class="sd">        queried chromosome.</span>
+<span class="sd">        queried chromosome and non-overlapping with blacklist regions</span>
+<span class="sd">        (if given).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -596,7 +665,7 @@
 <span class="sd">        start : int</span>
 <span class="sd">            The 0-based start coordinate of the sequence.</span>
 <span class="sd">        end : int</span>
-<span class="sd">            One past the last coordinate of the sequence.</span>
+<span class="sd">            One past the 0-based last position in the sequence.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -605,9 +674,11 @@
 <span class="sd">            in the input.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span> <span class="ow">and</span> \
-            <span class="p">(</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">]</span> <span class="ow">and</span>
-             <span class="n">end</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">[</span><span class="n">chrom</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="n">_check_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">len_chrs</span><span class="p">,</span>
+                             <span class="n">chrom</span><span class="p">,</span>
+                             <span class="n">start</span><span class="p">,</span>
+                             <span class="n">end</span><span class="p">,</span>
+                             <span class="n">blacklist_tabix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_blacklist_tabix</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Genome.get_sequence_from_coords"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_sequence_from_coords">[docs]</a>    <span class="k">def</span> <span class="nf">get_sequence_from_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                  <span class="n">chrom</span><span class="p">,</span>
@@ -687,15 +758,17 @@
 <span class="sd">            and/or `end` are out of bounds to return a sequence of length</span>
 <span class="sd">            `end - start`.</span>
 
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        numpy.ndarray, dtype=bool</span>
+<span class="sd">        numpy.ndarray, dtype=numpy.float32</span>
 <span class="sd">            The :math:`L \\times 4` encoding of the sequence, where</span>
 <span class="sd">            :math:`L = end - start`, unless `chrom` cannot be found</span>
 <span class="sd">            in the input FASTA, `start` or `end` are out of bounds,</span>
-<span class="sd">            or (if a blacklist exists) the region overlaps with a blacklisted</span>
+<span class="sd">            or (if a blacklist exists) the region overlaps with a blacklist</span>
 <span class="sd">            region. In these cases, it will return an empty encoding--that is,</span>
 <span class="sd">            `L` = 0 for the NumPy array returned.</span>
+
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -709,6 +782,62 @@
             <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">)</span>
         <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">encoding</span></div>
+
+<div class="viewcode-block" id="Genome.get_encoding_from_coords_check_unk"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk">[docs]</a>    <span class="k">def</span> <span class="nf">get_encoding_from_coords_check_unk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                 <span class="n">chrom</span><span class="p">,</span>
+                                 <span class="n">start</span><span class="p">,</span>
+                                 <span class="n">end</span><span class="p">,</span>
+                                 <span class="n">strand</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
+                                 <span class="n">pad</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the one-hot encoding of the genomic sequence at the</span>
+<span class="sd">        queried coordinates and check whether the sequence contains </span>
+<span class="sd">        unknown base(s).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        chrom : str</span>
+<span class="sd">            The name of the chromosome or region, e.g. &quot;chr1&quot;.</span>
+<span class="sd">        start : int</span>
+<span class="sd">            The 0-based start coordinate of the first position in the</span>
+<span class="sd">            sequence.</span>
+<span class="sd">        end : int</span>
+<span class="sd">            One past the 0-based last position in the sequence.</span>
+<span class="sd">        strand : {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}, optional</span>
+<span class="sd">            Default is &#39;+&#39;. The strand the sequence is located on. &#39;.&#39; is</span>
+<span class="sd">            treated as &#39;+&#39;.</span>
+<span class="sd">        pad : bool, optional</span>
+<span class="sd">            Default is `False`. Pad the output sequence with &#39;N&#39; if `start`</span>
+<span class="sd">            and/or `end` are out of bounds to return a sequence of length</span>
+<span class="sd">            `end - start`.</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple(numpy.ndarray, bool)</span>
+
+<span class="sd">            * `tuple[0]` is the :math:`L \\times 4` encoding of the sequence</span>
+<span class="sd">            containing data of `numpy.float32` type, where</span>
+<span class="sd">            :math:`L = end - start`, unless `chrom` cannot be found</span>
+<span class="sd">            in the input FASTA, `start` or `end` are out of bounds,</span>
+<span class="sd">            or (if a blacklist exists) the region overlaps with a blacklist</span>
+<span class="sd">            region. In these cases, it will return an empty encoding--that is,</span>
+<span class="sd">            `L` = 0 for the NumPy array returned.</span>
+<span class="sd">            * `tuple[1]` is the boolean value that indicates whether the</span>
+<span class="sd">            sequence contains any unknown base(s) specified in self.UNK_BASE</span>
+
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the input char to `strand` is not one of the specified</span>
+<span class="sd">            choices.</span>
+<span class="sd">            (Raised in the call to `self.get_sequence_from_coords`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sequence_from_coords</span><span class="p">(</span>
+            <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="n">pad</span><span class="p">)</span>
+        <span class="n">encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNK_BASE</span> <span class="ow">in</span> <span class="n">sequence</span></div>
+
 
 <div class="viewcode-block" id="Genome.sequence_to_encoding"><a class="viewcode-back" href="../../../sequences.html#selene_sdk.sequences.Genome.sequence_to_encoding">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">sequence_to_encoding</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>

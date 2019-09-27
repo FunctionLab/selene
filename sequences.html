@@ -578,13 +578,14 @@ from the alphabet, but we are uncertain which.</p>
 <dt id="selene_sdk.sequences.Genome.coords_in_bounds">
 <code class="descname">coords_in_bounds</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.coords_in_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the region we want to query is within the bounds of the
-queried chromosome.</p>
+queried chromosome and non-overlapping with blacklist regions
+(if given).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>chrom</strong> (<em>str</em>) – The name of the chromosomes, e.g. “chr1”.</p></li>
 <li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the sequence.</p></li>
-<li><p><strong>end</strong> (<em>int</em>) – One past the last coordinate of the sequence.</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -667,12 +668,57 @@ and/or <cite>end</cite> are out of bounds to return a sequence of length
 <dd class="field-even"><p>The <span class="math notranslate nohighlight">\(L \times 4\)</span> encoding of the sequence, where
 <span class="math notranslate nohighlight">\(L = end - start\)</span>, unless <cite>chrom</cite> cannot be found
 in the input FASTA, <cite>start</cite> or <cite>end</cite> are out of bounds,
-or (if a blacklist exists) the region overlaps with a blacklisted
+or (if a blacklist exists) the region overlaps with a blacklist
 region. In these cases, it will return an empty encoding–that is,
 <cite>L</cite> = 0 for the NumPy array returned.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, dtype=bool</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, dtype=numpy.float32</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If the input char to <cite>strand</cite> is not one of the specified
+    choices.
+    (Raised in the call to <cite>self.get_sequence_from_coords</cite>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk">
+<code class="descname">get_encoding_from_coords_check_unk</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em>, <em>strand='+'</em>, <em>pad=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords_check_unk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the one-hot encoding of the genomic sequence at the
+queried coordinates and check whether the sequence contains
+unknown base(s).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chrom</strong> (<em>str</em>) – The name of the chromosome or region, e.g. “chr1”.</p></li>
+<li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the first position in the
+sequence.</p></li>
+<li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
+<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+treated as ‘+’.</p></li>
+<li><p><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
+and/or <cite>end</cite> are out of bounds to return a sequence of length
+<cite>end - start</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><cite>tuple[0]</cite> is the <span class="math notranslate nohighlight">\(L \times 4\)</span> encoding of the sequence</p></li>
+</ul>
+<p>containing data of <cite>numpy.float32</cite> type, where
+<span class="math notranslate nohighlight">\(L = end - start\)</span>, unless <cite>chrom</cite> cannot be found
+in the input FASTA, <cite>start</cite> or <cite>end</cite> are out of bounds,
+or (if a blacklist exists) the region overlaps with a blacklist
+region. In these cases, it will return an empty encoding–that is,
+<cite>L</cite> = 0 for the NumPy array returned.
+* <cite>tuple[1]</cite> is the boolean value that indicates whether the
+sequence contains any unknown base(s) specified in self.UNK_BASE</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>)</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If the input char to <cite>strand</cite> is not one of the specified
