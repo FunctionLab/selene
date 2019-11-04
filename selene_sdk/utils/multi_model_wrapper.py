@@ -36,6 +36,10 @@ class MultiModelWrapper(nn.Module):
         self.sub_models = sub_models
         self._concat_dim = concat_dim
 
+    def cuda(self):
+        for sm in self.sub_models:
+            sm.cuda()
+
     def eval(self):
         for sm in self.sub_models:
             sm.eval()
