@@ -337,14 +337,14 @@ as a label or annotation on an input sequence.</p>
 <h2>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.targets.Target">
-<em class="property">class </em><code class="descclassname">selene_sdk.targets.</code><code class="descname">Target</code><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.targets.</code><code class="sig-name descname">Target</code><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for all target feature classes.
 Target features classes are classes which define a way to access a
 “target feature” such as a label or annotation on an input sequence.</p>
 <dl class="method">
 <dt id="selene_sdk.targets.Target.get_feature_data">
-<code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target.get_feature_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the feature data for some coordinate.</p>
 </dd></dl>
 
@@ -355,7 +355,7 @@ Target features classes are classes which define a way to access a
 <h2>GenomicFeatures<a class="headerlink" href="#genomicfeatures" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.targets.GenomicFeatures">
-<em class="property">class </em><code class="descclassname">selene_sdk.targets.</code><code class="descname">GenomicFeatures</code><span class="sig-paren">(</span><em>input_path</em>, <em>features</em>, <em>feature_thresholds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.targets.</code><code class="sig-name descname">GenomicFeatures</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">features</em>, <em class="sig-param">feature_thresholds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.targets.target.Target</span></code></p>
 <p>Stores the dataset specifying sequence regions and features.
 Accepts a tabix-indexed <cite>*.bed</cite> file with the following columns,
@@ -391,13 +391,13 @@ the threshold specified for that feature.</p>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>~GenomicFeatures.data</strong> (<em>tabix.open</em>) – The data stored in a tabix-indexed <cite>*.bed</cite> file.</p></li>
-<li><p><strong>~GenomicFeatures.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of distinct features.</p></li>
-<li><p><strong>~GenomicFeatures.feature_index_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to indices (<cite>int</cite>),
+<li><p><strong>~GenomicFeatures.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of distinct features.</p></li>
+<li><p><strong>~GenomicFeatures.feature_index_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to indices (<cite>int</cite>),
 where the index is the position of the feature in <cite>features</cite>.</p></li>
-<li><p><strong>~GenomicFeatures.index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
+<li><p><strong>~GenomicFeatures.index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
 where the index is the position of the feature in the input
 features.</p></li>
-<li><p><strong>~GenomicFeatures.feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – <ul>
+<li><p><strong>~GenomicFeatures.feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – <ul>
 <li><p><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds        (<cite>float</cite>), where the threshold is the minimum overlap that a        feature annotation must have with a query region to be        considered a positive example of that feature.</p></li>
 <li><p><cite>None</cite> - No threshold specifications. Assumes that all features        returned by a tabix query are annotated to the query region.</p></li>
 </ul>
@@ -407,7 +407,7 @@ features.</p></li>
 </dl>
 <dl class="method">
 <dt id="selene_sdk.targets.GenomicFeatures.get_feature_data">
-<code class="descname">get_feature_data</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>For a sequence of length <span class="math notranslate nohighlight">\(L = end - start\)</span>, return the
 features’ one-hot encoding corresponding to that region. For
 instance, for <cite>n_features</cite>, each position in that sequence will
@@ -437,7 +437,7 @@ return a <cite>numpy.ndarray</cite> of zeros.</p>
 
 <dl class="method">
 <dt id="selene_sdk.targets.GenomicFeatures.is_positive">
-<code class="descname">is_positive</code><span class="sig-paren">(</span><em>chrom</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.is_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.is_positive" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_positive</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.is_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.is_positive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines whether the query the <cite>chrom</cite> queried contains any
 genomic features within the <span class="math notranslate nohighlight">\([start, end)\)</span> region. If so,
 the query is considered positive.</p>
@@ -457,7 +457,7 @@ assume the error was the result of no features being present
 in the queried region and return <cite>False</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>

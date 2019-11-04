@@ -337,7 +337,7 @@ thus is included here.</p>
 <h2>NonStrandSpecific<a class="headerlink" href="#nonstrandspecific" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.utils.NonStrandSpecific">
-<em class="property">class </em><code class="descclassname">selene_sdk.utils.</code><code class="descname">NonStrandSpecific</code><span class="sig-paren">(</span><em>model</em>, <em>mode='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/non_strand_specific_module.html#NonStrandSpecific"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.NonStrandSpecific" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">NonStrandSpecific</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">mode='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/non_strand_specific_module.html#NonStrandSpecific"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.NonStrandSpecific" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>A torch.nn.Module that wraps a user-specified model architecture if the
 architecture does not need to account for sequence strand-specificity.</p>
@@ -353,7 +353,7 @@ the non-strand specific prediction.</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~NonStrandSpecific.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.3.0a0+b0a2f6f ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</p></li>
+<li><p><strong>~NonStrandSpecific.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.4.0a0+2460dce ))"><em>torch.nn.Module</em></a>) – The user-specified model architecture.</p></li>
 <li><p><strong>~NonStrandSpecific.mode</strong> (<em>{'mean'</em><em>, </em><em>'max'}</em>) – How to handle outputting a non-strand specific prediction.</p></li>
 </ul>
 </dd>
@@ -365,8 +365,8 @@ the non-strand specific prediction.</p></li>
 <h2>PerformanceMetrics<a class="headerlink" href="#performancemetrics" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="selene_sdk.utils.PerformanceMetrics">
-<em class="property">class </em><code class="descclassname">selene_sdk.utils.</code><code class="descname">PerformanceMetrics</code><span class="sig-paren">(</span><em>get_feature_from_index_fn</em>, <em>report_gt_feature_n_positives=10</em>, <em>metrics={'average_precision': &lt;function average_precision_score&gt;</em>, <em>'roc_auc': &lt;function roc_auc_score&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">PerformanceMetrics</code><span class="sig-paren">(</span><em class="sig-param">get_feature_from_index_fn</em>, <em class="sig-param">report_gt_feature_n_positives=10</em>, <em class="sig-param">metrics={'average_precision': &lt;function average_precision_score&gt;</em>, <em class="sig-param">'roc_auc': &lt;function roc_auc_score&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Tracks and calculates metrics to evaluate how closely a model’s
 predictions match the true values it was designed to predict.</p>
 <dl class="field-list simple">
@@ -384,12 +384,12 @@ which maps to <cite>sklearn.metrics.average_precision_score</cite>.</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~PerformanceMetrics.skip_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The minimum number of positive examples of a feature that must
+<li><p><strong>~PerformanceMetrics.skip_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The minimum number of positive examples of a feature that must
 be included in an update for a metric score to be
 calculated for it.</p></li>
 <li><p><strong>~PerformanceMetrics.get_feature_from_index</strong> (<em>types.FunctionType</em>) – A function that takes an index (<cite>int</cite>) and returns a feature
 name (<cite>str</cite>).</p></li>
-<li><p><strong>~PerformanceMetrics.metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric objects
+<li><p><strong>~PerformanceMetrics.metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric objects
 (<cite>Metric</cite>). By default, this contains <cite>“roc_auc”</cite> and
 <cite>“average_precision”</cite>.</p></li>
 </ul>
@@ -397,7 +397,7 @@ name (<cite>str</cite>).</p></li>
 </dl>
 <dl class="method">
 <dt id="selene_sdk.utils.PerformanceMetrics.add_metric">
-<code class="descname">add_metric</code><span class="sig-paren">(</span><em>name</em>, <em>metric_fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.add_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.add_metric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_metric</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">metric_fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.add_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.add_metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Begins tracking of the specified metric.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -411,7 +411,7 @@ name (<cite>str</cite>).</p></li>
 
 <dl class="method">
 <dt id="selene_sdk.utils.PerformanceMetrics.remove_metric">
-<code class="descname">remove_metric</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.remove_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.remove_metric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_metric</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.remove_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.remove_metric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ends the tracking of the specified metric, and returns the
 previous scores associated with that metric.</p>
 <dl class="field-list simple">
@@ -423,14 +423,14 @@ previous scores associated with that metric.</p>
 uses of the specified metric.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.utils.PerformanceMetrics.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">prediction</em>, <em class="sig-param">target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluates the tracked metrics on a model prediction and its
 target value, and adds this to the metric histories.</p>
 <dl class="field-list simple">
@@ -446,14 +446,14 @@ average score of that metric across all features
 (<cite>float</cite>).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.utils.PerformanceMetrics.visualize">
-<code class="descname">visualize</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.visualize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">visualize</code><span class="sig-paren">(</span><em class="sig-param">prediction</em>, <em class="sig-param">target</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.visualize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Outputs ROC and PR curves. Does not support other metrics
 currently.</p>
 <dl class="field-list">
@@ -478,14 +478,14 @@ function accepts the following args:</p>
 <dd class="field-even"><p>Outputs figures to <cite>output_dir</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.utils.PerformanceMetrics.write_feature_scores_to_file">
-<code class="descname">write_feature_scores_to_file</code><span class="sig-paren">(</span><em>output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.write_feature_scores_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.write_feature_scores_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_feature_scores_to_file</code><span class="sig-paren">(</span><em class="sig-param">output_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#PerformanceMetrics.write_feature_scores_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.PerformanceMetrics.write_feature_scores_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes each metric’s score for each feature to a specified
 file.</p>
 <dl class="field-list simple">
@@ -501,7 +501,7 @@ given feature. If a metric was not evaluated on a given
 feature, the score will be <cite>None</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -510,7 +510,7 @@ feature, the score will be <cite>None</cite>.</p>
 
 <dl class="function">
 <dt id="selene_sdk.utils.visualize_roc_curves">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">visualize_roc_curves</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>report_gt_feature_n_positives=50</em>, <em>style='seaborn-colorblind'</em>, <em>fig_title='Feature ROC curves'</em>, <em>dpi=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#visualize_roc_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.visualize_roc_curves" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">visualize_roc_curves</code><span class="sig-paren">(</span><em class="sig-param">prediction</em>, <em class="sig-param">target</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">report_gt_feature_n_positives=50</em>, <em class="sig-param">style='seaborn-colorblind'</em>, <em class="sig-param">fig_title='Feature ROC curves'</em>, <em class="sig-param">dpi=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#visualize_roc_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.visualize_roc_curves" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output the ROC curves for each feature predicted by a model
 as an SVG.</p>
 <dl class="field-list simple">
@@ -532,14 +532,14 @@ less than 50 positive examples in <cite>target</cite>.</p></li>
 <dd class="field-even"><p>Outputs the figure in <cite>output_dir</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="selene_sdk.utils.visualize_precision_recall_curves">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">visualize_precision_recall_curves</code><span class="sig-paren">(</span><em>prediction</em>, <em>target</em>, <em>output_dir</em>, <em>report_gt_feature_n_positives=50</em>, <em>style='seaborn-colorblind'</em>, <em>fig_title='Feature precision-recall curves'</em>, <em>dpi=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#visualize_precision_recall_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.visualize_precision_recall_curves" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">visualize_precision_recall_curves</code><span class="sig-paren">(</span><em class="sig-param">prediction</em>, <em class="sig-param">target</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">report_gt_feature_n_positives=50</em>, <em class="sig-param">style='seaborn-colorblind'</em>, <em class="sig-param">fig_title='Feature precision-recall curves'</em>, <em class="sig-param">dpi=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/performance_metrics.html#visualize_precision_recall_curves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.visualize_precision_recall_curves" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output the precision-recall (PR) curves for each feature predicted by
 a model as an SVG.</p>
 <dl class="field-list simple">
@@ -561,7 +561,7 @@ less than 50 positive examples in <cite>target</cite>.</p></li>
 <dd class="field-even"><p>Outputs the figure in <cite>output_dir</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -571,7 +571,7 @@ less than 50 positive examples in <cite>target</cite>.</p></li>
 <h2>initialize_logger<a class="headerlink" href="#initialize-logger" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.initialize_logger">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">initialize_logger</code><span class="sig-paren">(</span><em>output_path</em>, <em>verbosity=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#initialize_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.initialize_logger" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">initialize_logger</code><span class="sig-paren">(</span><em class="sig-param">output_path</em>, <em class="sig-param">verbosity=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#initialize_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.initialize_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the logger for Selene.
 This function can only be called successfully once.
 If the logger has already been initialized with handlers,
@@ -601,7 +601,7 @@ logger configurations.</p>
 <h2>load_features_list<a class="headerlink" href="#load-features-list" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.load_features_list">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">load_features_list</code><span class="sig-paren">(</span><em>input_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#load_features_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_features_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">load_features_list</code><span class="sig-paren">(</span><em class="sig-param">input_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#load_features_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_features_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads in a file of distinct feature names line-by-line and returns
 these features as a list. Each feature name in the file must occur
 on a separate line.</p>
@@ -615,7 +615,7 @@ be on its own line.</p>
 bottom).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)         The list of features. The features will appear in the list in</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)         The list of features. The features will appear in the list in</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -637,7 +637,7 @@ and <span class="math notranslate nohighlight">\(YFG\)</span> might look like th
 <h2>load_model_from_state_dict<a class="headerlink" href="#load-model-from-state-dict" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.load_model_from_state_dict">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">load_model_from_state_dict</code><span class="sig-paren">(</span><em>state_dict</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#load_model_from_state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_model_from_state_dict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">load_model_from_state_dict</code><span class="sig-paren">(</span><em class="sig-param">state_dict</em>, <em class="sig-param">model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#load_model_from_state_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_model_from_state_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads model weights that were saved to a file previously by <cite>torch.save</cite>.
 This is a helper function to reconcile state dict keys where a model was
 saved with/without torch.nn.DataParallel and now must be loaded
@@ -656,7 +656,7 @@ without/with torch.nn.DataParallel.</p>
 <dd class="field-odd"><p>torch.nn.Module         The model with weights loaded from the state dict.</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If model state dict keys do not match the keys in <cite>state_dict</cite>.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If model state dict keys do not match the keys in <cite>state_dict</cite>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -666,7 +666,7 @@ without/with torch.nn.DataParallel.</p>
 <h2>get_indices_and_probabilities<a class="headerlink" href="#get-indices-and-probabilities" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.get_indices_and_probabilities">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">get_indices_and_probabilities</code><span class="sig-paren">(</span><em>interval_lengths</em>, <em>indices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#get_indices_and_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.get_indices_and_probabilities" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">get_indices_and_probabilities</code><span class="sig-paren">(</span><em class="sig-param">interval_lengths</em>, <em class="sig-param">indices</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/utils.html#get_indices_and_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.get_indices_and_probabilities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a list of different interval lengths and the indices of
 interest in that list, weight the probability that we will sample
 one of the indices in <cite>indices</cite> based on the interval lengths in
@@ -683,7 +683,7 @@ used to weight the indices proportionally to interval length.</p></li>
 <dd class="field-even"><p><strong>indices, weights</strong> – weights of those intervals.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>))         Tuple of interval indices to sample from and the corresponding</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a>))         Tuple of interval indices to sample from and the corresponding</p>
 </dd>
 </dl>
 </dd></dl>
@@ -693,7 +693,7 @@ used to weight the indices proportionally to interval length.</p></li>
 <h2>load_path (for config.yml)<a class="headerlink" href="#load-path-for-config-yml" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.load_path">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">load_path</code><span class="sig-paren">(</span><em>path</em>, <em>environ=None</em>, <em>instantiate=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#load_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_path" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">load_path</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">environ=None</em>, <em class="sig-param">instantiate=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#load_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.load_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience function for loading a YAML configuration from a
 file.</p>
 <dl class="field-list simple">
@@ -714,7 +714,7 @@ a Python object to instantiate), or a nested hierarchy of
 <cite>_Proxy</cite> objects.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -726,7 +726,7 @@ a Python object to instantiate), or a nested hierarchy of
 <h2>instantiate (configuration object)<a class="headerlink" href="#instantiate-configuration-object" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.instantiate">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">instantiate</code><span class="sig-paren">(</span><em>proxy</em>, <em>bindings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.instantiate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">instantiate</code><span class="sig-paren">(</span><em class="sig-param">proxy</em>, <em class="sig-param">bindings=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config.html#instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.instantiate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate a hierarchy of proxy objects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -741,7 +741,7 @@ to their instantiated values.</p></li>
 <dd class="field-even"><p><strong>obj</strong> – The result object from recursively instantiating the object DAG.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -753,7 +753,7 @@ to their instantiated values.</p></li>
 <h2>initialize_model<a class="headerlink" href="#initialize-model" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.initialize_model">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">initialize_model</code><span class="sig-paren">(</span><em>model_configs</em>, <em>train=True</em>, <em>lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#initialize_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.initialize_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">initialize_model</code><span class="sig-paren">(</span><em class="sig-param">model_configs</em>, <em class="sig-param">train=True</em>, <em class="sig-param">lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#initialize_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.initialize_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize model (and associated criterion, optimizer)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -777,10 +777,10 @@ True.</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.3.0a0+b0a2f6f ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.3.0a0+b0a2f6f ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.4.0a0+2460dce ))">torch.nn.Module</a>, torch.nn._Loss) or             model, criterion, optim_class, optim_kwargs :                 tuple(<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.4.0a0+2460dce ))">torch.nn.Module</a>, torch.nn._Loss, torch.optim, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>)</p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>train</cite> but the <cite>lr</cite> specified is not a float.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -790,7 +790,7 @@ True.</p>
 <h2>parse_configs_and_run<a class="headerlink" href="#parse-configs-and-run" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.parse_configs_and_run">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">parse_configs_and_run</code><span class="sig-paren">(</span><em>configs</em>, <em>create_subdirectory=True</em>, <em>lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#parse_configs_and_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.parse_configs_and_run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">parse_configs_and_run</code><span class="sig-paren">(</span><em class="sig-param">configs</em>, <em class="sig-param">create_subdirectory=True</em>, <em class="sig-param">lr=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#parse_configs_and_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.parse_configs_and_run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method to parse the configuration YAML file and run each operation
 specified.</p>
 <dl class="field-list">
@@ -823,7 +823,7 @@ operations to be executed.</p></li>
 to the dirs specified in each operation’s configuration.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -833,7 +833,7 @@ to the dirs specified in each operation’s configuration.</p>
 <h2>execute (run Selene operations)<a class="headerlink" href="#execute-run-selene-operations" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="selene_sdk.utils.execute">
-<code class="descclassname">selene_sdk.utils.</code><code class="descname">execute</code><span class="sig-paren">(</span><em>operations</em>, <em>configs</em>, <em>output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.execute" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">selene_sdk.utils.</code><code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">operations</em>, <em class="sig-param">configs</em>, <em class="sig-param">output_dir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/utils/config_utils.html#execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.utils.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Execute operations in _Selene_.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -852,10 +852,10 @@ it is required.</p></li>
 to the dirs specified in each operation’s configuration.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – If an expected key in configuration is missing.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If an expected key in configuration is missing.</p>
 </dd>
 </dl>
 </dd></dl>
