@@ -956,41 +956,31 @@ class AnalyzeSequences(object):
             center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
-            seq_encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
-                        chrom,
-                        start,
-                        end,
-                        strand=strand)
-            if len(ref) and strand == '-':
-                ref = get_reverse_complement(
-                    ref,
-                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
-                alt = get_reverse_complement(
-                    alt,
-                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+            ref_sequence_encoding, contains_unk = \
+                self.reference_sequence.get_encoding_from_coords_check_unk(
+                    chrom, start, end)
 
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
-            alt_encoding = _process_alt(
-                chrom, pos, ref, alt, start, end, strand,
-                seq_encoding, self.reference_sequence)
+            alt_sequence_encoding = _process_alt(
+                chrom, pos, ref, alt, start, end,
+                ref_sequence_encoding,
+                self.reference_sequence)
 
             match = True
             seq_at_ref = None
             if len(ref) and len(ref) < self.sequence_length:
-                match, seq_encoding, seq_at_ref = _handle_standard_ref(
+                match, ref_sequence_encoding, seq_at_ref = _handle_standard_ref(
                     ref_encoding,
-                    seq_encoding,
+                    ref_sequence_encoding,
                     self.sequence_length,
-                    self.reference_sequence,
-                    strand)
+                    self.reference_sequence)
             elif len(ref) >= self.sequence_length:
-                match, seq_encoding, seq_at_ref = _handle_long_ref(
+                match, ref_sequence_encoding, seq_at_ref = _handle_long_ref(
                     ref_encoding,
-                    seq_encoding,
+                    ref_sequence_encoding,
                     self._start_radius,
                     self._end_radius,
-                    self.reference_sequence,
-                    strand)
+                    self.reference_sequence)
 
             if contains_unk:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
@@ -1008,8 +998,11 @@ class AnalyzeSequences(object):
                               "column of the .tsv or the row_labels .txt file".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
             batch_ids.append((chrom, pos, name, ref, alt, strand, match, contains_unk))
-            batch_ref_seqs.append(seq_encoding)
-            batch_alt_seqs.append(alt_encoding)
+            batch_ref_seqs.append(ref_sequence_encoding)
+            if strand == '-':
+                alt_sequence_encoding = get_reverse_complement_encoding(
+                    alt_sequence_encoding)
+            batch_alt_seqs.append(alt_sequence_encoding)
 
             if len(batch_ref_seqs) >= self.batch_size:
                 _handle_ref_alt_predictions(

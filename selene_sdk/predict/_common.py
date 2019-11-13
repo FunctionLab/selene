@@ -35,6 +35,43 @@ def get_reverse_complement(allele, complementary_base_dict):
     return ''.join(list(reversed(a_complement)))
 
 
+def get_reverse_complement_encoding(allele_encoding,
+                                    complementary_base_encoding,
+                                    index_to_base):
+    """
+    Get the reverse complement of the input allele one-hot encoding.
+
+    Parameters
+    ----------
+    allele : str
+        The sequence allele encoding, :math:`L \\times 4`
+    complementary_base_dict : dict(str: str)
+        The dictionary that maps each base to its complement
+    index_to_base : dict(str: int)
+        The dictionary that maps each index to the base
+
+    Returns
+    -------
+    np.ndarray
+        The reverse complement encoding of the allele, shape
+        :math:`L \\times 4`.
+
+    """
+    base_to_index = {b: ix for (ix, b) in index_to_base.items()}
+    rc_allele = np.zeros(allele.shape)
+    for i, base_enc in enumerate(allele):
+        base_ix = np.where(base_enc == 1)[0]
+        rc_i = len(rc_allele) - 1 - i
+        if not ix:
+            rc_allele[rc_i] = base_enc
+        else:
+            rc_base = complementary_base_dict[
+                index_to_base[base_ix]]
+            rc_base_ix = base_to_index[rc_base]
+            rc_allele[rc_i, rc_base_ix] = 1
+    return rc_allele
+
+
 def predict(model, batch_sequences, use_cuda=False):
     """
     Return model predictions for a batch of sequences.

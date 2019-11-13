@@ -26,10 +26,12 @@ def read_vcf_file(input_path,
         Path to the VCF file.
     strand_index : int or None, optional
         Default is None. By default we assume the input sequence
-        surrounding a variant should be on the forward strand. If your
-        model is strand-specific, you may want to specify the column number
-        (0-based) in the VCF file that includes the strand corresponding
-        to each variant.
+        surrounding a variant is on the forward strand. If your
+        model is strand-specific, you may specify a column number
+        (0-based) in the VCF file that includes strand information. Please
+        note that variant position, ref, and alt should still be specified
+        for the forward strand and Selene will apply reverse complement
+        to this variant.
     require_strand : bool, optional
         Default is False. Whether strand can be specified as '.'. If False,
         Selene accepts strand value to be '+', '-', or '.' and automatically
@@ -115,7 +117,7 @@ def read_vcf_file(input_path,
                     continue
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
-                
+
     if reference_sequence and seq_context and output_NAs_to_file:
         with open(output_NAs_to_file, 'w') as file_handle:
             for na_row in na_rows:
@@ -123,19 +125,11 @@ def read_vcf_file(input_path,
     return variants
 
 
-def _get_ref_idxs(seq_len, strand, ref_len):
-    mid = None
-    if strand == '-':
-        mid = math.ceil(seq_len / 2)
-    else:
-        mid = seq_len // 2
-
-    start_pos = mid
-    if strand == '-' and ref_len > 1:
-        start_pos = mid - (ref_len + 1) // 2 + 1
-    elif strand == '+' and ref_len == 1:
+def _get_ref_idxs(seq_len, ref_len):
+    mid = seq_len // 2
+    if ref_len == 1:
         start_pos = mid - 1
-    elif strand == '+':
+    else:
         start_pos = mid - ref_len // 2 - 1
     end_pos = start_pos + ref_len
     return (start_pos, end_pos)
@@ -147,7 +141,6 @@ def _process_alt(chrom,
                  alt,
                  start,
                  end,
-                 strand,
                  wt_sequence,
                  reference_sequence):
     """
@@ -168,8 +161,6 @@ def _process_alt(chrom,
         The start coordinate for genome query
     end : int
         The end coordinate for genome query
-    strand : {'+', '-'}
-        The strand the variant is on
     wt_sequence : numpy.ndarray
         The reference sequence encoding
     reference_sequence : selene_sdk.sequences.Sequence
@@ -194,13 +185,13 @@ def _process_alt(chrom,
 
     alt_encoding = reference_sequence.sequence_to_encoding(alt)
     if ref_len == alt_len:  # substitution
-        start_pos, end_pos = _get_ref_idxs(len(wt_sequence), strand, ref_len)
+        start_pos, end_pos = _get_ref_idxs(len(wt_sequence), ref_len)
         sequence = np.vstack([wt_sequence[:start_pos, :],
                               alt_encoding,
                               wt_sequence[end_pos:, :]])
         return sequence
     elif alt_len > ref_len:  # insertion
-        start_pos, end_pos = _get_ref_idxs(len(wt_sequence), strand, ref_len)
+        start_pos, end_pos = _get_ref_idxs(len(wt_sequence), ref_len)
         sequence = np.vstack([wt_sequence[:start_pos, :],
                               alt_encoding,
                               wt_sequence[end_pos:, :]])
@@ -213,17 +204,12 @@ def _process_alt(chrom,
             chrom,
             start - ref_len // 2 + alt_len // 2,
             pos + 1,
-            strand=strand,
             pad=True)
         rhs = reference_sequence.get_sequence_from_coords(
             chrom,
             pos + 1 + ref_len,
             end + math.ceil(ref_len / 2.) - math.ceil(alt_len / 2.),
-            strand=strand,
             pad=True)
-        if strand == '-':
-            sequence = rhs + alt + lhs
-        else:
             sequence = lhs + alt + rhs
         return reference_sequence.sequence_to_encoding(
             sequence)
@@ -232,11 +218,10 @@ def _process_alt(chrom,
 def _handle_standard_ref(ref_encoding,
                          seq_encoding,
                          seq_length,
-                         reference_sequence,
-                         strand):
+                         reference_sequence):
     ref_len = ref_encoding.shape[0]
 
-    start_pos, end_pos = _get_ref_idxs(seq_length, strand, ref_len)
+    start_pos, end_pos = _get_ref_idxs(seq_length, ref_len)
 
     sequence_encoding_at_ref = seq_encoding[
         start_pos:start_pos + ref_len, :]
@@ -256,15 +241,11 @@ def _handle_long_ref(ref_encoding,
                      seq_encoding,
                      start_radius,
                      end_radius,
-                     reference_sequence,
-                     reverse=True):
+                     reference_sequence):
     ref_len = ref_encoding.shape[0]
     sequence_encoding_at_ref = seq_encoding
-    ref_start = ref_len // 2 - start_radius
-    ref_end = ref_len // 2 + end_radius
-    if not reverse:
-        ref_start -= 1
-        ref_end -= 1
+    ref_start = ref_len // 2 - start_radius - 1
+    ref_end = ref_len // 2 + end_radius - 1
     ref_encoding = ref_encoding[ref_start:ref_end]
     references_match = np.array_equal(
         sequence_encoding_at_ref, ref_encoding)
