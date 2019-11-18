@@ -999,12 +999,16 @@ class AnalyzeSequences(object):
                               "column of the .tsv or the row_labels .txt file".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
             batch_ids.append((chrom, pos, name, ref, alt, strand, match, contains_unk))
-            batch_ref_seqs.append(ref_sequence_encoding)
             if strand == '-':
+                ref_sequence_encoding = get_reverse_complement_encoding(
+                    ref_sequence_encoding,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT,
+                    self.reference_sequence.INDEX_TO_BASE)
                 alt_sequence_encoding = get_reverse_complement_encoding(
                     alt_sequence_encoding,
                     self.reference_sequence.COMPLEMENTARY_BASE_DICT,
                     self.reference_sequence.INDEX_TO_BASE)
+            batch_ref_seqs.append(ref_sequence_encoding)
             batch_alt_seqs.append(alt_sequence_encoding)
 
             if len(batch_ref_seqs) >= self.batch_size:

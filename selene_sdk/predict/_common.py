@@ -62,7 +62,7 @@ def get_reverse_complement_encoding(allele_encoding,
     for i, base_enc in enumerate(allele_encoding):
         base_ix = np.where(base_enc == 1)[0]
         rc_i = len(rc_allele) - 1 - i
-        if not base_ix or len(base_ix) > 1:
+        if len(base_ix) != 1:
             rc_allele[rc_i] = base_enc
         else:
             rc_base = complementary_base_dict[
