@@ -210,7 +210,7 @@ def _process_alt(chrom,
             pos + 1 + ref_len,
             end + math.ceil(ref_len / 2.) - math.ceil(alt_len / 2.),
             pad=True)
-            sequence = lhs + alt + rhs
+        sequence = lhs + alt + rhs
         return reference_sequence.sequence_to_encoding(
             sequence)
 

@@ -15,6 +15,7 @@ import torch.nn as nn
 from ._common import _pad_sequence
 from ._common import _truncate_sequence
 from ._common import get_reverse_complement
+from ._common import get_reverse_complement_encoding
 from ._common import predict
 from ._in_silico_mutagenesis import _ism_sample_id
 from ._in_silico_mutagenesis import in_silico_mutagenesis_sequences
@@ -1001,7 +1002,9 @@ class AnalyzeSequences(object):
             batch_ref_seqs.append(ref_sequence_encoding)
             if strand == '-':
                 alt_sequence_encoding = get_reverse_complement_encoding(
-                    alt_sequence_encoding)
+                    alt_sequence_encoding,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT,
+                    self.reference_sequence.INDEX_TO_BASE)
             batch_alt_seqs.append(alt_sequence_encoding)
 
             if len(batch_ref_seqs) >= self.batch_size:
