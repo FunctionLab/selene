@@ -165,10 +165,10 @@ class AnalyzeSequences(object):
 
         self.sequence_length = sequence_length
 
-        self._start_radius = int(sequence_length / 2)
+        self._start_radius = sequence_length // 2
         self._end_radius = self._start_radius
         if sequence_length % 2 != 0:
-            self._end_radius += 1
+            self._start_radius += 1
 
         self.batch_size = batch_size
         self.features = features

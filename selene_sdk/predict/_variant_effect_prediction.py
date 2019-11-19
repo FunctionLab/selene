@@ -127,10 +127,9 @@ def read_vcf_file(input_path,
 
 def _get_ref_idxs(seq_len, ref_len):
     mid = seq_len // 2
-    if ref_len == 1:
-        start_pos = mid - 1
-    else:
-        start_pos = mid - ref_len // 2 - 1
+    if seq_len % 2 == 0:
+        mid -= 1
+    start_pos = mid - ref_len // 2
     end_pos = start_pos + ref_len
     return (start_pos, end_pos)
 
