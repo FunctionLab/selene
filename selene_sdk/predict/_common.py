@@ -36,8 +36,8 @@ def get_reverse_complement(allele, complementary_base_dict):
 
 
 def get_reverse_complement_encoding(allele_encoding,
-                                    complementary_base_dict,
-                                    index_to_base):
+                                    bases_arr,
+                                    complementary_base_dict):
     """
     Get the reverse complement of the input allele one-hot encoding.
 
@@ -45,10 +45,10 @@ def get_reverse_complement_encoding(allele_encoding,
     ----------
     allele_encoding : numpy.ndarray
         The sequence allele encoding, :math:`L \\times 4`
+    bases_arr : list(str)
+        The base ordering for the one-hot encoding
     complementary_base_dict : dict(str: str)
         The dictionary that maps each base to its complement
-    index_to_base : dict(str: int)
-        The dictionary that maps each index to the base
 
     Returns
     -------
@@ -57,19 +57,10 @@ def get_reverse_complement_encoding(allele_encoding,
         :math:`L \\times 4`.
 
     """
-    base_to_index = {b: ix for (ix, b) in index_to_base.items()}
-    rc_allele = np.zeros(allele_encoding.shape)
-    for i, base_enc in enumerate(allele_encoding):
-        base_ix = np.where(base_enc == 1)[0]
-        rc_i = len(rc_allele) - 1 - i
-        if len(base_ix) != 1:
-            rc_allele[rc_i] = base_enc
-        else:
-            rc_base = complementary_base_dict[
-                index_to_base[base_ix[0]]]
-            rc_base_ix = base_to_index[rc_base]
-            rc_allele[rc_i, rc_base_ix] = 1
-    return rc_allele
+    base_ixs = {b: i for (i, b) in enumerate(bases_arr)}
+    complement_indices = [
+        base_ixs[complementary_base_dict[b]] for b in bases_arr]
+    return allele_encoding[:, complement_indices][::-1, :]
 
 
 def predict(model, batch_sequences, use_cuda=False):
