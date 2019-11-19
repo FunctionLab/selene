@@ -342,6 +342,7 @@
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">_pad_sequence</span>
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">_truncate_sequence</span>
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">get_reverse_complement</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">get_reverse_complement_encoding</span>
 <span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">predict</span>
 <span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">_ism_sample_id</span>
 <span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">in_silico_mutagenesis_sequences</span>
@@ -491,10 +492,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="n">sequence_length</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sequence_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">=</span> <span class="n">sequence_length</span> <span class="o">//</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span>
         <span class="k">if</span> <span class="n">sequence_length</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
@@ -810,7 +811,7 @@
             <span class="p">[</span><span class="s2">&quot;predictions&quot;</span><span class="p">],</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">output_prefix</span><span class="p">),</span>
             <span class="n">output_format</span><span class="p">,</span>
-            <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;contains_unk&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">],</span>
             <span class="n">output_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">fasta_file</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
             <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;prediction&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
@@ -827,7 +828,6 @@
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_sequence</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
                 <span class="n">cur_sequence</span> <span class="o">=</span> <span class="n">_truncate_sequence</span><span class="p">(</span><span class="n">cur_sequence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
 
-            <span class="n">contains_unk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">UNK_BASE</span> <span class="ow">in</span> <span class="n">cur_sequence</span>
             <span class="n">cur_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">)</span>
 
@@ -838,14 +838,9 @@
                 <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
                 <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">contains_unk</span><span class="p">])</span>
+            <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
             <span class="n">sequences</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cur_sequence_encoding</span>
-            <span class="k">if</span> <span class="n">contains_unk</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Sequence (</span><span class="si">{0}</span><span class="s2">,</span><span class="si">{1}</span><span class="s2">) &quot;</span>
-                              <span class="s2">&quot; contains unknown base(s). &quot;</span>
-                              <span class="s2">&quot;--will be marked `True` in the `contains_unk` column &quot;</span>
-                              <span class="s2">&quot;of the .tsv or the row_labels .txt file.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                  <span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span> <span class="p">))</span>
+
         <span class="k">if</span> <span class="p">(</span><span class="n">batch_ids</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
@@ -1283,41 +1278,31 @@
             <span class="n">center</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
             <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span>
             <span class="n">end</span> <span class="o">=</span> <span class="n">center</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span>
-            <span class="n">seq_encoding</span><span class="p">,</span> <span class="n">contains_unk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords_check_unk</span><span class="p">(</span>
-                        <span class="n">chrom</span><span class="p">,</span>
-                        <span class="n">start</span><span class="p">,</span>
-                        <span class="n">end</span><span class="p">,</span>
-                        <span class="n">strand</span><span class="o">=</span><span class="n">strand</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="ow">and</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
-                <span class="n">ref</span> <span class="o">=</span> <span class="n">get_reverse_complement</span><span class="p">(</span>
-                    <span class="n">ref</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">COMPLEMENTARY_BASE_DICT</span><span class="p">)</span>
-                <span class="n">alt</span> <span class="o">=</span> <span class="n">get_reverse_complement</span><span class="p">(</span>
-                    <span class="n">alt</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">COMPLEMENTARY_BASE_DICT</span><span class="p">)</span>
+            <span class="n">ref_sequence_encoding</span><span class="p">,</span> <span class="n">contains_unk</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords_check_unk</span><span class="p">(</span>
+                    <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
             <span class="n">ref_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
-            <span class="n">alt_encoding</span> <span class="o">=</span> <span class="n">_process_alt</span><span class="p">(</span>
-                <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span>
-                <span class="n">seq_encoding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
+            <span class="n">alt_sequence_encoding</span> <span class="o">=</span> <span class="n">_process_alt</span><span class="p">(</span>
+                <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span>
+                <span class="n">ref_sequence_encoding</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
 
             <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
-                <span class="n">match</span><span class="p">,</span> <span class="n">seq_encoding</span><span class="p">,</span> <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="n">_handle_standard_ref</span><span class="p">(</span>
+                <span class="n">match</span><span class="p">,</span> <span class="n">ref_sequence_encoding</span><span class="p">,</span> <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="n">_handle_standard_ref</span><span class="p">(</span>
                     <span class="n">ref_encoding</span><span class="p">,</span>
-                    <span class="n">seq_encoding</span><span class="p">,</span>
+                    <span class="n">ref_sequence_encoding</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span>
-                    <span class="n">strand</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
-                <span class="n">match</span><span class="p">,</span> <span class="n">seq_encoding</span><span class="p">,</span> <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="n">_handle_long_ref</span><span class="p">(</span>
+                <span class="n">match</span><span class="p">,</span> <span class="n">ref_sequence_encoding</span><span class="p">,</span> <span class="n">seq_at_ref</span> <span class="o">=</span> <span class="n">_handle_long_ref</span><span class="p">(</span>
                     <span class="n">ref_encoding</span><span class="p">,</span>
-                    <span class="n">seq_encoding</span><span class="p">,</span>
+                    <span class="n">ref_sequence_encoding</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span>
-                    <span class="n">strand</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">contains_unk</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;For variant (</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2">, </span><span class="si">{4}</span><span class="s2">, </span><span class="si">{5}</span><span class="s2">), &quot;</span>
@@ -1335,8 +1320,17 @@
                               <span class="s2">&quot;column of the .tsv or the row_labels .txt file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                                   <span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="n">seq_at_ref</span><span class="p">))</span>
             <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">chrom</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">alt</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span> <span class="n">match</span><span class="p">,</span> <span class="n">contains_unk</span><span class="p">))</span>
-            <span class="n">batch_ref_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seq_encoding</span><span class="p">)</span>
-            <span class="n">batch_alt_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt_encoding</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">strand</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">ref_sequence_encoding</span> <span class="o">=</span> <span class="n">get_reverse_complement_encoding</span><span class="p">(</span>
+                    <span class="n">ref_sequence_encoding</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">BASES_ARR</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">COMPLEMENTARY_BASE_DICT</span><span class="p">)</span>
+                <span class="n">alt_sequence_encoding</span> <span class="o">=</span> <span class="n">get_reverse_complement_encoding</span><span class="p">(</span>
+                    <span class="n">alt_sequence_encoding</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">BASES_ARR</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">COMPLEMENTARY_BASE_DICT</span><span class="p">)</span>
+            <span class="n">batch_ref_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ref_sequence_encoding</span><span class="p">)</span>
+            <span class="n">batch_alt_seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt_sequence_encoding</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch_ref_seqs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">:</span>
                 <span class="n">_handle_ref_alt_predictions</span><span class="p">(</span>

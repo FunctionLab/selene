@@ -447,8 +447,8 @@
 <span class="nt">    data_parallel</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
 <span class="nt">    logging_verbosity</span><span class="p">:</span> <span class="nv">2</span><span class="p p-Indicator">,</span>
 <span class="nt">    metrics</span><span class="p">:</span> <span class="p p-Indicator">{</span>
-<span class="nt">        roc_auc</span><span class="p">:</span> <span class="kt">!import:sklearn.metrics.roc_auc_score,</span>
-<span class="nt">        average_precision</span><span class="p">:</span> <span class="kt">!import:sklearn.metrics.average_precision_score</span>
+<span class="nt">        roc_auc</span><span class="p">:</span> <span class="kt">!import</span> <span class="nv">sklearn.metrics.roc_auc_score</span><span class="p p-Indicator">,</span>
+<span class="nt">        average_precision</span><span class="p">:</span> <span class="kt">!import</span> <span class="nv">sklearn.metrics.average_precision_score</span>
     <span class="p p-Indicator">},</span>
 <span class="nt">    checkpoint_resume</span><span class="p">:</span> <span class="nv">False</span>    
 <span class="p p-Indicator">}</span>
