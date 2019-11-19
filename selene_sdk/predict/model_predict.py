@@ -15,6 +15,7 @@ import torch.nn as nn
 from ._common import _pad_sequence
 from ._common import _truncate_sequence
 from ._common import get_reverse_complement
+from ._common import get_reverse_complement_encoding
 from ._common import predict
 from ._in_silico_mutagenesis import _ism_sample_id
 from ._in_silico_mutagenesis import in_silico_mutagenesis_sequences
@@ -164,10 +165,10 @@ class AnalyzeSequences(object):
 
         self.sequence_length = sequence_length
 
-        self._start_radius = int(sequence_length / 2)
+        self._start_radius = sequence_length // 2
         self._end_radius = self._start_radius
         if sequence_length % 2 != 0:
-            self._end_radius += 1
+            self._start_radius += 1
 
         self.batch_size = batch_size
         self.features = features
@@ -483,7 +484,7 @@ class AnalyzeSequences(object):
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
-            ["index", "name", "contains_unk"],
+            ["index", "name"],
             output_size=len(fasta_file.keys()),
             mode="prediction")[0]
         sequences = np.zeros((self.batch_size,
@@ -500,7 +501,6 @@ class AnalyzeSequences(object):
             elif len(cur_sequence) > self.sequence_length:
                 cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
 
-            contains_unk = self.reference_sequence.UNK_BASE in cur_sequence
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
@@ -511,14 +511,9 @@ class AnalyzeSequences(object):
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
-            batch_ids.append([i, fasta_record.name, contains_unk])
+            batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
-            if contains_unk:
-                warnings.warn("Sequence ({0},{1}) "
-                              " contains unknown base(s). "
-                              "--will be marked `True` in the `contains_unk` column "
-                              "of the .tsv or the row_labels .txt file.".format(
-                                  i, fasta_record.name ))
+
         if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
@@ -956,41 +951,31 @@ class AnalyzeSequences(object):
             center = pos + len(ref) // 2
             start = center - self._start_radius
             end = center + self._end_radius
-            seq_encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
-                        chrom,
-                        start,
-                        end,
-                        strand=strand)
-            if len(ref) and strand == '-':
-                ref = get_reverse_complement(
-                    ref,
-                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
-                alt = get_reverse_complement(
-                    alt,
-                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+            ref_sequence_encoding, contains_unk = \
+                self.reference_sequence.get_encoding_from_coords_check_unk(
+                    chrom, start, end)
 
             ref_encoding = self.reference_sequence.sequence_to_encoding(ref)
-            alt_encoding = _process_alt(
-                chrom, pos, ref, alt, start, end, strand,
-                seq_encoding, self.reference_sequence)
+            alt_sequence_encoding = _process_alt(
+                chrom, pos, ref, alt, start, end,
+                ref_sequence_encoding,
+                self.reference_sequence)
 
             match = True
             seq_at_ref = None
             if len(ref) and len(ref) < self.sequence_length:
-                match, seq_encoding, seq_at_ref = _handle_standard_ref(
+                match, ref_sequence_encoding, seq_at_ref = _handle_standard_ref(
                     ref_encoding,
-                    seq_encoding,
+                    ref_sequence_encoding,
                     self.sequence_length,
-                    self.reference_sequence,
-                    strand)
+                    self.reference_sequence)
             elif len(ref) >= self.sequence_length:
-                match, seq_encoding, seq_at_ref = _handle_long_ref(
+                match, ref_sequence_encoding, seq_at_ref = _handle_long_ref(
                     ref_encoding,
-                    seq_encoding,
+                    ref_sequence_encoding,
                     self._start_radius,
                     self._end_radius,
-                    self.reference_sequence,
-                    strand)
+                    self.reference_sequence)
 
             if contains_unk:
                 warnings.warn("For variant ({0}, {1}, {2}, {3}, {4}, {5}), "
@@ -1008,8 +993,17 @@ class AnalyzeSequences(object):
                               "column of the .tsv or the row_labels .txt file".format(
                                   chrom, pos, name, ref, alt, strand, seq_at_ref))
             batch_ids.append((chrom, pos, name, ref, alt, strand, match, contains_unk))
-            batch_ref_seqs.append(seq_encoding)
-            batch_alt_seqs.append(alt_encoding)
+            if strand == '-':
+                ref_sequence_encoding = get_reverse_complement_encoding(
+                    ref_sequence_encoding,
+                    self.reference_sequence.BASES_ARR,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+                alt_sequence_encoding = get_reverse_complement_encoding(
+                    alt_sequence_encoding,
+                    self.reference_sequence.BASES_ARR,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
+            batch_ref_seqs.append(ref_sequence_encoding)
+            batch_alt_seqs.append(alt_sequence_encoding)
 
             if len(batch_ref_seqs) >= self.batch_size:
                 _handle_ref_alt_predictions(

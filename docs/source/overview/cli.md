@@ -112,8 +112,8 @@ train_model: !obj:selene_sdk.TrainModel {
     data_parallel: True,
     logging_verbosity: 2,
     metrics: {
-        roc_auc: !import:sklearn.metrics.roc_auc_score,
-        average_precision: !import:sklearn.metrics.average_precision_score
+        roc_auc: !import sklearn.metrics.roc_auc_score,
+        average_precision: !import sklearn.metrics.average_precision_score
     },
     checkpoint_resume: False    
 }
