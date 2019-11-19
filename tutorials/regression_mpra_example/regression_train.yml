@@ -41,7 +41,7 @@ train_model: !obj:selene_sdk.TrainModel {
     data_parallel: False,
     logging_verbosity: 2,
     metrics: {
-        r2: !import:sklearn.metrics.r2_score
+        r2: !import sklearn.metrics.r2_score
     }
 }
 output_dir: ./
