@@ -484,7 +484,7 @@ class AnalyzeSequences(object):
             ["predictions"],
             os.path.join(output_dir, output_prefix),
             output_format,
-            ["index", "name", "contains_unk"],
+            ["index", "name"],
             output_size=len(fasta_file.keys()),
             mode="prediction")[0]
         sequences = np.zeros((self.batch_size,
@@ -501,7 +501,6 @@ class AnalyzeSequences(object):
             elif len(cur_sequence) > self.sequence_length:
                 cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
 
-            contains_unk = self.reference_sequence.UNK_BASE in cur_sequence
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
@@ -512,14 +511,9 @@ class AnalyzeSequences(object):
                 reporter.handle_batch_predictions(preds, batch_ids)
                 batch_ids = []
 
-            batch_ids.append([i, fasta_record.name, contains_unk])
+            batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
-            if contains_unk:
-                warnings.warn("Sequence ({0},{1}) "
-                              " contains unknown base(s). "
-                              "--will be marked `True` in the `contains_unk` column "
-                              "of the .tsv or the row_labels .txt file.".format(
-                                  i, fasta_record.name ))
+
         if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
             preds = predict(self.model, sequences, use_cuda=self.use_cuda)
@@ -1002,12 +996,12 @@ class AnalyzeSequences(object):
             if strand == '-':
                 ref_sequence_encoding = get_reverse_complement_encoding(
                     ref_sequence_encoding,
-                    self.reference_sequence.COMPLEMENTARY_BASE_DICT,
-                    self.reference_sequence.INDEX_TO_BASE)
+                    self.reference_sequence.BASES_ARR,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
                 alt_sequence_encoding = get_reverse_complement_encoding(
                     alt_sequence_encoding,
-                    self.reference_sequence.COMPLEMENTARY_BASE_DICT,
-                    self.reference_sequence.INDEX_TO_BASE)
+                    self.reference_sequence.BASES_ARR,
+                    self.reference_sequence.COMPLEMENTARY_BASE_DICT)
             batch_ref_seqs.append(ref_sequence_encoding)
             batch_alt_seqs.append(alt_sequence_encoding)
 
