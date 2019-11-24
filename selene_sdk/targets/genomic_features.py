@@ -363,13 +363,13 @@ class GenomicFeatures(Target):
 
         """
         if self._feature_thresholds_vec is None:
-            features = np.zeros((end - start))
+            features = np.zeros(self.n_features)
             rows = self._query_tabix(chrom, start, end)
             if not rows:
                 return features
             for r in rows:
                 feature = r[3]
-                ix = self.feature_index_map[feature]
+                ix = self.feature_index_dict[feature]
                 features[ix] = 1
             return features
         return _get_feature_data(
