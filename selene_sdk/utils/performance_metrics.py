@@ -249,20 +249,26 @@ def get_feature_specific_scores(data, get_feature_from_index_fn):
 
 def auc_u_test(labels, predictions):
 
-    """ Outputs the area under the the ROC curve associated with a certain 
+    """
+    Outputs the area under the the ROC curve associated with a certain 
     set of labels and the predictions given by the training model.
+    Computed from the U statistic.
 
     Parameters
     ----------
     labels: numpy.ndarray
-    Known labels of values predicted by model.
-
+        Known labels of values predicted by model.
+        Must be one dimensional.
     predictions: numpy.ndarray
-    Value predicted by user model
+        Value predicted by user model
+        Must be one dimensional, with matching
+        dimension to `labels`
 
-    Returns:
-    numpy.float64
-    AUC value of given label, prediction pairs  
+    Returns
+    -------
+    float64
+        AUC value of given label, prediction pairs  
+   
     """
     len_pos = int(np.sum(labels))
     len_neg = len(labels) - len_pos
@@ -270,6 +276,7 @@ def auc_u_test(labels, predictions):
     u_value = rank_sum - (len_pos * (len_pos + 1)) / 2
     auc = u_value / (len_pos * len_neg)
     return auc
+
 
 class PerformanceMetrics(object):
     """
