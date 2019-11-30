@@ -13,6 +13,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 from scipy.stats import rankdata
 
+
 logger = logging.getLogger("selene")
 
 
@@ -248,7 +249,6 @@ def get_feature_specific_scores(data, get_feature_from_index_fn):
 
 
 def auc_u_test(labels, predictions):
-
     """
     Outputs the area under the the ROC curve associated with a certain 
     set of labels and the predictions given by the training model.
@@ -257,16 +257,14 @@ def auc_u_test(labels, predictions):
     Parameters
     ----------
     labels: numpy.ndarray
-        Known labels of values predicted by model.
-        Must be one dimensional.
+        Known labels of values predicted by model. Must be one dimensional.
     predictions: numpy.ndarray
-        Value predicted by user model
-        Must be one dimensional, with matching
+        Value predicted by user model. Must be one dimensional, with matching
         dimension to `labels`
 
     Returns
     -------
-    float64
+    float
         AUC value of given label, prediction pairs  
    
     """
