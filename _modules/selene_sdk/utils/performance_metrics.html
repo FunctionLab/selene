@@ -338,6 +338,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">precision_recall_curve</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_auc_score</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">roc_curve</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="k">import</span> <span class="n">rankdata</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;selene&quot;</span><span class="p">)</span>
@@ -572,6 +573,34 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">feature_score_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">feature_score_dict</span>
+
+
+<span class="k">def</span> <span class="nf">auc_u_test</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Outputs the area under the the ROC curve associated with a certain </span>
+<span class="sd">    set of labels and the predictions given by the training model.</span>
+<span class="sd">    Computed from the U statistic.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels: numpy.ndarray</span>
+<span class="sd">        Known labels of values predicted by model. Must be one dimensional.</span>
+<span class="sd">    predictions: numpy.ndarray</span>
+<span class="sd">        Value predicted by user model. Must be one dimensional, with matching</span>
+<span class="sd">        dimension to `labels`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        AUC value of given label, prediction pairs  </span>
+<span class="sd">   </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">len_pos</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span>
+    <span class="n">len_neg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">-</span> <span class="n">len_pos</span>
+    <span class="n">rank_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rankdata</span><span class="p">(</span><span class="n">predictions</span><span class="p">)[</span><span class="n">labels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">u_value</span> <span class="o">=</span> <span class="n">rank_sum</span> <span class="o">-</span> <span class="p">(</span><span class="n">len_pos</span> <span class="o">*</span> <span class="p">(</span><span class="n">len_pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">auc</span> <span class="o">=</span> <span class="n">u_value</span> <span class="o">/</span> <span class="p">(</span><span class="n">len_pos</span> <span class="o">*</span> <span class="n">len_neg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">auc</span>
 
 
 <div class="viewcode-block" id="PerformanceMetrics"><a class="viewcode-back" href="../../../utils.html#selene_sdk.utils.PerformanceMetrics">[docs]</a><span class="k">class</span> <span class="nc">PerformanceMetrics</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
