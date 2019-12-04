@@ -247,62 +247,85 @@ class TrainModel(object):
             os.path.join(self.output_dir, "{0}.log".format(__name__)),
             verbosity=logging_verbosity)
 
-        self._create_validation_set(n_samples=n_validation_samples)
-        self._validation_metrics = PerformanceMetrics(
-            self.sampler.get_feature_from_index,
-            report_gt_feature_n_positives=report_gt_feature_n_positives,
-            metrics=metrics)
+        self.report_gt_feature_n_positives = report_gt_feature_n_positives
+        self.metrics = metrics
+        self.n_validation_samples = n_validation_samples
+        self.n_test_samples = n_test_samples
+        self.use_scheduler = use_scheduler
 
+        self.init_train()
+        self.init_validate()
         if "test" in self.sampler.modes:
-            self._test_data = None
-            self._n_test_samples = n_test_samples
-            self._test_metrics = PerformanceMetrics(
-                self.sampler.get_feature_from_index,
-                report_gt_feature_n_positives=report_gt_feature_n_positives,
-                metrics=metrics)
-
-        self._start_step = 0
-        self._min_loss = float("inf") # TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.
+            self.init_test()
         if checkpoint_resume is not None:
-            checkpoint = torch.load(
-                checkpoint_resume,
-                map_location=lambda storage, location: storage)
-            if "state_dict" not in checkpoint:
-                raise ValueError("Selene does not support continued "
-                    "training of models that were not originally "
-                    "trained using Selene.")
+            self.load_checkpoint(checkpoint_resume)
 
-            self.model = load_model_from_state_dict(
-                checkpoint["state_dict"], self.model)
+    def load_checkpoint(self, checkpoint_resume):
+        checkpoint = torch.load(
+            checkpoint_resume,
+            map_location=lambda storage, location: storage)
+        if "state_dict" not in checkpoint:
+            raise ValueError("Selene does not support continued "
+                "training of models that were not originally "
+                "trained using Selene.")
 
-            self._start_step = checkpoint["step"]
-            if self._start_step >= self.max_steps:
-                self.max_steps += self._start_step
+        self.model = load_model_from_state_dict(
+            checkpoint["state_dict"], self.model)
 
-            self._min_loss = checkpoint["min_loss"]
-            self.optimizer.load_state_dict(
-                checkpoint["optimizer"])
-            if self.use_cuda:
-                for state in self.optimizer.state.values():
-                    for k, v in state.items():
-                        if isinstance(v, torch.Tensor):
-                            state[k] = v.cuda()
+        self._start_step = checkpoint["step"]
+        if self._start_step >= self.max_steps:
+            self.max_steps += self._start_step
 
-            logger.info(
-                ("Resuming from checkpoint: step {0}, min loss {1}").format(
-                    self._start_step, self._min_loss))
+        self._min_loss = checkpoint["min_loss"]
+        self.optimizer.load_state_dict(
+            checkpoint["optimizer"])
+        if self.use_cuda:
+            for state in self.optimizer.state.values():
+                for k, v in state.items():
+                    if isinstance(v, torch.Tensor):
+                        state[k] = v.cuda()
 
+        logger.info(
+            ("Resuming from checkpoint: step {0}, min loss {1}").format(
+                self._start_step, self._min_loss))
+                
+    def init_train(self):
+        self._start_step = 0
         self._train_logger = _metrics_logger(
                 "{0}.train".format(__name__), self.output_dir)
+        self._train_logger.info("loss")
+        if self.use_scheduler:
+            self.scheduler = ReduceLROnPlateau(
+                self.optimizer,
+                'min',
+                patience=16,
+                verbose=True,
+                factor=0.8)
+        self._train_iterator = iter(self.sampler._samplers["train"]) #FIXME
+        self.time_per_step = []
+        self.train_loss = []
+
+    def init_validate(self):
+        self._min_loss = float("inf") # TODO: Should this be set when it is used later? Would need to if we want to train model 2x in one run.
+        self._create_validation_set(n_samples=self.n_validation_samples)
+        self._validation_metrics = PerformanceMetrics(
+            self.sampler.get_feature_from_index,
+            report_gt_feature_n_positives=self.report_gt_feature_n_positives,
+            metrics=self.metrics)
         self._validation_logger = _metrics_logger(
                 "{0}.validation".format(__name__), self.output_dir)
 
-        self._train_logger.info("loss")
         self._validation_logger.info("\t".join(["loss"] +
             sorted([x for x in self._validation_metrics.metrics.keys()])))
 
-        self.use_scheduler = use_scheduler
-        
+    def init_test(self):
+        self._test_data = None
+        self._n_test_samples = self.n_test_samples
+        self._test_metrics = PerformanceMetrics(
+            self.sampler.get_feature_from_index,
+            report_gt_feature_n_positives=self.report_gt_feature_n_positives,
+            metrics=self.metrics)
+
     def _create_validation_set(self, n_samples=None):
         """
         Generates the set of validation examples.
@@ -370,81 +393,45 @@ class TrainModel(object):
                  t_f_sampling - t_i_sampling))
         return (batch_sequences, batch_targets)
 
+    def checkpoint(self):
+        checkpoint_dict = {
+            "step": self.step,
+            "arch": self.model.__class__.__name__,
+            "state_dict": self.model.state_dict(),
+            "min_loss": self._min_loss,
+            "optimizer": self.optimizer.state_dict()
+        }
+        if self.save_new_checkpoints is not None and \
+                self.save_new_checkpoints >= step:
+            checkpoint_filename = "checkpoint-{0}".format(
+                strftime("%m%d%H%M%S"))
+            self._save_checkpoint(
+                checkpoint_dict, False, filename=checkpoint_filename)
+            logger.debug("Saving checkpoint `{0}.pth.tar`".format(
+                checkpoint_filename))
+        else:
+            self._save_checkpoint(
+                checkpoint_dict, False)
+    
     def train_and_validate(self):
         """
         Trains the model and measures validation performance.
 
         """
-        min_loss = self._min_loss
-        if self.use_scheduler:
-            scheduler = ReduceLROnPlateau(
-                self.optimizer,
-                'min',
-                patience=16,
-                verbose=True,
-                factor=0.8)
 
-        time_per_step = []
+
         for step in range(self._start_step, self.max_steps):
-            t_i = time()
-            train_loss = self.train()
-            t_f = time()
-            time_per_step.append(t_f - t_i)
+            self.step = step
+            self.train()
 
             if step % self.nth_step_save_checkpoint == 0:
-                checkpoint_dict = {
-                    "step": step,
-                    "arch": self.model.__class__.__name__,
-                    "state_dict": self.model.state_dict(),
-                    "min_loss": min_loss,
-                    "optimizer": self.optimizer.state_dict()
-                }
-                if self.save_new_checkpoints is not None and \
-                        self.save_new_checkpoints >= step:
-                    checkpoint_filename = "checkpoint-{0}".format(
-                        strftime("%m%d%H%M%S"))
-                    self._save_checkpoint(
-                        checkpoint_dict, False, filename=checkpoint_filename)
-                    logger.debug("Saving checkpoint `{0}.pth.tar`".format(
-                        checkpoint_filename))
-                else:
-                    self._save_checkpoint(
-                        checkpoint_dict, False)
+                self.checkpoint()
+            if self.step and self.step % self.nth_step_report_stats == 0:
+                self.validate()
 
-            # TODO: Should we have some way to report training stats without running validation?
-            if step and step % self.nth_step_report_stats == 0:
-                logger.info(("[STEP {0}] average number "
-                             "of steps per second: {1:.1f}").format(
-                    step, 1. / np.average(time_per_step)))
-                time_per_step = []
-                valid_scores = self.validate()
-                validation_loss = valid_scores["loss"]
-                self._train_logger.info(train_loss)
-                to_log = [str(validation_loss)]
-                for k in sorted(self._validation_metrics.metrics.keys()):
-                    if k in valid_scores and valid_scores[k]:
-                        to_log.append(str(valid_scores[k]))
-                    else:
-                        to_log.append("NA")
-                self._validation_logger.info("\t".join(to_log))
-                if self.use_scheduler:
-                    scheduler.step(math.ceil(validation_loss * 1000.0) / 1000.0)
+        #We cannot actually support saving training set right?
+        #self.sampler.save_dataset_to_file("train", close_filehandle=True) 
 
-                if validation_loss < min_loss:
-                    min_loss = validation_loss
-                    self._save_checkpoint({
-                        "step": step,
-                        "arch": self.model.__class__.__name__,
-                        "state_dict": self.model.state_dict(),
-                        "min_loss": min_loss,
-                        "optimizer": self.optimizer.state_dict()}, True)
-                    logger.debug("Updating `best_model.pth.tar`")
-                logger.info("training loss: {0}".format(train_loss))
-                logger.info("validation loss: {0}".format(validation_loss))
-
-                # Logging training and validation on same line requires 2 parsers or more complex parser.
-                # Separate logging of train/validate is just a grep for validation/train and then same parser.
-        self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
     def train(self):
         """
@@ -456,10 +443,12 @@ class TrainModel(object):
             The training loss.
 
         """
+        t_i = time()
         self.model.train()
         self.sampler.set_mode("train")
 
-        inputs, targets = self._get_batch()
+        
+        inputs, targets = next(self._train_iterator) #TODO: change this
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
 
@@ -476,8 +465,19 @@ class TrainModel(object):
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+        self.train_loss.append(loss.item())
+        t_f = time()
+        
+        self.time_per_step.append(t_f - t_i)
+        if self.step and self.step % self.nth_step_report_stats == 0:
+            logger.info(("[STEP {0}] average number "
+                         "of steps per second: {1:.1f}").format(
+                self.step, 1. / np.average(self.time_per_step)))
+            self._train_logger.info(np.average(self.train_loss))
+            logger.info("training loss: {0}".format(np.average(self.train_loss)))
+            self.time_per_step = []
+            self.train_loss = []
 
-        return loss.item()
 
     def _evaluate_on_data(self, data_in_batches):
         """
@@ -534,15 +534,38 @@ class TrainModel(object):
             the validation set.
 
         """
-        average_loss, all_predictions = self._evaluate_on_data(
+        validation_loss, all_predictions = self._evaluate_on_data(
             self._validation_data)
-        average_scores = self._validation_metrics.update(all_predictions,
+        valid_scores = self._validation_metrics.update(all_predictions,
                                                          self._all_validation_targets)
-        for name, score in average_scores.items():
+        for name, score in valid_scores.items():
             logger.info("validation {0}: {1}".format(name, score))
 
-        average_scores["loss"] = average_loss
-        return average_scores
+        valid_scores["loss"] = validation_loss
+        
+        to_log = [str(validation_loss)]
+        for k in sorted(self._validation_metrics.metrics.keys()):
+            if k in valid_scores and valid_scores[k]:
+                to_log.append(str(valid_scores[k]))
+            else:
+                to_log.append("NA")
+        self._validation_logger.info("\t".join(to_log))
+
+        #scheduler update
+        if self.use_scheduler:
+            self.scheduler.step(math.ceil(self.validation_loss * 1000.0) / 1000.0)
+
+        #save best_model
+        if validation_loss < self._min_loss:
+            self._min_loss = validation_loss
+            self._save_checkpoint({
+                "step": self.step,
+                "arch": self.model.__class__.__name__,
+                "state_dict": self.model.state_dict(),
+                "min_loss": self._min_loss,
+                "optimizer": self.optimizer.state_dict()}, True)
+            logger.debug("Updating `best_model.pth.tar`")
+        logger.info("validation loss: {0}".format(validation_loss))
 
     def evaluate(self):
         """
