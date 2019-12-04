@@ -257,17 +257,19 @@ class RandomPositionsSampler(OnlineSampler):
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)
+
         if retrieved_seq.shape[0] == 0:
             logger.info("Full sequence centered at {0} position {1} "
                         "could not be retrieved. Sampling again.".format(
                             chrom, position))
             return None
-        elif np.sum(retrieved_seq) / float(retrieved_seq.shape[0]) < 0.60:
+        elif np.mean(retrieved_seq==0.25) >0.30: 
             logger.info("Over 30% of the bases in the sequence centered "
                         "at {0} position {1} are ambiguous ('N'). "
                         "Sampling again.".format(chrom, position))
             return None
 
+        #TODO: is this ok to remove now?
         if retrieved_seq.shape[0] < self.sequence_length:
             # TODO: remove after investigating this bug.
             print("Warning: sequence retrieved for {0}, {1}, {2}, {3} "
