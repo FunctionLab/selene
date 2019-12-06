@@ -375,7 +375,7 @@ class IntervalsSampler(OnlineSampler):
             p=self._sample_from_mode[mode].weights)
         self._randcache[mode]["sample_next"] = 0
 
-    def sample(self, batch_size=1):
+    def sample(self, batch_size=1, mode=None):
         """
         Randomly draws a mini-batch of examples and their corresponding
         labels.
@@ -385,7 +385,10 @@ class IntervalsSampler(OnlineSampler):
         batch_size : int, optional
             Default is 1. The number of examples to include in the
             mini-batch.
-
+        mode : str, optional
+            Default is None. The operating mode that the object should run in.
+            If None, will use the current mode `self.mode`.
+            
         Returns
         -------
         sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
@@ -399,18 +402,19 @@ class IntervalsSampler(OnlineSampler):
             where :math:`F` is the number of features.
 
         """
+        mode = mode if mode else self.mode
         sequences = np.zeros((batch_size, self.sequence_length, 4))
         targets = np.zeros((batch_size, self.n_features))
         n_samples_drawn = 0
         while n_samples_drawn < batch_size:
-            sample_index = self._randcache[self.mode]["sample_next"]
-            if sample_index == len(self._sample_from_mode[self.mode].indices):
+            sample_index = self._randcache[mode]["sample_next"]
+            if sample_index == len(self._sample_from_mode[mode].indices):
                 self._update_randcache()
                 sample_index = 0
 
             rand_interval_index = \
-                self._randcache[self.mode]["cache_indices"][sample_index]
-            self._randcache[self.mode]["sample_next"] += 1
+                self._randcache[mode]["cache_indices"][sample_index]
+            self._randcache[mode]["sample_next"] += 1
 
             interval_info = self.sample_from_intervals[rand_interval_index]
             interval_length = self.interval_lengths[rand_interval_index]

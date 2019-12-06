@@ -3,27 +3,39 @@ This module provides the `MultiFileSampler` class, which uses a
 FileSampler for each mode of sampling (train, test, validation).
 The MultiFileSampler is therefore a subclass of Sampler.
 """
+from torch.utils.data import DataLoader
 
 from .sampler import Sampler
-
+from .dataloader import SamplerDataLoader
 
 class MultiFileSampler(Sampler):
     """
-    This sampler contains individual file samplers for each mode.
-    The file samplers parse .bed/.mat files that correspond to
-    training, validation, and testing and MultiFileSampler calls on
-    the correct file sampler to draw samples for a given mode.
+    This sampler draws samples from individual file samplers or data loaders 
+    that corresponds to training, validation, and testing (optional) modes. 
+    MultiFileSampler calls on the correct file sampler to draw samples 
+    for a given mode. 
 
-    Attributes
+    MultiFileSampler can use either file samplers or data loaders for 
+    different modes. Using data loaders for some mode while using file samplers
+    for other modes are also allowed. The file samplers parse data files 
+    (e.g. bed, mat, or hdf5) to provide samples. The data loaders can provide
+    multi-worker iterators that draw samples from a sampler or a file sampler. 
+    As data loaders support parallel sampling, they are generally recommended 
+    for sampling speed.
+    
+    Parameters
     ----------
-    train_sampler : selene_sdk.samplers.file_samplers.FileSampler
+    train_sampler : selene_sdk.samplers.file_samplers.FileSampler or
+        selene_sdk.samplers.dataloaders.SamplerDataLoader
         Load your training data as a `FileSampler` before passing it
         into the `MultiFileSampler` constructor.
-    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler
+    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler or
+        selene_sdk.samplers.dataloaders.SamplerDataLoader
         The validation dataset file sampler.
     features : list(str)
         The list of features the model should predict
-    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional
+    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler or
+            selene_sdk.samplers.dataloaders.SamplerDataLoader, optional
         Default is None. The test file sampler is optional.
     mode : str, optional
         Default is "train". Must be one of `{train, validate, test}`. The
@@ -63,20 +75,35 @@ class MultiFileSampler(Sampler):
             output_dir=output_dir)
 
         self._samplers = {
-            "train": train_sampler,
-            "validate": validate_sampler
+            "train": train_sampler if isinstance(train_sampler, Sampler) else None,
+            "validate": validate_sampler if isinstance(validate_sampler, Sampler) else None
         }
 
+        self._dataloaders = {
+            "train": train_sampler if isinstance(train_sampler, DataLoader) else None,
+            "validate": validate_sampler if isinstance(validate_sampler, DataLoader) else None
+        }
+
+        self._iterators = {
+            "train": iter(self._dataloaders["train"]) \
+                if self._dataloaders["train"] else None,
+            "validate": iter(self._dataloaders["validate"]) \
+                if self._dataloaders["validate"] else None
+        }
+        
         self._index_to_feature = {
             i: f for (i, f) in enumerate(features)
         }
 
         if test_sampler is not None:
             self.modes.append("test")
-            self._samplers["test"] = test_sampler
+            self._samplers["test"] = \
+                test_sampler if isinstance(test_sampler, Sampler) else None
+            self._dataloaders["test"] = \
+                test_sampler if isinstance(test_sampler, DataLoader) else None
 
         self.mode = mode
-
+        
     def set_mode(self, mode):
         """
         Sets the sampling mode.
@@ -100,6 +127,28 @@ class MultiFileSampler(Sampler):
                 "{1}".format(mode, self.modes))
         self.mode = mode
 
+    def set_batch_size(self, batch_size, mode=None):
+        """
+        Sets the batch size for DataLoader for the specified mode,
+        if the specified  batch_size does not equal the current batch_size.
+        
+        Parameters
+        ----------
+        batch_size : int
+            The batch size for the mode.
+        mode : str, optional
+            Default is None. The  mode to set batch_size
+            If None, will use the current mode `self.mode`.
+        """
+        if mode is None:
+            mode = self.mode
+        if  self._dataloaders[mode].batch_size != batch_size:
+            self._dataloaders[mode] = SamplerDataLoader(
+                self._dataloaders[mode].dataset,
+                num_workers=self._dataloaders[mode].num_workers,
+                batch_size = batch_size)
+            self._iterators[mode] = iter(self._dataloaders[mode])
+
     def get_feature_from_index(self, index):
         """
         Returns the feature corresponding to an index in the feature
@@ -118,7 +167,7 @@ class MultiFileSampler(Sampler):
         """
         return self._index_to_feature[index]
 
-    def sample(self, batch_size=1):
+    def sample(self, batch_size=1, mode=None):
         """
         Fetches a mini-batch of the data from the sampler.
 
@@ -126,9 +175,23 @@ class MultiFileSampler(Sampler):
         ----------
         batch_size : int, optional
             Default is 1. The size of the batch to retrieve.
-
+        mode : str, optional
+            Default is None. The operating mode that the object should run in.
+            If None, will use the current mode `self.mode`.
         """
-        return self._samplers[self.mode].sample(batch_size)
+        mode = mode if mode else self.mode
+        if self._samplers[mode]:
+            return self._samplers[mode].sample(batch_size)
+        else:
+            self.set_batch_size(batch_size)
+            try:
+                data, targets = next(self._iterators[mode])
+                return data.numpy(), targets.numpy()
+            except StopIteration:
+                #If SamplerDataLoader iterator reaches sys.maxsize, reinitialize
+                self._iterators[mode] = iter(self._dataloaders[mode])
+                data, targets = next(self._iterators[mode])
+                return data.numpy(), targets.numpy()
 
     def get_data_and_targets(self, batch_size, n_samples, mode=None):
         """
@@ -144,15 +207,29 @@ class MultiFileSampler(Sampler):
         n_samples : int
             The total number of samples to retrieve.
         mode : str, optional
-            Default is None. The operating mode that the sampler
-            should run in. If None, will use the current
-            `self.mode`.
-
+            Default is None. The operating mode that the object should run in.
+            If None, will use the current mode `self.mode`.
         """
-        mode = self.mode
-        return self._samplers[mode].get_data_and_targets(
-            batch_size, n_samples)
-
+        if self._samplers[mode if mode else self.mode]:
+            return self._samplers[mode if mode else self.mode].get_data_and_targets(
+                batch_size, n_samples)
+        else:
+            self.set_batch_size(batch_size, mode=mode)
+            data_and_targets = []
+            targets_mat = []
+            count = batch_size
+            while count < n_samples:
+                data, tgts = self.sample(batch_size=batch_size, mode=mode)
+                data_and_targets.append((data, tgts))
+                targets_mat.append(tgts)
+                count += batch_size
+            remainder = batch_size - (count - n_samples)
+            data, tgts = self.sample(batch_size=remainder)
+            data_and_targets.append((data, tgts))
+            targets_mat.append(tgts)
+            targets_mat = np.vstack(targets_mat)
+            return data_and_targets, targets_mat
+        
     def get_validation_set(self, batch_size, n_samples=None):
         """
         This method returns a subset of validation data from the
@@ -168,8 +245,8 @@ class MultiFileSampler(Sampler):
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
         """
-        return self._samplers["validate"].get_data_and_targets(
-            batch_size, n_samples)
+        return self.get_data_and_targets(
+            batch_size, n_samples, mode="validate")
 
     def get_test_set(self, batch_size, n_samples=None):
         """
@@ -205,8 +282,8 @@ class MultiFileSampler(Sampler):
             If no test partition of the data was specified during
             sampler initialization.
         """
-        return self._samplers["test"].get_data_and_targets(
-            batch_size, n_samples)
+        return self.get_data_and_targets(
+            batch_size, n_samples, mode="test")
 
     def save_dataset_to_file(self, mode, close_filehandle=False):
         """

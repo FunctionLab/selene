@@ -301,7 +301,6 @@ class TrainModel(object):
                 patience=16,
                 verbose=True,
                 factor=0.8)
-        self._train_iterator = iter(self.sampler._samplers["train"]) #FIXME
         self.time_per_step = []
         self.train_loss = []
 
@@ -402,7 +401,7 @@ class TrainModel(object):
             "optimizer": self.optimizer.state_dict()
         }
         if self.save_new_checkpoints is not None and \
-                self.save_new_checkpoints >= step:
+                self.save_new_checkpoints >= self.step:
             checkpoint_filename = "checkpoint-{0}".format(
                 strftime("%m%d%H%M%S"))
             self._save_checkpoint(
@@ -418,8 +417,6 @@ class TrainModel(object):
         Trains the model and measures validation performance.
 
         """
-
-
         for step in range(self._start_step, self.max_steps):
             self.step = step
             self.train()
@@ -448,7 +445,7 @@ class TrainModel(object):
         self.sampler.set_mode("train")
 
         
-        inputs, targets = next(self._train_iterator) #TODO: change this
+        inputs, targets = self._get_batch()
         inputs = torch.Tensor(inputs)
         targets = torch.Tensor(targets)
 
