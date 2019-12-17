@@ -696,12 +696,14 @@
 </div>
 <div class="section" id="in-silico-mutagenesis">
 <h3><em>In silico</em> mutagenesis<a class="headerlink" href="#in-silico-mutagenesis" title="Permalink to this headline">¶</a></h3>
-<p>An example configuration for <em>in silico</em> mutagenesis when using a single sequence as input:</p>
+<p>An example configuration for <em>in silico</em> mutagenesis of the whole sequence (i.e. rather than a subsequence), when using a single sequence as input:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">in_silico_mutagenesis</span><span class="p">:</span> <span class="p p-Indicator">{</span>
 <span class="nt">    input_sequence</span><span class="p">:</span> <span class="nv">ATCGATAAAATTCTGGAG...</span><span class="p p-Indicator">,</span>
 <span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">predictions</span><span class="p p-Indicator">,</span> <span class="nv">diffs</span><span class="p p-Indicator">],</span>
 <span class="nt">    output_path_prefix</span><span class="p">:</span> <span class="nv">/path/to/output/dir/filename_prefix</span><span class="p p-Indicator">,</span>
-<span class="nt">    mutate_n_bases</span><span class="p">:</span> <span class="nv">1</span>
+<span class="nt">    mutate_n_bases</span><span class="p">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
+<span class="nt">    start_position</span><span class="p">:</span> <span class="nv">0</span><span class="p p-Indicator">,</span>
+<span class="nt">    end_position</span><span class="p">:</span> <span class="nv">None</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -712,14 +714,18 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">save_data</span></code>: A list of the data files to output. Must input 1 or more of the following options: <code class="docutils literal notranslate"><span class="pre">[abs_diffs,</span> <span class="pre">diffs,</span> <span class="pre">logits,</span> <span class="pre">predictions]</span></code>. (Note that the raw prediction values will not be outputted by default—you must specify <code class="docutils literal notranslate"><span class="pre">predictions</span></code> in the list if you want them.)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">output_path_prefix</span></code>: Optional, default is “ism”. The path to which the data files are written. We have specified that it should be a filename <em>prefix</em> because we will append additional information depending on what files you would like to output (e.g. <code class="docutils literal notranslate"><span class="pre">fileprefix_logits.tsv</span></code>) If directories in the path do not yet exist, they will automatically be created.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mutate_n_bases</span></code>: Optional, default is 1. The number of bases to mutate at any time. Standard <em>in silico</em> mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1. Double/triple mutations will be more difficult to interpret and are something we may work on in the future.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_position</span></code>: Optional, default is 0. The starting position of the subsequence that should be mutated. This value should be nonnegative, and less than <code class="docutils literal notranslate"><span class="pre">end_position</span></code>. Also, the value of <code class="docutils literal notranslate"><span class="pre">end_position</span> <span class="pre">-</span> <span class="pre">start_position</span></code> should be at least <code class="docutils literal notranslate"><span class="pre">mutate_n_bases</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_position</span></code>: Optional, default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. If left as <code class="docutils literal notranslate"><span class="pre">None</span></code>, Selene will use the <code class="docutils literal notranslate"><span class="pre">sequence_length</span></code> parameter from <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code>. This is the ending position of the subsequence that should be mutated. This value should be nonnegative, and greater than <code class="docutils literal notranslate"><span class="pre">start_position</span></code>. The value of <code class="docutils literal notranslate"><span class="pre">end_position</span> <span class="pre">-</span>&#160; <span class="pre">start_position</span></code> should be at least <code class="docutils literal notranslate"><span class="pre">mutate_n_bases</span></code>.</p></li>
 </ul>
-<p>An example configuration for <em>in silico</em> mutagenesis when using a FASTA file as input:</p>
+<p>An example configuration for <em>in silico</em> mutagenesis of the center 100 bases of a 1000 base sequence read from a FASTA file input:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">in_silico_mutagenesis</span><span class="p">:</span> <span class="p p-Indicator">{</span>
-<span class="nt">    input_path</span><span class="p">:</span> <span class="nv">/path/to/sequences1.fa</span><span class="p p-Indicator">,</span> 
+<span class="nt">    input_path</span><span class="p">:</span> <span class="nv">/path/to/sequences1.fa</span><span class="p p-Indicator">,</span>
 <span class="nt">    save_data</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">logits</span><span class="p p-Indicator">],</span>
 <span class="nt">    output_dir</span><span class="p">:</span> <span class="nv">/path/to/output/predictions/dir</span><span class="p p-Indicator">,</span>
 <span class="nt">    mutate_n_bases</span><span class="p">:</span> <span class="nv">1</span><span class="p p-Indicator">,</span>
-<span class="nt">    use_sequence_name</span><span class="p">:</span> <span class="nv">True</span>
+<span class="nt">    use_sequence_name</span><span class="p">:</span> <span class="nv">True</span><span class="p p-Indicator">,</span>
+<span class="nt">    start_position</span><span class="p">:</span> <span class="nv">450</span><span class="p p-Indicator">,</span>
+<span class="nt">    end_position</span><span class="p">:</span> <span class="nv">550</span>
 <span class="p p-Indicator">}</span>
 </pre></div>
 </div>
@@ -737,6 +743,8 @@
 <li><p>If not <code class="docutils literal notranslate"><span class="pre">use_sequence_name</span></code>, output files are prefixed with the index <code class="docutils literal notranslate"><span class="pre">i</span></code> corresponding to the <code class="docutils literal notranslate"><span class="pre">i</span></code>th sequence in the FASTA file.</p></li>
 </ul>
 </li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_position</span></code>: Optional, default is 0. The starting position of the subsequence that should be mutated. This value should be nonnegative, and less than <code class="docutils literal notranslate"><span class="pre">end_position</span></code>. The value of <code class="docutils literal notranslate"><span class="pre">end_position</span> <span class="pre">-</span> <span class="pre">start_position</span></code> should be at least <code class="docutils literal notranslate"><span class="pre">mutate_n_bases</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_position</span></code>: Optional, default is <code class="docutils literal notranslate"><span class="pre">None</span></code>. If left as <code class="docutils literal notranslate"><span class="pre">None</span></code>, Selene will use the <code class="docutils literal notranslate"><span class="pre">sequence_length</span></code> parameter passed to <code class="docutils literal notranslate"><span class="pre">analyze_sequences</span></code>. This is the ending position of the subsequence that should be mutated. This value should be nonnegative, and greater than <code class="docutils literal notranslate"><span class="pre">start_position</span></code>. The value of <code class="docutils literal notranslate"><span class="pre">end_position</span> <span class="pre">-</span>&#160; <span class="pre">start_position</span></code> should be at least <code class="docutils literal notranslate"><span class="pre">mutate_n_bases</span></code>.</p></li>
 </ul>
 </div>
 </div>

@@ -981,7 +981,9 @@
                               <span class="n">save_data</span><span class="p">,</span>
                               <span class="n">output_path_prefix</span><span class="o">=</span><span class="s2">&quot;ism&quot;</span><span class="p">,</span>
                               <span class="n">mutate_n_bases</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                              <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">):</span>
+                              <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span>
+                              <span class="n">start_position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                              <span class="n">end_position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Applies *in silico* mutagenesis to a sequence.</span>
 
@@ -1001,6 +1003,13 @@
 <span class="sd">            optimized operations for double and triple mutations.</span>
 <span class="sd">        output_format : {&#39;tsv&#39;, &#39;hdf5&#39;}, optional</span>
 <span class="sd">            Default is &#39;tsv&#39;. The desired output format.</span>
+<span class="sd">        start_position : int, optional</span>
+<span class="sd">            Default is 0. The starting position of the subsequence to be</span>
+<span class="sd">            mutated.</span>
+<span class="sd">        end_position : int or None, optional</span>
+<span class="sd">            Default is None. The ending position of the subsequence to be</span>
+<span class="sd">            mutated. If left as `None`, then `self.sequence_length` will be</span>
+<span class="sd">            used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1010,7 +1019,46 @@
 <span class="sd">            file named `*_ref_predictions.h5` will be outputted with the</span>
 <span class="sd">            model prediction for the original input sequence.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the value of `start_position` or `end_position` is negative.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are fewer than `mutate_n_bases` between `start_position`</span>
+<span class="sd">            and `end_position`.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `start_position` is greater or equal to `end_position`.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `start_position` is not less than `self.sequence_length`.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `end_position` is greater than `self.sequence_length`.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">end_position</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span>
+        <span class="k">if</span> <span class="n">start_position</span> <span class="o">&gt;=</span> <span class="n">end_position</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Starting positions must be less than the ending &quot;</span>
+                              <span class="s2">&quot;positions. Found a starting position of </span><span class="si">{0}</span><span class="s2"> with &quot;</span>
+                              <span class="s2">&quot;an ending position of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_position</span><span class="p">,</span>
+                                                                   <span class="n">end_position</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">start_position</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Negative starting positions are not supported.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end_position</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Negative ending positions are not supported.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">start_position</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Starting positions must be less than the sequence length.&quot;</span>
+                              <span class="s2">&quot; Found a starting position of </span><span class="si">{0}</span><span class="s2"> with a sequence length &quot;</span>
+                              <span class="s2">&quot;of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">end_position</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Ending positions must be less than or equal to the sequence &quot;</span>
+                              <span class="s2">&quot;length. Found an ending position of </span><span class="si">{0}</span><span class="s2"> with a sequence &quot;</span>
+                              <span class="s2">&quot;length of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">end_position</span> <span class="o">-</span> <span class="n">start_position</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">mutate_n_bases</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Fewer bases exist in the substring specified by the starting &quot;</span>
+                              <span class="s2">&quot;and ending positions than need to be mutated. There are only &quot;</span>
+                              <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> currently, but </span><span class="si">{1}</span><span class="s2"> bases must be mutated at a &quot;</span>
+                              <span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_position</span> <span class="o">-</span> <span class="n">start_position</span><span class="p">,</span> <span class="n">mutate_n_bases</span><span class="p">))</span>
+
         <span class="n">path_dirs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">output_path_prefix</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path_dirs</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path_dirs</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1031,7 +1079,9 @@
         <span class="n">sequence</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">upper</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
         <span class="n">mutated_sequences</span> <span class="o">=</span> <span class="n">in_silico_mutagenesis_sequences</span><span class="p">(</span>
             <span class="n">sequence</span><span class="p">,</span> <span class="n">mutate_n_bases</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
+            <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span>
+            <span class="n">start_position</span><span class="o">=</span><span class="n">start_position</span><span class="p">,</span>
+            <span class="n">end_position</span><span class="o">=</span><span class="n">end_position</span><span class="p">)</span>
         <span class="n">reporters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_reporters</span><span class="p">(</span>
             <span class="n">save_data</span><span class="p">,</span>
             <span class="n">output_path_prefix</span><span class="p">,</span>
@@ -1071,7 +1121,9 @@
                                         <span class="n">output_dir</span><span class="p">,</span>
                                         <span class="n">mutate_n_bases</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                                         <span class="n">use_sequence_name</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                        <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">):</span>
+                                        <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;tsv&quot;</span><span class="p">,</span>
+                                        <span class="n">start_position</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                        <span class="n">end_position</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply *in silico* mutagenesis to all sequences in a FASTA file.</span>
 
@@ -1103,6 +1155,16 @@
 <span class="sd">            the FASTA file will have its own set of output files, where</span>
 <span class="sd">            the number of output files depends on the number of `save_data`</span>
 <span class="sd">            predictions/scores specified.</span>
+<span class="sd">        start_position : int, optional</span>
+<span class="sd">            Default is 0. The starting position of the subsequence to be</span>
+<span class="sd">            mutated.</span>
+<span class="sd">        end_position : int or None, optional</span>
+<span class="sd">            Default is None. The ending position of the subsequence to be</span>
+<span class="sd">            mutated. If left as `None`, then `self.sequence_length` will be</span>
+<span class="sd">            used.</span>
+
+
+
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1112,7 +1174,46 @@
 <span class="sd">            file named `*_ref_predictions.h5` will be outputted with the</span>
 <span class="sd">            model prediction for the original input sequence.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the value of `start_position` or `end_position` is negative.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If there are fewer than `mutate_n_bases` between `start_position`</span>
+<span class="sd">            and `end_position`.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `start_position` is greater or equal to `end_position`.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `start_position` is not less than `self.sequence_length`.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If `end_position` is greater than `self.sequence_length`.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">end_position</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span>
+        <span class="k">if</span> <span class="n">start_position</span> <span class="o">&gt;=</span> <span class="n">end_position</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Starting positions must be less than the ending &quot;</span>
+                              <span class="s2">&quot;positions. Found a starting position of </span><span class="si">{0}</span><span class="s2"> with &quot;</span>
+                              <span class="s2">&quot;an ending position of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_position</span><span class="p">,</span>
+                                                                   <span class="n">end_position</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">start_position</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Negative starting positions are not supported.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end_position</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Negative ending positions are not supported.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">start_position</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Starting positions must be less than the sequence length.&quot;</span>
+                              <span class="s2">&quot; Found a starting position of </span><span class="si">{0}</span><span class="s2"> with a sequence length &quot;</span>
+                              <span class="s2">&quot;of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">end_position</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Ending positions must be less than or equal to the sequence &quot;</span>
+                              <span class="s2">&quot;length. Found an ending position of </span><span class="si">{0}</span><span class="s2"> with a sequence &quot;</span>
+                              <span class="s2">&quot;length of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">end_position</span> <span class="o">-</span> <span class="n">start_position</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">mutate_n_bases</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span><span class="s2">&quot;Fewer bases exist in the substring specified by the starting &quot;</span>
+                              <span class="s2">&quot;and ending positions than need to be mutated. There are only &quot;</span>
+                              <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> currently, but </span><span class="si">{1}</span><span class="s2"> bases must be mutated at a &quot;</span>
+                              <span class="s2">&quot;time&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_position</span> <span class="o">-</span> <span class="n">start_position</span><span class="p">,</span> <span class="n">mutate_n_bases</span><span class="p">))</span>
+
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">fasta_file</span> <span class="o">=</span> <span class="n">pyfaidx</span><span class="o">.</span><span class="n">Fasta</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
@@ -1130,7 +1231,9 @@
             <span class="n">mutated_sequences</span> <span class="o">=</span> <span class="n">in_silico_mutagenesis_sequences</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">,</span>
                 <span class="n">mutate_n_bases</span><span class="o">=</span><span class="n">mutate_n_bases</span><span class="p">,</span>
-                <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span>
+                <span class="n">reference_sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">,</span>
+                <span class="n">start_position</span><span class="o">=</span><span class="n">start_position</span><span class="p">,</span>
+                <span class="n">end_position</span><span class="o">=</span><span class="n">end_position</span><span class="p">)</span>
             <span class="n">cur_sequence_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">sequence_to_encoding</span><span class="p">(</span>
                 <span class="n">cur_sequence</span><span class="p">)</span>
             <span class="n">base_encoding</span> <span class="o">=</span> <span class="n">cur_sequence_encoding</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>

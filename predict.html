@@ -388,7 +388,7 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.4.0a0+c780610 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
+<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.4.0a0+d206756 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
 <li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
 <li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
 <li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
@@ -551,7 +551,7 @@ of the sequences in the input FASTA).</p></li>
 
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis">
-<code class="sig-name descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_path_prefix='ism'</em>, <em class="sig-param">mutate_n_bases=1</em>, <em class="sig-param">output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_path_prefix='ism'</em>, <em class="sig-param">mutate_n_bases=1</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">start_position=0</em>, <em class="sig-param">end_position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies <em>in silico</em> mutagenesis to a sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -565,6 +565,11 @@ the path do not yet exist they will be automatically created.</p></li>
 this parameter set to <cite>1</cite> at this time, as we have not yet
 optimized operations for double and triple mutations.</p></li>
 <li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}, optional</em>) – Default is ‘tsv’. The desired output format.</p></li>
+<li><p><strong>start_position</strong> (<em>int, optional</em>) – Default is 0. The starting position of the subsequence to be
+mutated.</p></li>
+<li><p><strong>end_position</strong> (<em>int or None, optional</em>) – Default is None. The ending position of the subsequence to be
+mutated. If left as <cite>None</cite>, then <cite>self.sequence_length</cite> will be
+used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -576,12 +581,22 @@ model prediction for the original input sequence.</p>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the value of <cite>start_position</cite> or <cite>end_position</cite> is negative.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If there are fewer than <cite>mutate_n_bases</cite> between <cite>start_position</cite>
+    and <cite>end_position</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is greater or equal to <cite>end_position</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is not less than <cite>self.sequence_length</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>end_position</cite> is greater than <cite>self.sequence_length</cite>.</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">
-<code class="sig-name descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">mutate_n_bases=1</em>, <em class="sig-param">use_sequence_name=True</em>, <em class="sig-param">output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">mutate_n_bases=1</em>, <em class="sig-param">use_sequence_name=True</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">start_position=0</em>, <em class="sig-param">end_position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply <em>in silico</em> mutagenesis to all sequences in a FASTA file.</p>
 <p>Please note that we have not parallelized this function yet, so runtime
 increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
@@ -605,6 +620,11 @@ to the :math:<a href="#id1"><span class="problematic" id="id2">`</span></a>i`th 
 the FASTA file will have its own set of output files, where
 the number of output files depends on the number of <cite>save_data</cite>
 predictions/scores specified.</p></li>
+<li><p><strong>start_position</strong> (<em>int, optional</em>) – Default is 0. The starting position of the subsequence to be
+mutated.</p></li>
+<li><p><strong>end_position</strong> (<em>int or None, optional</em>) – Default is None. The ending position of the subsequence to be
+mutated. If left as <cite>None</cite>, then <cite>self.sequence_length</cite> will be
+used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -615,6 +635,16 @@ model prediction for the original input sequence.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the value of <cite>start_position</cite> or <cite>end_position</cite> is negative.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If there are fewer than <cite>mutate_n_bases</cite> between <cite>start_position</cite>
+    and <cite>end_position</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is greater or equal to <cite>end_position</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is not less than <cite>self.sequence_length</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>end_position</cite> is greater than <cite>self.sequence_length</cite>.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
