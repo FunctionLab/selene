@@ -654,7 +654,9 @@ class AnalyzeSequences(object):
                               save_data,
                               output_path_prefix="ism",
                               mutate_n_bases=1,
-                              output_format="tsv"):
+                              output_format="tsv",
+                              start_position=0,
+                              end_position=None):
         """
         Applies *in silico* mutagenesis to a sequence.
 
@@ -674,6 +676,13 @@ class AnalyzeSequences(object):
             optimized operations for double and triple mutations.
         output_format : {'tsv', 'hdf5'}, optional
             Default is 'tsv'. The desired output format.
+        start_position : int, optional
+            Default is 0. The starting position of the subsequence to be
+            mutated.
+        end_position : int or None, optional
+            Default is None. The ending position of the subsequence to be
+            mutated. If left as `None`, then `self.sequence_length` will be
+            used.
 
         Returns
         -------
@@ -683,7 +692,37 @@ class AnalyzeSequences(object):
             file named `*_ref_predictions.h5` will be outputted with the
             model prediction for the original input sequence.
 
+        Raises
+        ------
+        ValueError
+            If the value of `start_position` or `end_position` is negative.
+        ValueError
+            If there are fewer than `mutate_n_bases` between `start_position`
+            and `end_position`.
+        ValueError
+            If `start_position` is greater or equal to `end_position`.
+        ValueError
+            If `start_position` is not less than `self.sequence_length`.
+        ValueError
+            If `end_position` is greater than `self.sequence_length`.
+
         """
+        if end_position is None:
+            end_position = self.sequence_length
+        if start_position >= end_position:
+            raise ValueError("Starting positions must be less than the ending positions.")
+        if start_position < 0:
+            raise ValueError("Negative starting positions are not supported.")
+        if end_position < 0:
+            raise ValueError("Negative ending positions are not supported.")
+        if start_position >= self.sequence_length:
+            raise ValueError("Starting positions must be less than the sequence length.")
+        if end_position > self.sequence_length:
+            raise ValueError("Ending positions must be less than or equal to the sequence length.")
+        if (end_position - start_position) < mutate_n_bases:
+            raise ValueError("Fewer bases exist in the substring specified by the starting and ending positions than need to be mutated.")
+
+
         path_dirs, _ = os.path.split(output_path_prefix)
         if path_dirs:
             os.makedirs(path_dirs, exist_ok=True)
@@ -704,7 +743,9 @@ class AnalyzeSequences(object):
         sequence = str.upper(sequence)
         mutated_sequences = in_silico_mutagenesis_sequences(
             sequence, mutate_n_bases=1,
-            reference_sequence=self.reference_sequence)
+            reference_sequence=self.reference_sequence,
+            start_position=start_position,
+            end_position=end_position)
         reporters = self._initialize_reporters(
             save_data,
             output_path_prefix,
@@ -744,7 +785,9 @@ class AnalyzeSequences(object):
                                         output_dir,
                                         mutate_n_bases=1,
                                         use_sequence_name=True,
-                                        output_format="tsv"):
+                                        output_format="tsv",
+                                        start_position=0,
+                                        end_position=None):
         """
         Apply *in silico* mutagenesis to all sequences in a FASTA file.
 
@@ -776,6 +819,16 @@ class AnalyzeSequences(object):
             the FASTA file will have its own set of output files, where
             the number of output files depends on the number of `save_data`
             predictions/scores specified.
+        start_position : int, optional
+            Default is 0. The starting position of the subsequence to be
+            mutated.
+        end_position : int or None, optional
+            Default is None. The ending position of the subsequence to be
+            mutated. If left as `None`, then `self.sequence_length` will be
+            used.
+
+
+
 
         Returns
         -------
@@ -785,7 +838,38 @@ class AnalyzeSequences(object):
             file named `*_ref_predictions.h5` will be outputted with the
             model prediction for the original input sequence.
 
+        Raises
+        ------
+        ValueError
+            If the value of `start_position` or `end_position` is negative.
+        ValueError
+            If there are fewer than `mutate_n_bases` between `start_position`
+            and `end_position`.
+        ValueError
+            If `start_position` is greater or equal to `end_position`.
+        ValueError
+            If `start_position` is not less than `self.sequence_length`.
+        ValueError
+            If `end_position` is greater than `self.sequence_length`.
+
         """
+        if end_position is None:
+            end_position = self.sequence_length
+        if start_position >= end_position:
+            raise ValueError("Starting positions must be less than the ending positions.")
+        if start_position < 0:
+            raise ValueError("Negative starting positions are not supported.")
+        if end_position < 0:
+            raise ValueError("Negative ending positions are not supported.")
+        if start_position >= self.sequence_length:
+            raise ValueError("Starting positions must be less than the sequence length.")
+        if end_position > self.sequence_length:
+            raise ValueError("Ending positions must be less than or equal to the sequence length.")
+        if (end_position - start_position) < mutate_n_bases:
+            raise ValueError("Fewer bases exist in the substring specified by the starting and ending positions than need to be mutated.")
+
+
+
         os.makedirs(output_dir, exist_ok=True)
 
         fasta_file = pyfaidx.Fasta(input_path)
@@ -803,7 +887,9 @@ class AnalyzeSequences(object):
             mutated_sequences = in_silico_mutagenesis_sequences(
                 cur_sequence,
                 mutate_n_bases=mutate_n_bases,
-                reference_sequence=self.reference_sequence)
+                reference_sequence=self.reference_sequence,
+                start_position=start_position,
+                end_position=end_position)
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
             base_encoding = cur_sequence_encoding.reshape(

@@ -7,7 +7,9 @@ from ..sequences import Genome
 
 def in_silico_mutagenesis_sequences(sequence,
                                     mutate_n_bases=1,
-                                    reference_sequence=Genome):
+                                    reference_sequence=Genome,
+                                    start_position=0,
+                                    end_position=None):
     """
     Creates a list containing each mutation that occurs from an
     *in silico* mutagenesis across the whole sequence.
@@ -26,6 +28,13 @@ def in_silico_mutagenesis_sequences(sequence,
     reference_sequence : class, optional
         Default is `selene_sdk.sequences.Genome`. The type of sequence
         that has been passed in.
+    start_position : int, optional
+        Default is 0. The starting position of the subsequence to be
+        mutated.
+    end_position : int or None, optional
+        Default is None. The ending position of the subsequence to be
+        mutated. If left as `None`, then `len(sequence)` will be
+        used.
 
     Returns
     -------
@@ -39,7 +48,36 @@ def in_silico_mutagenesis_sequences(sequence,
         we return a list with length of 3000-4000, depending on the number of
         unknown bases in the input sequences.
 
+    Raises
+    ------
+    ValueError
+        If the value of `start_position` or `end_position` is negative.
+    ValueError
+        If there are fewer than `mutate_n_bases` between `start_position`
+        and `end_position`.
+    ValueError
+        If `start_position` is greater or equal to `end_position`.
+    ValueError
+        If `start_position` is not less than `len(sequence)`.
+    ValueError
+        If `end_position` is greater than `len(sequence)`.
+
     """
+    if end_position is None:
+        end_position = len(sequence)
+    if start_position >= end_position:
+        raise ValueError("Starting positions must be less than the ending positions.")
+    if start_position < 0:
+        raise ValueError("Negative starting positions are not supported.")
+    if end_position < 0:
+        raise ValueError("Negative ending positions are not supported.")
+    if start_position >= len(sequence):
+        raise ValueError("Starting positions must be less than the sequence length.")
+    if end_position > len(sequence):
+        raise ValueError("Ending positions must be less than or equal to the sequence length.")
+    if (end_position - start_position) < mutate_n_bases:
+        raise ValueError("Fewer bases exist in the substring specified by the starting and ending positions than need to be mutated.")
+
     sequence_alts = []
     for index, ref in enumerate(sequence):
         alts = []
@@ -50,7 +88,7 @@ def in_silico_mutagenesis_sequences(sequence,
         sequence_alts.append(alts)
     all_mutated_sequences = []
     for indices in itertools.combinations(
-            range(len(sequence)), mutate_n_bases):
+            range(start_position, end_position), mutate_n_bases):
         pos_mutations = []
         for i in indices:
             pos_mutations.append(sequence_alts[i])
