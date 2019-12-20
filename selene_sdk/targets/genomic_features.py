@@ -233,7 +233,13 @@ class GenomicFeatures(Target):
         * `types.FunctionType` - define a function that takes as \
                                  input the feature name and returns\
                                  the feature's threshold.
-
+                                 
+    init_unpicklable : bool, optional
+        Default is False. If False, delay part of initialization code
+        to executed only when a relevant method is called. This enables
+        the object to be pickled after instantiation. `init_unpicklable` should
+        be `False` when used when multi-processing is needed e.g. DataLoader.
+        
     Attributes
     ----------
     data : tabix.open
@@ -258,7 +264,7 @@ class GenomicFeatures(Target):
 
     """
 
-    def __init__(self, input_path, features, feature_thresholds=None):
+    def __init__(self, input_path, features, feature_thresholds=None, init_unpicklable=False):
         """
         Constructs a new `GenomicFeatures` object.
         """
@@ -278,12 +284,18 @@ class GenomicFeatures(Target):
                 _define_feature_thresholds(feature_thresholds, features)
         self.initialized = False
 
+        if init_unpicklable:
+            self._unpicklable_init()
+
+    def _unpicklable_init(self):
+        if not self.initialized:
+            self.data = tabix.open(self.input_path)
+            self.initialized = True
+            
     def init(func):
-        #delay initlization to allow  multiprocessing
+        #delay initlization to allow multiprocessing
         def dfunc(self, *args, **kwargs):
-            if not self.initialized:
-                self.data = tabix.open(self.input_path)
-                self.initialized = True
+            self._unpicklable_init()
             return func(self, *args, **kwargs)
         return dfunc
 

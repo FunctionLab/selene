@@ -190,6 +190,11 @@ class Genome(Sequence):
         Default is None (use the default base ordering of
         `['A', 'C', 'G', 'T']`). Specify a different ordering of
         DNA bases for one-hot encoding.
+    init_unpickable : bool, optional
+        Default is False. If False, delay part of initialization code 
+        to executed only when a relevant method is called. This enables
+        the object to be pickled after instantiation. `init_unpickable` should 
+        be `False` when used when multi-processing is needed e.g. DataLoader.
 
     Attributes
     ----------
@@ -247,7 +252,7 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path, blacklist_regions=None, bases_order=None):
+    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpickable=False):
         """
         Constructs a `Genome` object.
         """
@@ -266,6 +271,9 @@ class Genome(Sequence):
             self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
             self.update_bases_order(bases)
 
+        if init_unpickable:
+            self._unpicklable_init()
+
     @classmethod
     def update_bases_order(cls, bases):
         cls.BASES_ARR = bases
@@ -275,30 +283,32 @@ class Genome(Sequence):
             **{b: ix for (ix, b) in enumerate(lc_bases)}}
         cls.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
 
+    def _unpicklable_init(self):
+        if not self.initialized:
+            self.genome = pyfaidx.Fasta(self.input_path)
+            self.chrs = sorted(self.genome.keys())
+            self.len_chrs = self._get_len_chrs()
+            self._blacklist_tabix = None
+
+            if self.blacklist_regions == "hg19":
+                self._blacklist_tabix = tabix.open(
+                    pkg_resources.resource_filename(
+                        "selene_sdk",
+                        "sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz"))
+            elif self.blacklist_regions == "hg38":
+                self._blacklist_tabix = tabix.open(
+                    pkg_resources.resource_filename(
+                        "selene_sdk",
+                        "sequences/data/hg38.blacklist.bed.gz"))
+            elif self.blacklist_regions is not None:  # user-specified file
+                self._blacklist_tabix = tabix.open(
+                    blacklist_regions)
+            self.initialized = True
+                
     def init(func):
         #delay initlization to allow  multiprocessing
         def dfunc(self, *args, **kwargs):
-            if not self.initialized:
-                self.genome = pyfaidx.Fasta(self.input_path)
-                self.chrs = sorted(self.genome.keys())
-                self.len_chrs = self._get_len_chrs()
-                self._blacklist_tabix = None
-
-                if self.blacklist_regions == "hg19":
-                    self._blacklist_tabix = tabix.open(
-                        pkg_resources.resource_filename(
-                            "selene_sdk",
-                            "sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz"))
-                elif self.blacklist_regions == "hg38":
-                    self._blacklist_tabix = tabix.open(
-                        pkg_resources.resource_filename(
-                            "selene_sdk",
-                            "sequences/data/hg38.blacklist.bed.gz"))
-                elif self.blacklist_regions is not None:  # user-specified file
-                    self._blacklist_tabix = tabix.open(
-                        blacklist_regions)
-
-                self.initialized = True
+            self._unpicklable_init()
             return func(self, *args, **kwargs)
         return dfunc
 
