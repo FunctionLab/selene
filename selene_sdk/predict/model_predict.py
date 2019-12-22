@@ -427,10 +427,9 @@ class AnalyzeSequences(object):
                                 "of the .tsv or the row_labels .txt file.".format(
                                   label))
 
-        if (batch_ids and i == 0) or i % self.batch_size != 0:
-            sequences = sequences[:i % self.batch_size + 1, :, :]
-            preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-            reporter.handle_batch_predictions(preds, batch_ids)
+        sequences = sequences[:i % self.batch_size + 1, :, :]
+        preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+        reporter.handle_batch_predictions(preds, batch_ids)
 
         reporter.write_to_file()
 
@@ -516,10 +515,9 @@ class AnalyzeSequences(object):
             batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
 
-        if (batch_ids and i == 0) or i % self.batch_size != 0:
-            sequences = sequences[:i % self.batch_size + 1, :, :]
-            preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-            reporter.handle_batch_predictions(preds, batch_ids)
+        sequences = sequences[:i % self.batch_size + 1, :, :]
+        preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+        reporter.handle_batch_predictions(preds, batch_ids)
 
         fasta_file.close()
         reporter.write_to_file()
