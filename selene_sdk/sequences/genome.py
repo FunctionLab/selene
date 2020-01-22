@@ -190,10 +190,10 @@ class Genome(Sequence):
         Default is None (use the default base ordering of
         `['A', 'C', 'G', 'T']`). Specify a different ordering of
         DNA bases for one-hot encoding.
-    init_unpickable : bool, optional
+    init_unpicklable : bool, optional
         Default is False. If False, delay part of initialization code 
         to executed only when a relevant method is called. This enables
-        the object to be pickled after instantiation. `init_unpickable` should 
+        the object to be pickled after instantiation. `init_unpicklable` should 
         be `False` when used when multi-processing is needed e.g. DataLoader.
 
     Attributes
@@ -252,14 +252,14 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpickable=False):
+    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpicklable=False):
         """
         Constructs a `Genome` object.
         """
 
         self.input_path = input_path
         self.blacklist_regions = blacklist_regions
-        self.initialized =False
+        self._initialized =False
         
         if bases_order is not None:
             bases = [str.upper(b) for b in bases_order]
@@ -271,7 +271,7 @@ class Genome(Sequence):
             self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
             self.update_bases_order(bases)
 
-        if init_unpickable:
+        if init_unpicklable:
             self._unpicklable_init()
 
     @classmethod
@@ -284,7 +284,7 @@ class Genome(Sequence):
         cls.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
 
     def _unpicklable_init(self):
-        if not self.initialized:
+        if not self._initialized:
             self.genome = pyfaidx.Fasta(self.input_path)
             self.chrs = sorted(self.genome.keys())
             self.len_chrs = self._get_len_chrs()
@@ -303,7 +303,7 @@ class Genome(Sequence):
             elif self.blacklist_regions is not None:  # user-specified file
                 self._blacklist_tabix = tabix.open(
                     blacklist_regions)
-            self.initialized = True
+            self._initialized = True
                 
     def init(func):
         #delay initlization to allow  multiprocessing

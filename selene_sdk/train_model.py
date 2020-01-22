@@ -265,8 +265,9 @@ class TrainModel(object):
             checkpoint_resume,
             map_location=lambda storage, location: storage)
         if "state_dict" not in checkpoint:
-            raise ValueError("Selene does not support continued "
-                "training of models that were not originally "
+            raise ValueError("'state_dict' not found in file {filename} "
+                "loaded with method `torch.load`. Selene does not support "
+                "continued training of models that were not originally "
                 "trained using Selene.")
 
         self.model = load_model_from_state_dict(

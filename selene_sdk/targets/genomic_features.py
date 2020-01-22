@@ -282,15 +282,15 @@ class GenomicFeatures(Target):
         else:
             self.feature_thresholds, self._feature_thresholds_vec = \
                 _define_feature_thresholds(feature_thresholds, features)
-        self.initialized = False
+        self._initialized = False
 
         if init_unpicklable:
             self._unpicklable_init()
 
     def _unpicklable_init(self):
-        if not self.initialized:
+        if not self._initialized:
             self.data = tabix.open(self.input_path)
-            self.initialized = True
+            self._initialized = True
             
     def init(func):
         #delay initlization to allow multiprocessing

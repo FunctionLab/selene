@@ -159,12 +159,12 @@ class RandomPositionsSampler(OnlineSampler):
 
         self.sample_from_intervals = []
         self.interval_lengths = []
-        self.initialized = False
+        self._initialized = False
 
     def init(func):
         #delay initlization to allow  multiprocessing
         def dfunc(self, *args, **kwargs):
-            if not self.initialized:
+            if not self._initialized:
                 if self._holdout_type == "chromosome":
                     self._partition_genome_by_chromosome()
                 else:
@@ -172,7 +172,7 @@ class RandomPositionsSampler(OnlineSampler):
 
                 for mode in self.modes:
                     self._update_randcache(mode=mode)
-                self.initialized = True
+                self._initialized = True
             return func(self, *args, **kwargs)
         return dfunc
 
