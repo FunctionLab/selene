@@ -113,12 +113,6 @@ class AnalyzeSequences(object):
         Whether to use multiple GPUs or not.
     reference_sequence : class
         The type of sequence on which this analysis will be performed.
-    n_frames : int, optional
-        Default is 1. If specified to be greater than 1, predictions for
-        multiple frames are averaged. For example, if `n_frames=3`, the
-        predicted are averaged across the default window surrounding
-        the position, and two windows shifed by -1 and +1 in position.
-        Currently affects for bed format only.
 
     """
 
@@ -131,8 +125,7 @@ class AnalyzeSequences(object):
                  use_cuda=False,
                  data_parallel=False,
                  reference_sequence=Genome,
-                 write_mem_limit=1500,
-                 n_frames=1):
+                 write_mem_limit=1500):
         """
         Constructs a new `AnalyzeSequences` object.
         """
@@ -186,7 +179,6 @@ class AnalyzeSequences(object):
                 _is_lua_trained_model(model):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
         self._write_mem_limit = write_mem_limit
-        self.n_frames = n_frames
         
     def _initialize_reporters(self,
                               save_data,
@@ -418,37 +410,28 @@ class AnalyzeSequences(object):
         batch_ids = []
 
 
-        frameshifts = np.arange(np.ceil(-self.n_frames/2.0), np.ceil(self.n_frames/2.0))
-        frameshifts = frameshifts.astype(int)
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
-            for j, s in enumerate(frameshifts):
-                print(j)
-                encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
-                        coords[0],
-                        coords[1]+s,
-                        coords[2]+s,
-                        coords[3],
-                        pad=True)
-                if sequences is None:
-                    sequences = np.zeros((self.batch_size * self.n_frames, *encoding.shape))
-                if i and i % self.batch_size == 0 and j == 0:
-                    preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-                    preds = preds.reshape((int(preds.shape[0] / self.n_frames), self.n_frames, -1)).mean(axis=1)
-                    sequences = np.zeros((self.batch_size * self.n_frames, *encoding.shape))
-                    reporter.handle_batch_predictions(preds, batch_ids)
-                    batch_ids = []  
-                sequences[ (i % self.batch_size) * self.n_frames + j, :, :] = encoding
-                if contains_unk:
-                    warnings.warn("For region {0}, "
-                                    "reference sequence contains unknown base(s). "
-                                    "--will be marked `True` in the `contains_unk` column "
-                                    "of the .tsv or the row_labels .txt file.".format(
-                                      label))
+            encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
+                    *coords,
+                    pad=True)
+            if sequences is None:
+                sequences = np.zeros((self.batch_size, *encoding.shape))
+            if i and i % self.batch_size == 0:
+                preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+                sequences = np.zeros((self.batch_size, *encoding.shape))
+                reporter.handle_batch_predictions(preds, batch_ids)
+                batch_ids = []  
+            sequences[ i % self.batch_size, :, :] = encoding
+            if contains_unk:
+                warnings.warn("For region {0}, "
+                                "reference sequence contains unknown base(s). "
+                                "--will be marked `True` in the `contains_unk` column "
+                                "of the .tsv or the row_labels .txt file.".format(
+                                  label))
             batch_ids.append(label+(contains_unk,))
 
-        sequences = sequences[:((i % self.batch_size + 1) * self.n_frames), :, :]
+        sequences = sequences[:i % self.batch_size + 1, :, :]
         preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-        preds = preds.reshape((int(preds.shape[0] / self.n_frames), self.n_frames, -1)).mean(axis=1)
         reporter.handle_batch_predictions(preds, batch_ids)
 
         reporter.write_to_file()
