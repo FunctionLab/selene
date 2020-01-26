@@ -176,6 +176,8 @@ class AnalyzeSequences(object):
         if type(self.reference_sequence) == Genome and \
                 _is_lua_trained_model(model):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
+        else:
+            Genome.update_bases_order(['A', 'C', 'G', 'T'])
         self._write_mem_limit = write_mem_limit
 
     def _initialize_reporters(self,
