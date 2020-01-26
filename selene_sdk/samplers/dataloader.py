@@ -77,6 +77,9 @@ class SamplerDataLoader(DataLoader):
     A DataLoader that provides parallel sampling for any `Sampler`
     or `FileSampler` object. SamplerDataLoader requires sampler to be 
     initialized with `picklable=True` to enable multi-procesing.
+    Currently `SamplerDataLoader` can be used with `MultiFileSampler` by
+    passing `SamplerDataLoader` object as `train_sampler`, `validate_sampler`
+    or `test_sampler` when initiating a `MultiFileSampler`.
 
     Parameters
     ----------
