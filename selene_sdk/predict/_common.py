@@ -93,7 +93,8 @@ def predict(model, batch_sequences, use_cuda=False):
         inputs = Variable(inputs)
 
         if _is_lua_trained_model(model):
-            outputs = model.forward(inputs.transpose(1, 2).unsqueeze_(2))
+            outputs = model.forward(
+                inputs.transpose(1, 2).contiguous().unsqueeze_(2))
         else:
             outputs = model.forward(inputs.transpose(1, 2))
         return outputs.data.cpu().numpy()
