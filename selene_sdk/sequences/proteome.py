@@ -71,8 +71,8 @@ class Proteome(Sequence):
 
     """
 
-    BASES_ARR = np.array(['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I',
-                          'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V'])
+    BASES_ARR = ['A', 'R', 'N', 'D', 'C', 'E', 'Q', 'G', 'H', 'I',
+                 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
     """
     This is an array with the alphabet (i.e. all possible symbols
     that may occur in a sequence). We expect that
