@@ -88,7 +88,8 @@ class EvaluateModel(object):
                  n_test_samples=None,
                  report_gt_feature_n_positives=10,
                  use_cuda=False,
-                 data_parallel=False):
+                 data_parallel=False,
+                 use_features_ord=None):
         self.criterion = criterion
 
         trained_model = torch.load(
@@ -104,6 +105,13 @@ class EvaluateModel(object):
         self.sampler = data_sampler
 
         self.features = features
+        self._use_ixs = list(range(len(features)))
+        if use_features_ord is not None:
+            feature_ixs = {f: ix for (ix, f) in enumerate(features)}
+            self._use_ixs = []
+            self._use_features = use_features_ord
+            for f in use_features_ord:
+                self._use_ixs.append(feature_ixs[f])
 
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
@@ -135,6 +143,8 @@ class EvaluateModel(object):
                 isinstance(self.sampler.reference_sequence, Genome) and
                 _is_lua_trained_model(model)):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
+        elif isinstance(self.sampler.reference_sequence, Genome):
+            Genome.update_bases_order(['A', 'C', 'G', 'T'])
 
     def _get_feature_from_index(self, index):
         """
@@ -186,6 +196,7 @@ class EvaluateModel(object):
                 else:
                     predictions = self.model.forward(
                         inputs.transpose(1, 2))
+                predictions = predictions[:, self._use_ixs]
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(predictions.data.cpu().numpy())
