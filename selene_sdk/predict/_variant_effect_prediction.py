@@ -85,12 +85,13 @@ def read_vcf_file(input_path,
             chrom = str(cols[0])
             if 'CHR' == chrom[:3]:
                 chrom = chrom.replace('CHR', 'chr')
-            elif "chr" not in chrom:
-                chrom = "chr" + chrom
 
             if chrom == "chrMT" and \
                     chrom not in reference_sequence.get_chrs():
                 chrom = "chrM"
+            elif chrom == "MT" and \
+                    chrom not in reference_sequence.get_chrs():
+                chrom = "M"
 
             pos = int(cols[1])
             name = cols[2]
