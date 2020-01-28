@@ -310,8 +310,6 @@ class AnalyzeSequences(object):
                 strand = '.'
                 if isinstance(strand_index, int) and len(cols) > strand_index:
                     strand = cols[strand_index]
-                if 'chr' not in chrom:
-                    chrom = 'chr{0}'.format(chrom)
                 if not str.isdigit(start) or not str.isdigit(end) \
                         or chrom not in self.reference_sequence.genome:
                     na_rows.append(line)
