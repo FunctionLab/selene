@@ -298,6 +298,11 @@ class AnalyzeSequences(object):
         sequences = []
         labels = []
         na_rows = []
+        check_chr = True
+        for chrom in reference_sequence.get_chrs():
+            if not chrom.startswith("chr"):
+                check_chr = False
+                break
         with open(input_path, 'r') as read_handle:
             for i, line in enumerate(read_handle):
                 cols = line.strip().split('\t')
@@ -310,6 +315,8 @@ class AnalyzeSequences(object):
                 strand = '.'
                 if isinstance(strand_index, int) and len(cols) > strand_index:
                     strand = cols[strand_index]
+                if 'chr' not in chrom and check_chr is True:
+                    chrom = "chr{0}".format(chrom)
                 if not str.isdigit(start) or not str.isdigit(end) \
                         or chrom not in self.reference_sequence.genome:
                     na_rows.append(line)
