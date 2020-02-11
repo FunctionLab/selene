@@ -176,7 +176,7 @@ class AnalyzeSequences(object):
         if type(self.reference_sequence) == Genome and \
                 _is_lua_trained_model(model):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
-        else:
+        else:  # even if not using Genome, I guess we can update?
             Genome.update_bases_order(['A', 'C', 'G', 'T'])
         self._write_mem_limit = write_mem_limit
 
@@ -421,11 +421,11 @@ class AnalyzeSequences(object):
             batch_ids.append(label+(contains_unk,))
             sequences[ i % self.batch_size, :, :] = encoding
             if contains_unk:
-                warnings.warn("For region {0}, "
-                                "reference sequence contains unknown base(s). "
-                                "--will be marked `True` in the `contains_unk` column "
-                                "of the .tsv or the row_labels .txt file.".format(
-                                  label))
+                warnings.warn(("For region {0}, "
+                               "reference sequence contains unknown "
+                               "base(s). --will be marked `True` in the "
+                               "`contains_unk` column of the .tsv or "
+                               "row_labels .txt file.").format(label))
 
         if (batch_ids and i == 0) or i % self.batch_size != 0:
             sequences = sequences[:i % self.batch_size + 1, :, :]
