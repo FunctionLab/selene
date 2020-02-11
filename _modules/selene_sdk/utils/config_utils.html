@@ -23,11 +23,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -333,13 +333,13 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">strftime</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">strftime</span>
 <span class="kn">import</span> <span class="nn">types</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_is_lua_trained_model</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">instantiate</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_is_lua_trained_model</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">instantiate</span>
 
 
 <span class="k">def</span> <span class="nf">class_instantiate</span><span class="p">(</span><span class="n">classobj</span><span class="p">):</span>
@@ -443,7 +443,7 @@
 
     <span class="n">model</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;class_args&quot;</span><span class="p">])</span>
     <span class="k">if</span> <span class="s2">&quot;non_strand_specific&quot;</span> <span class="ow">in</span> <span class="n">model_configs</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">selene_sdk.utils</span> <span class="k">import</span> <span class="n">NonStrandSpecific</span>
+        <span class="kn">from</span> <span class="nn">selene_sdk.utils</span> <span class="kn">import</span> <span class="n">NonStrandSpecific</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">NonStrandSpecific</span><span class="p">(</span>
             <span class="n">model</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">model_configs</span><span class="p">[</span><span class="s2">&quot;non_strand_specific&quot;</span><span class="p">])</span>
 

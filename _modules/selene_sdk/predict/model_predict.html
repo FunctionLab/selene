@@ -23,11 +23,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -331,7 +331,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -339,27 +339,27 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
-<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">_pad_sequence</span>
-<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">_truncate_sequence</span>
-<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">get_reverse_complement</span>
-<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">get_reverse_complement_encoding</span>
-<span class="kn">from</span> <span class="nn">._common</span> <span class="k">import</span> <span class="n">predict</span>
-<span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">_ism_sample_id</span>
-<span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">in_silico_mutagenesis_sequences</span>
-<span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="k">import</span> <span class="n">mutate_sequence</span>
-<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_handle_long_ref</span>
-<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_handle_standard_ref</span>
-<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_handle_ref_alt_predictions</span>
-<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">_process_alt</span>
-<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="k">import</span> <span class="n">read_vcf_file</span>
-<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">AbsDiffScoreHandler</span>
-<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">DiffScoreHandler</span>
-<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">LogitScoreHandler</span>
-<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">WritePredictionsHandler</span>
-<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="k">import</span> <span class="n">WriteRefAltHandler</span>
-<span class="kn">from</span> <span class="nn">..sequences</span> <span class="k">import</span> <span class="n">Genome</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="k">import</span> <span class="n">_is_lua_trained_model</span>
-<span class="kn">from</span> <span class="nn">..utils</span> <span class="k">import</span> <span class="n">load_model_from_state_dict</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="kn">import</span> <span class="n">_pad_sequence</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="kn">import</span> <span class="n">_truncate_sequence</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="kn">import</span> <span class="n">get_reverse_complement</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="kn">import</span> <span class="n">get_reverse_complement_encoding</span>
+<span class="kn">from</span> <span class="nn">._common</span> <span class="kn">import</span> <span class="n">predict</span>
+<span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="kn">import</span> <span class="n">_ism_sample_id</span>
+<span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="kn">import</span> <span class="n">in_silico_mutagenesis_sequences</span>
+<span class="kn">from</span> <span class="nn">._in_silico_mutagenesis</span> <span class="kn">import</span> <span class="n">mutate_sequence</span>
+<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="kn">import</span> <span class="n">_handle_long_ref</span>
+<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="kn">import</span> <span class="n">_handle_standard_ref</span>
+<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="kn">import</span> <span class="n">_handle_ref_alt_predictions</span>
+<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="kn">import</span> <span class="n">_process_alt</span>
+<span class="kn">from</span> <span class="nn">._variant_effect_prediction</span> <span class="kn">import</span> <span class="n">read_vcf_file</span>
+<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="kn">import</span> <span class="n">AbsDiffScoreHandler</span>
+<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="kn">import</span> <span class="n">DiffScoreHandler</span>
+<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="kn">import</span> <span class="n">LogitScoreHandler</span>
+<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="kn">import</span> <span class="n">WritePredictionsHandler</span>
+<span class="kn">from</span> <span class="nn">.predict_handlers</span> <span class="kn">import</span> <span class="n">WriteRefAltHandler</span>
+<span class="kn">from</span> <span class="nn">..sequences</span> <span class="kn">import</span> <span class="n">Genome</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">_is_lua_trained_model</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">load_model_from_state_dict</span>
 
 
 <span class="c1"># TODO: MAKE THESE GENERIC:</span>
@@ -443,7 +443,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">model</span><span class="p">,</span>
                  <span class="n">trained_model_path</span><span class="p">,</span>
                  <span class="n">sequence_length</span><span class="p">,</span>
@@ -625,6 +625,11 @@
         <span class="n">sequences</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">na_rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">check_chr</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">chrom</span> <span class="ow">in</span> <span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_chrs</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chrom</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;chr&quot;</span><span class="p">):</span>
+                <span class="n">check_chr</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">read_handle</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">read_handle</span><span class="p">):</span>
                 <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -637,8 +642,8 @@
                 <span class="n">strand</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">strand_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">strand_index</span><span class="p">:</span>
                     <span class="n">strand</span> <span class="o">=</span> <span class="n">cols</span><span class="p">[</span><span class="n">strand_index</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s1">&#39;chr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span><span class="p">:</span>
-                    <span class="n">chrom</span> <span class="o">=</span> <span class="s1">&#39;chr</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;chr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chrom</span> <span class="ow">and</span> <span class="n">check_chr</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">chrom</span> <span class="o">=</span> <span class="s2">&quot;chr</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">str</span><span class="o">.</span><span class="n">isdigit</span><span class="p">(</span><span class="n">end</span><span class="p">)</span> \
                         <span class="ow">or</span> <span class="n">chrom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">genome</span><span class="p">:</span>
                     <span class="n">na_rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>

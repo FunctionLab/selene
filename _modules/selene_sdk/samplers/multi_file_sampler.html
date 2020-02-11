@@ -23,11 +23,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -331,7 +331,7 @@
 <span class="sd">The MultiFileSampler is therefore a subclass of Sampler.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">.sampler</span> <span class="k">import</span> <span class="n">Sampler</span>
+<span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">Sampler</span>
 
 
 <div class="viewcode-block" id="MultiFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler">[docs]</a><span class="k">class</span> <span class="nc">MultiFileSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
@@ -373,7 +373,7 @@
 <span class="sd">        Default is `None`. The current mode that the object is operating in.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">train_sampler</span><span class="p">,</span>
                  <span class="n">validate_sampler</span><span class="p">,</span>
                  <span class="n">features</span><span class="p">,</span>
