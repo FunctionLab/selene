@@ -58,6 +58,11 @@ class EvaluateModel(object):
     data_parallel : bool, optional
         Default is `False`. Specify whether multiple GPUs are available
         for torch to use during training.
+    use_features_ord : list(str) or None, optional
+        Default is None. Specify an ordered list of features for which to
+        run the evaluation. The features in this list must be identical to or
+        a subset of `features`, and in the order you want the resulting
+        `test_targets.npz` and `test_predictions.npz` to be saved.
 
     Attributes
     ----------

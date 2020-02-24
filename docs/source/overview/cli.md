@@ -172,6 +172,9 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
     features: !obj:selene_sdk.utils.load_features_list {
         input_path: /path/to/features_list.txt
     },
+    use_features_ord: !obj:selene_sdk.utils.load_features_list {
+        input_path: /path/to/features_subset_ordered.txt
+    },
     trained_model_path: /path/to/trained/model.pth.tar,
     batch_size: 64,
     n_test_samples: 640000,
@@ -190,6 +193,7 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
 - `report_gt_feature_n_positives`: Default is 10. In total, each class/feature must have more than `report_gt_feature_n_positives` positive examples in the test set to be considered in the performance computation. The output file that reports each class's performance will report 'NA' for classes that do not have enough positive samples.
 - `use_cuda`: Default is False. Specify whether CUDA-enabled GPUs are available for torch to use.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use.
+- `use_features_ord`: Default is None. Specify an ordered list of features for which to run the evaluation. The features in this list must be identical to or a subset of `features`, and in the order you want the resulting `test_targets.npz` and `test_predictions.npz` to be saved.
 
 #### Additional notes
 Similar to the `train_model` configuration, any arguments that you find in [the documentation](https://selene.flatironinstitute.org/selene.html#evaluatemodel) that are not present in the function-type value's arguments are automatically instantiated and passed in by Selene.
