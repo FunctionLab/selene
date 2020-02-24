@@ -147,11 +147,13 @@ class EvaluateModel(object):
 
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
-        # TODO: we should be able to do this on the sampler end, vs here...
-        # this is a bad workaround, since self._test_data still has the full
-        # featureset in it, and we select the subset during `evaluate`
+        # TODO: we should be able to do this on the sampler end instead of
+        # here. the current workaround is problematic, since
+        # self._test_data still has the full featureset in it, and we
+        # select the subset during `evaluate`
         self._all_test_targets = self._all_test_targets[:, self._use_ixs]
 
+        # reset Genome base ordering when applicable.
         if (hasattr(self.sampler, "reference_sequence") and
                 isinstance(self.sampler.reference_sequence, Genome)):
             if _is_lua_trained_model(model):
@@ -160,6 +162,11 @@ class EvaluateModel(object):
                 Genome.update_bases_order(['A', 'C', 'G', 'T'])
 
     def _write_features_ordered_to_file(self):
+        """
+        Write the feature ordering specified by `use_features_ord`
+        after matching it with the `features` list from the class
+        initialization parameters.
+        """
         fp = os.path.join(self.output_dir, 'use_features_ord.txt')
         with open(fp, 'w+') as file_handle:
             for f in self.features:
