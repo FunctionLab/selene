@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                master (0.4.4)
+                master (0.4.5)
               </div>
             
           
@@ -503,6 +503,8 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span> <span class="o">==</span> <span class="n">Genome</span> <span class="ow">and</span> \
                 <span class="n">_is_lua_trained_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
             <span class="n">Genome</span><span class="o">.</span><span class="n">update_bases_order</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># even if not using Genome, I guess we can update?</span>
+            <span class="n">Genome</span><span class="o">.</span><span class="n">update_bases_order</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_mem_limit</span> <span class="o">=</span> <span class="n">write_mem_limit</span>
 
     <span class="k">def</span> <span class="nf">_initialize_reporters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -751,11 +753,11 @@
             <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="o">+</span><span class="p">(</span><span class="n">contains_unk</span><span class="p">,))</span>
             <span class="n">sequences</span><span class="p">[</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">encoding</span>
             <span class="k">if</span> <span class="n">contains_unk</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;For region </span><span class="si">{0}</span><span class="s2">, &quot;</span>
-                                <span class="s2">&quot;reference sequence contains unknown base(s). &quot;</span>
-                                <span class="s2">&quot;--will be marked `True` in the `contains_unk` column &quot;</span>
-                                <span class="s2">&quot;of the .tsv or the row_labels .txt file.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                  <span class="n">label</span><span class="p">))</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;For region </span><span class="si">{0}</span><span class="s2">, &quot;</span>
+                               <span class="s2">&quot;reference sequence contains unknown &quot;</span>
+                               <span class="s2">&quot;base(s). --will be marked `True` in the &quot;</span>
+                               <span class="s2">&quot;`contains_unk` column of the .tsv or &quot;</span>
+                               <span class="s2">&quot;row_labels .txt file.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="n">batch_ids</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>

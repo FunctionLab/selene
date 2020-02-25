@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                master (0.4.4)
+                master (0.4.5)
               </div>
             
           
@@ -533,6 +533,9 @@
 <span class="nt">    features</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
 <span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_list.txt</span>
     <span class="p p-Indicator">},</span>
+<span class="nt">    use_features_ord</span><span class="p">:</span> <span class="kt">!obj:selene_sdk.utils.load_features_list</span> <span class="p p-Indicator">{</span>
+<span class="nt">        input_path</span><span class="p">:</span> <span class="nv">/path/to/features_subset_ordered.txt</span>
+    <span class="p p-Indicator">},</span>
 <span class="nt">    trained_model_path</span><span class="p">:</span> <span class="nv">/path/to/trained/model.pth.tar</span><span class="p p-Indicator">,</span>
 <span class="nt">    batch_size</span><span class="p">:</span> <span class="nv">64</span><span class="p p-Indicator">,</span>
 <span class="nt">    n_test_samples</span><span class="p">:</span> <span class="nv">640000</span><span class="p p-Indicator">,</span>
@@ -556,6 +559,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">report_gt_feature_n_positives</span></code>: Default is 10. In total, each class/feature must have more than <code class="docutils literal notranslate"><span class="pre">report_gt_feature_n_positives</span></code> positive examples in the test set to be considered in the performance computation. The output file that reports each class’s performance will report ‘NA’ for classes that do not have enough positive samples.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">use_cuda</span></code>: Default is False. Specify whether CUDA-enabled GPUs are available for torch to use.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">data_parallel</span></code>: Default is False. Specify whether multiple GPUs are available for torch to use.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_features_ord</span></code>: Default is None. Specify an ordered list of features for which to run the evaluation. The features in this list must be identical to or a subset of <code class="docutils literal notranslate"><span class="pre">features</span></code>, and in the order you want the resulting <code class="docutils literal notranslate"><span class="pre">test_targets.npz</span></code> and <code class="docutils literal notranslate"><span class="pre">test_predictions.npz</span></code> to be saved.</p></li>
 </ul>
 </div>
 <div class="section" id="id3">
