@@ -62,7 +62,5 @@ setup(name="selene-sdk",
         "scipy",
         "seaborn",
         "statsmodels",
-        "torch>=0.4.1",
-        "torch<=1.4.0",
-        "torchvision"
+        "torch>=0.4.1, <=1.4.0",
     ])
