@@ -123,6 +123,7 @@ def read_vcf_file(input_path,
                 if not reference_sequence.coords_in_bounds(chrom, start, end):
                     na_rows.append(line)
                     continue
+            alt = alt.replace('.', ',')  # consider '.' a valid delimiter
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
 

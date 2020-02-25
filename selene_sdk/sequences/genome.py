@@ -17,7 +17,7 @@ from .sequence import encoding_to_sequence
 def _not_blacklist_region(chrom, start, end, blacklist_tabix):
     """
     Check if the input coordinates are not overlapping with blacklist regions.
-    
+
     Parameters
     ----------
     chrom : str
@@ -29,14 +29,14 @@ def _not_blacklist_region(chrom, start, end, blacklist_tabix):
     blacklist_tabix : tabix.open or None, optional
         Default is `None`. Tabix file handle if a file of blacklist regions
         is available.
-    
+
     Returns
     -------
     bool
         False if the coordinates are overlaping with blacklist regions
         (if specified). Otherwise, return True.
-    
-    
+
+
     """
     if blacklist_tabix is not None:
         try:
@@ -203,7 +203,7 @@ class Genome(Sequence):
 
     """
 
-    BASES_ARR = np.array(['A', 'C', 'G', 'T'])
+    BASES_ARR = ['A', 'C', 'G', 'T']
     """
     This is an array with the alphabet (i.e. all possible symbols
     that may occur in a sequence). We expect that
@@ -463,7 +463,7 @@ class Genome(Sequence):
                                  strand='+',
                                  pad=False):
         """Gets the one-hot encoding of the genomic sequence at the
-        queried coordinates and check whether the sequence contains 
+        queried coordinates and check whether the sequence contains
         unknown base(s).
 
         Parameters
