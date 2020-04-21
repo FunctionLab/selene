@@ -8,34 +8,32 @@ from torch.utils.data import DataLoader
 from .sampler import Sampler
 from .dataloader import SamplerDataLoader
 
+
 class MultiFileSampler(Sampler):
     """
-    This sampler draws samples from individual file samplers or data loaders 
-    that corresponds to training, validation, and testing (optional) modes. 
-    MultiFileSampler calls on the correct file sampler to draw samples 
-    for a given mode. 
+    This sampler draws samples from individual file samplers or data loaders
+    that corresponds to training, validation, and testing (optional) modes.
+    MultiFileSampler calls on the correct file sampler to draw samples
+    for a given mode.
 
-    MultiFileSampler can use either file samplers or data loaders for 
+    MultiFileSampler can use either file samplers or data loaders for
     different modes. Using data loaders for some mode while using file samplers
-    for other modes are also allowed. The file samplers parse data files 
+    for other modes are also allowed. The file samplers parse data files
     (e.g. bed, mat, or hdf5) to provide samples. The data loaders can provide
-    multi-worker iterators that draw samples from a sampler or a file sampler. 
-    As data loaders support parallel sampling, they are generally recommended 
+    multi-worker iterators that draw samples from a sampler or a file sampler.
+    As data loaders support parallel sampling, they are generally recommended
     for sampling speed.
-    
+
     Parameters
     ----------
-    train_sampler : selene_sdk.samplers.file_samplers.FileSampler or
-        selene_sdk.samplers.dataloaders.SamplerDataLoader
+    train_sampler : FileSampler or SamplerDataLoader
         Load your training data as a `FileSampler` before passing it
         into the `MultiFileSampler` constructor.
-    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler or
-        selene_sdk.samplers.dataloaders.SamplerDataLoader
+    validate_sampler : FileSampler or SamplerDataLoader
         The validation dataset file sampler.
     features : list(str)
         The list of features the model should predict
-    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler or
-            selene_sdk.samplers.dataloaders.SamplerDataLoader, optional
+    test_sampler : None or FileSampler or SamplerDataLoader, optional
         Default is None. The test file sampler is optional.
     mode : str, optional
         Default is "train". Must be one of `{train, validate, test}`. The
@@ -90,10 +88,8 @@ class MultiFileSampler(Sampler):
             "validate": iter(self._dataloaders["validate"]) \
                 if self._dataloaders["validate"] else None
         }
-        
-        self._index_to_feature = {
-            i: f for (i, f) in enumerate(features)
-        }
+
+        self._index_to_feature = {i: f for (i, f) in enumerate(features)}
 
         if test_sampler is not None:
             self.modes.append("test")
@@ -103,7 +99,7 @@ class MultiFileSampler(Sampler):
                 test_sampler if isinstance(test_sampler, DataLoader) else None
 
         self.mode = mode
-        
+
     def set_mode(self, mode):
         """
         Sets the sampling mode.
@@ -131,7 +127,7 @@ class MultiFileSampler(Sampler):
         """
         Sets the batch size for DataLoader for the specified mode,
         if the specified  batch_size does not equal the current batch_size.
-        
+
         Parameters
         ----------
         batch_size : int
@@ -146,7 +142,7 @@ class MultiFileSampler(Sampler):
             self._dataloaders[mode] = SamplerDataLoader(
                 self._dataloaders[mode].dataset,
                 num_workers=self._dataloaders[mode].num_workers,
-                batch_size = batch_size)
+                batch_size=batch_size)
             self._iterators[mode] = iter(self._dataloaders[mode])
 
     def get_feature_from_index(self, index):
@@ -229,7 +225,7 @@ class MultiFileSampler(Sampler):
             targets_mat.append(tgts)
             targets_mat = np.vstack(targets_mat)
             return data_and_targets, targets_mat
-        
+
     def get_validation_set(self, batch_size, n_samples=None):
         """
         This method returns a subset of validation data from the

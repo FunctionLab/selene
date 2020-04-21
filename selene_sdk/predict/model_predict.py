@@ -179,7 +179,7 @@ class AnalyzeSequences(object):
                 _is_lua_trained_model(model):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
         self._write_mem_limit = write_mem_limit
-        
+
     def _initialize_reporters(self,
                               save_data,
                               output_path_prefix,
@@ -408,33 +408,30 @@ class AnalyzeSequences(object):
             mode="prediction")[0]
         sequences = None
         batch_ids = []
-
-
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
             encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
-                    *coords,
-                    pad=True)
+                    *coords, pad=True)
             if sequences is None:
                 sequences = np.zeros((self.batch_size, *encoding.shape))
             if i and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-                sequences = np.zeros((self.batch_size, *encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
-                batch_ids = []  
-            sequences[ i % self.batch_size, :, :] = encoding
+                sequences = np.zeros((self.batch_size, *encoding.shape))
+                batch_ids = []
+            sequences[i % self.batch_size, :, :] = encoding
+            batch_ids.append(label+(contains_unk,))
             if contains_unk:
                 warnings.warn("For region {0}, "
-                                "reference sequence contains unknown base(s). "
-                                "--will be marked `True` in the `contains_unk` column "
-                                "of the .tsv or the row_labels .txt file.".format(
+                              "reference sequence contains unknown base(s). "
+                              "--will be marked `True` in the `contains_unk` column "
+                              "of the .tsv or the row_labels .txt file.".format(
                                   label))
-            batch_ids.append(label+(contains_unk,))
 
         sequences = sequences[:i % self.batch_size + 1, :, :]
         preds = predict(self.model, sequences, use_cuda=self.use_cuda)
         reporter.handle_batch_predictions(preds, batch_ids)
-
         reporter.write_to_file()
+
 
     def get_predictions_for_fasta_file(self,
                                        input_path,
