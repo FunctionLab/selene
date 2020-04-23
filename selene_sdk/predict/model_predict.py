@@ -499,15 +499,7 @@ class AnalyzeSequences(object):
                               len(self.reference_sequence.BASES_ARR)))
         batch_ids = []
         for i, fasta_record in enumerate(fasta_file):
-            cur_sequence = str(fasta_record)
-
-            if len(cur_sequence) < self.sequence_length:
-                cur_sequence = _pad_sequence(cur_sequence,
-                                             self.sequence_length,
-                                             self.reference_sequence.UNK_BASE)
-            elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
-
+            cur_sequence = self._pad_or_truncate_sequence(str(fasta_record))
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
@@ -586,14 +578,7 @@ class AnalyzeSequences(object):
 
         """
         if output_dir is None:
-            sequence = input
-            if len(input) < self.sequence_length:
-                sequence = _pad_sequence(input,
-                                             self.sequence_length,
-                                             self.reference_sequence.UNK_BASE)
-            elif len(input) > self.sequence_length:
-                sequence = _truncate_sequence(input, self.sequence_length)
-
+            sequence = self._pad_or_truncate_sequence(input)
             seq_enc = self.reference_sequence.sequence_to_encoding(sequence)
             seq_enc = np.expand_dims(seq_enc, axis=0)  # add batch size of 1
             return predict(self.model, seq_enc)
@@ -914,14 +899,7 @@ class AnalyzeSequences(object):
 
         fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
-            cur_sequence = str.upper(str(fasta_record))
-            if len(cur_sequence) < self.sequence_length:
-                cur_sequence = _pad_sequence(cur_sequence,
-                                             self.sequence_length,
-                                             self.reference_sequence.UNK_BASE)
-            elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = _truncate_sequence(
-                    cur_sequence, self.sequence_length)
+            cur_sequence = self._pad_or_truncate_sequence(str.upper(str(fasta_record)))
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
@@ -1159,3 +1137,16 @@ class AnalyzeSequences(object):
 
         for r in reporters:
             r.write_to_file()
+
+    def _pad_or_truncate_sequence(self, input_seq):
+        sequence = input_seq
+        if len(sequence) < self.sequence_length:
+            sequence = _pad_sequence(
+                sequence,
+                self.sequence_length,
+                self.reference_sequence.UNK_BASE,
+            )
+        elif len(sequence) > self.sequence_length:
+            sequence = _truncate_sequence(sequence, self.sequence_length)
+
+        return sequence
