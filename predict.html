@@ -388,7 +388,7 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.5.0a0+7eba36b ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
+<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/nn.html#torch.nn.Module" title="(in PyTorch vmaster (1.6.0a0+c306f2e ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
 <li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
 <li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
 <li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
@@ -400,13 +400,16 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dl>
 <dl class="method">
 <dt id="selene_sdk.predict.AnalyzeSequences.get_predictions">
-<code class="sig-name descname">get_predictions</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">strand_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get model predictions for sequences specified in a FASTA or BED file.</p>
+<code class="sig-name descname">get_predictions</code><span class="sig-paren">(</span><em class="sig-param">input</em>, <em class="sig-param">output_dir=None</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">strand_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get model predictions for sequences specified as a raw sequence,
+FASTA, or BED file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul>
-<li><p><strong>input_path</strong> (<em>str</em>) – Input path to the FASTA or BED file.</p></li>
-<li><p><strong>output_dir</strong> (<em>str</em>) – Output directory to write the model predictions.</p></li>
+<li><p><strong>input</strong> (<em>str</em>) – A single sequence, or a path to the FASTA or BED file input.</p></li>
+<li><p><strong>output_dir</strong> (<em>str, optional</em>) – Default is None. Output directory to write the model predictions.
+If this is left blank a raw sequence input will be assumed, though
+an output directory is required for FASTA and BED inputs.</p></li>
 <li><p><strong>output_format</strong> (<em>{‘tsv’, ‘hdf5’}, optional</em>) – Default is ‘tsv’. Choose whether to save TSV or HDF5 output files.
 TSV is easier to access (i.e. open with text editor/Excel) and
 quickly peruse, whereas HDF5 files must be accessed through
