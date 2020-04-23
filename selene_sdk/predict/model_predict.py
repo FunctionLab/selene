@@ -499,15 +499,7 @@ class AnalyzeSequences(object):
                               len(self.reference_sequence.BASES_ARR)))
         batch_ids = []
         for i, fasta_record in enumerate(fasta_file):
-            cur_sequence = str(fasta_record)
-
-            if len(cur_sequence) < self.sequence_length:
-                cur_sequence = _pad_sequence(cur_sequence,
-                                             self.sequence_length,
-                                             self.reference_sequence.UNK_BASE)
-            elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = _truncate_sequence(cur_sequence, self.sequence_length)
-
+            cur_sequence = self._pad_or_truncate_sequence(str(fasta_record))
             cur_sequence_encoding = self.reference_sequence.sequence_to_encoding(
                 cur_sequence)
 
@@ -531,19 +523,22 @@ class AnalyzeSequences(object):
 
 
     def get_predictions(self,
-                        input_path,
-                        output_dir,
+                        input,
+                        output_dir=None,
                         output_format="tsv",
                         strand_index=None):
         """
-        Get model predictions for sequences specified in a FASTA or BED file.
+        Get model predictions for sequences specified as a raw sequence,
+        FASTA, or BED file.
 
         Parameters
         ----------
-        input_path : str
-            Input path to the FASTA or BED file.
-        output_dir : str
-            Output directory to write the model predictions.
+        input : str
+            A single sequence, or a path to the FASTA or BED file input.
+        output_dir : str, optional
+            Default is None. Output directory to write the model predictions.
+            If this is left blank a raw sequence input will be assumed, though
+            an output directory is required for FASTA and BED inputs.
         output_format : {'tsv', 'hdf5'}, optional
             Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
             TSV is easier to access (i.e. open with text editor/Excel) and
@@ -583,15 +578,22 @@ class AnalyzeSequences(object):
             or .tsv file will mark this sequence or region as `contains_unk = True`.
 
         """
-        if input_path.endswith('.fa') or input_path.endswith('.fasta'):
+        if output_dir is None:
+            sequence = self._pad_or_truncate_sequence(input)
+            seq_enc = self.reference_sequence.sequence_to_encoding(sequence)
+            seq_enc = np.expand_dims(seq_enc, axis=0)  # add batch size of 1
+            return predict(self.model, seq_enc)
+        elif input.endswith('.fa') or input.endswith('.fasta'):
             self.get_predictions_for_fasta_file(
-                input_path, output_dir, output_format=output_format)
+                input, output_dir, output_format=output_format)
         else:
             self.get_predictions_for_bed_file(
-                input_path,
+                input,
                 output_dir,
                 output_format=output_format,
                 strand_index=strand_index)
+
+        return None
 
     def in_silico_mutagenesis_predict(self,
                                       sequence,
@@ -898,14 +900,7 @@ class AnalyzeSequences(object):
 
         fasta_file = pyfaidx.Fasta(input_path)
         for i, fasta_record in enumerate(fasta_file):
-            cur_sequence = str.upper(str(fasta_record))
-            if len(cur_sequence) < self.sequence_length:
-                cur_sequence = _pad_sequence(cur_sequence,
-                                             self.sequence_length,
-                                             self.reference_sequence.UNK_BASE)
-            elif len(cur_sequence) > self.sequence_length:
-                cur_sequence = _truncate_sequence(
-                    cur_sequence, self.sequence_length)
+            cur_sequence = self._pad_or_truncate_sequence(str.upper(str(fasta_record)))
 
             # Generate mut sequences and base preds.
             mutated_sequences = in_silico_mutagenesis_sequences(
@@ -1143,3 +1138,15 @@ class AnalyzeSequences(object):
 
         for r in reporters:
             r.write_to_file()
+
+    def _pad_or_truncate_sequence(self, sequence):
+        if len(sequence) < self.sequence_length:
+            sequence = _pad_sequence(
+                sequence,
+                self.sequence_length,
+                self.reference_sequence.UNK_BASE,
+            )
+        elif len(sequence) > self.sequence_length:
+            sequence = _truncate_sequence(sequence, self.sequence_length)
+
+        return sequence
