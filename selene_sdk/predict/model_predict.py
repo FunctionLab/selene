@@ -536,8 +536,9 @@ class AnalyzeSequences(object):
         input : str
             A single sequence, or a path to the FASTA or BED file input.
         output_dir : str, optional
-            Output directory to write the model predictions. If this is left
-            blank a raw sequence input will be assumed.
+            Default is None. Output directory to write the model predictions.
+            If this is left blank a raw sequence input will be assumed, though
+            an output directory is required for FASTA and BED inputs.
         output_format : {'tsv', 'hdf5'}, optional
             Default is 'tsv'. Choose whether to save TSV or HDF5 output files.
             TSV is easier to access (i.e. open with text editor/Excel) and
@@ -1138,8 +1139,7 @@ class AnalyzeSequences(object):
         for r in reporters:
             r.write_to_file()
 
-    def _pad_or_truncate_sequence(self, input_seq):
-        sequence = input_seq
+    def _pad_or_truncate_sequence(self, sequence):
         if len(sequence) < self.sequence_length:
             sequence = _pad_sequence(
                 sequence,
