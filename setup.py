@@ -25,7 +25,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext}
 
 setup(name="selene-sdk",
-      version="0.4.5",
+      version="0.4.6",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
