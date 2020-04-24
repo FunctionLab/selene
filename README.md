@@ -27,7 +27,7 @@ pip install selene-sdk
 
 Note that we do not recommend pip-installing older versions of Selene (below 0.4.0), as these releases were less stable. 
 
-We currently only have a source distribution available for pip-installation. We are looking into releasing wheels in the future. 
+We currently only have a source distribution available for pip-installation.  
 
 ### Installing selene from source:
 
@@ -90,7 +90,7 @@ These examples reflect how we most often use Selene in our own projects, whereas
 We recommend that the examples be run on a machine with a CUDA-enabled GPU. All examples take significantly longer when run on a CPU machine.
 (See the following sections for time estimates.)
 
-**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) may not be compatible with the newer version of PyTorch. If you have trouble using one of our trained models on a CUDA-enabled GPU, it may be the result of differences in PyTorch or CUDA toolkit versions.  
+**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) are NOT compatible with newer versions of PyTorch. If you run into errors loading trained model weights files, it is likely the result of differences in PyTorch or CUDA toolkit versions.  
 
 ### Tutorials
 
