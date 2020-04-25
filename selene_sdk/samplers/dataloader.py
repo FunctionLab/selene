@@ -6,14 +6,16 @@ torch DataLoader mechanism.
 import  sys
 
 import numpy as np
-import torch.utils.data as data
-from torch.utils.data import DataLoader
+import h5py
+import torch
+from torch.utils.data import Dataset, DataLoader
 
 
-class _SamplerDataset(data.Dataset):
+class _SamplerDataset(Dataset):
     """
-    This class provides a Dataset interface for a Sampler or FileSampler.
-    `_SamplerDataset` is intended to be used with `SamplerDataLoader`.
+    This class provides a Dataset interface that wraps around a Sampler or
+    FileSampler. `_SamplerDataset` is intended to be used internally by
+    `SamplerDataLoader`.
 
     Parameters
     ----------
@@ -77,7 +79,7 @@ class SamplerDataLoader(DataLoader):
     A DataLoader that provides parallel sampling for any `Sampler`
     or `FileSampler` object. SamplerDataLoader requires sampler to be
     initialized with `picklable=True` to enable multi-procesing.
-    Currently `SamplerDataLoader` can be used with `MultiFileSampler` by
+    `SamplerDataLoader` can be used with `MultiFileSampler` by
     passing `SamplerDataLoader` object as `train_sampler`, `validate_sampler`
     or `test_sampler` when initiating a `MultiFileSampler`.
 
@@ -121,6 +123,182 @@ class SamplerDataLoader(DataLoader):
             "worker_init_fn": worker_init_fn
             }
 
-        super(SamplerDataLoader, self).__init__(_SamplerDataset(sampler),**args)
+        super(SamplerDataLoader, self).__init__(_SamplerDataset(sampler), **args)
+        self.seed = seed
 
+class _H5Dataset(Dataset):
+    """
+    This class provides a Dataset that directly load sequences and targets
+    from a hdf5 file. `_H5Dataset` is intended to be used internally by
+    `H5DataLoader`.
 
+    Parameters
+    ----------
+    file_path : str
+        The file path of the hdf5 file.
+    size : int or None
+        Default is None. Specify dataset size. This be used to limit the dataset to
+        first N rows. If None, use the sequences array length.
+    in_memory : bool, optional
+        Default is False. If True, load entire dataset into memory.
+    unpackbits : bool, optional
+        Default is False. If True, unpack binary-valued array from uint8
+        sequence and targets array. See `numpy.packbits` for details.
+    seq_key : str, optional
+        Default is "sequences". Specify the name of the hdf5 dataset that contains
+        sequence data.
+    tgt_key : str, optional
+        Default is "targets". Specify the name of the hdf5 dataset that contains
+        target data.
+
+    Attributes
+    ----------
+    file_path : str
+        The file path of the hdf5 file.
+    size : int or None
+        Specify dataset size. This be used to limit the dataset to
+        first N rows. If None, use the sequences array length.
+    in_memory : bool, optional
+        If True, load entire dataset into memory.
+    unpackbits : bool, optional
+        If True, unpack binary-valued array from uint8
+        sequence and targets array. See `numpy.packbits` for details.
+    """
+    def __init__(self,
+                 file_path,
+                 size=None,
+                 in_memory=False,
+                 unpackbits=False,
+                 seq_key="sequences",
+                 tgt_key="targets"):
+        super(_H5Dataset, self).__init__()
+        self.file_path = file_path
+        self._initialized = False
+        self.in_memory = in_memory
+        self.unpackbits = unpackbits
+        self._seq_key = seq_key
+        self._tgt_key = tgt_key
+        self.size = size
+
+    def init(func):
+        # delay initialization to allow multiprocessing
+        def dfunc(self, *args, **kwargs):
+            if not self._initialized:
+                self.db = h5py.File(self.file_path, 'r')
+                self.s_len = self.db['{0}_length'.format(self._seq_key)][()]
+                self.t_len = self.db['{0}_length'.format(self._tgt_key)][()]
+                if self.in_memory:
+                    self.sequences = np.asarray(self.db[self._seq_key])
+                    self.targets = np.asarray(self.db[self._tgt_key])
+                else:
+                    self.sequences = self.db[self._seq_key]
+                    self.targets = self.db[self._tgt_key]
+                self._initialized = True
+            return func(self, *args, **kwargs)
+        return dfunc
+
+    @init
+    def __getitem__(self, index):
+        if isinstance(index, int):
+            index = index % self.sequences.shape[0]
+        sequence = self.sequences[index, :, :]
+        targets = self.targets[index, :]
+        if self.unpackbits:
+            sequence = np.unpackbits(sequence, axis=-2)
+            nulls = np.sum(sequence, axis=-1) == 4
+            sequence = sequence.astype(float)
+            sequence[nulls, :] = 0.25
+            targets = np.unpackbits(targets, axis=-1).astype(
+                float)
+        if sequence.ndim == 3:
+            sequence = sequence[:, :self.s_len, :]
+        else:
+            sequence = sequence[:self.s_len, :]
+        if targets.ndim == 2:
+            targets = targets[:, :self.t_len]
+        else:
+            targets = targets[:self.t_len]
+        return (torch.from_numpy(sequence.astype(np.float32)),
+                torch.from_numpy(targets.astype(np.float32)))
+
+    @init
+    def __len__(self):
+        if self.size is None:
+            self.size = self.sequences.shape[0]
+        return self.size
+
+class H5DataLoader(DataLoader):
+    """
+    H5DataLoader that provides optionally parallel sampling from a HDF5
+    dataset that contains sequences and targets data. `H5DataLoader`
+    can be used with `MultiFileSampler` by passing `SamplerDataLoader` object
+    as `train_sampler`, `validate_sampler` or `test_sampler` when initiating a
+    `MultiFileSampler`.
+
+    Parameters
+    ----------
+    file_path : str
+        The file path of the hdf5 file.
+    size : int or None
+        Default is None. Specify dataset size. This be used to limit the dataset to
+        first N rows. If None, use the sequences array length.
+    in_memory : bool, optional
+        Default is False. If True, load entire dataset into memory.
+    num_workers : int, optional
+        Default is 1. If great than 1, use multiple process to parallelize data
+        sampling.
+    use_subset : int, list of int, or None, optional
+        Default is None. If int is provided, sample from only the first N rows of
+        the dataset. If list of int is provided, the list should provide indices to
+        sample from. If None, use the entire dataset.
+    batch_size : int, optional
+        Default is 1. Specify the batch size of the DataLoader.
+    shuffle : bool, optional
+        Default is True. If False, load the data in provided order.
+    unpackbits : bool, optional
+        Default is False. If True, unpack binary-valued array from uint8
+        sequence and targets array. See `numpy.packbits` for details.
+    seq_key : str, optional
+        Default is "sequences". Specify the name of the hdf5 dataset that contains
+        sequence data.
+    tgt_key : str, optional
+        Default is "targets". Specify the name of the hdf5 dataset that contains
+        target data.
+
+    Attributes
+    ----------
+    dataset : `_H5Dataset`
+        The `_H5Dataset` to load data from.
+
+    """
+    def __init__(self,
+                 filepath,
+                 size=None,
+                 in_memory=False,
+                 num_workers=1,
+                 use_subset=None,
+                 batch_size=1,
+                 shuffle=True,
+                 unpackbits=False,
+                 seq_key="sequences",
+                 tgt_key="targets"):
+        args = {
+            "batch_size": batch_size,
+            "num_workers": 0 if in_memory else num_workers,
+            "pin_memory": True
+        }
+        if use_subset is not None:
+            from torch.utils.data.sampler import SubsetRandomSampler
+            if type(use_subset, int):
+                use_subset = list(range(use_subset))
+            args["sampler"] = SubsetRandomSampler(use_subset)
+        else:
+            args["shuffle"] = shuffle
+        super(H5DataLoader, self).__init__(
+            _H5Dataset(filepath,
+                       size=size,
+                       in_memory=in_memory,
+                       unpackbits=unpackbits,
+                       seq_key=seq_key,
+                       tgt_key=tgt_key),
+            **args)
