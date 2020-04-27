@@ -582,7 +582,7 @@ class AnalyzeSequences(object):
             sequence = self._pad_or_truncate_sequence(input)
             seq_enc = self.reference_sequence.sequence_to_encoding(sequence)
             seq_enc = np.expand_dims(seq_enc, axis=0)  # add batch size of 1
-            return predict(self.model, seq_enc)
+            return predict(self.model, seq_enc, use_cuda=self.use_cuda)
         elif input.endswith('.fa') or input.endswith('.fasta'):
             self.get_predictions_for_fasta_file(
                 input, output_dir, output_format=output_format)
