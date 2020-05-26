@@ -7,7 +7,6 @@ across many of the packages modules.
 from collections import OrderedDict
 import logging
 import sys
-import traceback
 
 import numpy as np
 
@@ -99,32 +98,30 @@ def load_model_from_state_dict(state_dict, model):
     model_keys = model.state_dict().keys()
     state_dict_keys = state_dict.keys()
 
-    new_state_dict = OrderedDict()
-
     if len(model_keys) != len(state_dict_keys):
-        raise ValueError("State dict does not have the same "
-            "number of modules as the specified model "
-            "architecture. Please check whether you are using "
-            "the expected model architecture and that your PyTorch "
-            "version matches the version in which the loaded model "
-            "was trained.\n\n"
-            "\tExpected modules:\n\t{0}\n\n"
-            "\tModules in the loaded model weights:\n\t{1}\n".format(
-                model_keys, state_dict_keys))
+        try:
+            model.load_state_dict(state_dict, strict=False)
+            return model
+        except Exception as e:
+            raise ValueError("Loaded state dict does not match the model "
+                "architecture specified - please check that you are "
+                "using the correct architecture file and parameters.\n\n"
+                "{0}".format(e))
 
+    new_state_dict = OrderedDict()
     for (k1, k2) in zip(model_keys, state_dict_keys):
         value = state_dict[k2]
         try:
             new_state_dict[k1] = value
-        except Exception:
+        except Exception as e:
             raise ValueError(
                 "Failed to load weight from module {0} in model weights "
-                "into model architecture module {1}. (If module name "
+                "into model architecture module {1}. (If module name has "
                 "an additional prefix `model.` it is because the model is "
                 "wrapped in `selene_sdk.utils.NonStrandSpecific`. This "
                 "error was raised because the underlying module does "
                 "not match that expected by the loaded model:\n"
-                "{2}".format(k2, k1, traceback.print_exc()))
+                "{2}".format(k2, k1, e))
     model.load_state_dict(new_state_dict)
     return model
 

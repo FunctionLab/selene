@@ -62,6 +62,11 @@ def read_vcf_file(input_path,
     """
     variants = []
     na_rows = []
+    check_chr = True
+    for chrom in reference_sequence.get_chrs():
+        if not chrom.startswith("chr"):
+            check_chr = False
+            break
     with open(input_path, 'r') as file_handle:
         lines = file_handle.readlines()
         index = 0
@@ -85,12 +90,15 @@ def read_vcf_file(input_path,
             chrom = str(cols[0])
             if 'CHR' == chrom[:3]:
                 chrom = chrom.replace('CHR', 'chr')
-            elif "chr" not in chrom:
+            elif "chr" not in chrom and check_chr is True:
                 chrom = "chr" + chrom
 
             if chrom == "chrMT" and \
                     chrom not in reference_sequence.get_chrs():
                 chrom = "chrM"
+            elif chrom == "MT" and \
+                    chrom not in reference_sequence.get_chrs():
+                chrom = "M"
 
             pos = int(cols[1])
             name = cols[2]
@@ -115,6 +123,7 @@ def read_vcf_file(input_path,
                 if not reference_sequence.coords_in_bounds(chrom, start, end):
                     na_rows.append(line)
                     continue
+            alt = alt.replace('.', ',')  # consider '.' a valid delimiter
             for a in alt.split(','):
                 variants.append((chrom, pos, name, ref, a, strand))
 

@@ -3,6 +3,7 @@ This module provides the EvaluateModel class.
 """
 import logging
 import os
+import warnings
 
 import numpy as np
 import torch
@@ -57,6 +58,11 @@ class EvaluateModel(object):
     data_parallel : bool, optional
         Default is `False`. Specify whether multiple GPUs are available
         for torch to use during training.
+    use_features_ord : list(str) or None, optional
+        Default is None. Specify an ordered list of features for which to
+        run the evaluation. The features in this list must be identical to or
+        a subset of `features`, and in the order you want the resulting
+        `test_targets.npz` and `test_predictions.npz` to be saved.
 
     Attributes
     ----------
@@ -88,7 +94,8 @@ class EvaluateModel(object):
                  n_test_samples=None,
                  report_gt_feature_n_positives=10,
                  use_cuda=False,
-                 data_parallel=False):
+                 data_parallel=False,
+                 use_features_ord=None):
         self.criterion = criterion
 
         trained_model = torch.load(
@@ -103,10 +110,25 @@ class EvaluateModel(object):
 
         self.sampler = data_sampler
 
-        self.features = features
-
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
+
+        self.features = features
+        self._use_ixs = list(range(len(features)))
+        if use_features_ord is not None:
+            feature_ixs = {f: ix for (ix, f) in enumerate(features)}
+            self._use_ixs = []
+            self.features = []
+
+            for f in use_features_ord:
+                if f in feature_ixs:
+                    self._use_ixs.append(feature_ixs[f])
+                    self.features.append(f)
+                else:
+                    warnings.warn(("Feature {0} in `use_features_ord` "
+                                   "does not match any features in the list "
+                                   "`features` and will be skipped.").format(f))
+            self._write_features_ordered_to_file()
 
         initialize_logger(
             os.path.join(self.output_dir, "{0}.log".format(
@@ -130,11 +152,30 @@ class EvaluateModel(object):
 
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
+        # TODO: we should be able to do this on the sampler end instead of
+        # here. the current workaround is problematic, since
+        # self._test_data still has the full featureset in it, and we
+        # select the subset during `evaluate`
+        self._all_test_targets = self._all_test_targets[:, self._use_ixs]
 
+        # reset Genome base ordering when applicable.
         if (hasattr(self.sampler, "reference_sequence") and
-                isinstance(self.sampler.reference_sequence, Genome) and
-                _is_lua_trained_model(model)):
-            Genome.update_bases_order(['A', 'G', 'C', 'T'])
+                isinstance(self.sampler.reference_sequence, Genome)):
+            if _is_lua_trained_model(model):
+                Genome.update_bases_order(['A', 'G', 'C', 'T'])
+            else:
+                Genome.update_bases_order(['A', 'C', 'G', 'T'])
+
+    def _write_features_ordered_to_file(self):
+        """
+        Write the feature ordering specified by `use_features_ord`
+        after matching it with the `features` list from the class
+        initialization parameters.
+        """
+        fp = os.path.join(self.output_dir, 'use_features_ord.txt')
+        with open(fp, 'w+') as file_handle:
+            for f in self.features:
+                file_handle.write('{0}\n'.format(f))
 
     def _get_feature_from_index(self, index):
         """
@@ -170,7 +211,7 @@ class EvaluateModel(object):
         all_predictions = []
         for (inputs, targets) in self._test_data:
             inputs = torch.Tensor(inputs)
-            targets = torch.Tensor(targets)
+            targets = torch.Tensor(targets[:, self._use_ixs])
 
             if self.use_cuda:
                 inputs = inputs.cuda()
@@ -182,10 +223,11 @@ class EvaluateModel(object):
                 predictions = None
                 if _is_lua_trained_model(self.model):
                     predictions = self.model.forward(
-                        inputs.transpose(1, 2).unsqueeze_(2))
+                        inputs.transpose(1, 2).contiguous().unsqueeze_(2))
                 else:
                     predictions = self.model.forward(
                         inputs.transpose(1, 2))
+                predictions = predictions[:, self._use_ixs]
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(predictions.data.cpu().numpy())

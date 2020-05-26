@@ -9,7 +9,9 @@ Selene is a Python library and command line interface for training deep neural n
 We recommend using Selene with Python 3.6 or above. 
 Package installation should only take a few minutes (less than 10 minutes, typically ~2-3 minutes) with any of these methods (conda, pip, source). 
 
-**Install [PyTorch](https://pytorch.org/get-started/locally/).** If you have an NVIDIA GPU, install a version of PyTorch that supports it--Selene will run much faster with a discrete GPU.
+**First, install [PyTorch](https://pytorch.org/get-started/locally/).** If you have an NVIDIA GPU, install a version of PyTorch that supports it--Selene will run much faster with a discrete GPU. 
+The library is currently compatible with PyTorch versions between 0.4.1 and 1.4.0.
+We will continue to update Selene to be compatible with the latest version of PyTorch.
 
 ### Installing selene with [Anaconda](https://www.anaconda.com/download/) (for Linux):
 
@@ -25,7 +27,7 @@ pip install selene-sdk
 
 Note that we do not recommend pip-installing older versions of Selene (below 0.4.0), as these releases were less stable. 
 
-We currently only have a source distribution available for pip-installation. We are looking into releasing wheels in the future. 
+We currently only have a source distribution available for pip-installation.  
 
 ### Installing selene from source:
 
@@ -88,7 +90,7 @@ These examples reflect how we most often use Selene in our own projects, whereas
 We recommend that the examples be run on a machine with a CUDA-enabled GPU. All examples take significantly longer when run on a CPU machine.
 (See the following sections for time estimates.)
 
-**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) may not be compatible with the newer version of PyTorch. If you have trouble using one of our trained models on a CUDA-enabled GPU, it may be the result of differences in PyTorch or CUDA toolkit versions.  
+**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) are NOT compatible with newer versions of PyTorch. If you run into errors loading trained model weights files, it is likely the result of differences in PyTorch or CUDA toolkit versions.  
 
 ### Tutorials
 

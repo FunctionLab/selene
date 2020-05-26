@@ -11,6 +11,7 @@ from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
+from scipy.stats import rankdata
 
 
 logger = logging.getLogger("selene")
@@ -245,6 +246,34 @@ def get_feature_specific_scores(data, get_feature_from_index_fn):
         else:
             feature_score_dict[feature] = None
     return feature_score_dict
+
+
+def auc_u_test(labels, predictions):
+    """
+    Outputs the area under the the ROC curve associated with a certain 
+    set of labels and the predictions given by the training model.
+    Computed from the U statistic.
+
+    Parameters
+    ----------
+    labels: numpy.ndarray
+        Known labels of values predicted by model. Must be one dimensional.
+    predictions: numpy.ndarray
+        Value predicted by user model. Must be one dimensional, with matching
+        dimension to `labels`
+
+    Returns
+    -------
+    float
+        AUC value of given label, prediction pairs  
+   
+    """
+    len_pos = int(np.sum(labels))
+    len_neg = len(labels) - len_pos
+    rank_sum = np.sum(rankdata(predictions)[labels == 1])
+    u_value = rank_sum - (len_pos * (len_pos + 1)) / 2
+    auc = u_value / (len_pos * len_neg)
+    return auc
 
 
 class PerformanceMetrics(object):

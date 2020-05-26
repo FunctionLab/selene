@@ -172,6 +172,9 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
     features: !obj:selene_sdk.utils.load_features_list {
         input_path: /path/to/features_list.txt
     },
+    use_features_ord: !obj:selene_sdk.utils.load_features_list {
+        input_path: /path/to/features_subset_ordered.txt
+    },
     trained_model_path: /path/to/trained/model.pth.tar,
     batch_size: 64,
     n_test_samples: 640000,
@@ -190,6 +193,7 @@ evaluate_model: !obj:selene_sdk.EvaluateModel {
 - `report_gt_feature_n_positives`: Default is 10. In total, each class/feature must have more than `report_gt_feature_n_positives` positive examples in the test set to be considered in the performance computation. The output file that reports each class's performance will report 'NA' for classes that do not have enough positive samples.
 - `use_cuda`: Default is False. Specify whether CUDA-enabled GPUs are available for torch to use.  
 - `data_parallel`: Default is False. Specify whether multiple GPUs are available for torch to use.
+- `use_features_ord`: Default is None. Specify an ordered list of features for which to run the evaluation. The features in this list must be identical to or a subset of `features`, and in the order you want the resulting `test_targets.npz` and `test_predictions.npz` to be saved.
 
 #### Additional notes
 Similar to the `train_model` configuration, any arguments that you find in [the documentation](https://selene.flatironinstitute.org/selene.html#evaluatemodel) that are not present in the function-type value's arguments are automatically instantiated and passed in by Selene.
@@ -303,13 +307,15 @@ You may find that there are more output files than you expect in `output_dir` at
 - **Warnings:** Selene may detect that the `ref` base(s) in a variant do not match with the bases specified in the reference sequence FASTA at the `(chrom, pos)`. In this case, Selene will use the `ref` base(s) specified in the VCF file in place of those in the reference genome and output predictions accordingly. These predictions will be distinguished by the row label column `ref_match` value `False`. You may review these variants and determine whether you still want to use those predictions/scores. If you find that most of the variants have `ref_match = False`, it may be that you have specified the wrong reference genome version---please check this before proceeding.  
 
 ### _In silico_ mutagenesis
-An example configuration for _in silico_ mutagenesis when using a single sequence as input:
+An example configuration for _in silico_ mutagenesis of the whole sequence (i.e. rather than a subsequence), when using a single sequence as input:
 ```YAML
 in_silico_mutagenesis: {
     input_sequence: ATCGATAAAATTCTGGAG...,
     save_data: [predictions, diffs],
     output_path_prefix: /path/to/output/dir/filename_prefix,
-    mutate_n_bases: 1
+    mutate_n_bases: 1,
+    start_position: 0,
+    end_position: None
 }
 ```
 
@@ -318,15 +324,19 @@ in_silico_mutagenesis: {
 - `save_data`: A list of the data files to output. Must input 1 or more of the following options: `[abs_diffs, diffs, logits, predictions]`. (Note that the raw prediction values will not be outputted by default---you must specify `predictions` in the list if you want them.)
 - `output_path_prefix`: Optional, default is "ism". The path to which the data files are written. We have specified that it should be a filename _prefix_ because we will append additional information depending on what files you would like to output (e.g. `fileprefix_logits.tsv`) If directories in the path do not yet exist, they will automatically be created. 
 - `mutate_n_bases`: Optional, default is 1. The number of bases to mutate at any time. Standard _in silico_ mutagenesis only mutates a single base at a time, so we encourage users to start by leaving this value at 1. Double/triple mutations will be more difficult to interpret and are something we may work on in the future. 
+- `start_position`: Optional, default is 0. The starting position of the subsequence that should be mutated. This value should be nonnegative, and less than `end_position`. Also, the value of `end_position - start_position` should be at least `mutate_n_bases`.
+- `end_position`: Optional, default is `None`. If left as `None`, Selene will use the `sequence_length` parameter from `analyze_sequences`. This is the ending position of the subsequence that should be mutated. This value should be nonnegative, and greater than `start_position`. The value of `end_position -  start_position` should be at least `mutate_n_bases`.
 
-An example configuration for _in silico_ mutagenesis when using a FASTA file as input:
+An example configuration for _in silico_ mutagenesis of the center 100 bases of a 1000 base sequence read from a FASTA file input:
 ```YAML
 in_silico_mutagenesis: {
-    input_path: /path/to/sequences1.fa, 
+    input_path: /path/to/sequences1.fa,
     save_data: [logits],
     output_dir: /path/to/output/predictions/dir,
     mutate_n_bases: 1,
-    use_sequence_name: True
+    use_sequence_name: True,
+    start_position: 450,
+    end_position: 550
 }
 ```
 
@@ -338,6 +348,8 @@ in_silico_mutagenesis: {
 - `use_sequence_name`: Optional, default is `True`.
   - If `use_sequence_name`, output files are prefixed by the sequence name/description corresponding to each sequence in the FASTA file. Spaces in the description are replaced with underscores '_'.
   - If not `use_sequence_name`, output files are prefixed with the index `i` corresponding to the `i`th sequence in the FASTA file.
+- `start_position`: Optional, default is 0. The starting position of the subsequence that should be mutated. This value should be nonnegative, and less than `end_position`. The value of `end_position - start_position` should be at least `mutate_n_bases`.
+- `end_position`: Optional, default is `None`. If left as `None`, Selene will use the `sequence_length` parameter passed to `analyze_sequences`. This is the ending position of the subsequence that should be mutated. This value should be nonnegative, and greater than `start_position`. The value of `end_position -  start_position` should be at least `mutate_n_bases`.
 
 ## Sampler configurations
 Data sampling is used during model training and evaluation. You must specify the sampler in the configuration YAML file alongside the other operation-specific configurations (i.e. `train_model` or `evaluate_model`). 

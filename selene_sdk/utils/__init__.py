@@ -13,6 +13,7 @@ from .utils import load_model_from_state_dict
 from .performance_metrics import PerformanceMetrics
 from .performance_metrics import visualize_roc_curves
 from .performance_metrics import visualize_precision_recall_curves
+from .performance_metrics import auc_u_test
 from .config import load
 from .config import load_path
 from .config import instantiate
