@@ -3,18 +3,19 @@ This module provides the `MultiFileSampler` class, which uses a
 FileSampler for each mode of sampling (train, test, validation).
 The MultiFileSampler is therefore a subclass of Sampler.
 """
+import numpy as np
 from torch.utils.data import DataLoader
 
 from .sampler import Sampler
-from .dataloader import SamplerDataLoader
-
 
 class MultiFileSampler(Sampler):
     """
     This sampler draws samples from individual file samplers or data loaders
     that corresponds to training, validation, and testing (optional) modes.
-    MultiFileSampler calls on the correct file sampler to draw samples
-    for a given mode.
+    MultiFileSampler calls on the correct file sampler or data loader to draw
+    samples for a given mode. Example file samples are under
+    `selene_sdk.samplers.file_samplers` and example data loaders are under
+    `selene_sdk.samplers.dataloaders`.
 
     MultiFileSampler can use either file samplers or data loaders for
     different modes. Using data loaders for some mode while using file samplers
@@ -26,14 +27,14 @@ class MultiFileSampler(Sampler):
 
     Parameters
     ----------
-    train_sampler : FileSampler or SamplerDataLoader
-        Load your training data as a `FileSampler` before passing it
-        into the `MultiFileSampler` constructor.
-    validate_sampler : FileSampler or SamplerDataLoader
-        The validation dataset file sampler.
+    train_sampler : FileSampler or DataLoader
+        Load your training data as a `FileSampler` or `DataLoader`
+        before passing it into the `MultiFileSampler` constructor.
+    validate_sampler : FileSampler or DataLoader
+        The validation dataset file sampler or data loader.
     features : list(str)
         The list of features the model should predict
-    test_sampler : None or FileSampler or SamplerDataLoader, optional
+    test_sampler : None or FileSampler or DataLoader, optional
         Default is None. The test file sampler is optional.
     mode : str, optional
         Default is "train". Must be one of `{train, validate, test}`. The
@@ -127,7 +128,6 @@ class MultiFileSampler(Sampler):
         """
         Sets the batch size for DataLoader for the specified mode,
         if the specified  batch_size does not equal the current batch_size.
-
         Parameters
         ----------
         batch_size : int
@@ -138,12 +138,22 @@ class MultiFileSampler(Sampler):
         """
         if mode is None:
             mode = self.mode
-        if  self._dataloaders[mode].batch_size != batch_size:
-            self._dataloaders[mode] = SamplerDataLoader(
-                self._dataloaders[mode].dataset,
-                num_workers=self._dataloaders[mode].num_workers,
-                batch_size=batch_size)
-            self._iterators[mode] = iter(self._dataloaders[mode])
+
+        if self._dataloaders[mode]:
+            batch_size_matched = True
+            if self._dataloaders[mode].batch_sampler:
+                if self._dataloaders[mode].batch_sampler.batch_size != batch_size:
+                    self._dataloaders[mode].batch_sampler.batch_size = batch_size
+                    batch_size_matched = False
+            else:
+                if self._dataloaders[mode].batch_size != batch_size:
+                    self._dataloaders[mode].batch_size = batch_size
+                    batch_size_matched = False
+
+            if not batch_size_matched:
+                print("Reset data loader for mode {0} to use the new batch "
+                      "size: {1}.".format(mode, batch_size))
+                self._iterators[mode] = iter(self._dataloaders[mode])
 
     def get_feature_from_index(self, index):
         """
@@ -179,12 +189,12 @@ class MultiFileSampler(Sampler):
         if self._samplers[mode]:
             return self._samplers[mode].sample(batch_size)
         else:
-            self.set_batch_size(batch_size)
+            self.set_batch_size(batch_size, mode=mode)
             try:
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()
             except StopIteration:
-                #If SamplerDataLoader iterator reaches sys.maxsize, reinitialize
+                #If DataLoader iterator reaches its length, reinitialize
                 self._iterators[mode] = iter(self._dataloaders[mode])
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()
