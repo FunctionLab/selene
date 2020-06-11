@@ -545,7 +545,7 @@ class TrainModel(object):
         # scheduler update
         if self._use_scheduler:
             self.scheduler.step(
-                math.ceil(self.validation_loss * 1000.0) / 1000.0)
+                math.ceil(validation_loss * 1000.0) / 1000.0)
 
         # save best_model
         if validation_loss < self._min_loss:
