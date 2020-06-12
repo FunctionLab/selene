@@ -7,7 +7,6 @@ We would like to generalize this to `selene_sdk.sequences.Sequence` if possible.
 from collections import namedtuple
 import logging
 import random
-import time
 
 import numpy as np
 
@@ -128,7 +127,6 @@ class RandomPositionsSampler(OnlineSampler):
         The current mode that the sampler is running in. Must be one of
         the modes listed in `modes`.
     """
-
     def __init__(self,
                  reference_sequence,
                  target_path,
@@ -386,8 +384,8 @@ class RandomPositionsSampler(OnlineSampler):
         Parameters
         ----------
         batch_size : int, optional
-        Default is 1. The number of examples to include in the
-        mini-batch.
+            Default is 1. The number of examples to include in the
+            mini-batch.
 
         Returns
         -------
