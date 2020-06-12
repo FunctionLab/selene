@@ -7,6 +7,7 @@ We would like to generalize this to `selene_sdk.sequences.Sequence` if possible.
 from collections import namedtuple
 import logging
 import random
+import time
 
 import numpy as np
 
@@ -42,7 +43,6 @@ weights : list(float)
 
 """
 
-
 class RandomPositionsSampler(OnlineSampler):
     """This sampler randomly selects a position in the genome and queries for
     a sequence centered at that position for input to the model.
@@ -58,6 +58,8 @@ class RandomPositionsSampler(OnlineSampler):
         coordinates mapped to the genomic features we want to predict.
     features : list(str)
         List of distinct features that we aim to predict.
+    sample_size : int
+        Total sample size.
     seed : int, optional
         Default is 436. Sets the random seed for sampling.
     validation_holdout : list(str) or float, optional
@@ -81,6 +83,9 @@ class RandomPositionsSampler(OnlineSampler):
         `GenomicFeatures` object.
     mode : {'train', 'validate', 'test'}
         Default is `'train'`. The mode to run the sampler in.
+    replacement : boolean, optional
+        Default is `True`. Determines if sampling will be done with _sample_with_replacement
+        (True) or without replacement (False).
     save_datasets : list(str), optional
         Default is `['test']`. The list of modes for which we should
         save the sampled data to file.
@@ -122,12 +127,13 @@ class RandomPositionsSampler(OnlineSampler):
     mode : str
         The current mode that the sampler is running in. Must be one of
         the modes listed in `modes`.
-
     """
+
     def __init__(self,
                  reference_sequence,
                  target_path,
                  features,
+                 sample_size,
                  seed=436,
                  validation_holdout=['chr6', 'chr7'],
                  test_holdout=['chr8', 'chr9'],
@@ -135,6 +141,7 @@ class RandomPositionsSampler(OnlineSampler):
                  center_bin_to_predict=200,
                  feature_thresholds=0.5,
                  mode="train",
+                 replacement=True,
                  save_datasets=[],
                  output_dir=None):
         super(RandomPositionsSampler, self).__init__(
@@ -167,6 +174,12 @@ class RandomPositionsSampler(OnlineSampler):
 
         for mode in self.modes:
             self._update_randcache(mode=mode)
+
+        self.replacement = replacement
+        self.sample_size = sample_size
+
+        self.tot_sample = np.zeros(1) # will be 1 indexed.
+        self.sample_init = False
 
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
@@ -282,6 +295,62 @@ class RandomPositionsSampler(OnlineSampler):
                 self.save_dataset_to_file(self.mode)
         return (retrieved_seq, retrieved_targets)
 
+# Make a dictionary of chromosomes which maps to how many elements from chrom
+# we sample. Determined probabilistically and weighted by proportion.
+    def _samples_per_chrom(self):
+        proportions = []
+        samples_per_chrom = {}
+        gen_size = 0
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            # Dividing by 100 increases performance significantly, but makes
+            # the proportions slightly off. However, it was decided that
+            # taking off the last few digits from the large genome size
+            # would not greatly change the ratios. Maybe this can be an optional
+            # feature, depending on the size of reference_sequence.
+            proportions += [chrom]*(int(len_chrom/100))
+            samples_per_chrom[chrom] = 0
+
+        # Could this possibly assign more positions to a certain chromosome than it has?
+        # Seems unlikely... but maybe check exactly how unlikely.
+        for i in range(self.sample_size):
+            chr = random.choice(proportions)
+            samples_per_chrom[chr] += 1
+
+        return samples_per_chrom
+
+# Updates tot_sample to hold the indices we will sample from
+# of a hypothetical flattened array of each chromosome laid side by side.
+# These indices can then be converted into (chrom, position) pairs to sample.
+    def _generate_sample(self):
+        tot_len = 0
+        samples_per_chrom = self._samples_per_chrom()
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            chrom_range = np.arange(tot_len, tot_len + len_chrom)
+            curr_sample = np.random.choice(chrom_range,
+                                        size=(1, samples_per_chrom[chrom]),
+                                        replace=False)[0]
+            self.tot_sample = np.append(self.tot_sample, curr_sample)
+            tot_len += len_chrom
+
+        self.sample_init = True
+
+# Returns (chrom, poition) pair corresponding to index in the genome array.
+    def _pair_from_index(self, index):
+        curr_index = 0
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            curr_index += len_chrom
+            if index < curr_index:
+                 return chrom, int(index - (curr_index - len_chrom))
+
+    def _sample_without_replacement(self):
+        if not self.sample_init:
+             self._generate_sample()
+
+        index = self.tot_sample[1]
+        np.delete(self.tot_sample, 1)
+        chrom, pos = self._pair_from_index(index)
+        return chrom, pos
+
     def _update_randcache(self, mode=None):
         if not mode:
             mode = self.mode
@@ -292,7 +361,24 @@ class RandomPositionsSampler(OnlineSampler):
             p=self._sample_from_mode[mode].weights)
         self._randcache[mode]["sample_next"] = 0
 
-    def sample(self, batch_size=1):
+    def _sample_with_replacement(self):
+
+        sample_index = self._randcache[self.mode]["sample_next"]
+        if sample_index == len(self._randcache[self.mode]["cache_indices"]):
+            self._update_randcache()
+            sample_index = 0
+
+        rand_interval_index = \
+            self._randcache[self.mode]["cache_indices"][sample_index]
+        self._randcache[self.mode]["sample_next"] += 1
+
+        chrom, cstart, cend = \
+            self.sample_from_intervals[rand_interval_index]
+        position = np.random.randint(cstart, cend)
+
+        return chrom, position
+
+    def sample(self, batch_size):
         """
         Randomly draws a mini-batch of examples and their corresponding
         labels.
@@ -300,8 +386,8 @@ class RandomPositionsSampler(OnlineSampler):
         Parameters
         ----------
         batch_size : int, optional
-            Default is 1. The number of examples to include in the
-            mini-batch.
+        Default is 1. The number of examples to include in the
+        mini-batch.
 
         Returns
         -------
@@ -320,18 +406,10 @@ class RandomPositionsSampler(OnlineSampler):
         targets = np.zeros((batch_size, self.n_features))
         n_samples_drawn = 0
         while n_samples_drawn < batch_size:
-            sample_index = self._randcache[self.mode]["sample_next"]
-            if sample_index == len(self._randcache[self.mode]["cache_indices"]):
-                self._update_randcache()
-                sample_index = 0
-
-            rand_interval_index = \
-                self._randcache[self.mode]["cache_indices"][sample_index]
-            self._randcache[self.mode]["sample_next"] += 1
-
-            chrom, cstart, cend = \
-                self.sample_from_intervals[rand_interval_index]
-            position = np.random.randint(cstart, cend)
+            if self.replacement:
+                chrom, position = self._sample_with_replacement()
+            else:
+                chrom, position = self._sample_without_replacement()
 
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
