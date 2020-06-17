@@ -335,6 +335,7 @@ class RandomPositionsSampler(OnlineSampler):
             self.tot_sample = np.append(self.tot_sample, curr_sample)
 
         self.sample_init = True
+        
 
 # Returns (chrom, poition) pair corresponding to index in the genome array.
     def _pair_from_index(self, index):
