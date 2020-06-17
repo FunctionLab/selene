@@ -5,6 +5,7 @@ TODO: Currently, only works with sequences from `selene_sdk.sequences.Genome`.
 We would like to generalize this to `selene_sdk.sequences.Sequence` if possible.
 """
 from collections import namedtuple
+from collections import defaultdict
 import logging
 import random
 
@@ -179,6 +180,11 @@ class RandomPositionsSampler(OnlineSampler):
         self.tot_sample = np.zeros(1) # will be 1 indexed.
         self.sample_init = False
 
+        self.chroms = np.zeros(0)
+        self.chrom_starts = np.zeros(0)
+        self.chrom_ends = np.zeros(0)
+        self.genome_length = 0
+
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
             self.sample_from_intervals.append(
@@ -296,22 +302,12 @@ class RandomPositionsSampler(OnlineSampler):
 # Make a dictionary of chromosomes which maps to how many elements from chrom
 # we sample. Determined probabilistically and weighted by proportion.
     def _samples_per_chrom(self):
-        proportions = []
-        samples_per_chrom = {}
-        gen_size = 0
-        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
-            # Dividing by 100 increases performance significantly, but makes
-            # the proportions slightly off. However, it was decided that
-            # taking off the last few digits from the large genome size
-            # would not greatly change the ratios. Maybe this can be an optional
-            # feature, depending on the size of reference_sequence.
-            proportions += [chrom]*(int(len_chrom/100))
-            samples_per_chrom[chrom] = 0
+        proportions = np.subtract(self.chrom_ends, self.chrom_starts)
+        proportions[:] = [chr_len / self.genome_length for chr_len in proportions]
+        samples_per_chrom = defaultdict(int)
 
-        # Could this possibly assign more positions to a certain chromosome than it has?
-        # Seems unlikely... but maybe check exactly how unlikely.
         for i in range(self.sample_size):
-            chr = random.choice(proportions)
+            chr = np.random.choice(self.chroms, p=proportions)
             samples_per_chrom[chr] += 1
 
         return samples_per_chrom
@@ -321,32 +317,45 @@ class RandomPositionsSampler(OnlineSampler):
 # These indices can then be converted into (chrom, position) pairs to sample.
     def _generate_sample(self):
         tot_len = 0
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            self.chroms = np.append(self.chroms, chrom)
+            self.chrom_starts = np.append(self.chrom_starts, tot_len)
+            self.chrom_ends = np.append(self.chrom_ends, tot_len + len_chrom - 1)
+            tot_len += len_chrom
+
+        self.genome_length = tot_len
+
         samples_per_chrom = self._samples_per_chrom()
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
-            chrom_range = np.arange(tot_len, tot_len + len_chrom)
+            chrom_range = np.arange(tot_len, tot_len + len_chrom - 1)
             curr_sample = np.random.choice(chrom_range,
                                         size=(1, samples_per_chrom[chrom]),
                                         replace=False)[0]
+            print(chrom + ": " + str(curr_sample))
             self.tot_sample = np.append(self.tot_sample, curr_sample)
-            tot_len += len_chrom
 
         self.sample_init = True
 
 # Returns (chrom, poition) pair corresponding to index in the genome array.
     def _pair_from_index(self, index):
         curr_index = 0
-        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
-            curr_index += len_chrom
-            if index < curr_index:
-                 return chrom, int(index - (curr_index - len_chrom))
+        find = np.where(self.chrom_ends >= index)
+        find = np.where(self.chrom_ends >= index)[0]
+        chrom = self.chroms[find]
+        pos = int(index - self.chrom_starts[find])
+        return chrom, pos
 
     def _sample_without_replacement(self):
         if not self.sample_init:
-             self._generate_sample()
+            self._generate_sample()
 
-        index = self.tot_sample[1]
-        np.delete(self.tot_sample, 1)
-        chrom, pos = self._pair_from_index(index)
+        random_index = np.random.randint(0, len(self.tot_sample))
+        print("Random index: " + str(random_index))
+        print(self.tot_sample)
+        sample_index = self.tot_sample[random_index]
+        print("Sample index: " + str(sample_index))
+        chrom, pos = self._pair_from_index(sample_index)
+        np.delete(self.tot_sample, random_index)
         return chrom, pos
 
     def _update_randcache(self, mode=None):
@@ -409,6 +418,8 @@ class RandomPositionsSampler(OnlineSampler):
             else:
                 chrom, position = self._sample_without_replacement()
 
+            print("Chrom: " + chrom)
+            print("Pos: " + str(position))
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
                 continue
