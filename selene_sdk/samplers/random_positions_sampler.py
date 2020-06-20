@@ -58,8 +58,12 @@ class RandomPositionsSampler(OnlineSampler):
         coordinates mapped to the genomic features we want to predict.
     features : list(str)
         List of distinct features that we aim to predict.
-    sample_size : int
-        Total sample size.
+    train_size : int
+        Total sample size for train set.
+    validation_size : int
+        Total sample size of validation set.
+    test_size : int
+        Total sample size of test set.
     seed : int, optional
         Default is 436. Sets the random seed for sampling.
     validation_holdout : list(str) or float, optional
@@ -132,7 +136,9 @@ class RandomPositionsSampler(OnlineSampler):
                  reference_sequence,
                  target_path,
                  features,
-                 sample_size,
+                 train_size,
+                 validation_size,
+                 test_size,
                  seed=436,
                  validation_holdout=['chr6', 'chr7'],
                  test_holdout=['chr8', 'chr9'],
@@ -175,15 +181,23 @@ class RandomPositionsSampler(OnlineSampler):
             self._update_randcache(mode=mode)
 
         self.replacement = replacement
-        self.sample_size = sample_size
 
-        self.tot_sample = np.zeros(1) # will be 1 indexed.
+        self.samples = {}
+        for mode, size in [("train", train_size),
+            ("validation", validation_size), ("test", test_size)]:
+            self.samples[mode] = {"size" : size,
+                                  "sample" : np.zeros(size),
+                                  "chroms" : np.zeros(0),
+                                  "length" : 0 }
+
         self.sample_init = False
 
-        self.chroms = np.zeros(0)
-        self.chrom_starts = np.zeros(0)
-        self.chrom_ends = np.zeros(0)
+        self.chroms_split = {}
+        for chrom_info in ["Total", "Starts", "Ends"]:
+            self.chroms_split[chrom_info] = np.zeros(0)
+
         self.genome_length = 0
+
 
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
@@ -299,64 +313,119 @@ class RandomPositionsSampler(OnlineSampler):
                 self.save_dataset_to_file(self.mode)
         return (retrieved_seq, retrieved_targets)
 
-# Make a dictionary of chromosomes which maps to how many elements from chrom
-# we sample. Determined probabilistically and weighted by proportion.
-    def _samples_per_chrom(self):
-        proportions = np.subtract(self.chrom_ends, self.chrom_starts)
-        proportions[:] = [chr_len / self.genome_length for chr_len in proportions]
-        samples_per_chrom = defaultdict(int)
+    # Returns arrays containing the relative proportions of chromosomes in the
+    # train sample, testing sample and validation sample.
+    def _get_proportions(self):
+        whole_proportions = np.subtract(self.chroms_split["Ends"], self.chroms_split["Starts"])
 
-        for i in range(self.sample_size):
-            chr = np.random.choice(self.chroms, p=proportions)
+        # Create masks
+        test_mask = np.in1d(self.chroms_split["Total"], self.test_holdout)
+        validation_mask = np.in1d(self.chroms_split["Total"], self.validation_holdout)
+        holdouts = self.test_holdout + self.validation_holdout
+        train_mask = np.in1d(self.chroms_split["Total"], holdouts, invert=True)
+
+        for mode, mask in [("test", test_mask),
+                    ("validation", validation_mask),
+                    ("train", train_mask)]:
+            self.samples[mode]["chroms"] = (self.chroms_split["Total"])[mask]
+            self.samples[mode]["proportions"] = \
+                [chr_len / self.samples[mode]["length"] for chr_len in whole_proportions[mask]]
+
+        return
+
+    # Update `samples_per_chrom` to map a chromosomes to the number of times it
+    # should be sampled in a `sample_size` set, given that each chrom's
+    # ratio is given by the `proportions` list. `
+    def _samples_from_proportion(self, samples_per_chrom, mode):
+        for i in range(self.samples[mode]["size"]):
+            chr = np.random.choice(self.samples[mode]["chroms"],
+                                   p=self.samples[mode]["proportions"])
             samples_per_chrom[chr] += 1
 
+    # Make a dictionary of chromosomes which maps to how many elements from chrom
+    # we sample. Determined probabilistically and weighted by proportion.
+    def _samples_per_chrom(self):
+        proportions = self._get_proportions()
+        samples_per_chrom = defaultdict(int)
+        self._samples_from_proportion(samples_per_chrom, "train")
+        self._samples_from_proportion(samples_per_chrom, "validation")
+        self._samples_from_proportion(samples_per_chrom, "test")
         return samples_per_chrom
 
-# Updates tot_sample to hold the indices we will sample from
-# of a hypothetical flattened array of each chromosome laid side by side.
-# These indices can then be converted into (chrom, position) pairs to sample.
-    def _generate_sample(self):
+    # Setup `self.chroms`, `self.chroms_starts`, `self.chroms_ends`, `self.genome_length`
+    def _init_chroms(self):
         tot_len = 0
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
-            self.chroms = np.append(self.chroms, chrom)
-            self.chrom_starts = np.append(self.chrom_starts, tot_len)
-            self.chrom_ends = np.append(self.chrom_ends, tot_len + len_chrom - 1)
+            self.chroms_split["Total"] = np.append(self.chroms_split["Total"], chrom)
+            self.chroms_split["Starts"] = np.append(self.chroms_split["Starts"], tot_len)
+            self.chroms_split["Ends"] = np.append(self.chroms_split["Ends"], tot_len + len_chrom)
             tot_len += len_chrom
+            if chrom in self.test_holdout:
+                self.samples["test"]["length"] += len_chrom
+            elif chrom in self.validation_holdout:
+                self.samples["validation"]["length"] += len_chrom
+            else:
+                self.samples["train"]["length"] += len_chrom
 
         self.genome_length = tot_len
 
+    # Generate a sample for a given chromosome with `samples_per_chrom` elements.
+    def _generate_chrom_sample(self, samples_per_chrom, len_chrom, tot_len):
+        chrom_range = np.arange(tot_len, tot_len + len_chrom)
+        curr_sample = np.random.choice(chrom_range,
+                                    size=(1, samples_per_chrom),
+                                    replace=False)[0]
+        return curr_sample
+
+    # Updates train_sample to hold the indices we will sample from
+    # of a hypothetical flattened array of each chromosome laid side by side.
+    # These indices can then be converted into (chrom, position) pairs to sample.
+    def _generate_sample(self):
+        self._init_chroms()
+
+        tot_len = 0
+        train_counter = 0
+        validation_counter = 0
+        test_counter = 0
+
         samples_per_chrom = self._samples_per_chrom()
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
-            chrom_range = np.arange(tot_len, tot_len + len_chrom - 1)
-            curr_sample = np.random.choice(chrom_range,
-                                        size=(1, samples_per_chrom[chrom]),
-                                        replace=False)[0]
-            print(chrom + ": " + str(curr_sample))
-            self.tot_sample = np.append(self.tot_sample, curr_sample)
+            _samples_per_chrom = samples_per_chrom[chrom]
+            curr_sample = self._generate_chrom_sample(_samples_per_chrom, len_chrom, tot_len)
+
+            if chrom in self.validation_holdout:
+                self.samples["validation"]["sample"][validation_counter  : validation_counter  + _samples_per_chrom] = curr_sample
+                validation_counter += _samples_per_chrom
+            elif chrom in self.test_holdout:
+                self.samples["test"]["sample"][test_counter : test_counter + _samples_per_chrom] = curr_sample
+                test_counter += _samples_per_chrom
+            else:
+                self.samples["train"]["sample"][train_counter  : train_counter  + _samples_per_chrom] = curr_sample
+                train_counter += _samples_per_chrom
+
+            tot_len += len_chrom
 
         self.sample_init = True
-        
+        return
 
-# Returns (chrom, poition) pair corresponding to index in the genome array.
+
+    # Returns (chrom, poition) pair corresponding to index in the genome array.
     def _pair_from_index(self, index):
         curr_index = 0
-        find = np.where(self.chrom_ends >= index)
-        find = np.where(self.chrom_ends >= index)[0]
-        chrom = self.chroms[find]
-        pos = int(index - self.chrom_starts[find])
+        # find = np.where(self.chrom_ends >= index)
+        find = np.where(self.chroms_split["Ends"] >= index)
+        next = find[0][0]
+        chrom = self.chroms_split["Total"][next]
+        pos = int(index - self.chroms_split["Starts"][next])
         return chrom, pos
 
     def _sample_without_replacement(self):
         if not self.sample_init:
             self._generate_sample()
-
-        random_index = np.random.randint(0, len(self.tot_sample))
-        print("Random index: " + str(random_index))
-        print(self.tot_sample)
-        sample_index = self.tot_sample[random_index]
-        print("Sample index: " + str(sample_index))
+        random_index = np.random.randint(0, len(self.samples[self.mode]["sample"]))
+        sample_index = self.samples[self.mode]["sample"][random_index]
         chrom, pos = self._pair_from_index(sample_index)
-        np.delete(self.tot_sample, random_index)
+        np.delete(self.samples[self.mode]["sample"], random_index)
         return chrom, pos
 
     def _update_randcache(self, mode=None):
@@ -419,8 +488,6 @@ class RandomPositionsSampler(OnlineSampler):
             else:
                 chrom, position = self._sample_without_replacement()
 
-            print("Chrom: " + chrom)
-            print("Pos: " + str(position))
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
                 continue
