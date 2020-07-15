@@ -235,15 +235,15 @@ class RandomPositionsSampler(OnlineSampler):
         test = np.arange(total, dtype=np.int64)
         jump = 250000000
         num_steps = int(total / jump)
-        # start = 0
-        # for i in range(num_steps):
-        #     np.random.shuffle(test[start : start + jump])
-        #     start = start + jump
+        start = 0
+        for i in range(num_steps):
+            np.random.shuffle(test[start : start + jump])
+            start = start + jump
 
-        # start = int(jump / 2)
-        # for i in range(num_steps - 1):
-        #     np.random.shuffle(test[start : start + jump])
-        #     start = start + jump
+        start = int(jump / 2)
+        for i in range(num_steps - 1):
+            np.random.shuffle(test[start : start + jump])
+            start = start + jump
 
         return test
         # rename
@@ -286,15 +286,6 @@ class RandomPositionsSampler(OnlineSampler):
             # get_N = _assign_samples_per_mode(training_prop_N, "train", start, self._N_train, genome_positions_arr)
             self._N_train -= get_N
 
-    # def printAll(self):
-    #     print("test")
-    #     print(self._partition_ixs["test"])
-    #
-    #     print("validate")
-    #     print(self._partition_ixs["validate"])
-    #
-    #     print("train")
-    #     print(self._partition_ixs["train"])
 
     # def _partition_by_chrom(self):
     #     return
@@ -393,8 +384,6 @@ class RandomPositionsSampler(OnlineSampler):
 
     def _sample(self):
         # @ Kathy, where do we set the partition for a particular sample?
-        # TODO: Overflow errors occured when using this random indexing
-        # Overflow should not occur with int64.
         # random_index = np.random.randint(0, len(self._partition_ixs[self.mode]))
         sample_index = self._partition_ixs[self.mode][0]
         chrom, pos = self._pair_from_index(sample_index)
@@ -429,13 +418,7 @@ class RandomPositionsSampler(OnlineSampler):
         targets = np.zeros((batch_size, self.n_features))
         n_samples_drawn = 0
         while n_samples_drawn < batch_size:
-            print("Samples: ")
-            print(n_samples_drawn)
             chrom, position = self._sample()
-            print("Chrom: ")
-            print(chrom)
-            print("Position: ")
-            print(position)
             retrieve_output = self._retrieve(chrom, position)
             if not retrieve_output:
                 continue
