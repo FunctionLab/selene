@@ -164,9 +164,9 @@ class RandomPositionsSampler(OnlineSampler):
 
         self._num_chroms = 0
         self._genome_n_bases = 0
-        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
-            self._num_chroms += 1
-            self._genome_n_bases += len_chrom
+        # Holds the size of the parition of each mode (the portion that is
+        # specified to belong to each mode)
+        self._parititon_sizes = {"validate" : 0, "train" : 0, "test" : 0}
 
         self._validation_holdout = validation_holdout
         self._N_validation = validation_size
@@ -177,9 +177,27 @@ class RandomPositionsSampler(OnlineSampler):
 
         self._N_train = train_size
 
-        self._partition_ixs = {"Train": np.zeros(self._N_train, dtype=np.int64),
-                                "Validate": np.zeros(self._N_validation, dtype=np.int64),
-                                "Test": np.zeros(self._N_test, dtype=np.int64)}
+        # Holds numpy array data sets for each mode (train, validate, test)
+        # which is made upon initilization of the class.
+        # These samples' initialize size is determined by the sample size
+        # designated by the class instance and is subsequently shrunken as
+        # calls to sample are made.
+        self._partition_ixs = {"train": np.zeros(self._N_train, dtype=np.int64),
+                                "validate": np.zeros(self._N_validation, dtype=np.int64),
+                                "test": np.zeros(self._N_test, dtype=np.int64)}
+
+        # Count the number of chromosomes and bases. If sampling by chromosome,
+        # count the number of base pairs in the chromosomes per mode.
+        for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            if not isinstance(validation_holdout, float):
+                if chrom in self.validation_holdout:
+                    self._parititon_sizes["validate"] += len_chrom
+                elif chrom in self.test_holdout:
+                    self._parititon_sizes["test"] += len_chrom
+                else:
+                    self._parititon_sizes["train"] += len_chrom
+            self._num_chroms += 1
+            self._genome_n_bases += len_chrom
 
         # Information about each chromosome, "Total" holds the chrom names
         # "Starts" holds the start indices in a theoretical flat array of all
@@ -190,10 +208,13 @@ class RandomPositionsSampler(OnlineSampler):
 
         if isinstance(validation_holdout, float):
             self._partition_by_proportion()
-        elif isinstance(validation_holdout):
+        else:
             self._partition_by_chromosome()
 
-    # Setup `self.chroms`, `self.chroms_starts`, `self.chroms_ends`, `self.genome_length`
+    # Set `self.chroms` (list containing chromosome names in order),
+    # `self.chroms_starts` (position of each chromosome start in the genome),
+    # `self.chroms_ends` (position of each chromosome end in the genome)
+
     def _init_chroms(self):
         tot_len = 0
         counter = 0
@@ -205,9 +226,8 @@ class RandomPositionsSampler(OnlineSampler):
             counter += 1
 
     # Compute the number of elements in the genome array that belong to
-    # each mode, by proportion
+    # each mode, by proportion (floored to an int)
 
-    # Edit to be used by chromosome code as well.
     def _assign_proportions(self):
         if self.test_holdout:
             test_prop_N = self._genome_n_bases * self._test_holdout
@@ -217,41 +237,54 @@ class RandomPositionsSampler(OnlineSampler):
             return int(test_prop_N), int(validation_prop_N), int(training_prop_N)
         else:
             validation_prop_N = self._genome_n_bases * self._validation_holdout
-            training_prop_N = self._genome_n_bases * (1 - _validation_holdout)
+            training_prop_N = self._genome_n_bases * (1 - self._validation_holdout)
             return int(validation_prop_N), int(training_prop_N)
 
-    # def _assign_samples_per_mode(self, prop_N, mode, start, sample_size, genome_positions_arr):
-    #     get_N = min(prop_N, sample_size)
-    #     self._partition_ixs[mode] = genome_positions_arr[start:start + get_N]
-    #     return get_N
-
-
-    def _partition_by_proportion(self):
-        self._init_chroms()
-        self._assign_samples() # can these be expanded to be used by partition by chrom?
-
+    # Should be updated to be dynamic for the genome that is being sampled.
+    # If the genome size is not a multiple of 250 million, then we do it
+    # differently ..
     def _psuedoshuffle(self):
         total = self._genome_n_bases
-        test = np.arange(total, dtype=np.int64)
+        shuffled_sample = np.arange(total, dtype=np.int64)
         jump = 250000000
         num_steps = int(total / jump)
         start = 0
         for i in range(num_steps):
-            np.random.shuffle(test[start : start + jump])
+            np.random.shuffle(shuffled_sample[start : start + jump])
             start = start + jump
 
         start = int(jump / 2)
         for i in range(num_steps - 1):
-            np.random.shuffle(test[start : start + jump])
+            np.random.shuffle(shuffled_sample[start : start + jump])
             start = start + jump
 
-        return test
-        # rename
+        return shuffled_sample
 
-    # Order: test, validate, train
-    # Make sure this matches chromosome implementation
-    def _assign_samples(self):
-        genome_positions_arr = self._psuedoshuffle()
+    # Samples for each mode are predetermined based on the sample size for
+    # each mode. This imposes an up front time constraint, dependent on each
+    # sample size and the size of the entire genome.  # Subsequently, sampling is quick.
+
+    # There is a space constraint in the first phase of picking the samples
+    # However, this constraint dwindles after samples are set and even further as
+    #  samples are taken and subsequently removed.
+
+    # If the genome is above 500 million base pairs, only a psuedoshuffle is
+    # performed on the genome to perform partitions. This is due to time
+    # constraints on shuffling larger sets.
+
+    # Samples are taken without replacement. However, if the sample size is
+    # larger than the proportion specified, there will be duplicate sample
+    # items. If this is not the intended behavior, the sample size should be
+    # chosen so as to not be larger than the proportion of the genome.
+
+    def _partition_by_proportion(self):
+        self._init_chroms()
+        if self._genome_n_bases > 500000000:
+            genome_positions_arr = self._psuedoshuffle()
+        else:
+            genome_positions_arr = np.arange(total, dtype=np.int64)
+            np.random.shuffle(genome_positions_arr)
+
         start = 0
         if self.test_holdout:
             test_prop_N, validation_prop_N, training_prop_N = self._assign_proportions()
@@ -259,7 +292,6 @@ class RandomPositionsSampler(OnlineSampler):
             while N_test:
                 get_N = min(test_prop_N, N_test)
                 self._partition_ixs["test"] = genome_positions_arr[start : start + get_N]
-                # get_N = self._assign_samples_per_mode(test_prop_N, "test", start, self._N_test, genome_positions_arr)
                 N_test -= get_N
                 if N_test :
                     start = start + get_N
@@ -273,8 +305,7 @@ class RandomPositionsSampler(OnlineSampler):
         while N_validation:
             get_N = min(validation_prop_N, N_validation)
             self._partition_ixs["validate"] = genome_positions_arr[start:start + get_N]
-            # get_N = _assign_samples_per_mode(validation_prop_N, "validation", start, self._N_validation, genome_positions_arr)
-            N_validation -= get_N # I dont think we can alter an int like this in a function bc its pass by copy
+            N_validation -= get_N
             if N_validation:
                 start = start + get_N
 
@@ -283,45 +314,59 @@ class RandomPositionsSampler(OnlineSampler):
         while self._N_train:
             get_N = min(training_prop_N, self._N_train)
             self._partition_ixs["train"] = genome_positions_arr[start:start + get_N]
-            # get_N = _assign_samples_per_mode(training_prop_N, "train", start, self._N_train, genome_positions_arr)
             self._N_train -= get_N
 
 
-    # def _partition_by_chrom(self):
-    #     return
-    #
-    #     genome_arr = np.arange(self._genome_n_bases)
-    #     # to keep this SIMPLE, you create the chromosome to position map based on what chromosomes
-    #     # the user specifies as holdouts!
-    #     # so validation is always after training, test chroms always after validation
-    #     tot_len = 0
-    #     train_counter = 0
-    #     validation_counter = self._N_train
-    #     test_counter = self._N_train + self._N_validation
-    #     genome_positions_arr = np.zeros(self._genome_n_bases)
-    #
-    #     for chrom, len in self.genome.get_chr_lens():
-    #
-    #         if chrom in self.validation_holdout:
-    #             genome_positions_arr[validation_counter  : validation_counter  + len] = np.arange(tot_len, tot_len + len)
-    #         elif chrom in self.test_holdout:
-    #             genome_positions_arr[test_counter : test_counter + len] = np.arange(tot_len, tot_len + len)
-    #         else:
-    #             genome_positions_arr[train_counter  : train_counter  + len] = np.arange(tot_len, tot_len + len)
-    #
-    #         for mode in self.modes:
-    #             # Shuffle each partitition individually
-    #             np.shuffle(genome_positions_arr[0:self._N_train])
-    #             np.shuffle(genome_positions_arr[self._N_train:self._N_train + self._N_validation])
-    #             np.shuffle(genome_positions_arr[self._N_train + self._N_validation:])
-    #
-    #             # what would be interval lengths here???
-    #             sample_indices = self._partition_ixs[mode].indices
-    #             indices, weights = get_indices_and_probabilities(
-    #                 self.interval_lengths, sample_indices)
-    #             self._sample_from_mode[mode] = \
-    #                 self._sample_from_mode[mode]._replace(
-    #                     indices=indices, weights=weights)
+    def _partition_by_chromosome(self):
+        self._init_chroms()
+        tot_len, train_counter, validation_counter, test_counter = 0, 0, 0, 0
+        # Holds the entire range of values that can be sampled for each mode
+        # determined by the user specification of which chrom to sample
+        partition = {"validate" : np.zeros(self._parititon_sizes["validate"]),
+                        "train" : np.zeros(self._parititon_sizes["train"]),
+                        "test" : np.zeros(self._parititon_sizes["test"])}
+
+        for chrom, length in self.reference_sequence.get_chr_lens():
+
+            if chrom in self.validation_holdout:
+                partition["validate"][validation_counter: validation_counter + length] = np.arange(tot_len, tot_len + length)
+            elif chrom in self.test_holdout:
+                partition["test"][test_counter: test_counter + length] = np.arange(tot_len, tot_len + length)
+            else:
+                partition["train"][train_counter: train_counter + length] = np.arange(tot_len, tot_len + length)
+            tot_len += length
+
+        # Given the possibilities to sample from given in `partition`,
+        # randomly select `sample_size` elements from `partition` to be in
+        # the final sample size for each mode.
+        # Sample without replacement unless necessary to do so due to
+        # the size of the parition in comparison to the sample size for a mode.
+        for mode in self.modes:
+            sample_size = self._partition_ixs[mode].size
+            counter = 0
+            partition_size = self._parititon_sizes[mode]
+            while counter < sample_size:
+                # If it is possible to sample without replacement, do so.
+                if sample_size - counter < partition_size:
+                    # This takes a very long time. Maybe pseudoshuffle before
+                    # the while loop and take sequentially.
+                    self._partition_ixs[mode][counter: sample_size] = np.random.choice(partition[mode],
+                                        size=(sample_size - counter), replace=False)
+                    counter = sample_size
+
+                # If not (because the user specified more samples than is
+                # available in `partition`) shuffle and then add the entire
+                # partition to the sample.
+                else:
+                    # This shuffling may take a long time if the parition is
+                    # large. Hopefully would never happen, since the sample size
+                    # would be small enough to avoid this.
+                    # However, maybe we can use the pseudoshuffle here to
+                    # avoid this edge case
+                    random.shuffle(partition)
+                    self._partition_ixs[mode][counter : counter + partition_size] = partition[mode]
+                    counter += partition_size
+
 
     def _retrieve(self, chrom, position):
         bin_start = position - self._start_radius
@@ -379,15 +424,14 @@ class RandomPositionsSampler(OnlineSampler):
         all = np.where(self.chroms_info["Ends"] >= index)
         min = all[0][0]
         chrom = self.chroms_info["Total"][min]
-        pos = int(index - self.chroms_info["Starts"][min])
+        pos = int(index - self.chroms_info["Starts"][min] - 1)
         return chrom, pos
 
     def _sample(self):
-        # @ Kathy, where do we set the partition for a particular sample?
-        # random_index = np.random.randint(0, len(self._partition_ixs[self.mode]))
-        sample_index = self._partition_ixs[self.mode][0]
+        random_index = np.random.randint(0, len(self._partition_ixs[self.mode]))
+        sample_index = self._partition_ixs[self.mode][random_index]
         chrom, pos = self._pair_from_index(sample_index)
-        np.delete(self._partition_ixs[self.mode], 0)
+        self._partition_ixs[self.mode] = np.delete(self._partition_ixs[self.mode], random_index)
         return chrom, pos
 
     def sample(self, batch_size):
