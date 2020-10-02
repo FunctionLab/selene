@@ -51,10 +51,6 @@ If you would like to locally install Selene, you can run
 python setup.py install
 ```
 
-### Additional dependency for the CLI
-
-Please install `docopt` before running the command-line script `selene_cli.py` provided in the repository.
-
 ## About Selene
 
 Selene is composed of a command-line interface and an API (the `selene-sdk` Python package). 
