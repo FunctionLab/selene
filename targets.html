@@ -27,7 +27,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,110 +95,18 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Functional overview of the SDK</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#training-a-model-api">Training a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html#help">Help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/installation.html#installing-selene-with-pip">Installing selene with pip:</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">Selene CLI operations and outputs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#operations">Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#general-configurations">General configurations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#model-architecture">Model architecture</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#train">Train</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id1">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id2">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id3">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id4">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id5">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id6">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#intervals-sampler">Intervals sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#important-note">Important note</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#bed-file-sampler">BED file sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id13">Some notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id14">Some notes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">FAQ and additional resources</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#extending-selene">Extending Selene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id10">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id21">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id26">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id31">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id36">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id41">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id46">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id53">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id64">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id69">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id74">}</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
@@ -335,16 +243,16 @@ These are classes which define a way to access a “target feature” such
 as a label or annotation on an input sequence.</p>
 <div class="section" id="target">
 <h2>Target<a class="headerlink" href="#target" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.targets.Target">
 <em class="property">class </em><code class="sig-prename descclassname">selene_sdk.targets.</code><code class="sig-name descname">Target</code><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for all target feature classes.
 Target features classes are classes which define a way to access a
 “target feature” such as a label or annotation on an input sequence.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.targets.Target.get_feature_data">
-<em class="property">abstract </em><code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/target.html#Target.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.Target.get_feature_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the feature data for some coordinate.</p>
 </dd></dl>
 
@@ -353,9 +261,9 @@ Target features classes are classes which define a way to access a
 </div>
 <div class="section" id="genomicfeatures">
 <h2>GenomicFeatures<a class="headerlink" href="#genomicfeatures" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.targets.GenomicFeatures">
-<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.targets.</code><code class="sig-name descname">GenomicFeatures</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">features</em>, <em class="sig-param">feature_thresholds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.targets.</code><code class="sig-name descname">GenomicFeatures</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_path</span></em>, <em class="sig-param"><span class="n">features</span></em>, <em class="sig-param"><span class="n">feature_thresholds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.targets.target.Target</span></code></p>
 <p>Stores the dataset specifying sequence regions and features.
 Accepts a tabix-indexed <cite>*.bed</cite> file with the following columns,
@@ -391,13 +299,13 @@ the threshold specified for that feature.</p>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>~GenomicFeatures.data</strong> (<em>tabix.open</em>) – The data stored in a tabix-indexed <cite>*.bed</cite> file.</p></li>
-<li><p><strong>~GenomicFeatures.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of distinct features.</p></li>
-<li><p><strong>~GenomicFeatures.feature_index_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to indices (<cite>int</cite>),
+<li><p><strong>~GenomicFeatures.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of distinct features.</p></li>
+<li><p><strong>~GenomicFeatures.feature_index_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – A dictionary mapping feature names (<cite>str</cite>) to indices (<cite>int</cite>),
 where the index is the position of the feature in <cite>features</cite>.</p></li>
-<li><p><strong>~GenomicFeatures.index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
+<li><p><strong>~GenomicFeatures.index_feature_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – A dictionary mapping indices (<cite>int</cite>) to feature names (<cite>str</cite>),
 where the index is the position of the feature in the input
 features.</p></li>
-<li><p><strong>~GenomicFeatures.feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – <ul>
+<li><p><strong>~GenomicFeatures.feature_thresholds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – <ul>
 <li><p><cite>dict</cite> - A dictionary mapping feature names (<cite>str</cite>) to thresholds        (<cite>float</cite>), where the threshold is the minimum overlap that a        feature annotation must have with a query region to be        considered a positive example of that feature.</p></li>
 <li><p><cite>None</cite> - No threshold specifications. Assumes that all features        returned by a tabix query are annotated to the query region.</p></li>
 </ul>
@@ -405,9 +313,9 @@ features.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.targets.GenomicFeatures.get_feature_data">
-<code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_feature_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chrom</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.get_feature_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.get_feature_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>For a sequence of length <span class="math notranslate nohighlight">\(L = end - start\)</span>, return the
 features’ one-hot encoding corresponding to that region. For
 instance, for <cite>n_features</cite>, each position in that sequence will
@@ -430,14 +338,14 @@ there being no features present in the queried region and
 return a <cite>numpy.ndarray</cite> of zeros.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.targets.GenomicFeatures.is_positive">
-<code class="sig-name descname">is_positive</code><span class="sig-paren">(</span><em class="sig-param">chrom</em>, <em class="sig-param">start</em>, <em class="sig-param">end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.is_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.is_positive" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_positive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chrom</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures.is_positive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures.is_positive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines whether the query the <cite>chrom</cite> queried contains any
 genomic features within the <span class="math notranslate nohighlight">\([start, end)\)</span> region. If so,
 the query is considered positive.</p>
@@ -457,7 +365,7 @@ assume the error was the result of no features being present
 in the queried region and return <cite>False</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -27,7 +27,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,110 +95,18 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Functional overview of the SDK</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#training-a-model-api">Training a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html#help">Help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/installation.html#installing-selene-with-pip">Installing selene with pip:</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">Selene CLI operations and outputs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#operations">Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#general-configurations">General configurations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#model-architecture">Model architecture</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#train">Train</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id1">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id2">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id3">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id4">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id5">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id6">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#intervals-sampler">Intervals sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#important-note">Important note</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#bed-file-sampler">BED file sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id13">Some notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id14">Some notes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">FAQ and additional resources</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#extending-selene">Extending Selene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id10">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id21">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id26">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id31">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id36">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id41">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id46">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id53">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id64">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id69">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id74">}</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
@@ -334,10 +242,10 @@
 predictions with models that have already been trained.</p>
 <div class="section" id="analyzesequences">
 <h2>AnalyzeSequences<a class="headerlink" href="#analyzesequences" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.predict.AnalyzeSequences">
 <em class="property">class </em><code class="sig-prename descclassname">selene_sdk.predict.</code><code class="sig-name descname">AnalyzeSequences</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">trained_model_path</em>, <em class="sig-param">sequence_length</em>, <em class="sig-param">features</em>, <em class="sig-param">batch_size=64</em>, <em class="sig-param">use_cuda=False</em>, <em class="sig-param">data_parallel=False</em>, <em class="sig-param">reference_sequence=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em>, <em class="sig-param">write_mem_limit=1500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Score sequences and their variants using the predictions made
 by a trained model.</p>
 <dl class="field-list simple">
@@ -388,19 +296,19 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.6.0a0+5077518 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
-<li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
-<li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
-<li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
-<li><p><strong>~AnalyzeSequences.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specifies whether to use a CUDA-enabled GPU or not.</p></li>
-<li><p><strong>~AnalyzeSequences.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
+<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.8.0a0+104de7d ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
+<li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
+<li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
+<li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
+<li><p><strong>~AnalyzeSequences.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Specifies whether to use a CUDA-enabled GPU or not.</p></li>
+<li><p><strong>~AnalyzeSequences.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
 <li><p><strong>~AnalyzeSequences.reference_sequence</strong> (<em>class</em>) – The type of sequence on which this analysis will be performed.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.get_predictions">
-<code class="sig-name descname">get_predictions</code><span class="sig-paren">(</span><em class="sig-param">input</em>, <em class="sig-param">output_dir=None</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">strand_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_predictions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em>, <em class="sig-param"><span class="n">output_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'tsv'</span></em>, <em class="sig-param"><span class="n">strand_index</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences specified as a raw sequence,
 FASTA, or BED file.</p>
 <dl class="field-list">
@@ -449,14 +357,14 @@ in the given or retrieved sequence is unknown, the row labels .txt file
 or .tsv file will mark this sequence or region as <cite>contains_unk = True</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file">
-<code class="sig-name descname">get_predictions_for_bed_file</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">strand_index=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_bed_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_predictions_for_bed_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_path</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'tsv'</span></em>, <em class="sig-param"><span class="n">strand_index</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_bed_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences specified as genome coordinates
 in a BED file. Coordinates do not need to be the same length as the
 model expected sequence input–predictions will be centered at the
@@ -502,14 +410,14 @@ the index (0-based) to use it. Otherwise, by default ‘+’ is used.</p></li>
 match that specified in the filepath.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">
-<code class="sig-name descname">get_predictions_for_fasta_file</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">output_format='tsv'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_predictions_for_fasta_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_path</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'tsv'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences in a FASTA file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -547,14 +455,14 @@ of the sequences in the input FASTA).</p></li>
 <dd class="field-even"><p>Writes the output to file(s) in <cite>output_dir</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis">
-<code class="sig-name descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_path_prefix='ism'</em>, <em class="sig-param">mutate_n_bases=1</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">start_position=0</em>, <em class="sig-param">end_position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_silico_mutagenesis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">save_data</span></em>, <em class="sig-param"><span class="n">output_path_prefix</span><span class="o">=</span><span class="default_value">'ism'</span></em>, <em class="sig-param"><span class="n">mutate_n_bases</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'tsv'</span></em>, <em class="sig-param"><span class="n">start_position</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_position</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies <em>in silico</em> mutagenesis to a sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -582,24 +490,24 @@ file named <cite>*_ref_predictions.h5</cite> will be outputted with the
 model prediction for the original input sequence.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the value of <cite>start_position</cite> or <cite>end_position</cite> is negative.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If there are fewer than <cite>mutate_n_bases</cite> between <cite>start_position</cite>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the value of <cite>start_position</cite> or <cite>end_position</cite> is negative.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If there are fewer than <cite>mutate_n_bases</cite> between <cite>start_position</cite>
     and <cite>end_position</cite>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is greater or equal to <cite>end_position</cite>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is not less than <cite>self.sequence_length</cite>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>end_position</cite> is greater than <cite>self.sequence_length</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is greater or equal to <cite>end_position</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is not less than <cite>self.sequence_length</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>end_position</cite> is greater than <cite>self.sequence_length</cite>.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">
-<code class="sig-name descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">mutate_n_bases=1</em>, <em class="sig-param">use_sequence_name=True</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">start_position=0</em>, <em class="sig-param">end_position=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_silico_mutagenesis_from_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_path</span></em>, <em class="sig-param"><span class="n">save_data</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">mutate_n_bases</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">use_sequence_name</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'tsv'</span></em>, <em class="sig-param"><span class="n">start_position</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">end_position</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply <em>in silico</em> mutagenesis to all sequences in a FASTA file.</p>
 <p>Please note that we have not parallelized this function yet, so runtime
 increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
@@ -637,24 +545,24 @@ file named <cite>*_ref_predictions.h5</cite> will be outputted with the
 model prediction for the original input sequence.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If the value of <cite>start_position</cite> or <cite>end_position</cite> is negative.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If there are fewer than <cite>mutate_n_bases</cite> between <cite>start_position</cite>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the value of <cite>start_position</cite> or <cite>end_position</cite> is negative.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If there are fewer than <cite>mutate_n_bases</cite> between <cite>start_position</cite>
     and <cite>end_position</cite>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is greater or equal to <cite>end_position</cite>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is not less than <cite>self.sequence_length</cite>.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><strong>ValueError</strong></a> – If <cite>end_position</cite> is greater than <cite>self.sequence_length</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is greater or equal to <cite>end_position</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>start_position</cite> is not less than <cite>self.sequence_length</cite>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>end_position</cite> is greater than <cite>self.sequence_length</cite>.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict">
-<code class="sig-name descname">in_silico_mutagenesis_predict</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">base_preds</em>, <em class="sig-param">mutations_list</em>, <em class="sig-param">reporters=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_silico_mutagenesis_predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">base_preds</span></em>, <em class="sig-param"><span class="n">mutations_list</span></em>, <em class="sig-param"><span class="n">reporters</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the predictions for all specified mutations applied
 to a given sequence and, if applicable, compute the scores
 (“abs_diffs”, “diffs”, “logits”) for these mutations.</p>
@@ -679,14 +587,14 @@ sequence), and output these as a file at the end.</p></li>
 <cite>reporters</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.predict.AnalyzeSequences.variant_effect_prediction">
-<code class="sig-name descname">variant_effect_prediction</code><span class="sig-paren">(</span><em class="sig-param">vcf_file</em>, <em class="sig-param">save_data</em>, <em class="sig-param">output_dir=None</em>, <em class="sig-param">output_format='tsv'</em>, <em class="sig-param">strand_index=None</em>, <em class="sig-param">require_strand=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">variant_effect_prediction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">vcf_file</span></em>, <em class="sig-param"><span class="n">save_data</span></em>, <em class="sig-param"><span class="n">output_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">output_format</span><span class="o">=</span><span class="default_value">'tsv'</span></em>, <em class="sig-param"><span class="n">strand_index</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">require_strand</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions and scores for a list of variants.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -750,7 +658,7 @@ chromosome containing the variant did not show up in the reference
 genome FASTA file.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>

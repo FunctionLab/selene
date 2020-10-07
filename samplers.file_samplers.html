@@ -27,7 +27,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -95,110 +95,18 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Functional overview of the SDK</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#training-a-model-api">Training a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html#help">Help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/installation.html#installing-selene-with-pip">Installing selene with pip:</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">Selene CLI operations and outputs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#operations">Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#general-configurations">General configurations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#model-architecture">Model architecture</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#train">Train</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id1">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id2">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id3">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id4">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id5">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id6">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#intervals-sampler">Intervals sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#important-note">Important note</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#bed-file-sampler">BED file sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id13">Some notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id14">Some notes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">FAQ and additional resources</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#extending-selene">Extending Selene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id10">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id21">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id26">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id31">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id36">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id41">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id46">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id53">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id64">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id69">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id74">}</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
@@ -334,9 +242,9 @@
 examples from files.</p>
 <div class="section" id="bedfilesampler">
 <h2>BedFileSampler<a class="headerlink" href="#bedfilesampler" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.samplers.file_samplers.BedFileSampler">
-<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.samplers.file_samplers.</code><code class="sig-name descname">BedFileSampler</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">reference_sequence</em>, <em class="sig-param">n_samples</em>, <em class="sig-param">sequence_length=None</em>, <em class="sig-param">targets_avail=False</em>, <em class="sig-param">n_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.samplers.file_samplers.</code><code class="sig-name descname">BedFileSampler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">reference_sequence</span></em>, <em class="sig-param"><span class="n">n_samples</span></em>, <em class="sig-param"><span class="n">sequence_length</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">targets_avail</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_features</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_samplers.file_sampler.FileSampler</span></code></p>
 <p>A sampler for which the dataset is loaded directly from a <cite>*.bed</cite> file.</p>
 <dl class="field-list simple">
@@ -364,29 +272,29 @@ within the interval.</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~BedFileSampler.filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The path to the file to load the data from.</p></li>
+<li><p><strong>~BedFileSampler.filepath</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The path to the file to load the data from.</p></li>
 <li><p><strong>~BedFileSampler.reference_sequence</strong> (<a class="reference internal" href="sequences.html#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.Sequence"><em>selene_sdk.sequences.Sequence</em></a>) – A reference sequence from which to create examples.</p></li>
-<li><p><strong>~BedFileSampler.n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</p></li>
-<li><p><strong>~BedFileSampler.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If the coordinates of each sample in the BED file
+<li><p><strong>~BedFileSampler.n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of lines in the file. (<cite>wc -l &lt;filepath&gt;</cite>)</p></li>
+<li><p><strong>~BedFileSampler.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. If the coordinates of each sample in the BED file
 already account for the full sequence (that is,
 <cite>end - start = sequence_length</cite>), there is no need to specify
 the sequence length. If <cite>sequence_length</cite> is not None, the length
 of each sample will be checked to determine whether the sample
 coordinates need to be truncated or expanded to reach the
 sequence length specified in the model architecture.</p></li>
-<li><p><strong>~BedFileSampler.targets_avail</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <cite>targets_avail</cite>, assumes that it is the last column of the <cite>*.bed</cite>
+<li><p><strong>~BedFileSampler.targets_avail</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <cite>targets_avail</cite>, assumes that it is the last column of the <cite>*.bed</cite>
 file. The last column should contain the indices, separated by
 semicolons, of features (classes) found within a given sample’s
 coordinates (e.g. 0;1;45;60). This assumes that we are only looking
 or the absence/presence of each feature within the interval.</p></li>
-<li><p><strong>~BedFileSampler.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – If <cite>targets_avail</cite> is True, must specify
+<li><p><strong>~BedFileSampler.n_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – If <cite>targets_avail</cite> is True, must specify
 <cite>n_features</cite>, the total number of features (classes).</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.samplers.file_samplers.BedFileSampler.get_data">
-<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param">batch_size</em>, <em class="sig-param">n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches.</p>
 <dl class="field-list simple">
@@ -404,14 +312,14 @@ is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</sp
 and <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(np.ndarray)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(np.ndarray)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.samplers.file_samplers.BedFileSampler.get_data_and_targets">
-<code class="sig-name descname">get_data_and_targets</code><span class="sig-paren">(</span><em class="sig-param">batch_size</em>, <em class="sig-param">n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_data_and_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the sequence data and
 targets from the sampler, divided into batches.</p>
 <dl class="field-list simple">
@@ -434,14 +342,14 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)), <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.samplers.file_samplers.BedFileSampler.sample">
-<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.sample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/bed_file_sampler.html#BedFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.BedFileSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws a mini-batch of examples and their corresponding
 labels.</p>
 <dl class="field-list simple">
@@ -460,7 +368,7 @@ The shape of <cite>targets</cite> will be <span class="math notranslate nohighli
 where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -470,9 +378,9 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 </div>
 <div class="section" id="matfilesampler">
 <h2>MatFileSampler<a class="headerlink" href="#matfilesampler" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.samplers.file_samplers.MatFileSampler">
-<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.samplers.file_samplers.</code><code class="sig-name descname">MatFileSampler</code><span class="sig-paren">(</span><em class="sig-param">filepath</em>, <em class="sig-param">sequence_key</em>, <em class="sig-param">targets_key=None</em>, <em class="sig-param">random_seed=436</em>, <em class="sig-param">shuffle=True</em>, <em class="sig-param">sequence_batch_axis=0</em>, <em class="sig-param">sequence_alphabet_axis=1</em>, <em class="sig-param">targets_batch_axis=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.samplers.file_samplers.</code><code class="sig-name descname">MatFileSampler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em>, <em class="sig-param"><span class="n">sequence_key</span></em>, <em class="sig-param"><span class="n">targets_key</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">random_seed</span><span class="o">=</span><span class="default_value">436</span></em>, <em class="sig-param"><span class="n">shuffle</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sequence_batch_axis</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">sequence_alphabet_axis</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">targets_batch_axis</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.file_samplers.file_sampler.FileSampler</span></code></p>
 <p>A sampler for which the dataset is loaded directly from a <cite>*.mat</cite> file.</p>
 <dl class="field-list simple">
@@ -490,12 +398,12 @@ before sampling from it.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
-<dd class="field-even"><p><strong>~MatFileSampler.n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of samples in the data matrix.</p>
+<dd class="field-even"><p><strong>~MatFileSampler.n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The number of samples in the data matrix.</p>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.samplers.file_samplers.MatFileSampler.get_data">
-<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param">batch_size</em>, <em class="sig-param">n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the data from the sampler,
 divided into batches.</p>
 <dl class="field-list simple">
@@ -513,14 +421,14 @@ is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</sp
 and <span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(np.ndarray)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(np.ndarray)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets">
-<code class="sig-name descname">get_data_and_targets</code><span class="sig-paren">(</span><em class="sig-param">batch_size</em>, <em class="sig-param">n_samples=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_data_and_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">n_samples</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.get_data_and_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method fetches a subset of the sequence data and
 targets from the sampler, divided into batches.</p>
 <dl class="field-list simple">
@@ -543,14 +451,14 @@ elements are of the shape <span class="math notranslate nohighlight">\(B \times 
 <span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>)), <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)), <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.samplers.file_samplers.MatFileSampler.sample">
-<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">batch_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.sample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/file_samplers/mat_file_sampler.html#MatFileSampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.samplers.file_samplers.MatFileSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Draws a mini-batch of examples and their corresponding
 labels.</p>
 <dl class="field-list simple">
@@ -569,7 +477,7 @@ The shape of <cite>targets</cite> will be <span class="math notranslate nohighli
 where <span class="math notranslate nohighlight">\(F\)</span> is the number of features.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>, <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.17)">numpy.ndarray</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a>)</p>
 </dd>
 </dl>
 </dd></dl>

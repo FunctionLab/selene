@@ -27,7 +27,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="selene_sdk.interpret" href="interpret.html" />
-    <link rel="prev" title="FAQ and additional resources" href="overview/faq.html" /> 
+    <link rel="prev" title="&lt;no title&gt;" href="overview/faq.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,110 +95,18 @@
             
               <p class="caption"><span class="caption-text">Overview</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html">Functional overview of the SDK</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#sampling">Sampling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#training-a-model-api">Training a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/overview.html#help">Help</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-with-anaconda">Installing with Anaconda</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/installation.html#installing-selene-with-pip">Installing selene with pip:</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#installing-from-source">Installing from source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">Selene CLI operations and outputs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#operations">Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#general-configurations">General configurations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#model-architecture">Model architecture</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#train">Train</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#required-parameters">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#optional-parameters">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#additional-notes">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#evaluate">Evaluate</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id1">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id2">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id3">Additional notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id4">Required parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id5">Optional parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters">Parameters</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id6">Parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#additional-note">Additional note</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#intervals-sampler">Intervals sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#important-note">Important note</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#bed-file-sampler">BED file sampler</a></li>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#some-notes">Some notes</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#id13">Some notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="overview/cli.html#id14">Some notes</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="overview/faq.html">FAQ and additional resources</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#extending-selene">Extending Selene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
-<li class="toctree-l2"><a class="reference internal" href="overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id10">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id21">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id26">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id31">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id36">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id41">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id46">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id53">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id64">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id69">}</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview/cli.html#id74">}</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul class="current">
@@ -333,10 +241,10 @@
 <p>This is the main module for Selene.</p>
 <div class="section" id="trainmodel">
 <h2>TrainModel<a class="headerlink" href="#trainmodel" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.TrainModel">
 <em class="property">class </em><code class="sig-prename descclassname">selene_sdk.</code><code class="sig-name descname">TrainModel</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">data_sampler</em>, <em class="sig-param">loss_criterion</em>, <em class="sig-param">optimizer_class</em>, <em class="sig-param">optimizer_kwargs</em>, <em class="sig-param">batch_size</em>, <em class="sig-param">max_steps</em>, <em class="sig-param">report_stats_every_n_steps</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">save_checkpoint_every_n_steps=1000</em>, <em class="sig-param">save_new_checkpoints_after_n_steps=None</em>, <em class="sig-param">report_gt_feature_n_positives=10</em>, <em class="sig-param">n_validation_samples=None</em>, <em class="sig-param">n_test_samples=None</em>, <em class="sig-param">cpu_n_threads=1</em>, <em class="sig-param">use_cuda=False</em>, <em class="sig-param">data_parallel=False</em>, <em class="sig-param">logging_verbosity=2</em>, <em class="sig-param">checkpoint_resume=None</em>, <em class="sig-param">metrics={'average_precision': &lt;function average_precision_score&gt;</em>, <em class="sig-param">'roc_auc': &lt;function roc_auc_score&gt;}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class ties together the various objects and methods needed to
 train and validate a model.</p>
 <p>TrainModel saves a checkpoint model (overwriting it after
@@ -428,26 +336,26 @@ using <cite>torch.load</cite>.</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.6.0a0+5077518 ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
+<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.8.0a0+104de7d ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
 <li><p><strong>~TrainModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
 <li><p><strong>~TrainModel.loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
-<li><p><strong>~TrainModel.optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.6.0a0+5077518 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
-<li><p><strong>~TrainModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size of the mini-batch to use during training.</p></li>
-<li><p><strong>~TrainModel.max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</p></li>
-<li><p><strong>~TrainModel.nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The frequency with which to report summary statistics.</p></li>
-<li><p><strong>~TrainModel.nth_step_save_checkpoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The frequency with which to save a model checkpoint.</p></li>
-<li><p><strong>~TrainModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
-<li><p><strong>~TrainModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
-<li><p><strong>~TrainModel.output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The directory to save model checkpoints and logs.</p></li>
-<li><p><strong>~TrainModel.training_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – The current training loss.</p></li>
-<li><p><strong>~TrainModel.metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
+<li><p><strong>~TrainModel.optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.8.0a0+104de7d ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
+<li><p><strong>~TrainModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the mini-batch to use during training.</p></li>
+<li><p><strong>~TrainModel.max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</p></li>
+<li><p><strong>~TrainModel.nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The frequency with which to report summary statistics.</p></li>
+<li><p><strong>~TrainModel.nth_step_save_checkpoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The frequency with which to save a model checkpoint.</p></li>
+<li><p><strong>~TrainModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
+<li><p><strong>~TrainModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
+<li><p><strong>~TrainModel.output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The directory to save model checkpoints and logs.</p></li>
+<li><p><strong>~TrainModel.training_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>)</em>) – The current training loss.</p></li>
+<li><p><strong>~TrainModel.metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
 By default, this contains <cite>“roc_auc”</cite>, which maps to
 <cite>sklearn.metrics.roc_auc_score</cite>, and <cite>“average_precision”</cite>,
 which maps to <cite>sklearn.metrics.average_precision_score</cite>.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.TrainModel.create_test_set">
 <code class="sig-name descname">create_test_set</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.create_test_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.create_test_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the set of test samples.
@@ -457,7 +365,7 @@ memory until the model has been trained and is ready to be
 evaluated.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.TrainModel.evaluate">
 <code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures the model test performance.</p>
@@ -468,12 +376,12 @@ and the values are the average value for that metric over
 the test set.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.TrainModel.train">
 <code class="sig-name descname">train</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model on a batch of data.</p>
@@ -482,18 +390,18 @@ the test set.</p>
 <dd class="field-odd"><p>The training loss.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.TrainModel.train_and_validate">
 <code class="sig-name descname">train_and_validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train_and_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.train_and_validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model and measures validation performance.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.TrainModel.validate">
 <code class="sig-name descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.TrainModel.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures model validation performance.</p>
@@ -504,7 +412,7 @@ and the values are the average value for that metric over
 the validation set.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -514,10 +422,10 @@ the validation set.</p>
 </div>
 <div class="section" id="evaluatemodel">
 <h2>EvaluateModel<a class="headerlink" href="#evaluatemodel" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="selene_sdk.EvaluateModel">
-<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.</code><code class="sig-name descname">EvaluateModel</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">criterion</em>, <em class="sig-param">data_sampler</em>, <em class="sig-param">features</em>, <em class="sig-param">trained_model_path</em>, <em class="sig-param">output_dir</em>, <em class="sig-param">batch_size=64</em>, <em class="sig-param">n_test_samples=None</em>, <em class="sig-param">report_gt_feature_n_positives=10</em>, <em class="sig-param">use_cuda=False</em>, <em class="sig-param">data_parallel=False</em>, <em class="sig-param">use_features_ord=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.</code><code class="sig-name descname">EvaluateModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">criterion</span></em>, <em class="sig-param"><span class="n">data_sampler</span></em>, <em class="sig-param"><span class="n">features</span></em>, <em class="sig-param"><span class="n">trained_model_path</span></em>, <em class="sig-param"><span class="n">output_dir</span></em>, <em class="sig-param"><span class="n">batch_size</span><span class="o">=</span><span class="default_value">64</span></em>, <em class="sig-param"><span class="n">n_test_samples</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">use_cuda</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">data_parallel</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_features_ord</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Evaluate model on a test set of sequences with known targets.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -551,17 +459,17 @@ a subset of <cite>features</cite>, and in the order you want the resulting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.6.0a0+5077518 ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
+<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.8.0a0+104de7d ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
 <li><p><strong>~EvaluateModel.criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</p></li>
 <li><p><strong>~EvaluateModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
-<li><p><strong>~EvaluateModel.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</p></li>
-<li><p><strong>~EvaluateModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The batch size to process examples. Should be a power of 2.</p></li>
-<li><p><strong>~EvaluateModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
-<li><p><strong>~EvaluateModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
+<li><p><strong>~EvaluateModel.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</p></li>
+<li><p><strong>~EvaluateModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The batch size to process examples. Should be a power of 2.</p></li>
+<li><p><strong>~EvaluateModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
+<li><p><strong>~EvaluateModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
+<dl class="py method">
 <dt id="selene_sdk.EvaluateModel.evaluate">
 <code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.EvaluateModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Passes all samples retrieved from the sampler to the model in
@@ -574,7 +482,7 @@ each a dict of the performance metrics (currently ROC AUC and
 AUPR) reported for each feature the model predicts.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -595,7 +503,7 @@ AUPR) reported for each feature the model predicts.</p>
         <a href="interpret.html" class="btn btn-neutral float-right" title="selene_sdk.interpret" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="overview/faq.html" class="btn btn-neutral float-left" title="FAQ and additional resources" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="overview/faq.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
