@@ -50,6 +50,7 @@ setup(name="selene-sdk",
       cmdclass=cmdclass,
       install_requires=[
         "cython>=0.27.3",
+        'click',
         "h5py",
         "matplotlib>=2.2.3",
         "numpy",
@@ -63,4 +64,10 @@ setup(name="selene-sdk",
         "seaborn",
         "statsmodels",
         "torch>=0.4.1, <=1.4.0",
-    ])
+    ],
+    entry_points={
+        'console_scripts': [
+            'selene_sdk = selene_sdk.cli:main',
+        ],
+    },
+)
