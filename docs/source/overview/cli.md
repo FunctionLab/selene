@@ -1,8 +1,5 @@
 # Selene CLI operations and outputs
-Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations.
-It is automatically installed using a setuptools entrypoint so it can be called with the bash function
-`selene_sdk` from anywhere in the bash. It can also be called with `python -m selene_sdk`.
-See [Operations](#operations) for more detail.
+Selene provides a command-line interface (CLI) that takes in a user-specified configuration file containing the operations the user wants to run and the parameters required for these operations. It is automatically installed using a setuptools entrypoint so it can be called with the bash function `selene_sdk` from anywhere in the bash. It can also be called with `python -m selene_sdk`. See [Operations](#operations) for more detail.
 
 The sections that follow describe in detail how the various components that make up the configuration file are specified. For operation-specific sections (e.g. training, evaluation), we also explain what the expected outputs are.
 
