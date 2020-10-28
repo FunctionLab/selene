@@ -13,7 +13,7 @@ To install with conda (recommended for Linux users), run the following command i
 conda install -c bioconda selene-sdk
 ```
 
-### Installing selene with pip:
+## Installing selene with pip:
 
 ```sh
 pip install selene-sdk
@@ -45,6 +45,6 @@ If you would like to locally install Selene, you can run
 python setup.py install
 ```
 
-## Additional dependency for running the CLI 
+## Additional dependency for running the CLI (versions 0.4.8 and below) 
 
 Please install `docopt` before running the command-line script `selene_cli.py` provided in the repository.

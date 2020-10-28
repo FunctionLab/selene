@@ -1,0 +1,4 @@
+Installation
+=============
+
+.. mdinclude:: ./installation.md
