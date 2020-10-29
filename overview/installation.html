@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; Selene master documentation</title>
+  <title>Installation &mdash; Selene master documentation</title>
   
 
   
@@ -40,8 +40,8 @@
   <link rel="stylesheet" href="../_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="tutorials.html" />
-    <link rel="prev" title="&lt;no title&gt;" href="overview.html" /> 
+    <link rel="next" title="Selene CLI operations and outputs" href="cli.html" />
+    <link rel="prev" title="Functional overview of the SDK" href="overview.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -94,19 +94,111 @@
             
             
               <p class="caption"><span class="caption-text">Overview</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id10">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id21">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id26">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id31">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id36">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id41">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id46">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id53">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id64">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id69">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id74">}</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Functional overview of the SDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#sampling">Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#help">Help</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-selene-with-pip">Installing selene with pip:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-dependency-for-running-the-cli-versions-0-4-8-and-below">Additional dependency for running the CLI (versions 0.4.8 and below)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id3">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id5">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id6">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id7">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#additional-note">Additional note</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id8"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id15">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id16">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
@@ -217,13 +309,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>&lt;no title&gt;</li>
+      <li>Installation</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/overview/installation.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/overview/installation.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -236,39 +328,50 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <p># Installation</p>
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>Users can clone and build the repository locally or install Selene through conda/pip.</p>
 <p>Please use Selene with Python 3.6+.</p>
-<p><strong>Install [PyTorch](https://pytorch.org/get-started/locally/).</strong> If you have an NVIDIA GPU, install a version of PyTorch that supports it–Selene will run much faster with a discrete GPU.</p>
-<p>## Installing with Anaconda</p>
-<p>To install with conda (recommended for Linux users), run the following command in your terminal:
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">conda</span> <span class="pre">install</span> <span class="pre">-c</span> <span class="pre">bioconda</span> <span class="pre">selene-sdk</span>
-<span class="pre">`</span></code></p>
-<p>### Installing selene with pip:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`sh</span>
-<span class="pre">pip</span> <span class="pre">install</span> <span class="pre">selene-sdk</span>
-<span class="pre">`</span></code></p>
+<p>Install <a class="reference external" href="https://pytorch.org/get-started/locally/">PyTorch</a>. If you have an NVIDIA GPU, install a version of PyTorch that supports it—Selene will run much faster with a discrete GPU.</p>
+<div class="section" id="installing-with-anaconda">
+<h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
+<p>To install with conda (recommended for Linux users), run the following command in your terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">bioconda</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-selene-with-pip">
+<h2>Installing selene with pip:<a class="headerlink" href="#installing-selene-with-pip" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install selene-sdk
+</pre></div>
+</div>
 <p>Note that we do not recommend pip-installing older versions of Selene (below 0.4.0), as these releases were less stable.</p>
 <p>We currently only have a source distribution available for pip-installation. We are looking into releasing wheels in the future.</p>
-<p>## Installing from source</p>
+</div>
+<div class="section" id="installing-from-source">
+<h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
 <p>Selene can also be installed from source.
-First, download the latest commits from the source repository:
-<code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/FunctionLab/selene.git</span>
-<span class="pre">`</span></code></p>
-<p>The <cite>setup.py</cite> script requires NumPy, Cython, and setuptools. Please make sure you have these already installed.</p>
-<p>If you plan on working in the <cite>selene</cite> repository directly, we recommend [setting up a conda environment](<a class="reference external" href="https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file">https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file</a>) using <cite>selene-cpu.yml</cite> or <cite>selene-gpu.yml</cite> (if CUDA is enabled on your machine) and activating it.</p>
-<p>Selene contains some Cython files. You can build these by running
-<code class="docutils literal notranslate"><span class="pre">`sh</span>
-<span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">build_ext</span> <span class="pre">--inplace</span>
-<span class="pre">`</span></code></p>
-<p>If you would like to locally install Selene, you can run
-<code class="docutils literal notranslate"><span class="pre">`sh</span>
-<span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span>
-<span class="pre">`</span></code></p>
-<p>## Additional dependency for running the CLI</p>
-<p>Please install <cite>docopt</cite> before running the command-line script <cite>selene_cli.py</cite> provided in the repository.</p>
+First, download the latest commits from the source repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">FunctionLab</span><span class="o">/</span><span class="n">selene</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> script requires NumPy, Cython, and setuptools. Please make sure you have these already installed.</p>
+<p>If you plan on working in the <code class="docutils literal notranslate"><span class="pre">selene</span></code> repository directly, we recommend <a class="reference external" href="https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file">setting up a conda environment</a> using <code class="docutils literal notranslate"><span class="pre">selene-cpu.yml</span></code> or <code class="docutils literal notranslate"><span class="pre">selene-gpu.yml</span></code> (if CUDA is enabled on your machine) and activating it.</p>
+<p>Selene contains some Cython files. You can build these by running</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py build_ext --inplace
+</pre></div>
+</div>
+<p>If you would like to locally install Selene, you can run</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py install
+</pre></div>
+</div>
+</div>
+<div class="section" id="additional-dependency-for-running-the-cli-versions-0-4-8-and-below">
+<h2>Additional dependency for running the CLI (versions 0.4.8 and below)<a class="headerlink" href="#additional-dependency-for-running-the-cli-versions-0-4-8-and-below" title="Permalink to this headline">¶</a></h2>
+<p>Please install <code class="docutils literal notranslate"><span class="pre">docopt</span></code> before running the command-line script <code class="docutils literal notranslate"><span class="pre">selene_cli.py</span></code> provided in the repository.
+In newer versions of Selene, the CLI can be run by calling <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">selene_sdk</span></code> from anywhere in bash (assuming you have installed the library, through conda/pip/local install - <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code>).</p>
+</div>
+</div>
 
 
            </div>
@@ -278,10 +381,10 @@ First, download the latest commits from the source repository:
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorials.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cli.html" class="btn btn-neutral float-right" title="Selene CLI operations and outputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="overview.html" class="btn btn-neutral float-left" title="&lt;no title&gt;" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Functional overview of the SDK" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

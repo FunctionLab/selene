@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; Selene master documentation</title>
+  <title>Functional overview of the SDK &mdash; Selene master documentation</title>
   
 
   
@@ -40,7 +40,7 @@
   <link rel="stylesheet" href="../_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="installation.html" />
+    <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="Selene documentation" href="../index.html" /> 
 </head>
 
@@ -94,19 +94,111 @@
             
             
               <p class="caption"><span class="caption-text">Overview</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id10">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id21">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id26">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id31">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id36">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id41">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id46">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id53">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id64">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id69">}</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli.html#id74">}</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Functional overview of the SDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sampling">Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-utilities-submodule-api">The utilities submodule (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#help">Help</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-with-anaconda">Installing with Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-selene-with-pip">Installing selene with pip:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#additional-dependency-for-running-the-cli-versions-0-4-8-and-below">Additional dependency for running the CLI (versions 0.4.8 and below)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id3">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id5">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id6">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id7">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#additional-note">Additional note</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#id8"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id15">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cli.html#id16">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Packages</span></p>
 <ul>
@@ -217,13 +309,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>&lt;no title&gt;</li>
+      <li>Functional overview of the SDK</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/overview/overview.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/overview/overview.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -236,65 +328,87 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <p># Functional overview of the SDK</p>
-<p>The software development kit (SDK), formally known as <cite>selene_sdk</cite>, is an extensible Python package intended to ease development of new programs that leverage sequence-level models through code reuse.
-The package is composed of six submodules: _sequences_, _samplers_, _targets_, _predict_, _interpret_, and _utils_.
-It also provides two top-level classes: _TrainModel_ and _EvaluateModel_.
+  <div class="section" id="functional-overview-of-the-sdk">
+<h1>Functional overview of the SDK<a class="headerlink" href="#functional-overview-of-the-sdk" title="Permalink to this headline">¶</a></h1>
+<p>The software development kit (SDK), formally known as <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code>, is an extensible Python package intended to ease development of new programs that leverage sequence-level models through code reuse.
+The package is composed of six submodules: <em>sequences</em>, <em>samplers</em>, <em>targets</em>, <em>predict</em>, <em>interpret</em>, and <em>utils</em>.
+It also provides two top-level classes: <em>TrainModel</em> and <em>EvaluateModel</em>.
 In the following sections, we briefly discuss each submodule and top-level class.</p>
-<p>## Sampling</p>
+<div class="section" id="sampling">
+<h2>Sampling<a class="headerlink" href="#sampling" title="Permalink to this headline">¶</a></h2>
 <p>We start with the modules for sampling data because both training and evaluting a model in Selene will require a user to specify the kind of sampler they want to use.</p>
-<p>### _sequences_ submodule ([API](<a class="reference external" href="http://selene.flatironinstitute.org/sequences.html">http://selene.flatironinstitute.org/sequences.html</a>))</p>
-<p>The _sequences_ submodule defines the <cite>Sequence</cite> type, and includes implementations for several sub-classes.
-These sub-classes–<cite>Genome</cite> and <cite>Proteome</cite>–represent different kinds of biological sequences (e.g. DNA, RNA, amino acid sequences), and implement the <cite>Sequence</cite> interface’s methods for reading the reference sequence from files (e.g. FASTA), querying subsequences of the reference sequence, and subsequently converting those queried subsequences into a numeric representation.
+<div class="section" id="sequences-submodule-api">
+<h3><em>sequences</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/sequences.html">API</a>)<a class="headerlink" href="#sequences-submodule-api" title="Permalink to this headline">¶</a></h3>
+<p>The <em>sequences</em> submodule defines the <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> type, and includes implementations for several sub-classes.
+These sub-classes–<code class="docutils literal notranslate"><span class="pre">Genome</span></code> and <code class="docutils literal notranslate"><span class="pre">Proteome</span></code>–represent different kinds of biological sequences (e.g. DNA, RNA, amino acid sequences), and implement the <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> interface’s methods for reading the reference sequence from files (e.g. FASTA), querying subsequences of the reference sequence, and subsequently converting those queried subsequences into a numeric representation.
 Further, each sequence class specifies its own alphabet (e.g., nucleotides, amino acids) to represent query results as strings.</p>
-<p>### _targets_ submodule ([API](<a class="reference external" href="http://selene.flatironinstitute.org/targets.html">http://selene.flatironinstitute.org/targets.html</a>))</p>
-<p>The _targets_ submodule defines the <cite>Target</cite> class, which specifies the interface for classes to retrieve labels or “targets” for a given query sequence.
-At present, we supply a single implementation of this interface: <cite>GenomicFeatures</cite>.
+</div>
+<div class="section" id="targets-submodule-api">
+<h3><em>targets</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/targets.html">API</a>)<a class="headerlink" href="#targets-submodule-api" title="Permalink to this headline">¶</a></h3>
+<p>The <em>targets</em> submodule defines the <code class="docutils literal notranslate"><span class="pre">Target</span></code> class, which specifies the interface for classes to retrieve labels or “targets” for a given query sequence.
+At present, we supply a single implementation of this interface: <code class="docutils literal notranslate"><span class="pre">GenomicFeatures</span></code>.
 This class takes a tabix-indexed file of intervals for each label we want our model to predict, and uses this file to identify the labels for a given sequence drawn from the reference.</p>
-<p>### _samplers_ submodule ([API](<a class="reference external" href="http://selene.flatironinstitute.org/samplers.html">http://selene.flatironinstitute.org/samplers.html</a>))</p>
-<p>The _samplers_ submodule provides methods and classes for randomly sampling and partitioning datasets for training and evaluation.
-The <cite>Sampler</cite> interface defines the minimal requirements for a class fulfilling these functions.
+</div>
+<div class="section" id="samplers-submodule-api">
+<h3><em>samplers</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/samplers.html">API</a>)<a class="headerlink" href="#samplers-submodule-api" title="Permalink to this headline">¶</a></h3>
+<p>The <em>samplers</em> submodule provides methods and classes for randomly sampling and partitioning datasets for training and evaluation.
+The <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> interface defines the minimal requirements for a class fulfilling these functions.
 In particular, samplers must be able to partition data (i.e. into training, validation, and testing datasets), sample data from each partition, and, if needed, save the sampled data to a file.
 Further, a file of names must be provided for the features to be predicted.
-We provide several implementations adhering to the <cite>Sampler</cite> interface: the <cite>RandomPositionsSampler</cite>, <cite>IntervalsSampler</cite>, and <cite>MultiFileSampler</cite>.</p>
-<p><cite>MultiFileSampler</cite> draws samples from structured data files for each partition.
-There is currently support for loading either .bed or .mat files via the <cite>FileSampler</cite> classes <cite>BedFileSampler</cite> and <cite>MatFileSampler</cite>, respectively (see [API docs for file samplers](<a class="reference external" href="http://selene.flatironinstitute.org/samplers.file_samplers.html">http://selene.flatironinstitute.org/samplers.file_samplers.html</a>)).
-It is worth noting that the .bed file used by <cite>BedFileSampler</cite> includes the coordinates of each sequence, and the indices corresponding to each feature for which said sequence is a positive example.
+We provide several implementations adhering to the <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> interface: the <code class="docutils literal notranslate"><span class="pre">RandomPositionsSampler</span></code>, <code class="docutils literal notranslate"><span class="pre">IntervalsSampler</span></code>, and <code class="docutils literal notranslate"><span class="pre">MultiFileSampler</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MultiFileSampler</span></code> draws samples from structured data files for each partition.
+There is currently support for loading either .bed or .mat files via the <code class="docutils literal notranslate"><span class="pre">FileSampler</span></code> classes <code class="docutils literal notranslate"><span class="pre">BedFileSampler</span></code> and <code class="docutils literal notranslate"><span class="pre">MatFileSampler</span></code>, respectively (see <a class="reference external" href="http://selene.flatironinstitute.org/samplers.file_samplers.html">API docs for file samplers</a>).
+It is worth noting that the .bed file used by <code class="docutils literal notranslate"><span class="pre">BedFileSampler</span></code> includes the coordinates of each sequence, and the indices corresponding to each feature for which said sequence is a positive example.
 We hope that users will request or contribute classes for other file samplers in the future.
-<cite>MultiFileSampler</cite> does not support saving the sampled data to a file, so calling the <cite>save_dataset_to_file</cite> method from this class will have no effect.</p>
-<p><cite>RandomPositionsSampler</cite> and <cite>IntervalsSampler</cite> are what we call online samplers.
+<code class="docutils literal notranslate"><span class="pre">MultiFileSampler</span></code> does not support saving the sampled data to a file, so calling the <code class="docutils literal notranslate"><span class="pre">save_dataset_to_file</span></code> method from this class will have no effect.</p>
+<p><code class="docutils literal notranslate"><span class="pre">RandomPositionsSampler</span></code> and <code class="docutils literal notranslate"><span class="pre">IntervalsSampler</span></code> are what we call online samplers.
 Online samplers generate examples from the reference sequence (e.g. genome, proteome) on-the-fly–either across the whole reference sequence (random positions sampler), or from user-specified regions (intervals sampler)–using a tabix-indexed .bed file.
 These samplers automatically partition said data according to user-specified parameters (e.g. validate on a subset of chromosomes or on some percentage of the data).
-Since <cite>OnlineSampler</cite>’s samples are randomly generated, we allow the user to save the sampled data to file.
-This file can be subsequently loaded with the <cite>BedFileSampler</cite>. They rely on classes from the _sequences_ and _targets_ submodules for retrieving each sequence and its targets in the proper matrix format.</p>
-<p>## Training a model ([API](<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#trainmodel">http://selene.flatironinstitute.org/selene.html#trainmodel</a>))</p>
-<p>The <cite>TrainModel</cite> class may be used for training and testing of sequence-based models, and provides the core functionality of the CLI’s train command.
-It relies on an <cite>OnlineSampler</cite> (or a subclass of <cite>OnlineSampler</cite>)  to automatically partition the dataset into subsets for training, validation, and testing.
+Since <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code>’s samples are randomly generated, we allow the user to save the sampled data to file.
+This file can be subsequently loaded with the <code class="docutils literal notranslate"><span class="pre">BedFileSampler</span></code>. They rely on classes from the <em>sequences</em> and <em>targets</em> submodules for retrieving each sequence and its targets in the proper matrix format.</p>
+</div>
+</div>
+<div class="section" id="training-a-model-api">
+<h2>Training a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#trainmodel">API</a>)<a class="headerlink" href="#training-a-model-api" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class may be used for training and testing of sequence-based models, and provides the core functionality of the CLI’s train command.
+It relies on an <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code> (or a subclass of <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code>)  to automatically partition the dataset into subsets for training, validation, and testing.
 These subsets are then used to automatically train and validate performance for a user-specified number of steps.
 The testing subset is used to evaluate the model performance after training is completed.
-The model’s loss, area under the receiver operating characteristic curve (AUC), and area under the precision-recall curve (AUPRC) are logged during training. (In the future, we plan to support other performance metrics. Please request specific ones or use cases in our [Github issues](<a class="reference external" href="https://github.com/FunctionLab/selene/issues">https://github.com/FunctionLab/selene/issues</a>).
+The model’s loss, area under the receiver operating characteristic curve (AUC), and area under the precision-recall curve (AUPRC) are logged during training. (In the future, we plan to support other performance metrics. Please request specific ones or use cases in our <a class="reference external" href="https://github.com/FunctionLab/selene/issues">Github issues</a>.
 The frequency of logging is provided by the user.
-At the end of evaluation, <cite>TrainModel</cite> logs the performance metrics for each feature predicted, and produces plots of the precision recall and receiver operating characteristic curves.</p>
-<p>## Evaluating a model ([API](<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#evaluatemodel">http://selene.flatironinstitute.org/selene.html#evaluatemodel</a>))</p>
-<p>The <cite>EvaluateModel</cite> class is used to test the performance of a trained model.
-<cite>EvaluateModel</cite> uses an instance of <cite>Sampler</cite> class or subclass to draw samples from a test set.
-After using the provided model to predict labels for said data, <cite>EvaluateModel</cite> logs the performance measures (as described in “Training a model”) and generates figures and a performance breakdown by feature.</p>
-<p>## Using a model to make predictions ([API](<a class="reference external" href="http://selene.flatironinstitute.org/predict.html">http://selene.flatironinstitute.org/predict.html</a>))</p>
-<p>Selene’s <cite>predict</cite> submodule includes a number of methods and classes for making predictions with sequence-based models.
-The <cite>AnalyzeSequences</cite> class is the main class to use.
-It leverages a user-specified trained model to make predictions for sequences sequences in a FASTA file, apply _in <a href="#id1"><span class="problematic" id="id2">silico_</span></a> mutagenesis to sequences in a FASTA file, or perform variant effect prediction on variants in a VCF file.
-In each case, the user can specify what <cite>AnalyzeSequences</cite> should save: raw predictions, difference scores, absolute difference scores, and/or logit scores.
-Note that the aforementioned “scores” can only be computed for _in <a href="#id3"><span class="problematic" id="id4">silico_</span></a> mutagenesis and variant effect prediction.</p>
-<p>## Visualizing model predictions ([API](<a class="reference external" href="http://selene.flatironinstitute.org/interpret.html">http://selene.flatironinstitute.org/interpret.html</a>))</p>
-<p>The <cite>interpret</cite> submodule of <cite>selene_sdk</cite> provides methods for visualizing a sequence-based model’s predictions made with <cite>AnalyzeSequences</cite>.
-For example, <cite>interpret</cite> includes methods for processing variant effect predictions made with <cite>AnalyzeSequences</cite> and subsequently visualizing them with a heatmap or sequence logo.
-The functionality included in the <cite>interpret</cite> submodule is not heavily incorporated into the CLI, but is instead intended for incorporation into user code.</p>
-<p>## The utilities submodule ([API](<a class="reference external" href="http://selene.flatironinstitute.org/utils.html">http://selene.flatironinstitute.org/utils.html</a>))</p>
-<p>Unlike the aforementioned submodules designed around individual concepts, the <cite>utils</cite> submodule is a catch-all submodule intended to prevent cluttering of the <cite>selene_sdk</cite> top-level namespace.
+At the end of evaluation, <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> logs the performance metrics for each feature predicted, and produces plots of the precision recall and receiver operating characteristic curves.</p>
+</div>
+<div class="section" id="evaluating-a-model-api">
+<h2>Evaluating a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#evaluatemodel">API</a>)<a class="headerlink" href="#evaluating-a-model-api" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> class is used to test the performance of a trained model.
+<code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> uses an instance of <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> class or subclass to draw samples from a test set.
+After using the provided model to predict labels for said data, <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> logs the performance measures (as described in “Training a model”) and generates figures and a performance breakdown by feature.</p>
+</div>
+<div class="section" id="using-a-model-to-make-predictions-api">
+<h2>Using a model to make predictions (<a class="reference external" href="http://selene.flatironinstitute.org/predict.html">API</a>)<a class="headerlink" href="#using-a-model-to-make-predictions-api" title="Permalink to this headline">¶</a></h2>
+<p>Selene’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> submodule includes a number of methods and classes for making predictions with sequence-based models.
+The <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> class is the main class to use.
+It leverages a user-specified trained model to make predictions for sequences sequences in a FASTA file, apply <em>in silico</em> mutagenesis to sequences in a FASTA file, or perform variant effect prediction on variants in a VCF file.
+In each case, the user can specify what <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> should save: raw predictions, difference scores, absolute difference scores, and/or logit scores.
+Note that the aforementioned “scores” can only be computed for <em>in silico</em> mutagenesis and variant effect prediction.</p>
+</div>
+<div class="section" id="visualizing-model-predictions-api">
+<h2>Visualizing model predictions (<a class="reference external" href="http://selene.flatironinstitute.org/interpret.html">API</a>)<a class="headerlink" href="#visualizing-model-predictions-api" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">interpret</span></code> submodule of <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code> provides methods for visualizing a sequence-based model’s predictions made with <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code>.
+For example, <code class="docutils literal notranslate"><span class="pre">interpret</span></code> includes methods for processing variant effect predictions made with <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> and subsequently visualizing them with a heatmap or sequence logo.
+The functionality included in the <code class="docutils literal notranslate"><span class="pre">interpret</span></code> submodule is not heavily incorporated into the CLI, but is instead intended for incorporation into user code.</p>
+</div>
+<div class="section" id="the-utilities-submodule-api">
+<h2>The utilities submodule (<a class="reference external" href="http://selene.flatironinstitute.org/utils.html">API</a>)<a class="headerlink" href="#the-utilities-submodule-api" title="Permalink to this headline">¶</a></h2>
+<p>Unlike the aforementioned submodules designed around individual concepts, the <code class="docutils literal notranslate"><span class="pre">utils</span></code> submodule is a catch-all submodule intended to prevent cluttering of the <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code> top-level namespace.
 It provides diverse functionality at varying levels of flexibility.
-Some members of <cite>utils</cite> are general-purpose (e.g. configuration file parsing) while others have highly specific use cases (e.g. CLI logger initialization).</p>
-<p># Help</p>
-<p>Join our [Google group](<a class="reference external" href="https://groups.google.com/forum/#!forum/selene-sdk">https://groups.google.com/forum/#!forum/selene-sdk</a>) if you have questions about the package, case studies, or model development.</p>
+Some members of <code class="docutils literal notranslate"><span class="pre">utils</span></code> are general-purpose (e.g. configuration file parsing) while others have highly specific use cases (e.g. CLI logger initialization).</p>
+</div>
+<div class="section" id="help">
+<h2>Help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
+<p>Join our <a class="reference external" href="https://groups.google.com/forum/#!forum/selene-sdk">Google group</a> if you have questions about the package, case studies, or model development.</p>
+</div>
+</div>
 
 
            </div>
@@ -304,7 +418,7 @@ Some members of <cite>utils</cite> are general-purpose (e.g. configuration file 
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="installation.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../index.html" class="btn btn-neutral float-left" title="Selene documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
