@@ -58,4 +58,4 @@ Additional dependency for running the CLI (versions 0.4.8 and below)
 --------------------------------------------------------------------
 
 Please install ``docopt`` before running the command-line script ``selene_cli.py`` provided in the repository. 
-In newer versions of Selene, the CLI can be run by calling ``selene_sdk`` or ``python -m selene_sdk`` from anywhere in bash (assuming you have installed the library, through conda/pip/local install - ``python setup.py install``).
+In newer versions of Selene, the CLI can be run by calling ``python -m selene_sdk`` from anywhere in bash (assuming you have installed the library, through conda/pip/local install - ``python setup.py install``).
