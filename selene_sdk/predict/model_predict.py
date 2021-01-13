@@ -523,7 +523,7 @@ class AnalyzeSequences(object):
 
 
     def get_predictions(self,
-                        input,
+                        input_path,
                         output_dir=None,
                         output_format="tsv",
                         strand_index=None):
@@ -533,7 +533,7 @@ class AnalyzeSequences(object):
 
         Parameters
         ----------
-        input : str
+        input_path : str
             A single sequence, or a path to the FASTA or BED file input.
         output_dir : str, optional
             Default is None. Output directory to write the model predictions.
@@ -579,16 +579,16 @@ class AnalyzeSequences(object):
 
         """
         if output_dir is None:
-            sequence = self._pad_or_truncate_sequence(input)
+            sequence = self._pad_or_truncate_sequence(input_path)
             seq_enc = self.reference_sequence.sequence_to_encoding(sequence)
             seq_enc = np.expand_dims(seq_enc, axis=0)  # add batch size of 1
             return predict(self.model, seq_enc, use_cuda=self.use_cuda)
-        elif input.endswith('.fa') or input.endswith('.fasta'):
+        elif input_path.endswith('.fa') or input_path.endswith('.fasta'):
             self.get_predictions_for_fasta_file(
-                input, output_dir, output_format=output_format)
+                input_path, output_dir, output_format=output_format)
         else:
             self.get_predictions_for_bed_file(
-                input,
+                input_path,
                 output_dir,
                 output_format=output_format,
                 strand_index=strand_index)
