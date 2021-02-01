@@ -162,7 +162,7 @@ class RandomPositionsSampler(OnlineSampler):
         self._initialized = False
 
     def init(func):
-        #delay initlization to allow  multiprocessing
+        # delay initialization to allow  multiprocessing
         def dfunc(self, *args, **kwargs):
             if not self._initialized:
                 if self._holdout_type == "chromosome":
@@ -263,21 +263,10 @@ class RandomPositionsSampler(OnlineSampler):
                         "could not be retrieved. Sampling again.".format(
                             chrom, position))
             return None
-        elif np.mean(retrieved_seq==0.25) >0.30: 
+        elif np.mean(retrieved_seq==0.25) >0.30:
             logger.info("Over 30% of the bases in the sequence centered "
                         "at {0} position {1} are ambiguous ('N'). "
                         "Sampling again.".format(chrom, position))
-            return None
-
-        #TODO: is this ok to remove now?
-        if retrieved_seq.shape[0] < self.sequence_length:
-            # TODO: remove after investigating this bug.
-            print("Warning: sequence retrieved for {0}, {1}, {2}, {3} "
-                  "had length less than required sequence length {4}. "
-                  "This bug will be investigated and addressed in the next "
-                  "version of Selene.".format(
-                      chrom, window_start, window_end, strand,
-                      self.sequence_length))
             return None
 
         if self.mode in self._save_datasets:
@@ -317,7 +306,7 @@ class RandomPositionsSampler(OnlineSampler):
         mode : str, optional
             Default is None. The operating mode that the object should run in.
             If None, will use the current mode `self.mode`.
-            
+
         Returns
         -------
         sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
