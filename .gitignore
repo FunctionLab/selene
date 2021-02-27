@@ -100,6 +100,9 @@ celerybeat-schedule
 venv/
 ENV/
 
+# VS Code
+.vscode/
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -112,3 +115,20 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Downloaded data
+**/data/**/*.log
+**/data/**/*.txt
+**/data/**/*.bed
+**/data/**/*.bed.gz
+**/data/**/*.bed.gz.tbi
+**/data/**/*.bed.tbi
+**/data/**/*.fasta
+**/data/**/*.fasta.fai
+**/data/**/*.fa
+**/data/**/*.fa.fai
+**/data/**/*.mat
+**/data/**/*.gz
+**/data/**/*.tsv
+**/data/chromatin_profiles/
+
