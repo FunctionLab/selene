@@ -5,7 +5,6 @@ import math
 
 import numpy as np
 import torch
-from torch.autograd import Variable
 
 from ..utils import _is_lua_trained_model
 
@@ -90,8 +89,6 @@ def predict(model, batch_sequences, use_cuda=False):
     if use_cuda:
         inputs = inputs.cuda()
     with torch.no_grad():
-        inputs = Variable(inputs)
-
         if _is_lua_trained_model(model):
             outputs = model.forward(
                 inputs.transpose(1, 2).contiguous().unsqueeze_(2))

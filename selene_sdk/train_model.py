@@ -11,7 +11,6 @@ from time import time
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import average_precision_score
@@ -458,9 +457,6 @@ class TrainModel(object):
             inputs = inputs.cuda()
             targets = targets.cuda()
 
-        inputs = Variable(inputs)
-        targets = Variable(targets)
-
         predictions = self.model(inputs.transpose(1, 2))
         loss = self.criterion(predictions, targets)
 
@@ -500,9 +496,6 @@ class TrainModel(object):
                 targets = targets.cuda()
 
             with torch.no_grad():
-                inputs = Variable(inputs)
-                targets = Variable(targets)
-
                 predictions = self.model(inputs.transpose(1, 2))
                 loss = self.criterion(predictions, targets)
 
@@ -622,4 +615,3 @@ class TrainModel(object):
             best_filepath = os.path.join(self.output_dir, "best_model")
             shutil.copyfile("{0}.pth.tar".format(cp_filepath),
                             "{0}.pth.tar".format(best_filepath))
-
