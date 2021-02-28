@@ -110,13 +110,6 @@ class RandomPositionsSampler(OnlineSampler):
         documentation for `validation_holdout` for more details.
     sequence_length : int
         The length of the sequences to  train the model on.
-    bin_radius : int
-        From the center of the sequence, the radius in which to detect
-        a feature annotation in order to include it as a sample's label.
-    surrounding_sequence_radius : int
-        The length of sequence falling outside of the feature detection
-        bin (i.e. `bin_radius`) center, but still within the
-        `sequence_length`.
     modes : list(str)
         The list of modes that the sampler can be run in.
     mode : str
@@ -246,12 +239,12 @@ class RandomPositionsSampler(OnlineSampler):
         bin_end = position + self._end_radius
         retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
-        window_start = bin_start - self.surrounding_sequence_radius
-        window_end = bin_end + self.surrounding_sequence_radius
+        window_start = position -  self._start_window_radius
+        window_end = position +  self._end_window_radius
         if window_end - window_start < self.sequence_length:
             print(bin_start, bin_end,
                   self._start_radius, self._end_radius,
-                  self.surrounding_sequence_radius)
+                  self._start_window_radius, self._end_window_radius,)
             return None
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \

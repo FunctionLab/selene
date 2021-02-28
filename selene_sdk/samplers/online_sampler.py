@@ -82,13 +82,6 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         documentation for `validation_holdout` for more details.
     sequence_length : int
         The length of the sequences to  train the model on.
-    bin_radius : int
-        From the center of the sequence, the radius in which to detect
-        a feature annotation in order to include it as a sample's label.
-    surrounding_sequence_radius : int
-        The length of sequence falling outside of the feature detection
-        bin (i.e. `bin_radius`) center, but still within the
-        `sequence_length`.
     modes : list(str)
         The list of modes that the sampler can be run in.
     mode : str
@@ -140,18 +133,12 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         np.random.seed(self.seed)
         random.seed(self.seed + 1)
 
-        if (sequence_length + center_bin_to_predict) % 2 != 0:
-            raise ValueError(
+        if isinstance(center_bin_to_predict, int):
+            if (sequence_length + center_bin_to_predict) % 2 != 0:
+                raise ValueError(
                 "Sequence length of {0} with a center bin length of {1} "
                 "is invalid. These 2 inputs should both be odd or both be "
                 "even.".format(
-                    sequence_length, center_bin_to_predict))
-
-        surrounding_sequence_length = sequence_length - center_bin_to_predict
-        if surrounding_sequence_length < 0:
-            raise ValueError(
-                "Sequence length of {0} is less than the center bin "
-                "length of {1}.".format(
                     sequence_length, center_bin_to_predict))
 
         # specifying a test holdout partition is optional
@@ -188,16 +175,35 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
                     self.modes, mode))
         self.mode = mode
 
-        self.surrounding_sequence_radius = int(
-            surrounding_sequence_length / 2)
-        self.sequence_length = sequence_length
-        self.bin_radius = int(center_bin_to_predict / 2)
-        self._start_radius = self.bin_radius
-        if center_bin_to_predict % 2 == 0:
-            self._end_radius = self.bin_radius
-        else:
-            self._end_radius = self.bin_radius + 1
 
+        self.sequence_length = sequence_length
+        window_radius = int(self.sequence_length / 2)
+        self._start_window_radius = window_radius
+        if self.sequence_length % 2 == 0:
+            self._end_window_radius = window_radius
+        else:
+            self._end_window_radius = window_radius + 1
+        if isinstance(center_bin_to_predict, int):
+            bin_radius = int(center_bin_to_predict / 2)
+            self._start_radius = bin_radius
+            if center_bin_to_predict % 2 == 0:
+                self._end_radius = bin_radius
+            else:
+                self._end_radius = bin_radius + 1
+        else:
+            if not isinstance(center_bin_to_predict, list) or len(center_bin_to_predict)!=2:                raise ValueError("`center_bin_to_predict` needs to be either an int or a list of two int")
+            else:
+                bin_start, bin_end = center_bin_to_predict
+                if bin_start < 0 or bin_end > self.sequence_length:
+                    ValueError(
+                        "center_bin_to_predict [{0}, {1}]"
+                        "is out-of-bound for sequence length {3}.".format(
+                            bin_start, bin_end,
+                            self.sequence_length))
+                self._start_radius = self._start_window_radius - bin_start
+                self._end_radius = self._end_window_radius - (self.sequence_length - bin_end)
+
+                
         self.reference_sequence = reference_sequence
 
         self.n_features = len(self._features)
