@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 
 from .sampler import Sampler
 
+
 class MultiFileSampler(Sampler):
     """
     This sampler draws samples from individual file samplers or data loaders
@@ -18,41 +19,40 @@ class MultiFileSampler(Sampler):
     `selene_sdk.samplers.dataloaders`.
 
     MultiFileSampler can use either file samplers or data loaders for
-    different modes. Using data loaders for some mode while using file samplers
+    different modes. Using data loaders for some modes while using file samplers
     for other modes are also allowed. The file samplers parse data files
-    (e.g. bed, mat, or hdf5) to provide samples. The data loaders can provide
-    multi-worker iterators that draw samples from a sampler or a file sampler.
-    As data loaders support parallel sampling, they are generally recommended
-    for sampling speed.
+    (e.g. bed, mat, or hdf5). The data loaders provide multi-worker iterators
+    that draw samples from a sampler or a file sampler. As data loaders
+    support parallel sampling, they are generally recommended for sampling speed.
 
     Parameters
     ----------
-    train_sampler : FileSampler or DataLoader
+    train_sampler : selene_sdk.samplers.file_samplers.FileSampler or
+            selene_sdk.samplers.dataloader.DataLoader
         Load your training data as a `FileSampler` or `DataLoader`
-        before passing it into the `MultiFileSampler` constructor.
     validate_sampler : FileSampler or DataLoader
         The validation dataset file sampler or data loader.
-    features : list(str)
-        The list of features the model should predict
+    targets : list(str)
+        The list of targets the model should predict
     test_sampler : None or FileSampler or DataLoader, optional
         Default is None. The test file sampler is optional.
     mode : str, optional
         Default is "train". Must be one of `{train, validate, test}`. The
         starting mode in which to run the sampler.
     save_datasets : list(str), optional
-        Default is None. Currently, we are only including these parameters
+        Default is None. Currently, we are only including this parameter
         so that `MultiFileSampler` is consistent with `Sampler`. The save
         dataset functionality for MultiFileSampler has not been defined
         yet.
     output_dir : str or None, optional
-        Default is None. Used if the sampler has any data or logging
-        statements to save to file. Currently not useful for
+        Default is None. Only used if the sampler has any data or
+        logging statements to save to file. Currently not used in
         `MultiFileSampler`.
 
     Attributes
     ----------
     modes : list(str)
-        A list of the names of the modes that the object may operate in.
+        A list of the modes that the object may operate in.
     mode : str or None
         Default is `None`. The current mode that the object is operating in.
 
@@ -74,13 +74,17 @@ class MultiFileSampler(Sampler):
             output_dir=output_dir)
 
         self._samplers = {
-            "train": train_sampler if isinstance(train_sampler, Sampler) else None,
-            "validate": validate_sampler if isinstance(validate_sampler, Sampler) else None
+            "train": train_sampler if isinstance(train_sampler, Sampler) \
+                     else None,
+            "validate": validate_sampler if isinstance(validate_sampler, Sampler) \
+                        else None
         }
 
         self._dataloaders = {
-            "train": train_sampler if isinstance(train_sampler, DataLoader) else None,
-            "validate": validate_sampler if isinstance(validate_sampler, DataLoader) else None
+            "train": train_sampler if isinstance(train_sampler, DataLoader) \
+                     else None,
+            "validate": validate_sampler if isinstance(validate_sampler, DataLoader) \
+                        else None
         }
 
         self._iterators = {
@@ -124,10 +128,10 @@ class MultiFileSampler(Sampler):
                 "{1}".format(mode, self.modes))
         self.mode = mode
 
-    def set_batch_size(self, batch_size, mode=None):
+    def _set_batch_size(self, batch_size, mode=None):
         """
         Sets the batch size for DataLoader for the specified mode,
-        if the specified  batch_size does not equal the current batch_size.
+        if the specified batch_size does not equal the current batch_size.
         Parameters
         ----------
         batch_size : int
@@ -189,7 +193,7 @@ class MultiFileSampler(Sampler):
         if self._samplers[mode]:
             return self._samplers[mode].sample(batch_size)
         else:
-            self.set_batch_size(batch_size, mode=mode)
+            self._set_batch_size(batch_size, mode=mode)
             try:
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()

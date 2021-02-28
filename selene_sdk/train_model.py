@@ -139,7 +139,8 @@ class TrainModel(object):
         using `torch.load`.
     use_scheduler : bool, optional
         Default is `True`. If `True`, learning rate scheduler is used to
-        reduce learning rate on plateau.
+        reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler 
+        with patience=16 and factor=0.8 is used.
 
     Attributes
     ----------

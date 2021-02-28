@@ -5,8 +5,8 @@ torch DataLoader mechanism.
 """
 import  sys
 
-import numpy as np
 import h5py
+import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 
@@ -14,20 +14,19 @@ from torch.utils.data import Dataset, DataLoader
 class _SamplerDataset(Dataset):
     """
     This class provides a Dataset interface that wraps around a Sampler or
-    FileSampler. `_SamplerDataset` is intended to be used internally by
-    `SamplerDataLoader`.
+    FileSampler. `_SamplerDataset` is used internally by `SamplerDataLoader`.
 
     Parameters
     ----------
     sampler : selene_sdk.samplers.Sampler or
         selene_sdk.samplers.file_samplers.FileSampler
-        The sampler to draw data from.
+        The sampler from which to draw data.
 
     Attributes
     ----------
     sampler : selene_sdk.samplers.Sampler or
-        selene_sdk.samplers.file_samplers.FileSampler
-        The sampler to draw data from.
+            selene_sdk.samplers.file_samplers.FileSampler
+        The sampler from which to draw data.
     """
     def __init__(self, sampler):
         super(_SamplerDataset, self).__init__()
@@ -36,13 +35,13 @@ class _SamplerDataset(Dataset):
     def __getitem__(self, index):
         """
         Retrieve sample(s) from self.sampler. Only index length affects the
-        size the samples. The index values are not used.
+        number of samples. The index values are not used.
 
         Parameters
         ----------
         index : int or any object with __len__ method implemented
-            The size of index is used to determined size of the samples
-            to return.
+            The size of index is used to determine the number of the
+            samples to return.
 
         Returns
         ----------
@@ -50,11 +49,11 @@ class _SamplerDataset(Dataset):
             A tuple containing the numeric representation of the
             sequence examples and their corresponding labels. The
             shape of `sequences` will be
-            :math:`B \\times L \\times N`, where :math:`B` is
-            `batch_size`, :math:`L` is the sequence length, and
+            :math:`I \\times L \\times N`, where :math:`I` is
+            `index`, :math:`L` is the sequence length, and
             :math:`N` is the size of the sequence type's alphabet.
-            The shape of `targets` will be :math:`B \\times F`,
-            where :math:`F` is the number of features.
+            The shape of `targets` will be :math:`I \\times T`,
+            where :math:`T` is the number of targets predicted.
         """
         sequences, targets = self.sampler.sample(
             batch_size=1 if isinstance(index, int) else len(index))
@@ -74,19 +73,21 @@ class _SamplerDataset(Dataset):
         """
         return sys.maxsize
 
+
 class SamplerDataLoader(DataLoader):
     """
     A DataLoader that provides parallel sampling for any `Sampler`
     or `FileSampler` object. SamplerDataLoader requires sampler to be
-    initialized with `picklable=True` to enable multi-procesing.
-    `SamplerDataLoader` can be used with `MultiFileSampler` by
-    passing `SamplerDataLoader` object as `train_sampler`, `validate_sampler`
+    initialized with `pickleable=True` to enable multi-procesing.
+    `SamplerDataLoader` can be used with `MultiFileSampler` by specifying
+    the `SamplerDataLoader` object as `train_sampler`, `validate_sampler`
     or `test_sampler` when initiating a `MultiFileSampler`.
 
     Parameters
     ----------
-    sampler : selene_sdk.samplers.Sampler or selene_sdk.samplers.file_samplers.FileSampler
-        The sampler to draw data from.
+    sampler : selene_sdk.samplers.Sampler or
+            selene_sdk.samplers.file_samplers.FileSampler
+        The sampler from which to draw data.
     num_workers : int, optional
         Default to 1. Number of workers to use for DataLoader.
     batch_size : int, optional
@@ -96,10 +97,11 @@ class SamplerDataLoader(DataLoader):
 
     Attributes
     ----------
-    dataset : selene_sdk.samplers.Sampler or selene_sdk.samplers.file_samplers.FileSampler
-        The sampler to draw data from. Specified by the `sampler` argument.
-    num_workers : int, optional
-        Default to 1. Number of workers to use for DataLoader.
+    dataset : selene_sdk.samplers.Sampler or
+            selene_sdk.samplers.file_samplers.FileSampler
+        The sampler from which to draw data. Specified by the `sampler` param.
+    num_workers : int
+        Number of workers to use for DataLoader.
     batch_size : int
         The number of samples the iterator returns in one step.
 
@@ -121,14 +123,15 @@ class SamplerDataLoader(DataLoader):
             "num_workers": num_workers,
             "pin_memory": True,
             "worker_init_fn": worker_init_fn
-            }
+        }
 
         super(SamplerDataLoader, self).__init__(_SamplerDataset(sampler), **args)
         self.seed = seed
 
+
 class _H5Dataset(Dataset):
     """
-    This class provides a Dataset that directly load sequences and targets
+    This class provides a Dataset that directly loads sequences and targets
     from a hdf5 file. `_H5Dataset` is intended to be used internally by
     `H5DataLoader`.
 
@@ -137,8 +140,8 @@ class _H5Dataset(Dataset):
     file_path : str
         The file path of the hdf5 file.
     size : int or None
-        Default is None. Specify dataset size. This be used to limit the dataset to
-        first N rows. If None, use the sequences array length.
+        Default is None. Specify dataset size. This can be used to limit the
+        dataset to first `size` rows. If None, use the sequences array length.
     in_memory : bool, optional
         Default is False. If True, load entire dataset into memory.
     unpackbits : bool, optional
@@ -155,12 +158,11 @@ class _H5Dataset(Dataset):
     ----------
     file_path : str
         The file path of the hdf5 file.
-    size : int or None
-        Specify dataset size. This be used to limit the dataset to
-        first N rows. If None, use the sequences array length.
-    in_memory : bool, optional
+    size : int
+        Dataset size.
+    in_memory : bool
         If True, load entire dataset into memory.
-    unpackbits : bool, optional
+    unpackbits : bool
         If True, unpack binary-valued array from uint8
         sequence and targets array. See `numpy.packbits` for details.
     """
@@ -173,12 +175,13 @@ class _H5Dataset(Dataset):
                  tgt_key="targets"):
         super(_H5Dataset, self).__init__()
         self.file_path = file_path
-        self._initialized = False
         self.in_memory = in_memory
         self.unpackbits = unpackbits
+        self.size = size
+
+        self._initialized = False
         self._seq_key = seq_key
         self._tgt_key = tgt_key
-        self.size = size
 
     def init(func):
         # delay initialization to allow multiprocessing
@@ -208,8 +211,8 @@ class _H5Dataset(Dataset):
             nulls = np.sum(sequence, axis=-1) == 4
             sequence = sequence.astype(float)
             sequence[nulls, :] = 0.25
-            targets = np.unpackbits(targets, axis=-1).astype(
-                float)
+            targets = np.unpackbits(
+                targets, axis=-1).astype(float)
         if sequence.ndim == 3:
             sequence = sequence[:, :self.s_len, :]
         else:
@@ -227,9 +230,10 @@ class _H5Dataset(Dataset):
             self.size = self.sequences.shape[0]
         return self.size
 
+
 class H5DataLoader(DataLoader):
     """
-    H5DataLoader that provides optionally parallel sampling from a HDF5
+    H5DataLoader provides optionally parallel sampling from a HDF5
     dataset that contains sequences and targets data. `H5DataLoader`
     can be used with `MultiFileSampler` by passing `SamplerDataLoader` object
     as `train_sampler`, `validate_sampler` or `test_sampler` when initiating a
@@ -241,7 +245,7 @@ class H5DataLoader(DataLoader):
         The file path of the hdf5 file.
     size : int or None
         Default is None. Specify dataset size. This be used to limit the dataset to
-        first N rows. If None, use the sequences array length.
+        first `size` rows. If None, use the sequences array length.
     in_memory : bool, optional
         Default is False. If True, load entire dataset into memory.
     num_workers : int, optional

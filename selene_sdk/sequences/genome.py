@@ -5,7 +5,6 @@ parts of the sequence and converting these parts into their one-hot
 encodings.
 
 """
-import numpy as np
 import pkg_resources
 import pyfaidx
 import tabix
@@ -190,10 +189,10 @@ class Genome(Sequence):
         Default is None (use the default base ordering of
         `['A', 'C', 'G', 'T']`). Specify a different ordering of
         DNA bases for one-hot encoding.
-    init_unpicklable : bool, optional
-        Default is False. If False, delay part of initialization code 
+    init_unpickleable : bool, optional
+        Default is False. If False, delay part of initialization code
         to executed only when a relevant method is called. This enables
-        the object to be pickled after instantiation. `init_unpicklable` should 
+        the object to be pickled after instantiation. `init_unpickleable` should
         be `False` when used when multi-processing is needed e.g. DataLoader.
 
     Attributes
@@ -252,7 +251,7 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpicklable=False):
+    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpickleable=False):
         """
         Constructs a `Genome` object.
         """
@@ -260,7 +259,7 @@ class Genome(Sequence):
         self.input_path = input_path
         self.blacklist_regions = blacklist_regions
         self._initialized =False
-        
+
         if bases_order is not None:
             bases = [str.upper(b) for b in bases_order]
             self.BASES_ARR = bases
@@ -271,8 +270,8 @@ class Genome(Sequence):
             self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
             self.update_bases_order(bases)
 
-        if init_unpicklable:
-            self._unpicklable_init()
+        if init_unpickleable:
+            self._unpickleable_init()
 
     @classmethod
     def update_bases_order(cls, bases):
@@ -283,7 +282,7 @@ class Genome(Sequence):
             **{b: ix for (ix, b) in enumerate(lc_bases)}}
         cls.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
 
-    def _unpicklable_init(self):
+    def _unpickleable_init(self):
         if not self._initialized:
             self.genome = pyfaidx.Fasta(self.input_path)
             self.chrs = sorted(self.genome.keys())
@@ -302,13 +301,13 @@ class Genome(Sequence):
                         "sequences/data/hg38.blacklist.bed.gz"))
             elif self.blacklist_regions is not None:  # user-specified file
                 self._blacklist_tabix = tabix.open(
-                    blacklist_regions)
+                    self.blacklist_regions)
             self._initialized = True
-                
+
     def init(func):
-        #delay initlization to allow  multiprocessing
+        # delay initialization to allow  multiprocessing
         def dfunc(self, *args, **kwargs):
-            self._unpicklable_init()
+            self._unpickleable_init()
             return func(self, *args, **kwargs)
         return dfunc
 
@@ -481,7 +480,7 @@ class Genome(Sequence):
             chrom, start, end, strand=strand, pad=pad)
         encoding = self.sequence_to_encoding(sequence)
         return encoding
-        
+
     @init
     def get_encoding_from_coords_check_unk(self,
                                  chrom,
