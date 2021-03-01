@@ -248,5 +248,48 @@ class TestGenomicFeatures(unittest.TestCase):
             query_features._feature_thresholds_vec.tolist(),
             [0.40, 0.50, 0.50, 0.30, 0.50, 0.50])
 
+    def test_GenomicFeatures_no_thresholds__get_feature_data(self):
+        data_path = os.path.join(
+            "selene_sdk", "targets", "tests",
+            "files", "sorted_aggregate.bed.gz")
+        query_features = GenomicFeatures(
+            data_path, self.features, feature_thresholds=None)
+
+        expected_feature_data = np.zeros(self.n_features)
+        expected_feature_data[self.feature_index_map['CTCF']] = 1.
+
+        # NOTE: "1	16110	16390	CTCF" is the first line in the test data.
+        actual_feature_data = query_features.get_feature_data('1', 16110, 16390)
+
+        np.testing.assert_array_almost_equal(
+            actual_feature_data,
+            expected_feature_data
+        )
+
+    def test_GenomicFeatures_0_5_threshold__get_feature_data(self):
+        data_path = os.path.join(
+            "selene_sdk", "targets", "tests",
+            "files", "sorted_aggregate.bed.gz")
+        query_features = GenomicFeatures(
+            data_path, self.features, feature_thresholds=0.5)
+
+        # NOTE: "1	16110	16390	CTCF" is the first line in the test data.
+
+        # Overlap is less than a threshold:
+        np.testing.assert_array_almost_equal(
+            query_features.get_feature_data('1', 16000, 17000),
+            np.zeros(self.n_features)
+        )
+
+        # Overlap is greater than a threshold:
+        expected_feature_data = np.zeros(self.n_features)
+        expected_feature_data[self.feature_index_map['CTCF']] = 1.
+
+        np.testing.assert_array_almost_equal(
+            query_features.get_feature_data('1', 16000, 16500),
+            expected_feature_data
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
