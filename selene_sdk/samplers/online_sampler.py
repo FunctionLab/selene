@@ -4,14 +4,14 @@ Objects of the class `OnlineSampler`, are samplers which load examples
 "on the fly" rather than storing them all persistently in memory.
 
 """
-from abc import ABCMeta
 import os
 import random
+from abc import ABCMeta
 
 import numpy as np
 
-from .sampler import Sampler
 from ..targets import GenomicFeatures
+from .sampler import Sampler
 
 
 class OnlineSampler(Sampler, metaclass=ABCMeta):
@@ -302,11 +302,11 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : \
+        tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches, as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,
@@ -320,7 +320,7 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
             self.set_mode(mode)
         else:
             mode = self.mode
-        sequences_and_targets = []
+        batches = []
         if n_samples is None and mode == "validate":
             n_samples = 32000
         elif n_samples is None and mode == "test":
@@ -328,12 +328,12 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         n_batches = int(n_samples / batch_size)
         for _ in range(n_batches):
-            inputs, targets = self.sample(batch_size)
-            sequences_and_targets.append((inputs, targets))
-        targets_mat = np.vstack([t for (s, t) in sequences_and_targets])
+            samples_batch = self.sample(batch_size)
+            batches.append(samples_batch)
+        targets_mat = np.vstack([batch.targets() for batch in batches])
         if mode in self._save_datasets:
             self.save_dataset_to_file(mode, close_filehandle=True)
-        return sequences_and_targets, targets_mat
+        return batches, targets_mat
 
     def get_dataset_in_batches(self, mode, batch_size, n_samples=None):
         """
@@ -355,12 +355,12 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : \
+        tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches, as well
             as a single matrix with all targets in the same order.
             The list is length :math:`S`, where :math:`S =` `n_samples`.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,
@@ -387,11 +387,11 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : \
+        tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches, as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,
@@ -419,11 +419,11 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : \
+        tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches, as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,

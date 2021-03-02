@@ -2,14 +2,15 @@
 This module provides the `IntervalsSampler` class and supporting
 methods.
 """
-from collections import namedtuple
 import logging
 import random
+from collections import namedtuple
 
 import numpy as np
 
-from .online_sampler import OnlineSampler
+from selene_sdk.samplers.samples_batch import SamplesBatch
 from ..utils import get_indices_and_probabilities
+from .online_sampler import OnlineSampler
 
 logger = logging.getLogger(__name__)
 
@@ -388,8 +389,8 @@ class IntervalsSampler(OnlineSampler):
 
         Returns
         -------
-        sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
-            A tuple containing the numeric representation of the
+        SamplesBatch
+            A batch containing the numeric representation of the
             sequence examples and their corresponding labels. The
             shape of `sequences` will be
             :math:`B \\times L \\times N`, where :math:`B` is
@@ -426,4 +427,4 @@ class IntervalsSampler(OnlineSampler):
             sequences[n_samples_drawn, :, :] = seq
             targets[n_samples_drawn, :] = seq_targets
             n_samples_drawn += 1
-        return (sequences, targets)
+        return SamplesBatch(sequences, target_batch=targets)
