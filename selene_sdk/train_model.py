@@ -376,10 +376,11 @@ class TrainModel(object):
             verbose=True,
             factor=0.8)
 
+        train_losses = []
         time_per_step = []
         for step in range(self._start_step, self.max_steps):
             t_i = time()
-            train_loss = self.train()
+            train_losses.append(self.train())
             t_f = time()
             time_per_step.append(t_f - t_i)
 
@@ -400,8 +401,7 @@ class TrainModel(object):
                     logger.debug("Saving checkpoint `{0}.pth.tar`".format(
                         checkpoint_filename))
                 else:
-                    self._save_checkpoint(
-                        checkpoint_dict, False)
+                    self._save_checkpoint(checkpoint_dict, False)
 
             # TODO: Should we have some way to report training stats without running validation?
             if step and step % self.nth_step_report_stats == 0:
@@ -409,9 +409,13 @@ class TrainModel(object):
                              "of steps per second: {1:.1f}").format(
                     step, 1. / np.average(time_per_step)))
                 time_per_step = []
+
+                train_loss = np.average(train_losses)
+                self._train_logger.info(train_loss)
+                train_losses = []
+
                 valid_scores = self.validate()
                 validation_loss = valid_scores["loss"]
-                self._train_logger.info(train_loss)
                 to_log = [str(validation_loss)]
                 for k in sorted(self._validation_metrics.metrics.keys()):
                     if k in valid_scores and valid_scores[k]:
@@ -419,6 +423,7 @@ class TrainModel(object):
                     else:
                         to_log.append("NA")
                 self._validation_logger.info("\t".join(to_log))
+
                 scheduler.step(math.ceil(validation_loss * 1000.0) / 1000.0)
 
                 if validation_loss < min_loss:
@@ -430,11 +435,12 @@ class TrainModel(object):
                         "min_loss": min_loss,
                         "optimizer": self.optimizer.state_dict()}, True)
                     logger.debug("Updating `best_model.pth.tar`")
-                logger.info("training loss: {0}".format(train_loss))
-                logger.info("validation loss: {0}".format(validation_loss))
 
                 # Logging training and validation on same line requires 2 parsers or more complex parser.
                 # Separate logging of train/validate is just a grep for validation/train and then same parser.
+                logger.info("training loss: {0}".format(train_loss))
+                logger.info("validation loss: {0}".format(validation_loss))
+
         self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
     def train(self):
