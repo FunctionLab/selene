@@ -174,7 +174,7 @@ class AnalyzeSequences(object):
         self.features = features
         self.reference_sequence = reference_sequence
         if not self.reference_sequence._initialized:
-            self.reference_sequence._unpickleable_init()
+            self.reference_sequence._unpicklable_init()
         if type(self.reference_sequence) == Genome and \
                 _is_lua_trained_model(model):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])

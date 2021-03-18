@@ -189,10 +189,10 @@ class Genome(Sequence):
         Default is None (use the default base ordering of
         `['A', 'C', 'G', 'T']`). Specify a different ordering of
         DNA bases for one-hot encoding.
-    init_unpickleable : bool, optional
+    init_unpicklable : bool, optional
         Default is False. If False, delay part of initialization code
         to executed only when a relevant method is called. This enables
-        the object to be pickled after instantiation. `init_unpickleable` should
+        the object to be pickled after instantiation. `init_unpicklable` should
         be `False` when used when multi-processing is needed e.g. DataLoader.
 
     Attributes
@@ -251,7 +251,7 @@ class Genome(Sequence):
     from the alphabet, but we are uncertain which.
     """
 
-    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpickleable=False):
+    def __init__(self, input_path, blacklist_regions=None, bases_order=None, init_unpicklable=False):
         """
         Constructs a `Genome` object.
         """
@@ -270,8 +270,8 @@ class Genome(Sequence):
             self.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
             self.update_bases_order(bases)
 
-        if init_unpickleable:
-            self._unpickleable_init()
+        if init_unpicklable:
+            self._unpicklable_init()
 
     @classmethod
     def update_bases_order(cls, bases):
@@ -282,7 +282,7 @@ class Genome(Sequence):
             **{b: ix for (ix, b) in enumerate(lc_bases)}}
         cls.INDEX_TO_BASE = {ix: b for (ix, b) in enumerate(bases)}
 
-    def _unpickleable_init(self):
+    def _unpicklable_init(self):
         if not self._initialized:
             self.genome = pyfaidx.Fasta(self.input_path)
             self.chrs = sorted(self.genome.keys())
@@ -307,7 +307,7 @@ class Genome(Sequence):
     def init(func):
         # delay initialization to allow  multiprocessing
         def dfunc(self, *args, **kwargs):
-            self._unpickleable_init()
+            self._unpicklable_init()
             return func(self, *args, **kwargs)
         return dfunc
 
