@@ -32,8 +32,8 @@ class MultiFileSampler(Sampler):
         Load your training data as a `FileSampler` or `DataLoader`
     validate_sampler : FileSampler or DataLoader
         The validation dataset file sampler or data loader.
-    targets : list(str)
-        The list of targets the model should predict
+    features : list(str)
+        The list of features the model should predict
     test_sampler : None or FileSampler or DataLoader, optional
         Default is None. The test file sampler is optional.
     mode : str, optional
