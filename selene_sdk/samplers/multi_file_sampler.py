@@ -224,7 +224,7 @@ class MultiFileSampler(Sampler):
             return self._samplers[mode if mode else self.mode].get_data_and_targets(
                 batch_size, n_samples)
         else:
-            self.set_batch_size(batch_size, mode=mode)
+            self._set_batch_size(batch_size, mode=mode)
             data_and_targets = []
             targets_mat = []
             count = batch_size
