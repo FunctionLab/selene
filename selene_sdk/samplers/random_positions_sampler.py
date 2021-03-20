@@ -10,6 +10,7 @@ import random
 
 import numpy as np
 
+from functools import wraps
 from .online_sampler import OnlineSampler
 from ..utils import get_indices_and_probabilities
 
@@ -156,6 +157,7 @@ class RandomPositionsSampler(OnlineSampler):
 
     def init(func):
         # delay initialization to allow  multiprocessing
+        @wraps(func)
         def dfunc(self, *args, **kwargs):
             if not self._initialized:
                 if self._holdout_type == "chromosome":

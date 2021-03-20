@@ -9,6 +9,7 @@ import pkg_resources
 import pyfaidx
 import tabix
 
+from functools import wraps
 from .sequence import Sequence
 from .sequence import sequence_to_encoding
 from .sequence import encoding_to_sequence
@@ -306,6 +307,7 @@ class Genome(Sequence):
 
     def init(func):
         # delay initialization to allow  multiprocessing
+        @wraps(func)
         def dfunc(self, *args, **kwargs):
             self._unpicklable_init()
             return func(self, *args, **kwargs)

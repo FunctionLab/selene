@@ -16,6 +16,7 @@ import types
 import tabix
 import numpy as np
 
+from functools import wraps
 from .target import Target
 from ._genomic_features import _fast_get_feature_data
 
@@ -294,6 +295,7 @@ class GenomicFeatures(Target):
 
     def init(func):
         # delay initialization to allow multiprocessing
+        @wraps(func)
         def dfunc(self, *args, **kwargs):
             self._unpicklable_init()
             return func(self, *args, **kwargs)

@@ -8,6 +8,8 @@ import  sys
 import h5py
 import numpy as np
 import torch
+
+from functools import wraps
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -177,6 +179,7 @@ class _H5Dataset(Dataset):
 
     def init(func):
         # delay initialization to allow multiprocessing
+        @wraps(func)
         def dfunc(self, *args, **kwargs):
             if not self._initialized:
                 self.db = h5py.File(self.file_path, 'r')
