@@ -1,24 +1,29 @@
 """
-This module provides the `MultiFileSampler` class, which uses a
+This module provides the `MultiSampler` class, which uses a
 FileSampler for each mode of sampling (train, test, validation).
-The MultiFileSampler is therefore a subclass of Sampler.
+The MultiSampler is therefore a subclass of Sampler.
 """
 import numpy as np
 from torch.utils.data import DataLoader
 
 from .sampler import Sampler
 
-
-class MultiFileSampler(Sampler):
+def MultiFileSampler(*args, **kwargs):
+    from warnings import warn
+    warn("MultiFileSampler is deprecated and will be removed from future "
+    "versions of Selene. Please use MultiSampler instead.")
+    return MultiSampler(*args, **kwargs)
+    
+class MultiSampler(Sampler):
     """
     This sampler draws samples from individual file samplers or data loaders
     that corresponds to training, validation, and testing (optional) modes.
-    MultiFileSampler calls on the correct file sampler or data loader to draw
+    MultiSampler calls on the correct file sampler or data loader to draw
     samples for a given mode. Example file samples are under
     `selene_sdk.samplers.file_samplers` and example data loaders are under
     `selene_sdk.samplers.dataloaders`.
 
-    MultiFileSampler can use either file samplers or data loaders for
+    MultiSampler can use either file samplers or data loaders for
     different modes. Using data loaders for some modes while using file samplers
     for other modes are also allowed. The file samplers parse data files
     (e.g. bed, mat, or hdf5). The data loaders provide multi-worker iterators
@@ -41,13 +46,13 @@ class MultiFileSampler(Sampler):
         starting mode in which to run the sampler.
     save_datasets : list(str), optional
         Default is None. Currently, we are only including this parameter
-        so that `MultiFileSampler` is consistent with `Sampler`. The save
-        dataset functionality for MultiFileSampler has not been defined
+        so that `MultiSampler` is consistent with `Sampler`. The save
+        dataset functionality for MultiSampler has not been defined
         yet.
     output_dir : str or None, optional
         Default is None. Only used if the sampler has any data or
         logging statements to save to file. Currently not used in
-        `MultiFileSampler`.
+        `MultiSampler`.
 
     Attributes
     ----------
@@ -66,9 +71,9 @@ class MultiFileSampler(Sampler):
                  save_datasets=[],
                  output_dir=None):
         """
-        Constructs a new `MultiFileSampler` object.
+        Constructs a new `MultiSampler` object.
         """
-        super(MultiFileSampler, self).__init__(
+        super(MultiSampler, self).__init__(
             features,
             save_datasets=save_datasets,
             output_dir=output_dir)
