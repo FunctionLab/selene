@@ -305,7 +305,7 @@ class IntervalsSampler(OnlineSampler):
         Returns
         -------
         retrieved_seq, retrieved_targets : \
-        tuple(numpy.ndarray, list(numpy.ndarray))
+        tuple(numpy.ndarray, numpy.ndarray)
             A tuple containing the numeric representation of the
             sequence centered at the query position, as well as a list
             of samples within this region that met the filtering

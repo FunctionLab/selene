@@ -336,12 +336,7 @@ class GenomicFeatures(Target):
 
     def get_feature_data(self, chrom, start, end):
         """
-        For a sequence of length :math:`L = end - start`, return the
-        features' one-hot encoding corresponding to that region. For
-        instance, for `n_features`, each position in that sequence will
-        have a binary vector specifying whether the genomic feature's
-        coordinates overlap with that position.
-        @TODO: Clarify with an example, as this is hard to read right now.
+        Computes which features overlap with the given region.
 
         Parameters
         ----------
@@ -355,21 +350,23 @@ class GenomicFeatures(Target):
         Returns
         -------
         numpy.ndarray
-            :math:`L \\times N` array, where :math:`L = end - start`
-            and :math:`N =` `self.n_features`. Note that if we catch a
-            `tabix.TabixError`, we assume the error was the result of
-            there being no features present in the queried region and
-            return a `numpy.ndarray` of zeros.
+            A target vector of size `self.n_features` where the `i`th
+            position is equal to one if the `i`th feature is positive,
+            and zero otherwise.
+
+            NOTE: If we catch a `tabix.TabixError`, we assume the error was
+            the result of there being no features present in the queried region
+            and return a `numpy.ndarray` of zeros.
 
         """
         if self._feature_thresholds_vec is None:
-            features = np.zeros((end - start))
+            features = np.zeros(self.n_features)
             rows = self._query_tabix(chrom, start, end)
             if not rows:
                 return features
             for r in rows:
                 feature = r[3]
-                ix = self.feature_index_map[feature]
+                ix = self.feature_index_dict[feature]
                 features[ix] = 1
             return features
         return _get_feature_data(
