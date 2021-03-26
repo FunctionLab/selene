@@ -232,24 +232,25 @@ class H5DataLoader(DataLoader):
     array of sequences and targets data are specified by `sequence_key`
     and `targets_key` respectively. The sequences array should be
     of shape:math:`B \\times L \\times N`, where :math:`B` is
-    the sample size, :math:`L` is the sequence length, and :math:`N` is the size 
-    of the sequence type's alphabet. The shape of the targets array
+    the sample size, :math:`L` is the sequence length, and :math:`N` is 
+    the size of the sequence type's alphabet. The shape of the targets array
      will be :math:`B \\times F`, where :math:`F` is the number of features.
      
     H5DataLoader also supports compressed binary data with `numpy.packbits` 
-    with the `unpackbits` option. To generate compressed binary data, the sequences 
-    and targets array have to be both binary-valued, and then packed in the 
-    :math:`L` and `F` dimensions. 
-    For the seqeunces array, to represent unknown bases ("N"s) by binary data,
-    all-one encoding should be used, and they will be transformed to the correct 
-    representations in selene_sdk.sequences.Genome when unpacked. In addition,
-    to unpack correctly, the length of the packed dimension, i.e. :math:`L` and
-    :math:`F` must be provided in two integer scalars named `{sequence_key}_length` 
-    and `{targets_key}_length` in the HDF5 file if `unpackbits==True`.
+    with the `unpackbits` option. To generate compressed binary data, the 
+    sequences and targets array have to be both binary-valued, and then 
+    packed in the :math:`L` and `F` dimensions respectively. 
+    For the seqeunces array, to represent unknown bases ("N"s) by binary 
+    data, all-one encoding should be used, and they will be transformed to 
+    the correct representations in selene_sdk.sequences.Genome when unpacked.
+    In addition, to unpack correctly, the length of the packed dimension, 
+    i.e. :math:`L` and :math:`F` must be provided in two integer scalars 
+    named `{sequence_key}_length` and `{targets_key}_length` in the HDF5 file 
+    if `unpackbits==True`.
 
-    `H5DataLoader` can be used with `MultiFileSampler` by passing `SamplerDataLoader`
-    object as `train_sampler`, `validate_sampler` or `test_sampler` when initiating a
-    `MultiFileSampler`.
+    `H5DataLoader` can be used with `MultiFileSampler` by passing 
+    `SamplerDataLoader` object as `train_sampler`, `validate_sampler` or 
+    `test_sampler` when initiating a `MultiFileSampler`.
 
     Parameters
     ----------
