@@ -26,7 +26,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -336,7 +335,7 @@ trained with Selene.</p>
 <h2>sequence_logo<a class="headerlink" href="#sequence-logo" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.sequence_logo">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">sequence_logo</code><span class="sig-paren">(</span><em class="sig-param">score_matrix</em>, <em class="sig-param">order='value'</em>, <em class="sig-param">width=1.0</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">sequence_type=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em>, <em class="sig-param">font_properties=None</em>, <em class="sig-param">color_scheme=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#sequence_logo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.sequence_logo" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">sequence_logo</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">score_matrix</span></em>, <em class="sig-param"><span class="pre">order='value'</span></em>, <em class="sig-param"><span class="pre">width=1.0</span></em>, <em class="sig-param"><span class="pre">ax=None</span></em>, <em class="sig-param"><span class="pre">sequence_type=&lt;class</span> <span class="pre">'selene_sdk.sequences.genome.Genome'&gt;</span></em>, <em class="sig-param"><span class="pre">font_properties=None</span></em>, <em class="sig-param"><span class="pre">color_scheme=None</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#sequence_logo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.sequence_logo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a sequence logo for visualizing motifs.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -404,7 +403,7 @@ plot below:</p>
 <h2>heatmap<a class="headerlink" href="#heatmap" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.heatmap">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">heatmap</code><span class="sig-paren">(</span><em class="sig-param">score_matrix</em>, <em class="sig-param">mask=None</em>, <em class="sig-param">sequence_type=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#heatmap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.heatmap" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">heatmap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">score_matrix</span></em>, <em class="sig-param"><span class="pre">mask=None</span></em>, <em class="sig-param"><span class="pre">sequence_type=&lt;class</span> <span class="pre">'selene_sdk.sequences.genome.Genome'&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.heatmap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the input matrix of scores, generally those produced by an
 <em>in silico</em> mutagenesis experiment, on a heatmap.</p>
 <dl class="field-list">
@@ -447,7 +446,7 @@ to remember are:</p>
 <h2>ISMResult<a class="headerlink" href="#ismresult" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="selene_sdk.interpret.ISMResult">
-<em class="property">class </em><code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">ISMResult</code><span class="sig-paren">(</span><em class="sig-param">data_frame</em>, <em class="sig-param">sequence_type=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">ISMResult</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_frame</span></em>, <em class="sig-param"><span class="pre">sequence_type=&lt;class</span> <span class="pre">'selene_sdk.sequences.genome.Genome'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object storing the results of an <em>in silico</em> mutagenesis
 experiment.</p>
@@ -475,7 +474,7 @@ with. This should generally be a subclass of
 </dl>
 <dl class="py method">
 <dt id="selene_sdk.interpret.ISMResult.from_file">
-<em class="property">static </em><code class="sig-name descname">from_file</code><span class="sig-paren">(</span><em class="sig-param">input_path</em>, <em class="sig-param">sequence_type=&lt;class 'selene_sdk.sequences.genome.Genome'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult.from_file" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">from_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">input_path</span></em>, <em class="sig-param"><span class="pre">sequence_type=&lt;class</span> <span class="pre">'selene_sdk.sequences.genome.Genome'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult.from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a <cite>selene_sdk.interpret.ISMResult</cite> from a <cite>pandas.DataFrame</cite>
 stored in a file of comma separated values (CSV).</p>
 <dl class="field-list simple">
@@ -500,7 +499,7 @@ specified input file.</p>
 
 <dl class="py method">
 <dt id="selene_sdk.interpret.ISMResult.get_score_matrix_for">
-<code class="sig-name descname">get_score_matrix_for</code><span class="sig-paren">(</span><em class="sig-param">feature</em>, <em class="sig-param">reference_mask=None</em>, <em class="sig-param">dtype=&lt;class 'numpy.float64'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult.get_score_matrix_for"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult.get_score_matrix_for" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_score_matrix_for</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">feature</span></em>, <em class="sig-param"><span class="pre">reference_mask=None</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/ism_result.html#ISMResult.get_score_matrix_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.ISMResult.get_score_matrix_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts a feature from the <em>in silico</em> mutagenesis results
 as a matrix, where the reference base positions hold the value
 for the reference prediction, and alternative positions hold the
@@ -525,7 +524,7 @@ of <cite>sequence_type</cite>) that holds the results from the
 feature. The elements will be of type <cite>dtype</cite>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If the input data frame contains a base not included in the
@@ -536,7 +535,7 @@ feature. The elements will be of type <cite>dtype</cite>.</p>
 
 <dl class="py method">
 <dt id="selene_sdk.interpret.ISMResult.reference_sequence">
-<em class="property">property </em><code class="sig-name descname">reference_sequence</code><a class="headerlink" href="#selene_sdk.interpret.ISMResult.reference_sequence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">reference_sequence</span></code><a class="headerlink" href="#selene_sdk.interpret.ISMResult.reference_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>The reference sequence that the <em>in silico</em> mutagenesis
 experiment was performed on.</p>
 <dl class="field-list simple">
@@ -552,7 +551,7 @@ string of characters.</p>
 
 <dl class="py method">
 <dt id="selene_sdk.interpret.ISMResult.sequence_type">
-<em class="property">property </em><code class="sig-name descname">sequence_type</code><a class="headerlink" href="#selene_sdk.interpret.ISMResult.sequence_type" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">sequence_type</span></code><a class="headerlink" href="#selene_sdk.interpret.ISMResult.sequence_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of underlying sequence. This should generally be a
 subclass of <cite>selene_sdk.sequences.Sequence</cite>.</p>
 <dl class="field-list simple">
@@ -573,7 +572,7 @@ performed on.</p>
 <h2>rescale_score_matrix<a class="headerlink" href="#rescale-score-matrix" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.rescale_score_matrix">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">rescale_score_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">score_matrix</span></em>, <em class="sig-param"><span class="n">base_scaling</span><span class="o">=</span><span class="default_value">'identity'</span></em>, <em class="sig-param"><span class="n">position_scaling</span><span class="o">=</span><span class="default_value">'identity'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#rescale_score_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.rescale_score_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">rescale_score_matrix</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">score_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'identity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'identity'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#rescale_score_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.rescale_score_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs base-wise and position-wise scaling of a score matrix for a
 feature, usually produced from an <em>in silico</em> mutagenesis experiment.</p>
 <dl class="field-list">
@@ -608,7 +607,7 @@ position, where <span class="math notranslate nohighlight">\(L\)</span> is the l
 <dd class="field-even"><p>The transformed score matrix.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If an unsupported <cite>base_scaling</cite> or <cite>position_scaling</cite> is
@@ -622,7 +621,7 @@ position, where <span class="math notranslate nohighlight">\(L\)</span> is the l
 <h2>load_variant_abs_diff_scores<a class="headerlink" href="#load-variant-abs-diff-scores" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.load_variant_abs_diff_scores">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">load_variant_abs_diff_scores</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#load_variant_abs_diff_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.load_variant_abs_diff_scores" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">load_variant_abs_diff_scores</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#load_variant_abs_diff_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.load_variant_abs_diff_scores" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the variant data, labels, and feature names from a diff scores
 file output from variant effect prediction.</p>
 <p>TODO: should we move this out of <cite>vis.py</cite>?</p>
@@ -649,7 +648,7 @@ file output from variant effect prediction.</p>
 <h2>variant_diffs_scatter_plot<a class="headerlink" href="#variant-diffs-scatter-plot" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.variant_diffs_scatter_plot">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">variant_diffs_scatter_plot</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">labels</em>, <em class="sig-param">features</em>, <em class="sig-param">output_path</em>, <em class="sig-param">filter_features=None</em>, <em class="sig-param">labels_sort_fn=&lt;function ordered_variants_and_indices&gt;</em>, <em class="sig-param">nth_percentile=None</em>, <em class="sig-param">hg_reference_version=None</em>, <em class="sig-param">threshold_line=None</em>, <em class="sig-param">auto_open=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#variant_diffs_scatter_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.variant_diffs_scatter_plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">variant_diffs_scatter_plot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">labels</span></em>, <em class="sig-param"><span class="pre">features</span></em>, <em class="sig-param"><span class="pre">output_path</span></em>, <em class="sig-param"><span class="pre">filter_features=None</span></em>, <em class="sig-param"><span class="pre">labels_sort_fn=&lt;function</span> <span class="pre">ordered_variants_and_indices&gt;</span></em>, <em class="sig-param"><span class="pre">nth_percentile=None</span></em>, <em class="sig-param"><span class="pre">hg_reference_version=None</span></em>, <em class="sig-param"><span class="pre">threshold_line=None</span></em>, <em class="sig-param"><span class="pre">auto_open=False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#variant_diffs_scatter_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.variant_diffs_scatter_plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Displays each variant’s max probability difference across features
 as a point in a scatter plot. The points in the scatter plot are
 ordered by the variant chromosome and position by default. Variants can
@@ -708,7 +707,7 @@ browser that displays the plotted HTML file.</p></li>
 <h2>ordered_variants_and_indices<a class="headerlink" href="#ordered-variants-and-indices" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.ordered_variants_and_indices">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">ordered_variants_and_indices</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">labels</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#ordered_variants_and_indices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.ordered_variants_and_indices" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">ordered_variants_and_indices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#ordered_variants_and_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.ordered_variants_and_indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the ordered variant labels, where the labels are sorted by chromosome
 and position, and the indices corresponding to the sort,</p>
 <dl class="field-list simple">
@@ -732,7 +731,7 @@ is the ordered list of label indices.</p>
 <h2>sort_standard_chrs<a class="headerlink" href="#sort-standard-chrs" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="selene_sdk.interpret.sort_standard_chrs">
-<code class="sig-prename descclassname">selene_sdk.interpret.</code><code class="sig-name descname">sort_standard_chrs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chrom</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#sort_standard_chrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#selene_sdk.interpret.sort_standard_chrs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">selene_sdk.interpret.</span></code><code class="sig-name descname"><span class="pre">sort_standard_chrs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/interpret/vis.html#sort_standard_chrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.interpret.sort_standard_chrs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the value on which the
 standard chromosomes can be sorted.</p>
 <dl class="field-list simple">

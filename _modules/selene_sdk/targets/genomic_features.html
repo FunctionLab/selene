@@ -26,8 +26,6 @@
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -663,12 +661,7 @@
 
 <div class="viewcode-block" id="GenomicFeatures.get_feature_data"><a class="viewcode-back" href="../../../targets.html#selene_sdk.targets.GenomicFeatures.get_feature_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        For a sequence of length :math:`L = end - start`, return the</span>
-<span class="sd">        features&#39; one-hot encoding corresponding to that region. For</span>
-<span class="sd">        instance, for `n_features`, each position in that sequence will</span>
-<span class="sd">        have a binary vector specifying whether the genomic feature&#39;s</span>
-<span class="sd">        coordinates overlap with that position.</span>
-<span class="sd">        @TODO: Clarify with an example, as this is hard to read right now.</span>
+<span class="sd">        Computes which features overlap with the given region.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -682,21 +675,23 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        numpy.ndarray</span>
-<span class="sd">            :math:`L \\times N` array, where :math:`L = end - start`</span>
-<span class="sd">            and :math:`N =` `self.n_features`. Note that if we catch a</span>
-<span class="sd">            `tabix.TabixError`, we assume the error was the result of</span>
-<span class="sd">            there being no features present in the queried region and</span>
-<span class="sd">            return a `numpy.ndarray` of zeros.</span>
+<span class="sd">            A target vector of size `self.n_features` where the `i`th</span>
+<span class="sd">            position is equal to one if the `i`th feature is positive,</span>
+<span class="sd">            and zero otherwise.</span>
+
+<span class="sd">            NOTE: If we catch a `tabix.TabixError`, we assume the error was</span>
+<span class="sd">            the result of there being no features present in the queried region</span>
+<span class="sd">            and return a `numpy.ndarray` of zeros.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_thresholds_vec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">)</span>
             <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_tabix</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">rows</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">features</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
                 <span class="n">feature</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-                <span class="n">ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_index_map</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span>
+                <span class="n">ix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_index_dict</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span>
                 <span class="n">features</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">return</span> <span class="n">features</span>
         <span class="k">return</span> <span class="n">_get_feature_data</span><span class="p">(</span>
