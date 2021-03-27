@@ -1,6 +1,6 @@
 """
 This module provides the `SamplerDataLoader` and  `SamplerDataSet` classes,
-which allow parallel sampling for any Sampler or FileSampler using
+which allow parallel sampling for any Sampler using
 torch DataLoader mechanism.
 """
 import  sys
@@ -15,19 +15,17 @@ from torch.utils.data import Dataset, DataLoader
 
 class _SamplerDataset(Dataset):
     """
-    This class provides a Dataset interface that wraps around a Sampler or
-    FileSampler. `_SamplerDataset` is used internally by `SamplerDataLoader`.
+    This class provides a Dataset interface that wraps around a Sampler. 
+    `_SamplerDataset` is used internally by `SamplerDataLoader`.
 
     Parameters
     ----------
-    sampler : selene_sdk.samplers.Sampler or
-        selene_sdk.samplers.file_samplers.FileSampler
+    sampler : selene_sdk.samplers.Sampler
         The sampler from which to draw data.
 
     Attributes
     ----------
-    sampler : selene_sdk.samplers.Sampler or
-            selene_sdk.samplers.file_samplers.FileSampler
+    sampler : selene_sdk.samplers.Sampler
         The sampler from which to draw data.
     """
     def __init__(self, sampler):
@@ -78,16 +76,14 @@ class _SamplerDataset(Dataset):
 
 class SamplerDataLoader(DataLoader):
     """
-    A DataLoader that provides parallel sampling for any `Sampler`
-    or `FileSampler` object.
-    `SamplerDataLoader` can be used with `MultiFileSampler` by specifying
+    A DataLoader that provides parallel sampling for any `Sampler` object.
+    `SamplerDataLoader` can be used with `MultiSampler` by specifying
     the `SamplerDataLoader` object as `train_sampler`, `validate_sampler`
-    or `test_sampler` when initiating a `MultiFileSampler`.
+    or `test_sampler` when initiating a `MultiSampler`.
 
     Parameters
     ----------
-    sampler : selene_sdk.samplers.Sampler or
-            selene_sdk.samplers.file_samplers.FileSampler
+    sampler : selene_sdk.samplers.Sampler
         The sampler from which to draw data.
     num_workers : int, optional
         Default to 1. Number of workers to use for DataLoader.
@@ -98,8 +94,7 @@ class SamplerDataLoader(DataLoader):
 
     Attributes
     ----------
-    dataset : selene_sdk.samplers.Sampler or
-            selene_sdk.samplers.file_samplers.FileSampler
+    dataset : selene_sdk.samplers.Sampler
         The sampler from which to draw data. Specified by the `sampler` param.
     num_workers : int
         Number of workers to use for DataLoader.
@@ -248,9 +243,9 @@ class H5DataLoader(DataLoader):
     named `{sequence_key}_length` and `{targets_key}_length` in the HDF5 file 
     if `unpackbits==True`.
 
-    `H5DataLoader` can be used with `MultiFileSampler` by passing 
+    `H5DataLoader` can be used with `MultiSampler` by passing 
     `SamplerDataLoader` object as `train_sampler`, `validate_sampler` or 
-    `test_sampler` when initiating a `MultiFileSampler`.
+    `test_sampler` when initiating a `MultiSampler`.
 
     Parameters
     ----------
