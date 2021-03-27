@@ -97,7 +97,7 @@ class TrainModel(object):
         used is the `selene_sdk.samplers.IntervalsSampler` or
         `selene_sdk.samplers.RandomSampler`, we will retrieve 32000
         validation samples. If `None` and using
-        `selene_sdk.samplers.MultiFileSampler`, we will use all
+        `selene_sdk.samplers.MultiSampler`, we will use all
         available validation samples from the appropriate data file.
     n_test_samples : int or None, optional
         Default is `None`. Specify the number of test samples in the test set.
@@ -112,7 +112,7 @@ class TrainModel(object):
               (and the test partition exists), we will retrieve 640000 test
               samples.
             - the sampler you use is of type
-              `selene_sdk.samplers.MultiFileSampler` (and the test partition
+              `selene_sdk.samplers.MultiSampler` (and the test partition
               exists), we will use all the test samples available in the
               appropriate data file.
 
