@@ -422,8 +422,7 @@ class TrainModel(object):
             if self.step and self.step % self.nth_step_report_stats == 0:
                 self.validate()
 
-        # We cannot actually support saving training set right?
-        # self.sampler.save_dataset_to_file("train", close_filehandle=True)
+        self.sampler.save_dataset_to_file("train", close_filehandle=True)
 
 
     def train(self):
