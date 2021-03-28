@@ -322,8 +322,8 @@ class IntervalsSampler(OnlineSampler):
                             chrom, position))
             return None
 
-        window_start = bin_start - self.surrounding_sequence_radius
-        window_end = bin_end + self.surrounding_sequence_radius
+        window_start = position - self._start_window_radius
+        window_end = position + self._end_window_radius
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
