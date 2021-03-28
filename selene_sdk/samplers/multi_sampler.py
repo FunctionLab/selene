@@ -13,13 +13,13 @@ def MultiFileSampler(*args, **kwargs):
     warn("MultiFileSampler is deprecated and will be removed from future "
     "versions of Selene. Please use MultiSampler instead.")
     return MultiSampler(*args, **kwargs)
-    
+
 class MultiSampler(Sampler):
     """
     This sampler draws samples from individual file samplers or data loaders
     that corresponds to training, validation, and testing (optional) modes.
     MultiSampler calls on the correct file sampler or data loader to draw
-    samples for a given mode. Example file samples are under
+    samples for a given mode. Example file samplers are under
     `selene_sdk.samplers.file_samplers` and example data loaders are under
     `selene_sdk.samplers.dataloaders`.
 
@@ -27,13 +27,14 @@ class MultiSampler(Sampler):
     different modes. Using data loaders for some modes while using file samplers
     for other modes are also allowed. The file samplers parse data files
     (e.g. bed, mat, or hdf5). The data loaders provide multi-worker iterators
-    that draw samples from a sampler or a file sampler. As data loaders
-    support parallel sampling, they are generally recommended for sampling speed.
+    that draw samples from online samplers (i.e. on-the-fly sampling). As data
+    loaders support parallel sampling, they are generally recommended for
+    sampling speed.
 
     Parameters
     ----------
-    train_sampler : selene_sdk.samplers.file_samplers.FileSampler or
-            selene_sdk.samplers.dataloader.DataLoader
+    train_sampler : selene_sdk.samplers.file_samplers.FileSampler or \
+                    selene_sdk.samplers.dataloader.DataLoader
         Load your training data as a `FileSampler` or `DataLoader`
     validate_sampler : FileSampler or DataLoader
         The validation dataset file sampler or data loader.
@@ -44,11 +45,11 @@ class MultiSampler(Sampler):
     mode : str, optional
         Default is "train". Must be one of `{train, validate, test}`. The
         starting mode in which to run the sampler.
-    save_datasets : list(str), optional
+    save_datasets : list(str) or None, optional
         Default is None. Currently, we are only including this parameter
-        so that `MultiSampler` is consistent with `Sampler`. The save
-        dataset functionality for MultiSampler has not been defined
-        yet.
+        so that `MultiSampler` is consistent with the `Sampler` interface.
+        The save dataset functionality for MultiSampler has not been
+        defined yet.
     output_dir : str or None, optional
         Default is None. Only used if the sampler has any data or
         logging statements to save to file. Currently not used in
