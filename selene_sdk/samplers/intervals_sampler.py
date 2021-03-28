@@ -125,13 +125,6 @@ class IntervalsSampler(OnlineSampler):
         documentation for `validation_holdout` for more details.
     sequence_length : int
         The length of the sequences to  train the model on.
-    bin_radius : int
-        From the center of the sequence, the radius in which to detect
-        a feature annotation in order to include it as a sample's label.
-    surrounding_sequence_radius : int
-        The length of sequence falling outside of the feature detection
-        bin (i.e. `bin_radius`) center, but still within the
-        `sequence_length`.
     modes : list(str)
         The list of modes that the sampler can be run in.
     mode : str
@@ -388,7 +381,7 @@ class IntervalsSampler(OnlineSampler):
         mode : str, optional
             Default is None. The operating mode that the object should run in.
             If None, will use the current mode `self.mode`.
-            
+
         Returns
         -------
         sequences, targets : tuple(numpy.ndarray, numpy.ndarray)

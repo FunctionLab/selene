@@ -258,7 +258,7 @@ class RandomPositionsSampler(OnlineSampler):
                         "could not be retrieved. Sampling again.".format(
                             chrom, position))
             return None
-        elif np.mean(retrieved_seq==0.25) >0.30:
+        elif np.mean(retrieved_seq==0.25) > 0.30:
             logger.info("Over 30% of the bases in the sequence centered "
                         "at {0} position {1} are ambiguous ('N'). "
                         "Sampling again.".format(chrom, position))
