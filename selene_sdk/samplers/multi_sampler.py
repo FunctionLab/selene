@@ -283,14 +283,14 @@ class MultiSampler(Sampler):
         tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
             Tuple containing the list of sequence-target pairs, as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `sequences_and_targets` sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,
             :math:`N` is the size of the sequence type's alphabet, and
             :math:`F` is the number of features. Further,
             `target_matrix` is of the shape :math:`S \\times F`, where
-            :math:`S =` `n_samples`.
+            :math:`S = n_samples`.
 
         Raises
         ------
