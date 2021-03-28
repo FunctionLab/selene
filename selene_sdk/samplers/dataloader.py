@@ -302,8 +302,8 @@ class H5DataLoader(DataLoader):
             from torch.utils.data.sampler import SubsetRandomSampler
             if isinstance(use_subset, int):
                 use_subset = list(range(use_subset))
-            elif isinstance(use_subset, range):
-                use_subset = list(use_subset)
+            elif isinstance(use_subset, tuple) and len(use_subset) == 2:
+                use_subset = list(range(use_subset[0], use_subset[1]))
             args["sampler"] = SubsetRandomSampler(use_subset)
         else:
             args["shuffle"] = shuffle
