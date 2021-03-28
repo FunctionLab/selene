@@ -15,7 +15,7 @@ from torch.utils.data import Dataset, DataLoader
 
 class _SamplerDataset(Dataset):
     """
-    This class provides a Dataset interface that wraps around a Sampler. 
+    This class provides a Dataset interface that wraps around a Sampler.
     `_SamplerDataset` is used internally by `SamplerDataLoader`.
 
     Parameters
@@ -94,7 +94,7 @@ class SamplerDataLoader(DataLoader):
 
     Attributes
     ----------
-    dataset : selene_sdk.samplers.Sampler
+    sampler : selene_sdk.samplers.Sampler
         The sampler from which to draw data. Specified by the `sampler` param.
     num_workers : int
         Number of workers to use for DataLoader.
@@ -223,28 +223,29 @@ class _H5Dataset(Dataset):
 class H5DataLoader(DataLoader):
     """
     H5DataLoader provides optionally parallel sampling from a HDF5
-    dataset that contains sequences and targets data. The name of the 
+    dataset that contains sequences and targets data. The name of the
     array of sequences and targets data are specified by `sequence_key`
     and `targets_key` respectively. The sequences array should be
     of shape:math:`B \\times L \\times N`, where :math:`B` is
-    the sample size, :math:`L` is the sequence length, and :math:`N` is 
+    the sample size, :math:`L` is the sequence length, and :math:`N` is
     the size of the sequence type's alphabet. The shape of the targets array
      will be :math:`B \\times F`, where :math:`F` is the number of features.
-     
-    H5DataLoader also supports compressed binary data with `numpy.packbits` 
-    with the `unpackbits` option. To generate compressed binary data, the 
-    sequences and targets array have to be both binary-valued, and then 
-    packed in the :math:`L` and `F` dimensions respectively. 
-    For the seqeunces array, to represent unknown bases ("N"s) by binary 
-    data, all-one encoding should be used, and they will be transformed to 
+
+    H5DataLoader also supports compressed binary data (using `numpy.packbits`)
+    with the `unpackbits` option. To generate compressed binary data, the
+    sequences and targets array have to both be binary-valued, and then
+    packed in the :math:`L` (sequence length) and `F` (number of features)
+    dimensions, respectively.
+    For the sequences array, represent unknown bases ("N"s) by binary
+    data with all-ones in the encoding - they will be transformed to
     the correct representations in selene_sdk.sequences.Genome when unpacked.
-    In addition, to unpack correctly, the length of the packed dimension, 
-    i.e. :math:`L` and :math:`F` must be provided in two integer scalars 
-    named `{sequence_key}_length` and `{targets_key}_length` in the HDF5 file 
+    In addition, to unpack correctly, the length of the packed dimensions,
+    i.e. :math:`L` and :math:`F` must be provided in two integer scalars
+    named `{sequence_key}_length` and `{targets_key}_length` in the HDF5 file
     if `unpackbits==True`.
 
-    `H5DataLoader` can be used with `MultiSampler` by passing 
-    `SamplerDataLoader` object as `train_sampler`, `validate_sampler` or 
+    `H5DataLoader` can be used with `MultiSampler` by passing
+    `SamplerDataLoader` object as `train_sampler`, `validate_sampler` or
     `test_sampler` when initiating a `MultiSampler`.
 
     Parameters
@@ -254,17 +255,18 @@ class H5DataLoader(DataLoader):
     in_memory : bool, optional
         Default is False. If True, load entire dataset into memory.
     num_workers : int, optional
-        Default is 1. If great than 1, use multiple process to parallelize data
+        Default is 1. If greater than 1, use multiple processes to parallelize data
         sampling.
-    use_subset : int, range, list of int, or None, optional
-        Default is None. If int is provided, sample from only the first N roww of
-        the dataset. If range is provided, sample from the range of rows specified.
-        If list of int is provided, the list should provide indices to
-        sample from. If None, use the entire dataset.
+    use_subset : int, (int, int), list(int), or None, optional
+        Default is None. If a single integer value is provided, sample from only
+        the first `use_subset` rows of the dataset. If a tuple of integers is
+        provided, `(<start-index>, <end-index>)`, sample from the range of
+        rows specified. If a list of integers is provided, restrict to sampling
+        only the indices specified in the list. If None, use the entire dataset.
     batch_size : int, optional
         Default is 1. Specify the batch size of the DataLoader.
     shuffle : bool, optional
-        Default is True. If False, load the data in provided order.
+        Default is True. If False, load the data in the original order.
     unpackbits : bool, optional
         Default is False. If True, unpack binary-valued array from uint8
         sequence and targets array. See `numpy.packbits` for details.
