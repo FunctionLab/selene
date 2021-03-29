@@ -21,7 +21,7 @@ node("docker") { stage('build') { timeout(time: 1, unit: 'HOURS') {
 
   dir("$tmpDir/gh-pages") {
     def subdir = env.BRANCH_NAME
-    git(url: "ssh://git@github.com/functionlab/selene.git", branch: "gh-pages", credentialsId: "ssh", changelog: false)
+    git(url: "ssh://git@github.com/FunctionLab/selene.git", branch: "gh-pages", credentialsId: "ssh", changelog: false)
     sh "mkdir $subdir || rm -rf $subdir/[[:lower:]_]*"
     sh "mv $workDir/docs/build/html/* $subdir"
     sh "git add -A $subdir"
