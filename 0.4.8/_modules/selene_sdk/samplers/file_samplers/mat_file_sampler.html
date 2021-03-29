@@ -1,0 +1,627 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>selene_sdk.samplers.file_samplers.mat_file_sampler &mdash; Selene master documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/selene_docs_theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> Selene
+          
+
+          
+            
+            <img src="../../../../_static/selene_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                master (0.4.8)
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/overview.html">Functional overview of the SDK</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/overview.html#sampling">Sampling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/overview.html#sequences-submodule-api"><em>sequences</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/overview.html#targets-submodule-api"><em>targets</em> submodule (API)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/overview.html#samplers-submodule-api"><em>samplers</em> submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/overview.html#training-a-model-api">Training a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/overview.html#evaluating-a-model-api">Evaluating a model (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/overview.html#using-a-model-to-make-predictions-api">Using a model to make predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/overview.html#visualizing-model-predictions-api">Visualizing model predictions (API)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/overview.html#the-utilities-submodule-api">The utilities submodule (API)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/overview.html#help">Help</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/installation.html#installing-with-anaconda">Installing with Anaconda</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/installation.html#installing-selene-with-pip">Installing selene with pip:</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/installation.html#installing-from-source">Installing from source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/installation.html#additional-dependency-for-running-the-cli">Additional dependency for running the CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/cli.html">Selene CLI operations and outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#operations">Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#general-configurations">General configurations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#model-architecture">Model architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#expected-input-class-and-methods">Expected input class and methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#model-architecture-configuration">Model architecture configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#a-note-for-the-following-sections">A note for the following sections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#train">Train</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#required-parameters">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#optional-parameters">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#additional-notes">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#expected-outputs-for-training">Expected outputs for training</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#evaluate">Evaluate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#id1">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#id2">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#id3">Additional notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#expected-outputs-for-evaluation">Expected outputs for evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#analyze-sequences">Analyze sequences</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#id4">Required parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#id5">Optional parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#prediction-on-sequences">Prediction on sequences</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#parameters">Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#variant-effect-prediction">Variant effect prediction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#id6">Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#additional-note">Additional note</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#in-silico-mutagenesis"><em>In silico</em> mutagenesis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#parameters-for-a-single-sequence-input">Parameters for a single sequence input</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#parameters-for-fasta-file-input">Parameters for FASTA file input:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#sampler-configurations">Sampler configurations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#samplers-used-for-training-and-evaluation-optionally">Samplers used for training (and evaluation, optionally)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#random-positions-sampler">Random positions sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#intervals-sampler">Intervals sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#multiple-file-sampler">Multiple-file sampler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#important-note">Important note</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#samplers-used-for-evaluation">Samplers used for evaluation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#bed-file-sampler">BED file sampler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#matrix-file-sampler">Matrix file sampler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/cli.html#examples-of-full-configuration-files">Examples of full configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#training-using-intervals-sampler">Training (using intervals sampler)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#some-notes">Some notes</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#evaluate-using-matrix-file-sampler">Evaluate (using matrix file sampler)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#id13">Some notes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../overview/cli.html#analyze-sequences-variant-effect-prediction">Analyze sequences (variant effect prediction)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../overview/cli.html#id14">Some notes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview/faq.html">FAQ and additional resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/faq.html#extending-selene">Extending Selene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/faq.html#exporting-a-selene-trained-model-to-kipoi">Exporting a Selene-trained model to Kipoi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../overview/faq.html#hyperparameter-optimization">Hyperparameter optimization</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Packages</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../selene.html">selene_sdk</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../selene.html#trainmodel">TrainModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../selene.html#evaluatemodel">EvaluateModel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../interpret.html">selene_sdk.interpret</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#sequence-logo">sequence_logo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#heatmap">heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#ismresult">ISMResult</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#rescale-score-matrix">rescale_score_matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#load-variant-abs-diff-scores">load_variant_abs_diff_scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#variant-diffs-scatter-plot">variant_diffs_scatter_plot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#ordered-variants-and-indices">ordered_variants_and_indices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../interpret.html#sort-standard-chrs">sort_standard_chrs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../predict.html">selene_sdk.predict</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../predict.html#analyzesequences">AnalyzeSequences</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../samplers.html">selene_sdk.samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#sampler">Sampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#onlinesampler">OnlineSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#intervalssampler">IntervalsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#randompositionssampler">RandomPositionsSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.html#multifilesampler">MultiFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../samplers.file_samplers.html">selene_sdk.samplers.file_samplers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.file_samplers.html#bedfilesampler">BedFileSampler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../samplers.file_samplers.html#matfilesampler">MatFileSampler</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../sequences.html">selene_sdk.sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#genome">Genome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#proteome">Proteome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#sequence-to-encoding">sequence_to_encoding</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#encoding-to-sequence">encoding_to_sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../sequences.html#get-reverse-encoding">get_reverse_encoding</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../targets.html">selene_sdk.targets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../targets.html#target">Target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../targets.html#genomicfeatures">GenomicFeatures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../utils.html">selene_sdk.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#nonstrandspecific">NonStrandSpecific</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#performancemetrics">PerformanceMetrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#initialize-logger">initialize_logger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#load-features-list">load_features_list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#load-model-from-state-dict">load_model_from_state_dict</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#get-indices-and-probabilities">get_indices_and_probabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#load-path-for-config-yml">load_path (for config.yml)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#instantiate-configuration-object">instantiate (configuration object)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#initialize-model">initialize_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#parse-configs-and-run">parse_configs_and_run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../utils.html#execute-run-selene-operations">execute (run Selene operations)</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Selene</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>selene_sdk.samplers.file_samplers.mat_file_sampler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for selene_sdk.samplers.file_samplers.mat_file_sampler</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides the `MatFileSampler` class and its supporting</span>
+<span class="sd">methods.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span>
+
+<span class="kn">from</span> <span class="nn">.file_sampler</span> <span class="kn">import</span> <span class="n">FileSampler</span>
+
+
+<span class="k">def</span> <span class="nf">_load_mat_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">sequence_key</span><span class="p">,</span> <span class="n">targets_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads data from a `*.mat` file or a `*.h5` file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filepath : str</span>
+<span class="sd">        The path to the file to load the data from.</span>
+<span class="sd">    sequence_key : str</span>
+<span class="sd">        The key for the sequences data matrix.</span>
+<span class="sd">    targets_key : str, optional</span>
+<span class="sd">        Default is None. The key for the targets data matrix.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (sequences, targets, h5py_filehandle) : \</span>
+<span class="sd">            tuple(array-like, array-like, h5py.File)</span>
+<span class="sd">        If the matrix files can be loaded with `scipy.io`,</span>
+<span class="sd">        the tuple will only be (sequences, targets). Otherwise,</span>
+<span class="sd">        the 2 matrices and the h5py file handle are returned.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># see if we can load the file using scipy first</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">targets_key</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">targets_key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mat</span><span class="p">[</span><span class="n">sequence_key</span><span class="p">],</span> <span class="n">targets</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="n">mat</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">sequence_key</span><span class="p">]</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">targets_key</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">targets_key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">mat</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MatFileSampler"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler">[docs]</a><span class="k">class</span> <span class="nc">MatFileSampler</span><span class="p">(</span><span class="n">FileSampler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A sampler for which the dataset is loaded directly from a `*.mat` file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filepath : str</span>
+<span class="sd">        The path to the file to load the data from.</span>
+<span class="sd">    sequence_key : str</span>
+<span class="sd">        The key for the sequences data matrix.</span>
+<span class="sd">    targets_key : str, optional</span>
+<span class="sd">        Default is None. The key for the targets data matrix.</span>
+<span class="sd">    random_seed : int, optional</span>
+<span class="sd">        Default is 436. Sets the random seed for sampling.</span>
+<span class="sd">    shuffle : bool, optional</span>
+<span class="sd">        Default is True. Shuffle the order of the samples in the matrix</span>
+<span class="sd">        before sampling from it.</span>
+<span class="sd">    sequence_batch_axis : int, optional</span>
+<span class="sd">        Default is 0. Specify the batch axis.</span>
+<span class="sd">    sequence_alphabet_axis : int, optional</span>
+<span class="sd">        Default is 1. Specify the alphabet axis.</span>
+<span class="sd">    targets_batch_axis : int, optional</span>
+<span class="sd">        Default is 0. Speciy the batch axis.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        The number of samples in the data matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">filepath</span><span class="p">,</span>
+                 <span class="n">sequence_key</span><span class="p">,</span>
+                 <span class="n">targets_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">random_seed</span><span class="o">=</span><span class="mi">436</span><span class="p">,</span>
+                 <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">sequence_batch_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">sequence_alphabet_axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">targets_batch_axis</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs a new `MatFileSampler` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatFileSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">_load_mat_file</span><span class="p">(</span>
+            <span class="n">filepath</span><span class="p">,</span>
+            <span class="n">sequence_key</span><span class="p">,</span>
+            <span class="n">targets_key</span><span class="o">=</span><span class="n">targets_key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mat_fh</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mat_fh</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span> <span class="o">=</span> <span class="n">sequence_batch_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seq_alphabet_axis</span> <span class="o">=</span> <span class="n">sequence_alphabet_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_seq_final_axis</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">sequence_batch_axis</span> <span class="o">-</span> <span class="n">sequence_alphabet_axis</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tgts_batch_axis</span> <span class="o">=</span> <span class="n">targets_batch_axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MatFileSampler.sample"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Draws a mini-batch of examples and their corresponding</span>
+<span class="sd">        labels.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_size : int, optional</span>
+<span class="sd">            Default is 1. The number of examples to include in the</span>
+<span class="sd">            mini-batch.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sequences, targets : tuple(numpy.ndarray, numpy.ndarray)</span>
+<span class="sd">            A tuple containing the numeric representation of the</span>
+<span class="sd">            sequence examples and their corresponding labels. The</span>
+<span class="sd">            shape of `sequences` will be</span>
+<span class="sd">            :math:`B \\times L \\times N`, where :math:`B` is</span>
+<span class="sd">            `batch_size`, :math:`L` is the sequence length, and</span>
+<span class="sd">            :math:`N` is the size of the sequence type&#39;s alphabet.</span>
+<span class="sd">            The shape of `targets` will be :math:`B \\times F`,</span>
+<span class="sd">            where :math:`F` is the number of features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sample_up_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">+</span> <span class="n">batch_size</span>
+        <span class="n">use_indices</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">sample_up_to</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">use_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">[:</span><span class="n">batch_size</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span><span class="p">:</span><span class="n">sample_up_to</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">+=</span> <span class="n">batch_size</span>
+        <span class="n">use_indices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">use_indices</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="p">[</span><span class="n">use_indices</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="p">[:,</span> <span class="n">use_indices</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">use_indices</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_seq_alphabet_axis</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+                <span class="n">sequences</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_seq_final_axis</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_seq_alphabet_axis</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tgts_batch_axis</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span><span class="p">[</span><span class="n">use_indices</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span><span class="p">[:,</span> <span class="n">use_indices</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+                    <span class="n">targets</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sequences</span><span class="p">,</span></div>
+
+<div class="viewcode-block" id="MatFileSampler.get_data"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method fetches a subset of the data from the sampler,</span>
+<span class="sd">        divided into batches.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_size : int</span>
+<span class="sd">            The size of the batches to divide the data into.</span>
+<span class="sd">        n_samples : int, optional</span>
+<span class="sd">            Default is None. The total number of samples to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sequences : list(np.ndarray)</span>
+<span class="sd">            The list of sequences grouped into batches.</span>
+<span class="sd">            An element in the `sequences` list is of</span>
+<span class="sd">            the shape :math:`B \\times L \\times N`, where :math:`B`</span>
+<span class="sd">            is `batch_size`, :math:`L` is the sequence length,</span>
+<span class="sd">            and :math:`N` is the size of the sequence type&#39;s alphabet.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n_samples</span><span class="p">:</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">n_samples</span><span class="p">:</span>
+            <span class="n">seqs</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seqs</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="n">batch_size</span>
+        <span class="n">remainder</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">n_samples</span><span class="p">)</span>
+        <span class="n">seqs</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">remainder</span><span class="p">)</span>
+        <span class="n">sequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seqs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sequences</span></div>
+
+<div class="viewcode-block" id="MatFileSampler.get_data_and_targets"><a class="viewcode-back" href="../../../../samplers.file_samplers.html#selene_sdk.samplers.file_samplers.MatFileSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method fetches a subset of the sequence data and</span>
+<span class="sd">        targets from the sampler, divided into batches.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_size : int</span>
+<span class="sd">            The size of the batches to divide the data into.</span>
+<span class="sd">        n_samples : int, optional</span>
+<span class="sd">            Default is None. The total number of samples to retrieve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sequences_and_targets, targets_matrix : \</span>
+<span class="sd">        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)</span>
+<span class="sd">            Tuple containing the list of sequence-target pairs, as well</span>
+<span class="sd">            as a single matrix with all targets in the same order.</span>
+<span class="sd">            Note that `sequences_and_targets`&#39;s sequence elements are of</span>
+<span class="sd">            the shape :math:`B \\times L \\times N` and its target</span>
+<span class="sd">            elements are of the shape :math:`B \\times F`, where</span>
+<span class="sd">            :math:`B` is `batch_size`, :math:`L` is the sequence length,</span>
+<span class="sd">            :math:`N` is the size of the sequence type&#39;s alphabet, and</span>
+<span class="sd">            :math:`F` is the number of features. Further,</span>
+<span class="sd">            `target_matrix` is of the shape :math:`S \\times F`, where</span>
+<span class="sd">            :math:`S =` `n_samples`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_tgts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;No targets matrix was specified during sampler &quot;</span>
+                <span class="s2">&quot;initialization. Please use `get_data` instead.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n_samples</span><span class="p">:</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
+        <span class="n">sequences_and_targets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">targets_mat</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">n_samples</span><span class="p">:</span>
+            <span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">sequences_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
+            <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="n">batch_size</span>
+        <span class="n">remainder</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">n_samples</span><span class="p">)</span>
+        <span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">remainder</span><span class="p">)</span>
+        <span class="n">sequences_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
+        <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
+        <span class="c1"># TODO: should not assume targets are always integers</span>
+        <span class="n">targets_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">targets_mat</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sequences_and_targets</span><span class="p">,</span> <span class="n">targets_mat</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Selene Contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+  
+ 
+
+
+
+</body>
+</html>
