@@ -244,6 +244,10 @@ class H5DataLoader(DataLoader):
     named `{sequence_key}_length` and `{targets_key}_length` in the HDF5 file
     if `unpackbits==True`.
 
+    You can generate a HDF5 dataset file by sampling from an online sampler
+    using the script that we provided `scripts/write_sampled_h5.py`. An
+    example config file template is in `config_examples/sample_h5.yml`.
+
     `H5DataLoader` can be used with `MultiSampler` by passing
     `SamplerDataLoader` object as `train_sampler`, `validate_sampler` or
     `test_sampler` when initiating a `MultiSampler`.
