@@ -8,6 +8,8 @@ Selene implements and will resolve this issue soon.
 from abc import ABCMeta
 from abc import abstractmethod
 
+from selene_sdk.samplers.samples_batch import SamplesBatch
+
 
 class FileSampler(metaclass=ABCMeta):
     """
@@ -26,7 +28,7 @@ class FileSampler(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def sample(self, batch_size=1):
+    def sample(self, batch_size=1) -> SamplesBatch:
         """
         Fetches a mini-batch of the data from the sampler.
 

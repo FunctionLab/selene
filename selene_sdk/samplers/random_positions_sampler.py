@@ -8,8 +8,10 @@ from collections import namedtuple
 import logging
 import random
 
+
 import numpy as np
 
+from selene_sdk.samplers.samples_batch import SamplesBatch
 from .online_sampler import OnlineSampler
 from ..utils import get_indices_and_probabilities
 
@@ -305,8 +307,8 @@ class RandomPositionsSampler(OnlineSampler):
 
         Returns
         -------
-        sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
-            A tuple containing the numeric representation of the
+        SamplesBatch
+            A batch containing the numeric representation of the
             sequence examples and their corresponding labels. The
             shape of `sequences` will be
             :math:`B \\times L \\times N`, where :math:`B` is
@@ -340,4 +342,4 @@ class RandomPositionsSampler(OnlineSampler):
             sequences[n_samples_drawn, :, :] = seq
             targets[n_samples_drawn, :] = seq_targets
             n_samples_drawn += 1
-        return (sequences, targets)
+        return SamplesBatch(sequences, target_batch=targets)

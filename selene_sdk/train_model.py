@@ -5,20 +5,17 @@ import logging
 import math
 import os
 import shutil
-from time import strftime
-from time import time
+from time import strftime, time
 
 import numpy as np
 import torch
 import torch.nn as nn
+from sklearn.metrics import average_precision_score, roc_auc_score
 from torch.autograd import Variable
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import average_precision_score
 
-from .utils import initialize_logger
-from .utils import load_model_from_state_dict
-from .utils import PerformanceMetrics
+from .utils import (PerformanceMetrics, initialize_logger,
+                    load_model_from_state_dict)
 
 logger = logging.getLogger("selene")
 
@@ -349,19 +346,18 @@ class TrainModel(object):
 
         Returns
         -------
-        tuple(numpy.ndarray, numpy.ndarray)
-            A tuple containing the examples and targets.
+        SamplesBatch
+            A batch containing the examples and targets.
 
         """
         t_i_sampling = time()
-        batch_sequences, batch_targets = self.sampler.sample(
-            batch_size=self.batch_size)
+        samples_batch = self.sampler.sample(batch_size=self.batch_size)
         t_f_sampling = time()
         logger.debug(
             ("[BATCH] Time to sample {0} examples: {1} s.").format(
                  self.batch_size,
                  t_f_sampling - t_i_sampling))
-        return (batch_sequences, batch_targets)
+        return samples_batch
 
     def train_and_validate(self):
         """
@@ -450,18 +446,9 @@ class TrainModel(object):
         self.model.train()
         self.sampler.set_mode("train")
 
-        inputs, targets = self._get_batch()
-        inputs = torch.Tensor(inputs)
-        targets = torch.Tensor(targets)
-
-        if self.use_cuda:
-            inputs = inputs.cuda()
-            targets = targets.cuda()
-
-        inputs = Variable(inputs)
-        targets = Variable(targets)
-
-        predictions = self.model(inputs.transpose(1, 2))
+        samples_batch = self._get_batch()
+        inputs, targets = samples_batch.torch_inputs_and_targets(self.use_cuda)
+        predictions = self.model(inputs)
         loss = self.criterion(predictions, targets)
 
         self.optimizer.zero_grad()
@@ -476,7 +463,7 @@ class TrainModel(object):
 
         Parameters
         ----------
-        data_in_batches : list(tuple(numpy.ndarray, numpy.ndarray))
+        data_in_batches : list(SamplesBatch)
             A list of tuples of the data, where the first element is
             the example, and the second element is the label.
 
@@ -491,19 +478,11 @@ class TrainModel(object):
         batch_losses = []
         all_predictions = []
 
-        for (inputs, targets) in data_in_batches:
-            inputs = torch.Tensor(inputs)
-            targets = torch.Tensor(targets)
-
-            if self.use_cuda:
-                inputs = inputs.cuda()
-                targets = targets.cuda()
+        for samples_batch in data_in_batches:
+            inputs, targets = samples_batch.torch_inputs_and_targets(self.use_cuda)
 
             with torch.no_grad():
-                inputs = Variable(inputs)
-                targets = Variable(targets)
-
-                predictions = self.model(inputs.transpose(1, 2))
+                predictions = self.model(inputs)
                 loss = self.criterion(predictions, targets)
 
                 all_predictions.append(
@@ -622,4 +601,3 @@ class TrainModel(object):
             best_filepath = os.path.join(self.output_dir, "best_model")
             shutil.copyfile("{0}.pth.tar".format(cp_filepath),
                             "{0}.pth.tar".format(best_filepath))
-

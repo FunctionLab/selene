@@ -209,24 +209,17 @@ class EvaluateModel(object):
         """
         batch_losses = []
         all_predictions = []
-        for (inputs, targets) in self._test_data:
-            inputs = torch.Tensor(inputs)
-            targets = torch.Tensor(targets[:, self._use_ixs])
+        for samples_batch in self._test_data:
+            inputs, targets = samples_batch.torch_inputs_and_targets(self.use_cuda)
+            targets = targets[:, self._use_ixs]
 
-            if self.use_cuda:
-                inputs = inputs.cuda()
-                targets = targets.cuda()
             with torch.no_grad():
-                inputs = Variable(inputs)
-                targets = Variable(targets)
-
                 predictions = None
                 if _is_lua_trained_model(self.model):
                     predictions = self.model.forward(
-                        inputs.transpose(1, 2).contiguous().unsqueeze_(2))
+                        inputs.contiguous().unsqueeze_(2))
                 else:
-                    predictions = self.model.forward(
-                        inputs.transpose(1, 2))
+                    predictions = self.model.forward(inputs)
                 predictions = predictions[:, self._use_ixs]
                 loss = self.criterion(predictions, targets)
 

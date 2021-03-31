@@ -6,6 +6,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 import os
 
+from selene_sdk.samplers.samples_batch import SamplesBatch
 
 class Sampler(metaclass=ABCMeta):
     """
@@ -98,7 +99,7 @@ class Sampler(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def sample(self, batch_size=1):
+    def sample(self, batch_size=1) -> SamplesBatch:
         """
         Fetches a mini-batch of the data from the sampler.
 
@@ -107,6 +108,10 @@ class Sampler(metaclass=ABCMeta):
         batch_size : int, optional
             Default is 1. The size of the batch to retrieve.
 
+        Returns
+        -------
+        samples_batch : SamplesBatch
+            A struct containing inputs and targets in numpy format.
         """
         raise NotImplementedError()
 
@@ -146,6 +151,19 @@ class Sampler(metaclass=ABCMeta):
             retrieve. Handling for `n_samples=None` should be done by
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
+        Returns
+        -------
+        batches, targets_matrix : tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches (with targets), as well
+            as a single matrix with all targets in the same order.
+            Note that `batches`'s sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S =` `n_samples`.
         """
         raise NotImplementedError()
 
@@ -160,16 +178,16 @@ class Sampler(metaclass=ABCMeta):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, 640000 examples are retrieved.
+            Default is `None`. The total number of test examples
+            to retrieve. Handling for `n_samples=None` should be done by
+            all classes that subclass `selene_sdk.samplers.Sampler`.
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches (with targets), as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,

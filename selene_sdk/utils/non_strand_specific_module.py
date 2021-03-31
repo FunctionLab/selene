@@ -43,8 +43,6 @@ class NonStrandSpecific(Module):
     ----------
     model : torch.nn.Module
         The user-specified model architecture.
-    mode : {'mean', 'max'}
-        How to handle outputting a non-strand specific prediction.
 
     """
 
@@ -53,25 +51,46 @@ class NonStrandSpecific(Module):
 
         self.model = model
 
-        if mode != "mean" and mode != "max":
+        if mode == "mean":
+            self.reduce_fn = lambda x, y: (x + y) / 2
+        elif mode == "max":
+            self.reduce_fn = torch.max
+        else:
             raise ValueError("Mode should be one of 'mean' or 'max' but was"
                              "{0}.".format(mode))
-        self.mode = mode
+
         self.from_lua = _is_lua_trained_model(model)
 
-    def forward(self, input):
-        reverse_input = None
+    def _forward_input_with_reversed_sequence(self, input):
+        multi_inputs = isinstance(input, dict)
+        sequence = input if not multi_inputs else input["sequence_batch"]
+        reversed_sequence = None
         if self.from_lua:
-            reverse_input = _flip(
-                _flip(torch.squeeze(input, 2), 1), 2).unsqueeze_(2)
+            reversed_sequence = _flip(
+                _flip(torch.squeeze(sequence, 2), 1), 2).unsqueeze_(2)
         else:
-            reverse_input = _flip(_flip(input, 1), 2)
+            reversed_sequence = _flip(_flip(sequence, 1), 2)
 
+        input_rev = None
+        if multi_inputs:
+            input_rev = input.copy()
+            input_rev["sequence_batch"] = reversed_sequence
+        else:
+            input_rev = reversed_sequence
+
+        return self.model.forward(input_rev)
+
+    def forward(self, input):
+        """Computes NN output for the given sequence and for a reversed sequence,
+        applies `self.reduce_fn` function to those outputs, and returns the result.
+
+        Parameters
+        ----------
+            input : numpy.ndarray or dict(str, numpy.ndarray)
+                Model's inputs. Can be just a sequence or multi-inputs.
+
+        """
         output = self.model.forward(input)
-        output_from_rev = self.model.forward(reverse_input)
+        output_from_rev = self._forward_input_with_reversed_sequence(input)
 
-        if self.mode == "mean":
-            return (output + output_from_rev) / 2
-        else:
-            return torch.max(output, output_from_rev)
-
+        return self.reduce_fn(output, output_from_rev)

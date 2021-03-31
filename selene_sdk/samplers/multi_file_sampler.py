@@ -186,11 +186,11 @@ class MultiFileSampler(Sampler):
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : \
+        tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches, as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,

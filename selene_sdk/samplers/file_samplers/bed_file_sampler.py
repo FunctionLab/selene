@@ -1,6 +1,7 @@
 """
 This module provides the BedFileSampler class.
 """
+from selene_sdk.samplers.samples_batch import SamplesBatch
 import numpy as np
 
 from .file_sampler import FileSampler
@@ -96,8 +97,8 @@ class BedFileSampler(FileSampler):
 
         Returns
         -------
-        sequences, targets : tuple(numpy.ndarray, numpy.ndarray)
-            A tuple containing the numeric representation of the
+        SamplesBatch
+            A batch containing the numeric representation of the
             sequence examples and their corresponding labels. The
             shape of `sequences` will be
             :math:`B \\times L \\times N`, where :math:`B` is
@@ -163,8 +164,8 @@ class BedFileSampler(FileSampler):
         sequences = np.array(sequences)
         if self.targets_avail:
             targets = np.array(targets)
-            return (sequences, targets)
-        return sequences,
+            return SamplesBatch(sequences, target_batch=targets)
+        return SamplesBatch(sequences)
 
     def get_data(self, batch_size, n_samples=None):
         """
@@ -188,18 +189,21 @@ class BedFileSampler(FileSampler):
             and :math:`N` is the size of the sequence type's alphabet.
 
         """
+        # TODO: Should this method return a collection of samples_batch.inputs()?
+
         if not n_samples:
             n_samples = self.n_samples
         sequences = []
 
         count = batch_size
         while count < n_samples:
-            seqs, = self.sample(batch_size=batch_size)
-            sequences.append(seqs)
+            samples_batch = self.sample(batch_size=batch_size)
+            sequences.append(samples_batch.sequence_batch())
             count += batch_size
         remainder = batch_size - (count - n_samples)
-        seqs, = self.sample(batch_size=remainder)
-        sequences.append(seqs)
+        samples_batch = self.sample(batch_size=remainder)
+        sequences.append(samples_batch.sequence_batch())
+
         return sequences
 
     def get_data_and_targets(self, batch_size, n_samples=None):
@@ -216,11 +220,11 @@ class BedFileSampler(FileSampler):
 
         Returns
         -------
-        sequences_and_targets, targets_matrix : \
-        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
-            Tuple containing the list of sequence-target pairs, as well
+        batches, targets_matrix : \
+        tuple(list(SamplesBatch), numpy.ndarray)
+            Tuple containing the list of batches, as well
             as a single matrix with all targets in the same order.
-            Note that `sequences_and_targets`'s sequence elements are of
+            Note that `batches`'s sequence elements are of
             the shape :math:`B \\times L \\times N` and its target
             elements are of the shape :math:`B \\times F`, where
             :math:`B` is `batch_size`, :math:`L` is the sequence length,
@@ -236,18 +240,18 @@ class BedFileSampler(FileSampler):
                 "Please use `get_data` instead.")
         if not n_samples:
             n_samples = self.n_samples
-        sequences_and_targets = []
+        batches = []
         targets_mat = []
 
         count = batch_size
         while count < n_samples:
-            seqs, tgts = self.sample(batch_size=batch_size)
-            sequences_and_targets.append((seqs, tgts))
-            targets_mat.append(tgts)
+            samples_batch = self.sample(batch_size=batch_size)
+            batches.append(samples_batch)
+            targets_mat.append(samples_batch.targets())
             count += batch_size
         remainder = batch_size - (count - n_samples)
-        seqs, tgts = self.sample(batch_size=remainder)
-        sequences_and_targets.append((seqs, tgts))
-        targets_mat.append(tgts)
+        samples_batch = self.sample(batch_size=remainder)
+        batches.append(samples_batch)
+        targets_mat.append(samples_batch.targets())
         targets_mat = np.vstack(targets_mat).astype(int)
-        return sequences_and_targets, targets_mat
+        return batches, targets_mat
