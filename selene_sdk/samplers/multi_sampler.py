@@ -267,6 +267,26 @@ class MultiSampler(Sampler):
             retrieve. Handling for `n_samples=None` should be done by
             all classes that subclass `selene_sdk.samplers.Sampler`.
 
+        Returns
+        -------
+        sequences_and_targets, targets_matrix : \
+        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)
+            Tuple containing the list of sequence-target pairs, as well
+            as a single matrix with all targets in the same order.
+            Note that `sequences_and_targets` sequence elements are of
+            the shape :math:`B \\times L \\times N` and its target
+            elements are of the shape :math:`B \\times F`, where
+            :math:`B` is `batch_size`, :math:`L` is the sequence length,
+            :math:`N` is the size of the sequence type's alphabet, and
+            :math:`F` is the number of features. Further,
+            `target_matrix` is of the shape :math:`S \\times F`, where
+            :math:`S = n_samples`.
+
+        Raises
+        ------
+        ValueError
+            If no test partition of the data was specified during
+            sampler initialization.
         """
         return self.get_data_and_targets(
             batch_size, n_samples, mode="validate")
@@ -281,8 +301,9 @@ class MultiSampler(Sampler):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, 640000 examples are retrieved.
+            Default is None. The total number of validation examples to
+            retrieve. Handling for `n_samples=None` should be done by
+            all classes that subclass `selene_sdk.samplers.Sampler`.
 
         Returns
         -------
