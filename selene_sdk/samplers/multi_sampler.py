@@ -219,7 +219,7 @@ class MultiSampler(Sampler):
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()
 
-    def get_data_and_targets(self, batch_size, n_samples, mode=None):
+    def get_data_and_targets(self, batch_size, n_samples=None, mode=None):
         """
         This method fetches a subset of the data from the sampler,
         divided into batches. This method also allows the user to
@@ -230,16 +230,27 @@ class MultiSampler(Sampler):
         ----------
         batch_size : int
             The size of the batches to divide the data into.
-        n_samples : int
-            The total number of samples to retrieve.
+        n_samples : int or None, optional
+            The total number of samples to retrieve. If `n_samples` is None,
+            if a FileSampler is specified for the mode, the number of samplers
+            returned is defined by the FileSample, or if a Dataloader is
+            specified, will set `n_samples` to 32000 if the mode is `validate`,
+            or 640000 if the mode is `test`. If the mode is `train`
+            you must have specified a value for `n_samples`.
         mode : str, optional
             Default is None. The operating mode that the object should run in.
             If None, will use the current mode `self.mode`.
         """
-        if self._samplers[mode if mode else self.mode]:
-            return self._samplers[mode if mode else self.mode].get_data_and_targets(
+        mode = mode if mode else self.mode
+        if self._samplers[mode]:
+            return self._samplers[mode].get_data_and_targets(
                 batch_size, n_samples)
         else:
+            if n_samples is None:
+                if mode == 'validate':
+                    n_samples = 32000
+                elif mode == 'test':
+                    n_samples = 640000
             self._set_batch_size(batch_size, mode=mode)
             data_and_targets = []
             targets_mat = []
@@ -267,8 +278,11 @@ class MultiSampler(Sampler):
             The size of the batches to divide the data into.
         n_samples : int, optional
             Default is None. The total number of validation examples to
-            retrieve. Handling for `n_samples=None` should be done by
-            all classes that subclass `selene_sdk.samplers.Sampler`.
+            retrieve. If `n_samples` is None,
+            then if a FileSampler is specified for the 'validate' mode, the
+            number of samplers returned is defined by the FileSample,
+            or if a Dataloader is specified, will set `n_samples` to
+            32000.
 
         Returns
         -------
@@ -304,9 +318,12 @@ class MultiSampler(Sampler):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int or None, optional
-            Default is None. The total number of validation examples to
-            retrieve. Handling for `n_samples=None` should be done by
-            all classes that subclass `selene_sdk.samplers.Sampler`.
+            Default is None. The total number of test examples to
+            retrieve. If `n_samples` is None,
+            then if a FileSampler is specified for the 'test' mode, the
+            number of samplers returned is defined by the FileSample,
+            or if a Dataloader is specified, will set `n_samples` to
+            640000.
 
         Returns
         -------

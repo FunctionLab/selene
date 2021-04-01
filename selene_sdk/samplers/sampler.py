@@ -162,8 +162,8 @@ class Sampler(metaclass=ABCMeta):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, 640000 examples are retrieved.
+            Default is `None`. Handling for `n_samples=None` should be done
+            by all classes that subclass `selene_sdk.samplers.Sampler`.
 
         Returns
         -------
