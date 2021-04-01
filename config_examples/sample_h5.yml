@@ -1,4 +1,5 @@
----
+--- 
+# example configuration for the `sampler_write_to_h5.py` script in `scripts`
 sampler: !obj:selene_sdk.samplers.RandomPositionsSampler {
     target_path: /path/to/tabix/indexed/targets.bed.gz, 
     reference_sequence: !obj:selene_sdk.sequences.Genome {
@@ -15,9 +16,8 @@ sampler: !obj:selene_sdk.samplers.RandomPositionsSampler {
     sequence_length: 1000,
     center_bin_to_predict: 200,
     feature_thresholds: 0.5,
-    save_datasets: []
 }
-n_steps: 1000 #set according to the number of samples you want to generate
-batch_size: 64
-n_features: 2002 #set to the number of features in your dataset
+n_steps: 1000 # set according to the number of samples you want to generate
+batch_size: 64 # where total number of samples will be batch_size x n_steps
+n_features: 2002 # number of chromatin features (targets/classes predicted) in `distinct_features.txt`
 ...
