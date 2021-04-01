@@ -17,7 +17,5 @@ sampler: !obj:selene_sdk.samplers.RandomPositionsSampler {
     center_bin_to_predict: 200,
     feature_thresholds: 0.5,
 }
-n_steps: 1000 # set according to the number of samples you want to generate
-batch_size: 64 # where total number of samples will be batch_size x n_steps
-n_features: 2002 # number of chromatin features (targets/classes predicted) in `distinct_features.txt`
+batch_size: 64
 ...
