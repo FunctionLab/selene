@@ -1,12 +1,14 @@
 """
-This module provides the `MultiSampler` class, which uses a
-FileSampler for each mode of sampling (train, test, validation).
-The MultiSampler is therefore a subclass of Sampler.
+This module provides the `MultiSampler` class, which accepts
+either an online sampler or a file sampler for each mode of
+sampling (train, test, validation).
+MultiSampler is a subclass of Sampler.
 """
 import numpy as np
 from torch.utils.data import DataLoader
 
 from .sampler import Sampler
+
 
 def MultiFileSampler(*args, **kwargs):
     """
@@ -20,6 +22,7 @@ def MultiFileSampler(*args, **kwargs):
     warn("MultiFileSampler is deprecated and will be removed from future "
     "versions of Selene. Please use MultiSampler instead.")
     return MultiSampler(*args, **kwargs)
+
 
 class MultiSampler(Sampler):
     """
