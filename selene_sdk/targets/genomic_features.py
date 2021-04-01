@@ -236,10 +236,12 @@ class GenomicFeatures(Target):
                                  the feature's threshold.
 
     init_unpicklable : bool, optional
-        Default is False. If False, delay part of initialization code
-        to executed only when a relevant method is called. This enables
-        the object to be pickled after instantiation. `init_unpicklable` should
-        be `False` when used when multi-processing is needed e.g. DataLoader.
+        Default is False. Delays initialization until a relevant method
+        is called. This enables the object to be pickled after instantiation.
+        `init_unpicklable` must be `False` when multi-processing is needed e.g.
+        DataLoader. Set `init_unpicklable` to True if you are using this class
+        directly through Selene's API and want to access class attributes
+        without having to call on a specific method in GenomicFeatures.
 
     Attributes
     ----------
