@@ -231,12 +231,13 @@ class MultiSampler(Sampler):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int or None, optional
-            The total number of samples to retrieve. If `n_samples` is None,
-            if a FileSampler is specified for the mode, the number of samplers
-            returned is defined by the FileSample, or if a Dataloader is
-            specified, will set `n_samples` to 32000 if the mode is `validate`,
-            or 640000 if the mode is `test`. If the mode is `train`
-            you must have specified a value for `n_samples`.
+            Default is None. The total number of samples to retrieve.
+            If `n_samples` is None, if a FileSampler is specified for the 
+            mode, the number of samplers returned is defined by the FileSample, 
+            or if a Dataloader is specified, will set `n_samples` to 32000 
+            if the mode is `validate`, or 640000 if the mode is `test`. 
+            If the mode is `train` you must have specified a value for 
+            `n_samples`.
         mode : str, optional
             Default is None. The operating mode that the object should run in.
             If None, will use the current mode `self.mode`.
