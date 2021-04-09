@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.sequences &mdash; Selene master documentation</title>
+  <title>selene_sdk.sequences &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -501,7 +501,7 @@ the size of the sequence type’s alphabet.</p>
 <h2>Genome<a class="headerlink" href="#genome" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="selene_sdk.sequences.Genome">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">Genome</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist_regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">Genome</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist_regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_unpicklable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.sequence.Sequence</span></code></p>
 <p>This class provides access to an organism’s genomic sequence.</p>
 <p>This class supports retrieving parts of the sequence and converting
@@ -522,6 +522,12 @@ tabix-indexed .gz file.</p></li>
 <li><p><strong>bases_order</strong> (<em>list(str) or None, optional</em>) – Default is None (use the default base ordering of
 <cite>[‘A’, ‘C’, ‘G’, ‘T’]</cite>). Specify a different ordering of
 DNA bases for one-hot encoding.</p></li>
+<li><p><strong>init_unpicklable</strong> (<em>bool, optional</em>) – Default is False. Delays initialization until a relevant method
+is called. This enables the object to be pickled after instantiation.
+<cite>init_unpicklable</cite> must be <cite>False</cite> when multi-processing is needed e.g.
+DataLoader. Set <cite>init_unpicklable</cite> to True if you are using this class
+directly through Selene’s API and want to access class attributes
+without having to call on a specific method in Genome.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>

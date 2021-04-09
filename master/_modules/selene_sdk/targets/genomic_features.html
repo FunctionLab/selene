@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.targets.genomic_features &mdash; Selene master documentation</title>
+  <title>selene_sdk.targets.genomic_features &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -341,6 +341,7 @@
 <span class="kn">import</span> <span class="nn">tabix</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">.target</span> <span class="kn">import</span> <span class="n">Target</span>
 <span class="kn">from</span> <span class="nn">._genomic_features</span> <span class="kn">import</span> <span class="n">_fast_get_feature_data</span>
 
@@ -559,6 +560,14 @@
 <span class="sd">                                 input the feature name and returns\</span>
 <span class="sd">                                 the feature&#39;s threshold.</span>
 
+<span class="sd">    init_unpicklable : bool, optional</span>
+<span class="sd">        Default is False. Delays initialization until a relevant method</span>
+<span class="sd">        is called. This enables the object to be pickled after instantiation.</span>
+<span class="sd">        `init_unpicklable` must be `False` when multi-processing is needed e.g.</span>
+<span class="sd">        DataLoader. Set `init_unpicklable` to True if you are using this class</span>
+<span class="sd">        directly through Selene&#39;s API and want to access class attributes</span>
+<span class="sd">        without having to call on a specific method in GenomicFeatures.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : tabix.open</span>
@@ -583,12 +592,11 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">feature_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">feature_thresholds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init_unpicklable</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `GenomicFeatures` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">input_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_index_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
@@ -602,6 +610,23 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">feature_thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_thresholds_vec</span> <span class="o">=</span> \
                 <span class="n">_define_feature_thresholds</span><span class="p">(</span><span class="n">feature_thresholds</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">init_unpicklable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unpicklable_init</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_unpicklable_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">tabix</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="c1"># delay initialization to allow multiprocessing</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_unpicklable_init</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfunc</span>
 
     <span class="k">def</span> <span class="nf">_query_tabix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -633,7 +658,8 @@
         <span class="k">except</span> <span class="n">tabix</span><span class="o">.</span><span class="n">TabixError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="GenomicFeatures.is_positive"><a class="viewcode-back" href="../../../targets.html#selene_sdk.targets.GenomicFeatures.is_positive">[docs]</a>    <span class="k">def</span> <span class="nf">is_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="GenomicFeatures.is_positive"><a class="viewcode-back" href="../../../targets.html#selene_sdk.targets.GenomicFeatures.is_positive">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">is_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines whether the query the `chrom` queried contains any</span>
 <span class="sd">        genomic features within the :math:`[start, end)` region. If so,</span>
@@ -659,7 +685,8 @@
         <span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_query_tabix</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_any_positive_rows</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_thresholds</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GenomicFeatures.get_feature_data"><a class="viewcode-back" href="../../../targets.html#selene_sdk.targets.GenomicFeatures.get_feature_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="GenomicFeatures.get_feature_data"><a class="viewcode-back" href="../../../targets.html#selene_sdk.targets.GenomicFeatures.get_feature_data">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">get_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes which features overlap with the given region.</span>
 

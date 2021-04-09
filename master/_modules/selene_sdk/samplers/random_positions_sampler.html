@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.samplers.random_positions_sampler &mdash; Selene master documentation</title>
+  <title>selene_sdk.samplers.random_positions_sampler &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -335,6 +335,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">.online_sampler</span> <span class="kn">import</span> <span class="n">OnlineSampler</span>
 <span class="kn">from</span> <span class="nn">..utils</span> <span class="kn">import</span> <span class="n">get_indices_and_probabilities</span>
 
@@ -435,13 +436,6 @@
 <span class="sd">        documentation for `validation_holdout` for more details.</span>
 <span class="sd">    sequence_length : int</span>
 <span class="sd">        The length of the sequences to  train the model on.</span>
-<span class="sd">    bin_radius : int</span>
-<span class="sd">        From the center of the sequence, the radius in which to detect</span>
-<span class="sd">        a feature annotation in order to include it as a sample&#39;s label.</span>
-<span class="sd">    surrounding_sequence_radius : int</span>
-<span class="sd">        The length of sequence falling outside of the feature detection</span>
-<span class="sd">        bin (i.e. `bin_radius`) center, but still within the</span>
-<span class="sd">        `sequence_length`.</span>
 <span class="sd">    modes : list(str)</span>
 <span class="sd">        The list of modes that the sampler can be run in.</span>
 <span class="sd">    mode : str</span>
@@ -484,14 +478,24 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interval_lengths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_holdout_type</span> <span class="o">==</span> <span class="s2">&quot;chromosome&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_chromosome</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_proportion</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="c1"># delay initialization to allow  multiprocessing</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">dfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_holdout_type</span> <span class="o">==</span> <span class="s2">&quot;chromosome&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_chromosome</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">_partition_genome_by_proportion</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dfunc</span>
+
 
     <span class="k">def</span> <span class="nf">_partition_genome_by_proportion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">chrom</span><span class="p">,</span> <span class="n">len_chrom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_chr_lens</span><span class="p">():</span>
@@ -562,36 +566,27 @@
         <span class="n">bin_end</span> <span class="o">=</span> <span class="n">position</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span>
         <span class="n">retrieved_targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">get_feature_data</span><span class="p">(</span>
             <span class="n">chrom</span><span class="p">,</span> <span class="n">bin_start</span><span class="p">,</span> <span class="n">bin_end</span><span class="p">)</span>
-        <span class="n">window_start</span> <span class="o">=</span> <span class="n">bin_start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span>
-        <span class="n">window_end</span> <span class="o">=</span> <span class="n">bin_end</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span>
+        <span class="n">window_start</span> <span class="o">=</span> <span class="n">position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_window_radius</span>
+        <span class="n">window_end</span> <span class="o">=</span> <span class="n">position</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_window_radius</span>
         <span class="k">if</span> <span class="n">window_end</span> <span class="o">-</span> <span class="n">window_start</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">bin_start</span><span class="p">,</span> <span class="n">bin_end</span><span class="p">,</span>
                   <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span><span class="p">,</span>
-                  <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span><span class="p">)</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">_start_window_radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_window_radius</span><span class="p">,)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">strand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRAND_SIDES</span><span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
         <span class="n">retrieved_seq</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords</span><span class="p">(</span>
                 <span class="n">chrom</span><span class="p">,</span> <span class="n">window_start</span><span class="p">,</span> <span class="n">window_end</span><span class="p">,</span> <span class="n">strand</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">retrieved_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Full sequence centered at </span><span class="si">{0}</span><span class="s2"> position </span><span class="si">{1}</span><span class="s2"> &quot;</span>
                         <span class="s2">&quot;could not be retrieved. Sampling again.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                             <span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">retrieved_seq</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">retrieved_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">0.60</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">retrieved_seq</span><span class="o">==</span><span class="mf">0.25</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.30</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Over 30</span><span class="si">% o</span><span class="s2">f the bases in the sequence centered &quot;</span>
                         <span class="s2">&quot;at </span><span class="si">{0}</span><span class="s2"> position </span><span class="si">{1}</span><span class="s2"> are ambiguous (&#39;N&#39;). &quot;</span>
                         <span class="s2">&quot;Sampling again.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chrom</span><span class="p">,</span> <span class="n">position</span><span class="p">))</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-        <span class="k">if</span> <span class="n">retrieved_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
-            <span class="c1"># TODO: remove after investigating this bug.</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: sequence retrieved for </span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">, </span><span class="si">{2}</span><span class="s2">, </span><span class="si">{3}</span><span class="s2"> &quot;</span>
-                  <span class="s2">&quot;had length less than required sequence length </span><span class="si">{4}</span><span class="s2">. &quot;</span>
-                  <span class="s2">&quot;This bug will be investigated and addressed in the next &quot;</span>
-                  <span class="s2">&quot;version of Selene.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                      <span class="n">chrom</span><span class="p">,</span> <span class="n">window_start</span><span class="p">,</span> <span class="n">window_end</span><span class="p">,</span> <span class="n">strand</span><span class="p">,</span>
-                      <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_save_datasets</span><span class="p">:</span>
@@ -617,7 +612,8 @@
             <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_from_mode</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="RandomPositionsSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.RandomPositionsSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomPositionsSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.RandomPositionsSampler.sample">[docs]</a>    <span class="nd">@init</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Randomly draws a mini-batch of examples and their corresponding</span>
 <span class="sd">        labels.</span>
@@ -627,6 +623,9 @@
 <span class="sd">        batch_size : int, optional</span>
 <span class="sd">            Default is 1. The number of examples to include in the</span>
 <span class="sd">            mini-batch.</span>
+<span class="sd">        mode : str, optional</span>
+<span class="sd">            Default is None. The operating mode that the object should run in.</span>
+<span class="sd">            If None, will use the current mode `self.mode`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -641,18 +640,19 @@
 <span class="sd">            where :math:`F` is the number of features.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span> <span class="k">if</span> <span class="n">mode</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
         <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">))</span>
         <span class="n">n_samples_drawn</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">n_samples_drawn</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
-            <span class="n">sample_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">sample_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">]):</span>
+            <span class="n">sample_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sample_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">]):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_update_randcache</span><span class="p">()</span>
                 <span class="n">sample_index</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="n">rand_interval_index</span> <span class="o">=</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">][</span><span class="n">sample_index</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;cache_indices&quot;</span><span class="p">][</span><span class="n">sample_index</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_randcache</span><span class="p">[</span><span class="n">mode</span><span class="p">][</span><span class="s2">&quot;sample_next&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="n">chrom</span><span class="p">,</span> <span class="n">cstart</span><span class="p">,</span> <span class="n">cend</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">sample_from_intervals</span><span class="p">[</span><span class="n">rand_interval_index</span><span class="p">]</span>

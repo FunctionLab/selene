@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.samplers.online_sampler &mdash; Selene master documentation</title>
+  <title>selene_sdk.samplers.online_sampler &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -407,13 +407,6 @@
 <span class="sd">        documentation for `validation_holdout` for more details.</span>
 <span class="sd">    sequence_length : int</span>
 <span class="sd">        The length of the sequences to  train the model on.</span>
-<span class="sd">    bin_radius : int</span>
-<span class="sd">        From the center of the sequence, the radius in which to detect</span>
-<span class="sd">        a feature annotation in order to include it as a sample&#39;s label.</span>
-<span class="sd">    surrounding_sequence_radius : int</span>
-<span class="sd">        The length of sequence falling outside of the feature detection</span>
-<span class="sd">        bin (i.e. `bin_radius`) center, but still within the</span>
-<span class="sd">        `sequence_length`.</span>
 <span class="sd">    modes : list(str)</span>
 <span class="sd">        The list of modes that the sampler can be run in.</span>
 <span class="sd">    mode : str</span>
@@ -465,19 +458,12 @@
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
         <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">sequence_length</span> <span class="o">+</span> <span class="n">center_bin_to_predict</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Sequence length of </span><span class="si">{0}</span><span class="s2"> with a center bin length of </span><span class="si">{1}</span><span class="s2"> &quot;</span>
-                <span class="s2">&quot;is invalid. These 2 inputs should both be odd or both be &quot;</span>
-                <span class="s2">&quot;even.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">sequence_length</span><span class="p">,</span> <span class="n">center_bin_to_predict</span><span class="p">))</span>
-
-        <span class="n">surrounding_sequence_length</span> <span class="o">=</span> <span class="n">sequence_length</span> <span class="o">-</span> <span class="n">center_bin_to_predict</span>
-        <span class="k">if</span> <span class="n">surrounding_sequence_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Sequence length of </span><span class="si">{0}</span><span class="s2"> is less than the center bin &quot;</span>
-                <span class="s2">&quot;length of </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">sequence_length</span><span class="p">,</span> <span class="n">center_bin_to_predict</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">center_bin_to_predict</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sequence_length</span> <span class="o">+</span> <span class="n">center_bin_to_predict</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Sequence length of </span><span class="si">{0}</span><span class="s2"> with a center bin length of </span><span class="si">{1}</span><span class="s2"> &quot;</span>
+                    <span class="s2">&quot;is invalid. These 2 inputs should both be odd or both be &quot;</span>
+                    <span class="s2">&quot;even.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sequence_length</span><span class="p">,</span> <span class="n">center_bin_to_predict</span><span class="p">))</span>
 
         <span class="c1"># specifying a test holdout partition is optional</span>
         <span class="k">if</span> <span class="n">test_holdout</span><span class="p">:</span>
@@ -504,8 +490,15 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">validation_holdout</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,)):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">validation_holdout</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">validation_holdout</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_holdout_type</span> <span class="o">=</span> <span class="s2">&quot;chromosome&quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">validation_holdout</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">validation_holdout</span> <span class="o">=</span> <span class="n">validation_holdout</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_holdout_type</span> <span class="o">=</span> <span class="s2">&quot;proportion&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Validation holdout must be of type list (chromosomal &quot;</span>
+                    <span class="s2">&quot;holdout) or float (proportion holdout) but was type &quot;</span>
+                    <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">validation_holdout</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -513,24 +506,41 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">,</span> <span class="n">mode</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">surrounding_sequence_radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="n">surrounding_sequence_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="n">sequence_length</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bin_radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">center_bin_to_predict</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_radius</span>
-        <span class="k">if</span> <span class="n">center_bin_to_predict</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_radius</span>
+        <span class="n">window_radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_window_radius</span> <span class="o">=</span> <span class="n">window_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_end_window_radius</span> <span class="o">=</span> <span class="n">window_radius</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_window_radius</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">center_bin_to_predict</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">bin_radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">center_bin_to_predict</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">=</span> <span class="n">bin_radius</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">=</span> <span class="n">bin_radius</span>
+            <span class="k">if</span> <span class="n">center_bin_to_predict</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_radius</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">center_bin_to_predict</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> \
+                    <span class="nb">len</span><span class="p">(</span><span class="n">center_bin_to_predict</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`center_bin_to_predict` needs to be either an int or a list of &quot;</span>
+                    <span class="s2">&quot;two ints, but was type &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">type</span><span class="p">(</span><span class="n">center_bin_to_predict</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bin_start</span><span class="p">,</span> <span class="n">bin_end</span> <span class="o">=</span> <span class="n">center_bin_to_predict</span>
+                <span class="k">if</span> <span class="n">bin_start</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">bin_end</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">:</span>
+                    <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;center_bin_to_predict [</span><span class="si">{0}</span><span class="s2">, </span><span class="si">{1}</span><span class="s2">]&quot;</span>
+                        <span class="s2">&quot;is out-of-bound for sequence length </span><span class="si">{3}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">bin_start</span><span class="p">,</span> <span class="n">bin_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_start_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_window_radius</span> <span class="o">-</span> <span class="n">bin_start</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_end_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_window_radius</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">-</span> <span class="n">bin_end</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span> <span class="o">=</span> <span class="n">reference_sequence</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">GenomicFeatures</span><span class="p">(</span>
             <span class="n">target_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">,</span>
             <span class="n">feature_thresholds</span><span class="o">=</span><span class="n">feature_thresholds</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_filehandles</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="OnlineSampler.get_feature_from_index"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.OnlineSampler.get_feature_from_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_from_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>

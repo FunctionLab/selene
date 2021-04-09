@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.samplers &mdash; Selene master documentation</title>
+  <title>selene_sdk.samplers &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -411,8 +411,8 @@ sampler, divided into batches.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
-<li><p><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of validation examples
-to retrieve. If <cite>None</cite>, 640000 examples are retrieved.</p></li>
+<li><p><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Handling for <cite>n_samples=None</cite> should be done
+by all classes that subclass <cite>selene_sdk.samplers.Sampler</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -456,11 +456,15 @@ all classes that subclass <cite>selene_sdk.samplers.Sampler</cite>.</p></li>
 
 <dl class="py method">
 <dt id="selene_sdk.samplers.Sampler.sample">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.sample" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/sampler.html#Sampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.Sampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches a mini-batch of the data from the sampler.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The size of the batch to retrieve.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The size of the batch to retrieve.</p></li>
+<li><p><strong>mode</strong> (<em>str, optional</em>) – Default is None. The operating mode that the object should run in.
+If None, will use the current mode <cite>self.mode</cite>.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -558,11 +562,6 @@ that will be held out.</p></li>
 <li><p><strong>~OnlineSampler.test_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The samples to hold out for testing model performance. See the
 documentation for <cite>validation_holdout</cite> for more details.</p></li>
 <li><p><strong>~OnlineSampler.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of the sequences to  train the model on.</p></li>
-<li><p><strong>~OnlineSampler.bin_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – From the center of the sequence, the radius in which to detect
-a feature annotation in order to include it as a sample’s label.</p></li>
-<li><p><strong>~OnlineSampler.surrounding_sequence_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of sequence falling outside of the feature detection
-bin (i.e. <cite>bin_radius</cite>) center, but still within the
-<cite>sequence_length</cite>.</p></li>
 <li><p><strong>~OnlineSampler.modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The list of modes that the sampler can be run in.</p></li>
 <li><p><strong>~OnlineSampler.mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The current mode that the sampler is running in. Must be one of
 the modes listed in <cite>modes</cite>.</p></li>
@@ -857,11 +856,6 @@ that will be held out.</p></li>
 <li><p><strong>~IntervalsSampler.test_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The samples to hold out for testing model performance. See the
 documentation for <cite>validation_holdout</cite> for more details.</p></li>
 <li><p><strong>~IntervalsSampler.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of the sequences to  train the model on.</p></li>
-<li><p><strong>~IntervalsSampler.bin_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – From the center of the sequence, the radius in which to detect
-a feature annotation in order to include it as a sample’s label.</p></li>
-<li><p><strong>~IntervalsSampler.surrounding_sequence_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of sequence falling outside of the feature detection
-bin (i.e. <cite>bin_radius</cite>) center, but still within the
-<cite>sequence_length</cite>.</p></li>
 <li><p><strong>~IntervalsSampler.modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The list of modes that the sampler can be run in.</p></li>
 <li><p><strong>~IntervalsSampler.mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The current mode that the sampler is running in. Must be one of
 the modes listed in <cite>modes</cite>.</p></li>
@@ -870,13 +864,17 @@ the modes listed in <cite>modes</cite>.</p></li>
 </dl>
 <dl class="py method">
 <dt id="selene_sdk.samplers.IntervalsSampler.sample">
-<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/intervals_sampler.html#IntervalsSampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.IntervalsSampler.sample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/intervals_sampler.html#IntervalsSampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.IntervalsSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly draws a mini-batch of examples and their corresponding
 labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
-mini-batch.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</p></li>
+<li><p><strong>mode</strong> (<em>str, optional</em>) – Default is None. The operating mode that the object should run in.
+If None, will use the current mode <cite>self.mode</cite>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
@@ -952,11 +950,6 @@ that will be held out.</p></li>
 <li><p><strong>~RandomPositionsSampler.test_holdout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – The samples to hold out for testing model performance. See the
 documentation for <cite>validation_holdout</cite> for more details.</p></li>
 <li><p><strong>~RandomPositionsSampler.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of the sequences to  train the model on.</p></li>
-<li><p><strong>~RandomPositionsSampler.bin_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – From the center of the sequence, the radius in which to detect
-a feature annotation in order to include it as a sample’s label.</p></li>
-<li><p><strong>~RandomPositionsSampler.surrounding_sequence_radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of sequence falling outside of the feature detection
-bin (i.e. <cite>bin_radius</cite>) center, but still within the
-<cite>sequence_length</cite>.</p></li>
 <li><p><strong>~RandomPositionsSampler.modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The list of modes that the sampler can be run in.</p></li>
 <li><p><strong>~RandomPositionsSampler.mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The current mode that the sampler is running in. Must be one of
 the modes listed in <cite>modes</cite>.</p></li>
@@ -965,13 +958,17 @@ the modes listed in <cite>modes</cite>.</p></li>
 </dl>
 <dl class="py method">
 <dt id="selene_sdk.samplers.RandomPositionsSampler.sample">
-<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/random_positions_sampler.html#RandomPositionsSampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.RandomPositionsSampler.sample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/random_positions_sampler.html#RandomPositionsSampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.RandomPositionsSampler.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Randomly draws a mini-batch of examples and their corresponding
 labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
-mini-batch.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The number of examples to include in the
+mini-batch.</p></li>
+<li><p><strong>mode</strong> (<em>str, optional</em>) – Default is None. The operating mode that the object should run in.
+If None, will use the current mode <cite>self.mode</cite>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>sequences, targets</strong> – A tuple containing the numeric representation of the
@@ -996,174 +993,12 @@ where <span class="math notranslate nohighlight">\(F\)</span> is the number of f
 <h2>MultiFileSampler<a class="headerlink" href="#multifilesampler" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="selene_sdk.samplers.MultiFileSampler">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.samplers.</span></code><code class="sig-name descname"><span class="pre">MultiFileSampler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_sampler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_sampler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_sampler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_datasets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.samplers.sampler.Sampler</span></code></p>
-<p>This sampler contains individual file samplers for each mode.
-The file samplers parse .bed/.mat files that correspond to
-training, validation, and testing and MultiFileSampler calls on
-the correct file sampler to draw samples for a given mode.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>~MultiFileSampler.train_sampler</strong> (<em>selene_sdk.samplers.file_samplers.FileSampler</em>) – Load your training data as a <cite>FileSampler</cite> before passing it
-into the <cite>MultiFileSampler</cite> constructor.</p></li>
-<li><p><strong>~MultiFileSampler.validate_sampler</strong> (<em>selene_sdk.samplers.file_samplers.FileSampler</em>) – The validation dataset file sampler.</p></li>
-<li><p><strong>~MultiFileSampler.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The list of features the model should predict</p></li>
-<li><p><strong>~MultiFileSampler.test_sampler</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em> or </em><em>selene_sdk.samplers.file_samplers.FileSampler</em><em>, </em><em>optional</em>) – Default is None. The test file sampler is optional.</p></li>
-<li><p><strong>~MultiFileSampler.mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a>) – Default is “train”. Must be one of <cite>{train, validate, test}</cite>. The
-starting mode in which to run the sampler.</p></li>
-<li><p><strong>~MultiFileSampler.save_datasets</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em><em>, </em><em>optional</em>) – Default is None. Currently, we are only including these parameters
-so that <cite>MultiFileSampler</cite> is consistent with <cite>Sampler</cite>. The save
-dataset functionality for MultiFileSampler has not been defined
-yet.</p></li>
-<li><p><strong>~MultiFileSampler.output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><em>optional</em>) – Default is None. Used if the sampler has any data or logging
-statements to save to file. Currently not useful for
-<cite>MultiFileSampler</cite>.</p></li>
-<li><p><strong>~MultiFileSampler.modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – A list of the names of the modes that the object may operate in.</p></li>
-<li><p><strong>~MultiFileSampler.mode</strong> – Default is <cite>None</cite>. The current mode that the object is operating in.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.get_data_and_targets">
-<code class="sig-name descname"><span class="pre">get_data_and_targets</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.get_data_and_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.get_data_and_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method fetches a subset of the data from the sampler,
-divided into batches. This method also allows the user to
-specify what operating mode to run the sampler in when fetching
-the data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
-<li><p><strong>n_samples</strong> (<em>int</em>) – The total number of samples to retrieve.</p></li>
-<li><p><strong>mode</strong> (<em>str, optional</em>) – Default is None. The operating mode that the sampler
-should run in. If None, will use the current
-<cite>self.mode</cite>.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.get_feature_from_index">
-<code class="sig-name descname"><span class="pre">get_feature_from_index</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.get_feature_from_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.get_feature_from_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the feature corresponding to an index in the feature
-vector.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the feature to retrieve the name for.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The name of the feature occurring at the specified index.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.get_test_set">
-<code class="sig-name descname"><span class="pre">get_test_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.get_test_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.get_test_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method returns a subset of testing data from the
-sampler, divided into batches.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
-<li><p><strong>n_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. The total number of validation examples
-to retrieve. If <cite>None</cite>, 640000 examples are retrieved.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>sequences_and_targets, targets_matrix</strong> – Tuple containing the list of sequence-target pairs, as well
-as a single matrix with all targets in the same order.
-Note that <cite>sequences_and_targets</cite>’s sequence elements are of
-the shape <span class="math notranslate nohighlight">\(B \times L \times N\)</span> and its target
-elements are of the shape <span class="math notranslate nohighlight">\(B \times F\)</span>, where
-<span class="math notranslate nohighlight">\(B\)</span> is <cite>batch_size</cite>, <span class="math notranslate nohighlight">\(L\)</span> is the sequence length,
-<span class="math notranslate nohighlight">\(N\)</span> is the size of the sequence type’s alphabet, and
-<span class="math notranslate nohighlight">\(F\)</span> is the number of features. Further,
-<cite>target_matrix</cite> is of the shape <span class="math notranslate nohighlight">\(S \times F\)</span>, where
-<span class="math notranslate nohighlight">\(S =\)</span> <cite>n_samples</cite>.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>)), <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>)</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If no test partition of the data was specified during
-    sampler initialization.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.get_validation_set">
-<code class="sig-name descname"><span class="pre">get_validation_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.get_validation_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.get_validation_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method returns a subset of validation data from the
-sampler, divided into batches.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>batch_size</strong> (<em>int</em>) – The size of the batches to divide the data into.</p></li>
-<li><p><strong>n_samples</strong> (<em>int, optional</em>) – Default is None. The total number of validation examples to
-retrieve. Handling for <cite>n_samples=None</cite> should be done by
-all classes that subclass <cite>selene_sdk.samplers.Sampler</cite>.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.sample">
-<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.sample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches a mini-batch of the data from the sampler.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>batch_size</strong> (<em>int, optional</em>) – Default is 1. The size of the batch to retrieve.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.save_dataset_to_file">
-<code class="sig-name descname"><span class="pre">save_dataset_to_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_filehandle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.save_dataset_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.save_dataset_to_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>We implement this function in this class only because the
-TrainModel class calls this method. In the future, we will
-likely remove this method or implement a different way
-of “saving the data” for file samplers. For example, we
-may only output the row numbers sampled so that users may
-reproduce exactly what order the data was sampled.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<em>str</em>) – Must be one of the modes specified in <cite>save_datasets</cite> during
-sampler initialization.</p></li>
-<li><p><strong>close_filehandle</strong> (<em>bool, optional</em>) – Default is False. <cite>close_filehandle=True</cite> assumes that all
-data corresponding to the input <cite>mode</cite> has been saved to
-file and <cite>save_dataset_to_file</cite> will not be called with
-<cite>mode</cite> again.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="selene_sdk.samplers.MultiFileSampler.set_mode">
-<code class="sig-name descname"><span class="pre">set_mode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_file_sampler.html#MultiFileSampler.set_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler.set_mode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the sampling mode.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) – The name of the mode to use. It must be one of
-<cite>Sampler.BASE_MODES</cite> (“train”, “validate”) or “test” if
-the test data is supplied.</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If <cite>mode</cite> is not a valid mode.</p>
-</dd>
-</dl>
-</dd></dl>
-
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.samplers.</span></code><code class="sig-name descname"><span class="pre">MultiFileSampler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/samplers/multi_sampler.html#MultiFileSampler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.samplers.MultiFileSampler" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>MultiFileSampler</cite> is deprecated and will be removed from future
+versions of Selene. Please use <cite>MultiSampler</cite> instead. This function
+maintains backward compatibility for code that uses <cite>MultiFileSampler</cite>,
+but we will remove this function in future. Please refer to the
+<cite>MultiSampler</cite> documentation for usage.</p>
 </dd></dl>
 
 </div>

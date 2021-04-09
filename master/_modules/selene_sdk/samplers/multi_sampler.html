@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.samplers.multi_file_sampler &mdash; Selene master documentation</title>
+  <title>selene_sdk.samplers.multi_sampler &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -307,7 +307,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>selene_sdk.samplers.multi_file_sampler</li>
+      <li>selene_sdk.samplers.multi_sampler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -322,51 +322,78 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for selene_sdk.samplers.multi_file_sampler</h1><div class="highlight"><pre>
+  <h1>Source code for selene_sdk.samplers.multi_sampler</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">This module provides the `MultiFileSampler` class, which uses a</span>
-<span class="sd">FileSampler for each mode of sampling (train, test, validation).</span>
-<span class="sd">The MultiFileSampler is therefore a subclass of Sampler.</span>
+<span class="sd">This module provides the `MultiSampler` class, which accepts</span>
+<span class="sd">either an online sampler or a file sampler for each mode of</span>
+<span class="sd">sampling (train, test, validation).</span>
+<span class="sd">MultiSampler is a subclass of Sampler.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">Sampler</span>
 
 
-<div class="viewcode-block" id="MultiFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler">[docs]</a><span class="k">class</span> <span class="nc">MultiFileSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler">[docs]</a><span class="k">def</span> <span class="nf">MultiFileSampler</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This sampler contains individual file samplers for each mode.</span>
-<span class="sd">    The file samplers parse .bed/.mat files that correspond to</span>
-<span class="sd">    training, validation, and testing and MultiFileSampler calls on</span>
-<span class="sd">    the correct file sampler to draw samples for a given mode.</span>
+<span class="sd">    `MultiFileSampler` is deprecated and will be removed from future</span>
+<span class="sd">    versions of Selene. Please use `MultiSampler` instead. This function</span>
+<span class="sd">    maintains backward compatibility for code that uses `MultiFileSampler`,</span>
+<span class="sd">    but we will remove this function in future. Please refer to the</span>
+<span class="sd">    `MultiSampler` documentation for usage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;MultiFileSampler is deprecated and will be removed from future &quot;</span>
+    <span class="s2">&quot;versions of Selene. Please use MultiSampler instead.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MultiSampler</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<span class="sd">    Attributes</span>
+
+<span class="k">class</span> <span class="nc">MultiSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This sampler draws samples from individual file samplers or data loaders</span>
+<span class="sd">    that corresponds to training, validation, and testing (optional) modes.</span>
+<span class="sd">    MultiSampler calls on the correct file sampler or data loader to draw</span>
+<span class="sd">    samples for a given mode. Example file samplers are under</span>
+<span class="sd">    `selene_sdk.samplers.file_samplers` and example data loaders are under</span>
+<span class="sd">    `selene_sdk.samplers.dataloaders`.</span>
+
+<span class="sd">    MultiSampler can use either file samplers or data loaders for</span>
+<span class="sd">    different modes. Using data loaders for some modes while using file samplers</span>
+<span class="sd">    for other modes are also allowed. The file samplers parse data files</span>
+<span class="sd">    (e.g. bed, mat, or hdf5). The data loaders provide multi-worker iterators</span>
+<span class="sd">    that draw samples from online samplers (i.e. on-the-fly sampling). As data</span>
+<span class="sd">    loaders support parallel sampling, they are generally recommended for</span>
+<span class="sd">    sampling speed.</span>
+
+<span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    train_sampler : selene_sdk.samplers.file_samplers.FileSampler</span>
-<span class="sd">        Load your training data as a `FileSampler` before passing it</span>
-<span class="sd">        into the `MultiFileSampler` constructor.</span>
-<span class="sd">    validate_sampler : selene_sdk.samplers.file_samplers.FileSampler</span>
-<span class="sd">        The validation dataset file sampler.</span>
+<span class="sd">    train_sampler : selene_sdk.samplers.file_samplers.FileSampler or \</span>
+<span class="sd">                    selene_sdk.samplers.dataloader.DataLoader</span>
+<span class="sd">        Load your training data as a `FileSampler` or `DataLoader`</span>
+<span class="sd">    validate_sampler : FileSampler or DataLoader</span>
+<span class="sd">        The validation dataset file sampler or data loader.</span>
 <span class="sd">    features : list(str)</span>
 <span class="sd">        The list of features the model should predict</span>
-<span class="sd">    test_sampler : None or selene_sdk.samplers.file_samplers.FileSampler, optional</span>
+<span class="sd">    test_sampler : None or FileSampler or DataLoader, optional</span>
 <span class="sd">        Default is None. The test file sampler is optional.</span>
 <span class="sd">    mode : str, optional</span>
 <span class="sd">        Default is &quot;train&quot;. Must be one of `{train, validate, test}`. The</span>
 <span class="sd">        starting mode in which to run the sampler.</span>
-<span class="sd">    save_datasets : list(str), optional</span>
-<span class="sd">        Default is None. Currently, we are only including these parameters</span>
-<span class="sd">        so that `MultiFileSampler` is consistent with `Sampler`. The save</span>
-<span class="sd">        dataset functionality for MultiFileSampler has not been defined</span>
-<span class="sd">        yet.</span>
+<span class="sd">    save_datasets : list(str) or None, optional</span>
+<span class="sd">        Default is None. Currently, we are only including this parameter</span>
+<span class="sd">        so that `MultiSampler` is consistent with the `Sampler` interface.</span>
+<span class="sd">        The save dataset functionality for MultiSampler has not been</span>
+<span class="sd">        defined yet.</span>
 <span class="sd">    output_dir : str or None, optional</span>
-<span class="sd">        Default is None. Used if the sampler has any data or logging</span>
-<span class="sd">        statements to save to file. Currently not useful for</span>
-<span class="sd">        `MultiFileSampler`.</span>
+<span class="sd">        Default is None. Only used if the sampler has any data or</span>
+<span class="sd">        logging statements to save to file. Currently not used in</span>
+<span class="sd">        `MultiSampler`.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    modes : list(str)</span>
-<span class="sd">        A list of the names of the modes that the object may operate in.</span>
+<span class="sd">        A list of the modes that the object may operate in.</span>
 <span class="sd">    mode : str or None</span>
 <span class="sd">        Default is `None`. The current mode that the object is operating in.</span>
 
@@ -380,29 +407,46 @@
                  <span class="n">save_datasets</span><span class="o">=</span><span class="p">[],</span>
                  <span class="n">output_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructs a new `MultiFileSampler` object.</span>
+<span class="sd">        Constructs a new `MultiSampler` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MultiFileSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MultiSampler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">features</span><span class="p">,</span>
             <span class="n">save_datasets</span><span class="o">=</span><span class="n">save_datasets</span><span class="p">,</span>
             <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_sampler</span><span class="p">,</span>
-            <span class="s2">&quot;validate&quot;</span><span class="p">:</span> <span class="n">validate_sampler</span>
+            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> \
+                     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;validate&quot;</span><span class="p">:</span> <span class="n">validate_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">validate_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> \
+                        <span class="k">else</span> <span class="kc">None</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_index_to_feature</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">i</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_sampler</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span> \
+                     <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;validate&quot;</span><span class="p">:</span> <span class="n">validate_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">validate_sampler</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span> \
+                        <span class="k">else</span> <span class="kc">None</span>
         <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">])</span> \
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;validate&quot;</span><span class="p">:</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;validate&quot;</span><span class="p">])</span> \
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;validate&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index_to_feature</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">f</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">)}</span>
 
         <span class="k">if</span> <span class="n">test_sampler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_sampler</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">test_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">test_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
-<div class="viewcode-block" id="MultiFileSampler.set_mode"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.set_mode">[docs]</a>    <span class="k">def</span> <span class="nf">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the sampling mode.</span>
 
@@ -423,9 +467,40 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Tried to set mode to be &#39;</span><span class="si">{0}</span><span class="s2">&#39; but the only valid modes are &quot;</span>
                 <span class="s2">&quot;</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
-<div class="viewcode-block" id="MultiFileSampler.get_feature_from_index"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.get_feature_from_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_from_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_batch_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the batch size for DataLoader for the specified mode,</span>
+<span class="sd">        if the specified batch_size does not equal the current batch_size.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        batch_size : int</span>
+<span class="sd">            The batch size for the mode.</span>
+<span class="sd">        mode : str, optional</span>
+<span class="sd">            Default is None. The  mode to set batch_size</span>
+<span class="sd">            If None, will use the current mode `self.mode`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">]:</span>
+            <span class="n">batch_size_matched</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">batch_sampler</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">batch_sampler</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">batch_sampler</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+                    <span class="n">batch_size_matched</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+                    <span class="n">batch_size_matched</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">batch_size_matched</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reset data loader for mode </span><span class="si">{0}</span><span class="s2"> to use the new batch &quot;</span>
+                      <span class="s2">&quot;size: </span><span class="si">{1}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">get_feature_from_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the feature corresponding to an index in the feature</span>
 <span class="sd">        vector.</span>
@@ -441,9 +516,9 @@
 <span class="sd">            The name of the feature occurring at the specified index.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_to_feature</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index_to_feature</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
-<div class="viewcode-block" id="MultiFileSampler.sample"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fetches a mini-batch of the data from the sampler.</span>
 
@@ -451,11 +526,25 @@
 <span class="sd">        ----------</span>
 <span class="sd">        batch_size : int, optional</span>
 <span class="sd">            Default is 1. The size of the batch to retrieve.</span>
-
+<span class="sd">        mode : str, optional</span>
+<span class="sd">            Default is None. The operating mode that the object should run in.</span>
+<span class="sd">            If None, will use the current mode `self.mode`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span></div>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span> <span class="k">if</span> <span class="n">mode</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_batch_size</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
+                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">targets</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="c1">#If DataLoader iterator reaches its length, reinitialize</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
+                <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">targets</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
-<div class="viewcode-block" id="MultiFileSampler.get_data_and_targets"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.get_data_and_targets">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_data_and_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method fetches a subset of the data from the sampler,</span>
 <span class="sd">        divided into batches. This method also allows the user to</span>
@@ -466,19 +555,45 @@
 <span class="sd">        ----------</span>
 <span class="sd">        batch_size : int</span>
 <span class="sd">            The size of the batches to divide the data into.</span>
-<span class="sd">        n_samples : int</span>
-<span class="sd">            The total number of samples to retrieve.</span>
+<span class="sd">        n_samples : int or None, optional</span>
+<span class="sd">            Default is None. The total number of samples to retrieve.</span>
+<span class="sd">            If `n_samples` is None, if a FileSampler is specified for the </span>
+<span class="sd">            mode, the number of samplers returned is defined by the FileSample, </span>
+<span class="sd">            or if a Dataloader is specified, will set `n_samples` to 32000 </span>
+<span class="sd">            if the mode is `validate`, or 640000 if the mode is `test`. </span>
+<span class="sd">            If the mode is `train` you must have specified a value for </span>
+<span class="sd">            `n_samples`.</span>
 <span class="sd">        mode : str, optional</span>
-<span class="sd">            Default is None. The operating mode that the sampler</span>
-<span class="sd">            should run in. If None, will use the current</span>
-<span class="sd">            `self.mode`.</span>
-
+<span class="sd">            Default is None. The operating mode that the object should run in.</span>
+<span class="sd">            If None, will use the current mode `self.mode`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
-            <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span></div>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span> <span class="k">if</span> <span class="n">mode</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;validate&#39;</span><span class="p">:</span>
+                    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">32000</span>
+                <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span>
+                    <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">640000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_batch_size</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+            <span class="n">data_and_targets</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">targets_mat</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">batch_size</span>
+            <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">n_samples</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+                <span class="n">data_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
+                <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="n">batch_size</span>
+            <span class="n">remainder</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">remainder</span><span class="p">)</span>
+            <span class="n">data_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
+            <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
+            <span class="n">targets_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">targets_mat</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data_and_targets</span><span class="p">,</span> <span class="n">targets_mat</span>
 
-<div class="viewcode-block" id="MultiFileSampler.get_validation_set"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.get_validation_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_validation_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_validation_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a subset of validation data from the</span>
 <span class="sd">        sampler, divided into batches.</span>
@@ -489,14 +604,37 @@
 <span class="sd">            The size of the batches to divide the data into.</span>
 <span class="sd">        n_samples : int, optional</span>
 <span class="sd">            Default is None. The total number of validation examples to</span>
-<span class="sd">            retrieve. Handling for `n_samples=None` should be done by</span>
-<span class="sd">            all classes that subclass `selene_sdk.samplers.Sampler`.</span>
+<span class="sd">            retrieve. If `n_samples` is None,</span>
+<span class="sd">            then if a FileSampler is specified for the &#39;validate&#39; mode, the</span>
+<span class="sd">            number of samplers returned is defined by the FileSample,</span>
+<span class="sd">            or if a Dataloader is specified, will set `n_samples` to</span>
+<span class="sd">            32000.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sequences_and_targets, targets_matrix : \</span>
+<span class="sd">        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)</span>
+<span class="sd">            Tuple containing the list of sequence-target pairs, as well</span>
+<span class="sd">            as a single matrix with all targets in the same order.</span>
+<span class="sd">            Note that `sequences_and_targets` sequence elements are of</span>
+<span class="sd">            the shape :math:`B \\times L \\times N` and its target</span>
+<span class="sd">            elements are of the shape :math:`B \\times F`, where</span>
+<span class="sd">            :math:`B` is `batch_size`, :math:`L` is the sequence length,</span>
+<span class="sd">            :math:`N` is the size of the sequence type&#39;s alphabet, and</span>
+<span class="sd">            :math:`F` is the number of features. Further,</span>
+<span class="sd">            `target_matrix` is of the shape :math:`S \\times F`, where</span>
+<span class="sd">            :math:`S = n_samples`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If no test partition of the data was specified during</span>
+<span class="sd">            sampler initialization.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="s2">&quot;validate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
-            <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;validate&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MultiFileSampler.get_test_set"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.get_test_set">[docs]</a>    <span class="k">def</span> <span class="nf">get_test_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_test_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method returns a subset of testing data from the</span>
 <span class="sd">        sampler, divided into batches.</span>
@@ -506,8 +644,12 @@
 <span class="sd">        batch_size : int</span>
 <span class="sd">            The size of the batches to divide the data into.</span>
 <span class="sd">        n_samples : int or None, optional</span>
-<span class="sd">            Default is `None`. The total number of validation examples</span>
-<span class="sd">            to retrieve. If `None`, 640000 examples are retrieved.</span>
+<span class="sd">            Default is None. The total number of test examples to</span>
+<span class="sd">            retrieve. If `n_samples` is None,</span>
+<span class="sd">            then if a FileSampler is specified for the &#39;test&#39; mode, the</span>
+<span class="sd">            number of samplers returned is defined by the FileSample,</span>
+<span class="sd">            or if a Dataloader is specified, will set `n_samples` to</span>
+<span class="sd">            640000.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -515,14 +657,14 @@
 <span class="sd">        tuple(list(tuple(numpy.ndarray, numpy.ndarray)), numpy.ndarray)</span>
 <span class="sd">            Tuple containing the list of sequence-target pairs, as well</span>
 <span class="sd">            as a single matrix with all targets in the same order.</span>
-<span class="sd">            Note that `sequences_and_targets`&#39;s sequence elements are of</span>
+<span class="sd">            Note that `sequences_and_targets` sequence elements are of</span>
 <span class="sd">            the shape :math:`B \\times L \\times N` and its target</span>
 <span class="sd">            elements are of the shape :math:`B \\times F`, where</span>
 <span class="sd">            :math:`B` is `batch_size`, :math:`L` is the sequence length,</span>
 <span class="sd">            :math:`N` is the size of the sequence type&#39;s alphabet, and</span>
 <span class="sd">            :math:`F` is the number of features. Further,</span>
 <span class="sd">            `target_matrix` is of the shape :math:`S \\times F`, where</span>
-<span class="sd">            :math:`S =` `n_samples`.</span>
+<span class="sd">            :math:`S = n_samples`.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -530,10 +672,10 @@
 <span class="sd">            If no test partition of the data was specified during</span>
 <span class="sd">            sampler initialization.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
-            <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_and_targets</span><span class="p">(</span>
+            <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MultiFileSampler.save_dataset_to_file"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler.save_dataset_to_file">[docs]</a>    <span class="k">def</span> <span class="nf">save_dataset_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">close_filehandle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">save_dataset_to_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">close_filehandle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        We implement this function in this class only because the</span>
 <span class="sd">        TrainModel class calls this method. In the future, we will</span>
@@ -553,7 +695,7 @@
 <span class="sd">            file and `save_dataset_to_file` will not be called with</span>
 <span class="sd">            `mode` again.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">None</span></div></div>
+        <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 
            </div>

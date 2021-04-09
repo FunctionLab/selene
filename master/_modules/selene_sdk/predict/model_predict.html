@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.predict.model_predict &mdash; Selene master documentation</title>
+  <title>selene_sdk.predict.model_predict &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -498,6 +498,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span> <span class="o">=</span> <span class="n">reference_sequence</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">_unpicklable_init</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="p">)</span> <span class="o">==</span> <span class="n">Genome</span> <span class="ow">and</span> \
                 <span class="n">_is_lua_trained_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
             <span class="n">Genome</span><span class="o">.</span><span class="n">update_bases_order</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">])</span>
@@ -712,6 +714,7 @@
 <span class="sd">            information (strand must be one of {&#39;+&#39;, &#39;-&#39;, &#39;.&#39;}). Specify</span>
 <span class="sd">            the index (0-based) to use it. Otherwise, by default &#39;+&#39; is used.</span>
 
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
@@ -739,17 +742,16 @@
         <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">coords</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">seq_coords</span><span class="p">)):</span>
             <span class="n">encoding</span><span class="p">,</span> <span class="n">contains_unk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_sequence</span><span class="o">.</span><span class="n">get_encoding_from_coords_check_unk</span><span class="p">(</span>
-                    <span class="o">*</span><span class="n">coords</span><span class="p">,</span>
-                    <span class="n">pad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="o">*</span><span class="n">coords</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sequences</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">i</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
-                <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
                 <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
+                <span class="n">sequences</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">*</span><span class="n">encoding</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
                 <span class="n">batch_ids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sequences</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">encoding</span>
             <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="o">+</span><span class="p">(</span><span class="n">contains_unk</span><span class="p">,))</span>
-            <span class="n">sequences</span><span class="p">[</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">encoding</span>
             <span class="k">if</span> <span class="n">contains_unk</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;For region </span><span class="si">{0}</span><span class="s2">, &quot;</span>
                                <span class="s2">&quot;reference sequence contains unknown &quot;</span>
@@ -757,12 +759,11 @@
                                <span class="s2">&quot;`contains_unk` column of the .tsv or &quot;</span>
                                <span class="s2">&quot;row_labels .txt file.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">batch_ids</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
-            <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
-            <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
-
+        <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
+        <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
         <span class="n">reporter</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="AnalyzeSequences.get_predictions_for_fasta_file"><a class="viewcode-back" href="../../../predict.html#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_predictions_for_fasta_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                        <span class="n">input_path</span><span class="p">,</span>
@@ -838,10 +839,9 @@
             <span class="n">batch_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">fasta_record</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
             <span class="n">sequences</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cur_sequence_encoding</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="n">batch_ids</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
-            <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
-            <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
+        <span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[:</span><span class="n">i</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="n">preds</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">sequences</span><span class="p">,</span> <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">)</span>
+        <span class="n">reporter</span><span class="o">.</span><span class="n">handle_batch_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">batch_ids</span><span class="p">)</span>
 
         <span class="n">fasta_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">reporter</span><span class="o">.</span><span class="n">write_to_file</span><span class="p">()</span></div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk.targets &mdash; Selene master documentation</title>
+  <title>selene_sdk.targets &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -354,7 +354,7 @@ Target features classes are classes which define a way to access a
 <h2>GenomicFeatures<a class="headerlink" href="#genomicfeatures" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="selene_sdk.targets.GenomicFeatures">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.targets.</span></code><code class="sig-name descname"><span class="pre">GenomicFeatures</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_thresholds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.targets.</span></code><code class="sig-name descname"><span class="pre">GenomicFeatures</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_thresholds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_unpicklable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/targets/genomic_features.html#GenomicFeatures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.targets.GenomicFeatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.targets.target.Target</span></code></p>
 <p>Stores the dataset specifying sequence regions and features.
 Accepts a tabix-indexed <cite>*.bed</cite> file with the following columns,
@@ -385,6 +385,12 @@ the threshold specified for that feature.</p>
 <li><p><cite>types.FunctionType</cite> - define a function that takes as                                  input the feature name and returns                                 the feature’s threshold.</p></li>
 </ul>
 </li>
+<li><p><strong>init_unpicklable</strong> (<em>bool, optional</em>) – Default is False. Delays initialization until a relevant method
+is called. This enables the object to be pickled after instantiation.
+<cite>init_unpicklable</cite> must be <cite>False</cite> when multi-processing is needed e.g.
+DataLoader. Set <cite>init_unpicklable</cite> to True if you are using this class
+directly through Selene’s API and want to access class attributes
+without having to call on a specific method in GenomicFeatures.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>

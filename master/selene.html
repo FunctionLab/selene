@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>selene_sdk &mdash; Selene master documentation</title>
+  <title>selene_sdk &mdash; Selene 0.5.dev0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                master (0.4.8)
+                0.5.dev0
               </div>
             
           
@@ -333,7 +333,7 @@
 <h2>TrainModel<a class="headerlink" href="#trainmodel" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="selene_sdk.TrainModel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.</span></code><code class="sig-name descname"><span class="pre">TrainModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">data_sampler</span></em>, <em class="sig-param"><span class="pre">loss_criterion</span></em>, <em class="sig-param"><span class="pre">optimizer_class</span></em>, <em class="sig-param"><span class="pre">optimizer_kwargs</span></em>, <em class="sig-param"><span class="pre">batch_size</span></em>, <em class="sig-param"><span class="pre">max_steps</span></em>, <em class="sig-param"><span class="pre">report_stats_every_n_steps</span></em>, <em class="sig-param"><span class="pre">output_dir</span></em>, <em class="sig-param"><span class="pre">save_checkpoint_every_n_steps=1000</span></em>, <em class="sig-param"><span class="pre">save_new_checkpoints_after_n_steps=None</span></em>, <em class="sig-param"><span class="pre">report_gt_feature_n_positives=10</span></em>, <em class="sig-param"><span class="pre">n_validation_samples=None</span></em>, <em class="sig-param"><span class="pre">n_test_samples=None</span></em>, <em class="sig-param"><span class="pre">cpu_n_threads=1</span></em>, <em class="sig-param"><span class="pre">use_cuda=False</span></em>, <em class="sig-param"><span class="pre">data_parallel=False</span></em>, <em class="sig-param"><span class="pre">logging_verbosity=2</span></em>, <em class="sig-param"><span class="pre">checkpoint_resume=None</span></em>, <em class="sig-param"><span class="pre">metrics={'average_precision':</span> <span class="pre">&lt;function</span> <span class="pre">average_precision_score&gt;</span></em>, <em class="sig-param"><span class="pre">'roc_auc':</span> <span class="pre">&lt;function</span> <span class="pre">roc_auc_score&gt;}</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.</span></code><code class="sig-name descname"><span class="pre">TrainModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">data_sampler</span></em>, <em class="sig-param"><span class="pre">loss_criterion</span></em>, <em class="sig-param"><span class="pre">optimizer_class</span></em>, <em class="sig-param"><span class="pre">optimizer_kwargs</span></em>, <em class="sig-param"><span class="pre">batch_size</span></em>, <em class="sig-param"><span class="pre">max_steps</span></em>, <em class="sig-param"><span class="pre">report_stats_every_n_steps</span></em>, <em class="sig-param"><span class="pre">output_dir</span></em>, <em class="sig-param"><span class="pre">save_checkpoint_every_n_steps=1000</span></em>, <em class="sig-param"><span class="pre">save_new_checkpoints_after_n_steps=None</span></em>, <em class="sig-param"><span class="pre">report_gt_feature_n_positives=10</span></em>, <em class="sig-param"><span class="pre">n_validation_samples=None</span></em>, <em class="sig-param"><span class="pre">n_test_samples=None</span></em>, <em class="sig-param"><span class="pre">cpu_n_threads=1</span></em>, <em class="sig-param"><span class="pre">use_cuda=False</span></em>, <em class="sig-param"><span class="pre">data_parallel=False</span></em>, <em class="sig-param"><span class="pre">logging_verbosity=2</span></em>, <em class="sig-param"><span class="pre">checkpoint_resume=None</span></em>, <em class="sig-param"><span class="pre">metrics={'average_precision':</span> <span class="pre">&lt;function</span> <span class="pre">average_precision_score&gt;</span></em>, <em class="sig-param"><span class="pre">'roc_auc':</span> <span class="pre">&lt;function</span> <span class="pre">roc_auc_score&gt;}</span></em>, <em class="sig-param"><span class="pre">use_scheduler=True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class ties together the various objects and methods needed to
 train and validate a model.</p>
@@ -382,7 +382,7 @@ validation set. If <cite>n_validation_samples</cite> is <cite>None</cite> and th
 used is the <cite>selene_sdk.samplers.IntervalsSampler</cite> or
 <cite>selene_sdk.samplers.RandomSampler</cite>, we will retrieve 32000
 validation samples. If <cite>None</cite> and using
-<cite>selene_sdk.samplers.MultiFileSampler</cite>, we will use all
+<cite>selene_sdk.samplers.MultiSampler</cite>, we will use all
 available validation samples from the appropriate data file.</p></li>
 <li><p><strong>n_test_samples</strong> (<em>int or None, optional</em>) – Default is <cite>None</cite>. Specify the number of test samples in the test set.
 If <cite>n_test_samples</cite> is <cite>None</cite> and</p>
@@ -397,7 +397,7 @@ not have any test data.</p></li>
 (and the test partition exists), we will retrieve 640000 test
 samples.</p></li>
 <li><p>the sampler you use is of type
-<cite>selene_sdk.samplers.MultiFileSampler</cite> (and the test partition
+<cite>selene_sdk.samplers.MultiSampler</cite> (and the test partition
 exists), we will use all the test samples available in the
 appropriate data file.</p></li>
 </ul>
@@ -422,14 +422,17 @@ for torch to use during training.</p></li>
 <li><p><strong>checkpoint_resume</strong> (<em>str or None, optional</em>) – Default is <cite>None</cite>. If <cite>checkpoint_resume</cite> is not None, it should be the
 path to a model file generated by <cite>torch.save</cite> that can now be read
 using <cite>torch.load</cite>.</p></li>
+<li><p><strong>use_scheduler</strong> (<em>bool, optional</em>) – Default is <cite>True</cite>. If <cite>True</cite>, learning rate scheduler is used to
+reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler
+with patience=16 and factor=0.8 is used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitf645897 ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
+<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+git26116b3 ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
 <li><p><strong>~TrainModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
-<li><p><strong>~TrainModel.loss_criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
-<li><p><strong>~TrainModel.optimizer_class</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.9.0a0+gitf645897 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
+<li><p><strong>~TrainModel.criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
+<li><p><strong>~TrainModel.optimizer</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.9.0a0+git26116b3 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
 <li><p><strong>~TrainModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the mini-batch to use during training.</p></li>
 <li><p><strong>~TrainModel.max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</p></li>
 <li><p><strong>~TrainModel.nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The frequency with which to report summary statistics.</p></li>
@@ -437,11 +440,6 @@ using <cite>torch.load</cite>.</p></li>
 <li><p><strong>~TrainModel.use_cuda</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If <cite>True</cite>, use a CUDA-enabled GPU. If <cite>False</cite>, use the CPU.</p></li>
 <li><p><strong>~TrainModel.data_parallel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to use multiple GPUs or not.</p></li>
 <li><p><strong>~TrainModel.output_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The directory to save model checkpoints and logs.</p></li>
-<li><p><strong>~TrainModel.training_loss</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>)</em>) – The current training loss.</p></li>
-<li><p><strong>~TrainModel.metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – A dictionary that maps metric names (<cite>str</cite>) to metric functions.
-By default, this contains <cite>“roc_auc”</cite>, which maps to
-<cite>sklearn.metrics.roc_auc_score</cite>, and <cite>“average_precision”</cite>,
-which maps to <cite>sklearn.metrics.average_precision_score</cite>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -549,7 +547,7 @@ a subset of <cite>features</cite>, and in the order you want the resulting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitf645897 ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
+<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+git26116b3 ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
 <li><p><strong>~EvaluateModel.criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</p></li>
 <li><p><strong>~EvaluateModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
 <li><p><strong>~EvaluateModel.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</p></li>
