@@ -9,6 +9,10 @@ Selene documentation
 Welcome! This is the documentation for Selene, a PyTorch-based deep learning library for sequence-level data.
 The Github repository is located `here <https://github.com/FunctionLab/selene>`_.
 
+The documentation here corresponds to the latest version of Selene (i.e. up-to-date with `master`). 
+You can view the documentation for Selene `version 0.4.8 here`<http://selene.flatironinstitute.org/0.4.8/>`,
+and we will add other older versions of the library docs to the website soon. 
+
 .. toctree::
    :glob:
    :maxdepth: 1

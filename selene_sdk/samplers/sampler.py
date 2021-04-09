@@ -98,7 +98,7 @@ class Sampler(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def sample(self, batch_size=1):
+    def sample(self, batch_size=1, mode=None):
         """
         Fetches a mini-batch of the data from the sampler.
 
@@ -106,7 +106,9 @@ class Sampler(metaclass=ABCMeta):
         ----------
         batch_size : int, optional
             Default is 1. The size of the batch to retrieve.
-
+        mode : str, optional
+            Default is None. The operating mode that the object should run in.
+            If None, will use the current mode `self.mode`.
         """
         raise NotImplementedError()
 
@@ -160,8 +162,8 @@ class Sampler(metaclass=ABCMeta):
         batch_size : int
             The size of the batches to divide the data into.
         n_samples : int or None, optional
-            Default is `None`. The total number of validation examples
-            to retrieve. If `None`, 640000 examples are retrieved.
+            Default is `None`. Handling for `n_samples=None` should be done
+            by all classes that subclass `selene_sdk.samplers.Sampler`.
 
         Returns
         -------

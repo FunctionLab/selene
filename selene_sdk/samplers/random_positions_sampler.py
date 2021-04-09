@@ -10,6 +10,7 @@ import random
 
 import numpy as np
 
+from functools import wraps
 from .online_sampler import OnlineSampler
 from ..utils import get_indices_and_probabilities
 
@@ -110,13 +111,6 @@ class RandomPositionsSampler(OnlineSampler):
         documentation for `validation_holdout` for more details.
     sequence_length : int
         The length of the sequences to  train the model on.
-    bin_radius : int
-        From the center of the sequence, the radius in which to detect
-        a feature annotation in order to include it as a sample's label.
-    surrounding_sequence_radius : int
-        The length of sequence falling outside of the feature detection
-        bin (i.e. `bin_radius`) center, but still within the
-        `sequence_length`.
     modes : list(str)
         The list of modes that the sampler can be run in.
     mode : str
@@ -159,14 +153,24 @@ class RandomPositionsSampler(OnlineSampler):
 
         self.sample_from_intervals = []
         self.interval_lengths = []
+        self._initialized = False
 
-        if self._holdout_type == "chromosome":
-            self._partition_genome_by_chromosome()
-        else:
-            self._partition_genome_by_proportion()
+    def init(func):
+        # delay initialization to allow  multiprocessing
+        @wraps(func)
+        def dfunc(self, *args, **kwargs):
+            if not self._initialized:
+                if self._holdout_type == "chromosome":
+                    self._partition_genome_by_chromosome()
+                else:
+                     self._partition_genome_by_proportion()
 
-        for mode in self.modes:
-            self._update_randcache(mode=mode)
+                for mode in self.modes:
+                    self._update_randcache(mode=mode)
+                self._initialized = True
+            return func(self, *args, **kwargs)
+        return dfunc
+
 
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
@@ -237,36 +241,27 @@ class RandomPositionsSampler(OnlineSampler):
         bin_end = position + self._end_radius
         retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
-        window_start = bin_start - self.surrounding_sequence_radius
-        window_end = bin_end + self.surrounding_sequence_radius
+        window_start = position - self._start_window_radius
+        window_end = position + self._end_window_radius
         if window_end - window_start < self.sequence_length:
             print(bin_start, bin_end,
                   self._start_radius, self._end_radius,
-                  self.surrounding_sequence_radius)
+                  self._start_window_radius, self._end_window_radius,)
             return None
         strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)
+
         if retrieved_seq.shape[0] == 0:
             logger.info("Full sequence centered at {0} position {1} "
                         "could not be retrieved. Sampling again.".format(
                             chrom, position))
             return None
-        elif np.sum(retrieved_seq) / float(retrieved_seq.shape[0]) < 0.60:
+        elif np.mean(retrieved_seq==0.25) > 0.30:
             logger.info("Over 30% of the bases in the sequence centered "
                         "at {0} position {1} are ambiguous ('N'). "
                         "Sampling again.".format(chrom, position))
-            return None
-
-        if retrieved_seq.shape[0] < self.sequence_length:
-            # TODO: remove after investigating this bug.
-            print("Warning: sequence retrieved for {0}, {1}, {2}, {3} "
-                  "had length less than required sequence length {4}. "
-                  "This bug will be investigated and addressed in the next "
-                  "version of Selene.".format(
-                      chrom, window_start, window_end, strand,
-                      self.sequence_length))
             return None
 
         if self.mode in self._save_datasets:
@@ -292,7 +287,8 @@ class RandomPositionsSampler(OnlineSampler):
             p=self._sample_from_mode[mode].weights)
         self._randcache[mode]["sample_next"] = 0
 
-    def sample(self, batch_size=1):
+    @init
+    def sample(self, batch_size=1, mode=None):
         """
         Randomly draws a mini-batch of examples and their corresponding
         labels.
@@ -302,6 +298,9 @@ class RandomPositionsSampler(OnlineSampler):
         batch_size : int, optional
             Default is 1. The number of examples to include in the
             mini-batch.
+        mode : str, optional
+            Default is None. The operating mode that the object should run in.
+            If None, will use the current mode `self.mode`.
 
         Returns
         -------
@@ -316,18 +315,19 @@ class RandomPositionsSampler(OnlineSampler):
             where :math:`F` is the number of features.
 
         """
+        mode = mode if mode else self.mode
         sequences = np.zeros((batch_size, self.sequence_length, 4))
         targets = np.zeros((batch_size, self.n_features))
         n_samples_drawn = 0
         while n_samples_drawn < batch_size:
-            sample_index = self._randcache[self.mode]["sample_next"]
-            if sample_index == len(self._randcache[self.mode]["cache_indices"]):
+            sample_index = self._randcache[mode]["sample_next"]
+            if sample_index == len(self._randcache[mode]["cache_indices"]):
                 self._update_randcache()
                 sample_index = 0
 
             rand_interval_index = \
-                self._randcache[self.mode]["cache_indices"][sample_index]
-            self._randcache[self.mode]["sample_next"] += 1
+                self._randcache[mode]["cache_indices"][sample_index]
+            self._randcache[mode]["sample_next"] += 1
 
             chrom, cstart, cend = \
                 self.sample_from_intervals[rand_interval_index]
