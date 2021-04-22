@@ -10,7 +10,7 @@ sampler: !obj:selene_sdk.samplers.RandomPositionsSampler {
         input_path:  /path/to/distinct_features.txt 
     },
     seed: 127,
-    output_dir: /path/to/output/ 
+    output_dir: /path/to/output/, 
     test_holdout: [chr8, chr9],
     validation_holdout: [chr6, chr7],
     sequence_length: 1000,
