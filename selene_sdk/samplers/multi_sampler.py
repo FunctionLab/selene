@@ -113,11 +113,14 @@ class MultiSampler(Sampler):
         self._index_to_feature = {i: f for (i, f) in enumerate(features)}
 
         if test_sampler is not None:
+            print('loading test sampler')
             self.modes.append("test")
             self._samplers["test"] = \
                 test_sampler if isinstance(test_sampler, Sampler) else None
             self._dataloaders["test"] = \
                 test_sampler if isinstance(test_sampler, DataLoader) else None
+            self._iterators["test"] = iter(self._dataloaders["test"]) \
+                if self._dataloaders["test"] else None
 
         self.mode = mode
 
@@ -232,11 +235,11 @@ class MultiSampler(Sampler):
             The size of the batches to divide the data into.
         n_samples : int or None, optional
             Default is None. The total number of samples to retrieve.
-            If `n_samples` is None, if a FileSampler is specified for the 
-            mode, the number of samplers returned is defined by the FileSample, 
-            or if a Dataloader is specified, will set `n_samples` to 32000 
-            if the mode is `validate`, or 640000 if the mode is `test`. 
-            If the mode is `train` you must have specified a value for 
+            If `n_samples` is None, if a FileSampler is specified for the
+            mode, the number of samplers returned is defined by the FileSample,
+            or if a Dataloader is specified, will set `n_samples` to 32000
+            if the mode is `validate`, or 640000 if the mode is `test`.
+            If the mode is `train` you must have specified a value for
             `n_samples`.
         mode : str, optional
             Default is None. The operating mode that the object should run in.
