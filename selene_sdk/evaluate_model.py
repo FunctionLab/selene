@@ -156,7 +156,10 @@ class EvaluateModel(object):
         # here. the current workaround is problematic, since
         # self._test_data still has the full featureset in it, and we
         # select the subset during `evaluate`
-        self._all_test_targets = self._all_test_targets[:, self._use_ixs]
+        print(self._all_test_targets.shape)
+        if self._all_test_targets.shape[1] != len(self._use_ixs):
+            self._all_test_targets = self._all_test_targets[:, self._use_ixs]
+            print('filtering')
 
         # reset Genome base ordering when applicable.
         if (hasattr(self.sampler, "reference_sequence") and
@@ -211,7 +214,9 @@ class EvaluateModel(object):
         all_predictions = []
         for (inputs, targets) in self._test_data:
             inputs = torch.Tensor(inputs)
-            targets = torch.Tensor(targets[:, self._use_ixs])
+            if targets.shape[1] != len(self._use_ixs):
+                targets = targets[:, self._use_ixs]
+            targets = torch.Tensor(targets)
 
             if self.use_cuda:
                 inputs = inputs.cuda()
