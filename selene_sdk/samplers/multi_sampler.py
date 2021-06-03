@@ -113,7 +113,6 @@ class MultiSampler(Sampler):
         self._index_to_feature = {i: f for (i, f) in enumerate(features)}
 
         if test_sampler is not None:
-            print('loading test sampler')
             self.modes.append("test")
             self._samplers["test"] = \
                 test_sampler if isinstance(test_sampler, Sampler) else None
