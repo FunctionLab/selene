@@ -303,13 +303,16 @@ def parse_configs_and_run(configs,
     """
     operations = configs["ops"]
 
-    if "train" in operations and "lr" not in configs and lr != "None":
+    if "train" in operations and "lr" not in configs and lr != None:
         configs["lr"] = float(lr)
-    elif "train" in operations and "lr" in configs and lr != "None":
+    elif "train" in operations and "lr" in configs and lr != None:
         print("Warning: learning rate specified in both the "
               "configuration dict and this method's `lr` parameter. "
               "Using the `lr` value input to `parse_configs_and_run` "
               "({0}, not {1}).".format(lr, configs["lr"]))
+    elif "train" in operations and "lr" not in configs and lr == None:
+        raise ValueError("Learning rate not specified, cannot "
+                         "fit model. Exiting.")
 
     current_run_output_dir = None
     if "output_dir" not in configs and \
