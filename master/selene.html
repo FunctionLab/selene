@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>selene_sdk &mdash; Selene 0.5.dev0 documentation</title>
@@ -23,6 +24,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -326,14 +328,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene_sdk">
+  <section id="module-selene_sdk">
 <span id="selene-sdk"></span><h1>selene_sdk<a class="headerlink" href="#module-selene_sdk" title="Permalink to this headline">¶</a></h1>
 <p>This is the main module for Selene.</p>
-<div class="section" id="trainmodel">
+<section id="trainmodel">
 <h2>TrainModel<a class="headerlink" href="#trainmodel" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="selene_sdk.TrainModel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.</span></code><code class="sig-name descname"><span class="pre">TrainModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">data_sampler</span></em>, <em class="sig-param"><span class="pre">loss_criterion</span></em>, <em class="sig-param"><span class="pre">optimizer_class</span></em>, <em class="sig-param"><span class="pre">optimizer_kwargs</span></em>, <em class="sig-param"><span class="pre">batch_size</span></em>, <em class="sig-param"><span class="pre">max_steps</span></em>, <em class="sig-param"><span class="pre">report_stats_every_n_steps</span></em>, <em class="sig-param"><span class="pre">output_dir</span></em>, <em class="sig-param"><span class="pre">save_checkpoint_every_n_steps=1000</span></em>, <em class="sig-param"><span class="pre">save_new_checkpoints_after_n_steps=None</span></em>, <em class="sig-param"><span class="pre">report_gt_feature_n_positives=10</span></em>, <em class="sig-param"><span class="pre">n_validation_samples=None</span></em>, <em class="sig-param"><span class="pre">n_test_samples=None</span></em>, <em class="sig-param"><span class="pre">cpu_n_threads=1</span></em>, <em class="sig-param"><span class="pre">use_cuda=False</span></em>, <em class="sig-param"><span class="pre">data_parallel=False</span></em>, <em class="sig-param"><span class="pre">logging_verbosity=2</span></em>, <em class="sig-param"><span class="pre">checkpoint_resume=None</span></em>, <em class="sig-param"><span class="pre">metrics={'average_precision':</span> <span class="pre">&lt;function</span> <span class="pre">average_precision_score&gt;</span></em>, <em class="sig-param"><span class="pre">'roc_auc':</span> <span class="pre">&lt;function</span> <span class="pre">roc_auc_score&gt;}</span></em>, <em class="sig-param"><span class="pre">use_scheduler=True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.TrainModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.</span></span><span class="sig-name descname"><span class="pre">TrainModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">data_sampler</span></em>, <em class="sig-param"><span class="pre">loss_criterion</span></em>, <em class="sig-param"><span class="pre">optimizer_class</span></em>, <em class="sig-param"><span class="pre">optimizer_kwargs</span></em>, <em class="sig-param"><span class="pre">batch_size</span></em>, <em class="sig-param"><span class="pre">max_steps</span></em>, <em class="sig-param"><span class="pre">report_stats_every_n_steps</span></em>, <em class="sig-param"><span class="pre">output_dir</span></em>, <em class="sig-param"><span class="pre">save_checkpoint_every_n_steps=1000</span></em>, <em class="sig-param"><span class="pre">save_new_checkpoints_after_n_steps=None</span></em>, <em class="sig-param"><span class="pre">report_gt_feature_n_positives=10</span></em>, <em class="sig-param"><span class="pre">n_validation_samples=None</span></em>, <em class="sig-param"><span class="pre">n_test_samples=None</span></em>, <em class="sig-param"><span class="pre">cpu_n_threads=1</span></em>, <em class="sig-param"><span class="pre">use_cuda=False</span></em>, <em class="sig-param"><span class="pre">data_parallel=False</span></em>, <em class="sig-param"><span class="pre">logging_verbosity=2</span></em>, <em class="sig-param"><span class="pre">checkpoint_resume=None</span></em>, <em class="sig-param"><span class="pre">metrics={'average_precision':</span> <span class="pre">&lt;function</span> <span class="pre">average_precision_score&gt;</span></em>, <em class="sig-param"><span class="pre">'roc_auc':</span> <span class="pre">&lt;function</span> <span class="pre">roc_auc_score&gt;}</span></em>, <em class="sig-param"><span class="pre">use_scheduler=True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class ties together the various objects and methods needed to
 train and validate a model.</p>
@@ -429,10 +431,10 @@ with patience=16 and factor=0.8 is used.</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitc797492 ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
+<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitabca349 ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
 <li><p><strong>~TrainModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
 <li><p><strong>~TrainModel.criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
-<li><p><strong>~TrainModel.optimizer</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.9.0a0+gitc797492 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
+<li><p><strong>~TrainModel.optimizer</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.9.0a0+gitabca349 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
 <li><p><strong>~TrainModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the mini-batch to use during training.</p></li>
 <li><p><strong>~TrainModel.max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</p></li>
 <li><p><strong>~TrainModel.nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The frequency with which to report summary statistics.</p></li>
@@ -444,8 +446,8 @@ with patience=16 and factor=0.8 is used.</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="selene_sdk.TrainModel.create_test_set">
-<code class="sig-name descname"><span class="pre">create_test_set</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.create_test_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.create_test_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.TrainModel.create_test_set">
+<span class="sig-name descname"><span class="pre">create_test_set</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.create_test_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.create_test_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads the set of test samples.
 We do not create the test set in the <cite>TrainModel</cite> object until
 this method is called, so that we avoid having to load it into
@@ -454,8 +456,8 @@ evaluated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.TrainModel.evaluate">
-<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.TrainModel.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures the model test performance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -470,8 +472,8 @@ the test set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.TrainModel.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.TrainModel.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.train" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model on a batch of data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -484,14 +486,14 @@ the test set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.TrainModel.train_and_validate">
-<code class="sig-name descname"><span class="pre">train_and_validate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train_and_validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.train_and_validate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.TrainModel.train_and_validate">
+<span class="sig-name descname"><span class="pre">train_and_validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.train_and_validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.train_and_validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Trains the model and measures validation performance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.TrainModel.validate">
-<code class="sig-name descname"><span class="pre">validate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.validate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.TrainModel.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/train_model.html#TrainModel.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.TrainModel.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures model validation performance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -507,12 +509,12 @@ the validation set.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="evaluatemodel">
+</section>
+<section id="evaluatemodel">
 <h2>EvaluateModel<a class="headerlink" href="#evaluatemodel" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="selene_sdk.EvaluateModel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.</span></code><code class="sig-name descname"><span class="pre">EvaluateModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_sampler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trained_model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_gt_feature_n_positives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_features_ord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.EvaluateModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.EvaluateModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.</span></span><span class="sig-name descname"><span class="pre">EvaluateModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_sampler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trained_model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_test_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_gt_feature_n_positives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_features_ord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.EvaluateModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Evaluate model on a test set of sequences with known targets.</p>
 <dl class="field-list simple">
@@ -547,7 +549,7 @@ a subset of <cite>features</cite>, and in the order you want the resulting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitc797492 ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
+<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitabca349 ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
 <li><p><strong>~EvaluateModel.criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</p></li>
 <li><p><strong>~EvaluateModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
 <li><p><strong>~EvaluateModel.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</p></li>
@@ -558,8 +560,8 @@ a subset of <cite>features</cite>, and in the order you want the resulting
 </dd>
 </dl>
 <dl class="py method">
-<dt id="selene_sdk.EvaluateModel.evaluate">
-<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.EvaluateModel.evaluate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.EvaluateModel.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/evaluate_model.html#EvaluateModel.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.EvaluateModel.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Passes all samples retrieved from the sampler to the model in
 batches and returns the predictions. Also reports the model’s
 performance on these examples.</p>
@@ -577,8 +579,8 @@ AUPR) reported for each feature the model predicts.</p>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

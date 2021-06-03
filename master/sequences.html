@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>selene_sdk.sequences &mdash; Selene 0.5.dev0 documentation</title>
@@ -23,10 +24,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -327,19 +329,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene_sdk.sequences">
+  <section id="module-selene_sdk.sequences">
 <span id="selene-sdk-sequences"></span><h1>selene_sdk.sequences<a class="headerlink" href="#module-selene_sdk.sequences" title="Permalink to this headline">¶</a></h1>
 <p>This module provides the types for representing biological sequences.</p>
-<div class="section" id="sequence">
+<section id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="selene_sdk.sequences.Sequence">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">Sequence</span></code><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></span><span class="sig-name descname"><span class="pre">Sequence</span></span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for biological sequence classes.</p>
-<dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.BASES_ARR">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">BASES_ARR</span></code><a class="headerlink" href="#selene_sdk.sequences.Sequence.BASES_ARR" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.BASES_ARR">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">BASES_ARR</span></span><a class="headerlink" href="#selene_sdk.sequences.Sequence.BASES_ARR" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is an array with the alphabet (i.e. all possible symbols
 that may occur in a sequence). We expect that
 <cite>INDEX_TO_BASE[i]==BASES_ARR[i]</cite> is <cite>True</cite> for all valid <cite>i</cite>.</p>
@@ -353,9 +355,9 @@ that may occur in a sequence). We expect that
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.BASE_TO_INDEX">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">BASE_TO_INDEX</span></code><a class="headerlink" href="#selene_sdk.sequences.Sequence.BASE_TO_INDEX" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.BASE_TO_INDEX">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">BASE_TO_INDEX</span></span><a class="headerlink" href="#selene_sdk.sequences.Sequence.BASE_TO_INDEX" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping members of the alphabet (i.e. all
 possible symbols that can occur in a sequence) to integers.</p>
 <dl class="field-list simple">
@@ -368,9 +370,9 @@ possible symbols that can occur in a sequence) to integers.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.INDEX_TO_BASE">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">INDEX_TO_BASE</span></code><a class="headerlink" href="#selene_sdk.sequences.Sequence.INDEX_TO_BASE" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.INDEX_TO_BASE">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">INDEX_TO_BASE</span></span><a class="headerlink" href="#selene_sdk.sequences.Sequence.INDEX_TO_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping integers to members of the alphabet (i.e.
 all possible symbols that can occur in a sequence). We expect
 that <cite>INDEX_TO_BASE[i]==BASES_ARR[i]</cite> is <cite>True</cite> for all
@@ -385,9 +387,9 @@ valid <cite>i</cite>.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.UNK_BASE">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">UNK_BASE</span></code><a class="headerlink" href="#selene_sdk.sequences.Sequence.UNK_BASE" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.UNK_BASE">
+<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">UNK_BASE</span></span><a class="headerlink" href="#selene_sdk.sequences.Sequence.UNK_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a base used to represent unknown positions. This is not
 the same as a character from outside the sequence’s alphabet. A
 character from outside the alphabet is an error. A position with
@@ -404,8 +406,8 @@ from the alphabet, but we are uncertain which.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.coords_in_bounds">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">coords_in_bounds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.coords_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.coords_in_bounds">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">coords_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.coords_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if queried coordinates are valid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -418,8 +420,8 @@ from the alphabet, but we are uncertain which.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.encoding_to_sequence">
-<em class="property"><span class="pre">abstract</span> <span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">encoding_to_sequence</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.encoding_to_sequence">
+<em class="property"><span class="pre">abstract</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">encoding_to_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transforms the input numerical representation of a sequence
 into a string representation.</p>
 <dl class="field-list simple">
@@ -439,8 +441,8 @@ sequence will be of length <span class="math notranslate nohighlight">\(L\)</spa
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.get_encoding_from_coords">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_encoding_from_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.get_encoding_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.get_encoding_from_coords">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_encoding_from_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.get_encoding_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the numerical encoding for a sequence occurring at
 the given coordinates.</p>
 <dl class="field-list simple">
@@ -457,8 +459,8 @@ alphabet. Behavior is undefined for invalid coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.get_sequence_from_coords">
-<em class="property"><span class="pre">abstract</span> </em><code class="sig-name descname"><span class="pre">get_sequence_from_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.get_sequence_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.get_sequence_from_coords">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_sequence_from_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.get_sequence_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts a string representation of a sequence at the
 given coordinates.</p>
 <dl class="field-list simple">
@@ -475,8 +477,8 @@ invalid coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Sequence.sequence_to_encoding">
-<em class="property"><span class="pre">abstract</span> <span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">sequence_to_encoding</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Sequence.sequence_to_encoding">
+<em class="property"><span class="pre">abstract</span> <span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">sequence_to_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#Sequence.sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Sequence.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transforms a biological sequence into a numerical
 representation.</p>
 <dl class="field-list simple">
@@ -496,13 +498,13 @@ the size of the sequence type’s alphabet.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="genome">
+</section>
+<section id="genome">
 <h2>Genome<a class="headerlink" href="#genome" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="selene_sdk.sequences.Genome">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">Genome</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist_regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_unpicklable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.sequence.Sequence</span></code></p>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></span><span class="sig-name descname"><span class="pre">Genome</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist_regions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_unpicklable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.sequence.Sequence</span></code></a></p>
 <p>This class provides access to an organism’s genomic sequence.</p>
 <p>This class supports retrieving parts of the sequence and converting
 these parts into their one-hot encodings. It is essentially a
@@ -540,29 +542,29 @@ the length of said chromosome.</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Genome.BASES_ARR">
-<code class="sig-name descname"><span class="pre">BASES_ARR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['A',</span> <span class="pre">'C',</span> <span class="pre">'G',</span> <span class="pre">'T']</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.BASES_ARR" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.BASES_ARR">
+<span class="sig-name descname"><span class="pre">BASES_ARR</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['A',</span> <span class="pre">'C',</span> <span class="pre">'G',</span> <span class="pre">'T']</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.BASES_ARR" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is an array with the alphabet (i.e. all possible symbols
 that may occur in a sequence). We expect that
 <cite>INDEX_TO_BASE[i]==BASES_ARR[i]</cite> is <cite>True</cite> for all valid <cite>i</cite>.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Genome.BASE_TO_INDEX">
-<code class="sig-name descname"><span class="pre">BASE_TO_INDEX</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'A':</span> <span class="pre">0,</span> <span class="pre">'C':</span> <span class="pre">1,</span> <span class="pre">'G':</span> <span class="pre">2,</span> <span class="pre">'T':</span> <span class="pre">3,</span> <span class="pre">'a':</span> <span class="pre">0,</span> <span class="pre">'c':</span> <span class="pre">1,</span> <span class="pre">'g':</span> <span class="pre">2,</span> <span class="pre">'t':</span> <span class="pre">3}</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.BASE_TO_INDEX" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.BASE_TO_INDEX">
+<span class="sig-name descname"><span class="pre">BASE_TO_INDEX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'A':</span> <span class="pre">0,</span> <span class="pre">'C':</span> <span class="pre">1,</span> <span class="pre">'G':</span> <span class="pre">2,</span> <span class="pre">'T':</span> <span class="pre">3,</span> <span class="pre">'a':</span> <span class="pre">0,</span> <span class="pre">'c':</span> <span class="pre">1,</span> <span class="pre">'g':</span> <span class="pre">2,</span> <span class="pre">'t':</span> <span class="pre">3}</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.BASE_TO_INDEX" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping members of the alphabet (i.e. all
 possible symbols that can occur in a sequence) to integers.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Genome.COMPLEMENTARY_BASE_DICT">
-<code class="sig-name descname"><span class="pre">COMPLEMENTARY_BASE_DICT</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'A':</span> <span class="pre">'T',</span> <span class="pre">'C':</span> <span class="pre">'G',</span> <span class="pre">'G':</span> <span class="pre">'C',</span> <span class="pre">'N':</span> <span class="pre">'N',</span> <span class="pre">'T':</span> <span class="pre">'A',</span> <span class="pre">'a':</span> <span class="pre">'T',</span> <span class="pre">'c':</span> <span class="pre">'G',</span> <span class="pre">'g':</span> <span class="pre">'C',</span> <span class="pre">'n':</span> <span class="pre">'N',</span> <span class="pre">'t':</span> <span class="pre">'A'}</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.COMPLEMENTARY_BASE_DICT" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.COMPLEMENTARY_BASE_DICT">
+<span class="sig-name descname"><span class="pre">COMPLEMENTARY_BASE_DICT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'A':</span> <span class="pre">'T',</span> <span class="pre">'C':</span> <span class="pre">'G',</span> <span class="pre">'G':</span> <span class="pre">'C',</span> <span class="pre">'N':</span> <span class="pre">'N',</span> <span class="pre">'T':</span> <span class="pre">'A',</span> <span class="pre">'a':</span> <span class="pre">'T',</span> <span class="pre">'c':</span> <span class="pre">'G',</span> <span class="pre">'g':</span> <span class="pre">'C',</span> <span class="pre">'n':</span> <span class="pre">'N',</span> <span class="pre">'t':</span> <span class="pre">'A'}</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.COMPLEMENTARY_BASE_DICT" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping each base to its complementary base.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Genome.INDEX_TO_BASE">
-<code class="sig-name descname"><span class="pre">INDEX_TO_BASE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{0:</span> <span class="pre">'A',</span> <span class="pre">1:</span> <span class="pre">'C',</span> <span class="pre">2:</span> <span class="pre">'G',</span> <span class="pre">3:</span> <span class="pre">'T'}</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.INDEX_TO_BASE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.INDEX_TO_BASE">
+<span class="sig-name descname"><span class="pre">INDEX_TO_BASE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{0:</span> <span class="pre">'A',</span> <span class="pre">1:</span> <span class="pre">'C',</span> <span class="pre">2:</span> <span class="pre">'G',</span> <span class="pre">3:</span> <span class="pre">'T'}</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.INDEX_TO_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping integers to members of the alphabet (i.e.
 all possible symbols that can occur in a sequence). We expect
 that <cite>INDEX_TO_BASE[i]==BASES_ARR[i]</cite> is <cite>True</cite> for all
@@ -570,8 +572,8 @@ valid <cite>i</cite>.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Genome.UNK_BASE">
-<code class="sig-name descname"><span class="pre">UNK_BASE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'N'</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.UNK_BASE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.UNK_BASE">
+<span class="sig-name descname"><span class="pre">UNK_BASE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'N'</span></em><a class="headerlink" href="#selene_sdk.sequences.Genome.UNK_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a base used to represent unknown positions. This is not
 the same as a character from outside the sequence’s alphabet. A
 character from outside the alphabet is an error. A position with
@@ -580,8 +582,8 @@ from the alphabet, but we are uncertain which.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.coords_in_bounds">
-<code class="sig-name descname"><span class="pre">coords_in_bounds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.coords_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.coords_in_bounds">
+<span class="sig-name descname"><span class="pre">coords_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.coords_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the region we want to query is within the bounds of the
 queried chromosome and non-overlapping with blacklist regions
 (if given).</p>
@@ -604,8 +606,8 @@ in the input.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.encoding_to_sequence">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">encoding_to_sequence</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.encoding_to_sequence">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">encoding_to_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an input one-hot encoding to its DNA sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -623,8 +625,8 @@ input array.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.get_chr_lens">
-<code class="sig-name descname"><span class="pre">get_chr_lens</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_chr_lens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_chr_lens" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.get_chr_lens">
+<span class="sig-name descname"><span class="pre">get_chr_lens</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_chr_lens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_chr_lens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the name and length of each chromosome sequence in the file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -637,8 +639,8 @@ input array.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.get_chrs">
-<code class="sig-name descname"><span class="pre">get_chrs</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_chrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_chrs" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.get_chrs">
+<span class="sig-name descname"><span class="pre">get_chrs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_chrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_chrs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the list of chromosome names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -651,8 +653,8 @@ input array.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.get_encoding_from_coords">
-<code class="sig-name descname"><span class="pre">get_encoding_from_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.get_encoding_from_coords">
+<span class="sig-name descname"><span class="pre">get_encoding_from_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the one-hot encoding of the genomic sequence at the
 queried coordinates.</p>
 <dl class="field-list simple">
@@ -662,7 +664,7 @@ queried coordinates.</p>
 <li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the first position in the
 sequence.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
-<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+<li><p><strong>strand</strong> (<em>{‘+’, ‘-’, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
 treated as ‘+’.</p></li>
 <li><p><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
 and/or <cite>end</cite> are out of bounds to return a sequence of length
@@ -689,8 +691,8 @@ region. In these cases, it will return an empty encoding–that is,
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk">
-<code class="sig-name descname"><span class="pre">get_encoding_from_coords_check_unk</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords_check_unk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk">
+<span class="sig-name descname"><span class="pre">get_encoding_from_coords_check_unk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_encoding_from_coords_check_unk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_encoding_from_coords_check_unk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the one-hot encoding of the genomic sequence at the
 queried coordinates and check whether the sequence contains
 unknown base(s).</p>
@@ -701,7 +703,7 @@ unknown base(s).</p>
 <li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the first position in the
 sequence.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
-<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+<li><p><strong>strand</strong> (<em>{‘+’, ‘-’, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
 treated as ‘+’.</p></li>
 <li><p><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
 and/or <cite>end</cite> are out of bounds to return a sequence of length
@@ -734,8 +736,8 @@ sequence contains any unknown base(s) specified in self.UNK_BASE</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.get_sequence_from_coords">
-<code class="sig-name descname"><span class="pre">get_sequence_from_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_sequence_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.get_sequence_from_coords">
+<span class="sig-name descname"><span class="pre">get_sequence_from_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.get_sequence_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the queried chromosome’s sequence at the input coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -743,7 +745,7 @@ sequence contains any unknown base(s) specified in self.UNK_BASE</p>
 <li><p><strong>chrom</strong> (<em>str</em>) – The name of the chromosomes, e.g. “chr1”.</p></li>
 <li><p><strong>start</strong> (<em>int</em>) – The 0-based start coordinate of the sequence.</p></li>
 <li><p><strong>end</strong> (<em>int</em>) – One past the 0-based last position in the sequence.</p></li>
-<li><p><strong>strand</strong> (<em>{‘+’, ‘-‘, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
+<li><p><strong>strand</strong> (<em>{‘+’, ‘-’, ‘.’}, optional</em>) – Default is ‘+’. The strand the sequence is located on. ‘.’ is
 treated as ‘.’.</p></li>
 <li><p><strong>pad</strong> (<em>bool, optional</em>) – Default is <cite>False</cite>. Pad the output sequence with ‘N’ if <cite>start</cite>
 and/or <cite>end</cite> are out of bounds to return a sequence of length
@@ -770,8 +772,8 @@ if appropriate.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Genome.sequence_to_encoding">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">sequence_to_encoding</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Genome.sequence_to_encoding">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">sequence_to_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/genome.html#Genome.sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Genome.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an input sequence to its one-hot encoding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -788,13 +790,13 @@ if appropriate.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="proteome">
+</section>
+<section id="proteome">
 <h2>Proteome<a class="headerlink" href="#proteome" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="selene_sdk.sequences.Proteome">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">Proteome</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.sequence.Sequence</span></code></p>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></span><span class="sig-name descname"><span class="pre">Proteome</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#selene_sdk.sequences.Sequence" title="selene_sdk.sequences.sequence.Sequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">selene_sdk.sequences.sequence.Sequence</span></code></a></p>
 <p>Provides access to an organism’s proteomic sequence.</p>
 <p>It supports retrieving parts of the sequence and converting these
 parts into their one-hot encodings. It is essentially a wrapper
@@ -816,23 +818,23 @@ for all protein sequences in the proteome.</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Proteome.BASES_ARR">
-<code class="sig-name descname"><span class="pre">BASES_ARR</span></code><em class="property"> <span class="pre">=</span> <span class="pre">['A',</span> <span class="pre">'R',</span> <span class="pre">'N',</span> <span class="pre">'D',</span> <span class="pre">'C',</span> <span class="pre">'E',</span> <span class="pre">'Q',</span> <span class="pre">'G',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'L',</span> <span class="pre">'K',</span> <span class="pre">'M',</span> <span class="pre">'F',</span> <span class="pre">'P',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'W',</span> <span class="pre">'Y',</span> <span class="pre">'V']</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.BASES_ARR" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.BASES_ARR">
+<span class="sig-name descname"><span class="pre">BASES_ARR</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['A',</span> <span class="pre">'R',</span> <span class="pre">'N',</span> <span class="pre">'D',</span> <span class="pre">'C',</span> <span class="pre">'E',</span> <span class="pre">'Q',</span> <span class="pre">'G',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'L',</span> <span class="pre">'K',</span> <span class="pre">'M',</span> <span class="pre">'F',</span> <span class="pre">'P',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'W',</span> <span class="pre">'Y',</span> <span class="pre">'V']</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.BASES_ARR" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is an array with the alphabet (i.e. all possible symbols
 that may occur in a sequence). We expect that
 <cite>INDEX_TO_BASE[i]==BASES_ARR[i]</cite> is <cite>True</cite> for all valid <cite>i</cite>.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Proteome.BASE_TO_INDEX">
-<code class="sig-name descname"><span class="pre">BASE_TO_INDEX</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{'A':</span> <span class="pre">0,</span> <span class="pre">'C':</span> <span class="pre">4,</span> <span class="pre">'D':</span> <span class="pre">3,</span> <span class="pre">'E':</span> <span class="pre">5,</span> <span class="pre">'F':</span> <span class="pre">13,</span> <span class="pre">'G':</span> <span class="pre">7,</span> <span class="pre">'H':</span> <span class="pre">8,</span> <span class="pre">'I':</span> <span class="pre">9,</span> <span class="pre">'K':</span> <span class="pre">11,</span> <span class="pre">'L':</span> <span class="pre">10,</span> <span class="pre">'M':</span> <span class="pre">12,</span> <span class="pre">'N':</span> <span class="pre">2,</span> <span class="pre">'P':</span> <span class="pre">14,</span> <span class="pre">'Q':</span> <span class="pre">6,</span> <span class="pre">'R':</span> <span class="pre">1,</span> <span class="pre">'S':</span> <span class="pre">15,</span> <span class="pre">'T':</span> <span class="pre">16,</span> <span class="pre">'V':</span> <span class="pre">19,</span> <span class="pre">'W':</span> <span class="pre">17,</span> <span class="pre">'Y':</span> <span class="pre">18}</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.BASE_TO_INDEX" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.BASE_TO_INDEX">
+<span class="sig-name descname"><span class="pre">BASE_TO_INDEX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{'A':</span> <span class="pre">0,</span> <span class="pre">'C':</span> <span class="pre">4,</span> <span class="pre">'D':</span> <span class="pre">3,</span> <span class="pre">'E':</span> <span class="pre">5,</span> <span class="pre">'F':</span> <span class="pre">13,</span> <span class="pre">'G':</span> <span class="pre">7,</span> <span class="pre">'H':</span> <span class="pre">8,</span> <span class="pre">'I':</span> <span class="pre">9,</span> <span class="pre">'K':</span> <span class="pre">11,</span> <span class="pre">'L':</span> <span class="pre">10,</span> <span class="pre">'M':</span> <span class="pre">12,</span> <span class="pre">'N':</span> <span class="pre">2,</span> <span class="pre">'P':</span> <span class="pre">14,</span> <span class="pre">'Q':</span> <span class="pre">6,</span> <span class="pre">'R':</span> <span class="pre">1,</span> <span class="pre">'S':</span> <span class="pre">15,</span> <span class="pre">'T':</span> <span class="pre">16,</span> <span class="pre">'V':</span> <span class="pre">19,</span> <span class="pre">'W':</span> <span class="pre">17,</span> <span class="pre">'Y':</span> <span class="pre">18}</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.BASE_TO_INDEX" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping members of the alphabet (i.e. all
 possible symbols that can occur in a sequence) to integers.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Proteome.INDEX_TO_BASE">
-<code class="sig-name descname"><span class="pre">INDEX_TO_BASE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{0:</span> <span class="pre">'A',</span> <span class="pre">1:</span> <span class="pre">'R',</span> <span class="pre">2:</span> <span class="pre">'N',</span> <span class="pre">3:</span> <span class="pre">'D',</span> <span class="pre">4:</span> <span class="pre">'C',</span> <span class="pre">5:</span> <span class="pre">'E',</span> <span class="pre">6:</span> <span class="pre">'Q',</span> <span class="pre">7:</span> <span class="pre">'G',</span> <span class="pre">8:</span> <span class="pre">'H',</span> <span class="pre">9:</span> <span class="pre">'I',</span> <span class="pre">10:</span> <span class="pre">'L',</span> <span class="pre">11:</span> <span class="pre">'K',</span> <span class="pre">12:</span> <span class="pre">'M',</span> <span class="pre">13:</span> <span class="pre">'F',</span> <span class="pre">14:</span> <span class="pre">'P',</span> <span class="pre">15:</span> <span class="pre">'S',</span> <span class="pre">16:</span> <span class="pre">'T',</span> <span class="pre">17:</span> <span class="pre">'W',</span> <span class="pre">18:</span> <span class="pre">'Y',</span> <span class="pre">19:</span> <span class="pre">'V'}</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.INDEX_TO_BASE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.INDEX_TO_BASE">
+<span class="sig-name descname"><span class="pre">INDEX_TO_BASE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{0:</span> <span class="pre">'A',</span> <span class="pre">1:</span> <span class="pre">'R',</span> <span class="pre">2:</span> <span class="pre">'N',</span> <span class="pre">3:</span> <span class="pre">'D',</span> <span class="pre">4:</span> <span class="pre">'C',</span> <span class="pre">5:</span> <span class="pre">'E',</span> <span class="pre">6:</span> <span class="pre">'Q',</span> <span class="pre">7:</span> <span class="pre">'G',</span> <span class="pre">8:</span> <span class="pre">'H',</span> <span class="pre">9:</span> <span class="pre">'I',</span> <span class="pre">10:</span> <span class="pre">'L',</span> <span class="pre">11:</span> <span class="pre">'K',</span> <span class="pre">12:</span> <span class="pre">'M',</span> <span class="pre">13:</span> <span class="pre">'F',</span> <span class="pre">14:</span> <span class="pre">'P',</span> <span class="pre">15:</span> <span class="pre">'S',</span> <span class="pre">16:</span> <span class="pre">'T',</span> <span class="pre">17:</span> <span class="pre">'W',</span> <span class="pre">18:</span> <span class="pre">'Y',</span> <span class="pre">19:</span> <span class="pre">'V'}</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.INDEX_TO_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary mapping integers to members of the alphabet (i.e.
 all possible symbols that can occur in a sequence). We expect
 that <cite>INDEX_TO_BASE[i]==BASES_ARR[i]</cite> is <cite>True</cite> for all
@@ -840,8 +842,8 @@ valid <cite>i</cite>.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="selene_sdk.sequences.Proteome.UNK_BASE">
-<code class="sig-name descname"><span class="pre">UNK_BASE</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'X'</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.UNK_BASE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.UNK_BASE">
+<span class="sig-name descname"><span class="pre">UNK_BASE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'X'</span></em><a class="headerlink" href="#selene_sdk.sequences.Proteome.UNK_BASE" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a base used to represent unknown positions. This is not
 the same as a character from outside the sequence’s alphabet. A
 character from outside the alphabet is an error. A position with
@@ -850,8 +852,8 @@ from the alphabet, but we are uncertain which.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.coords_in_bounds">
-<code class="sig-name descname"><span class="pre">coords_in_bounds</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.coords_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.coords_in_bounds">
+<span class="sig-name descname"><span class="pre">coords_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.coords_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.coords_in_bounds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if the coordinates we want to query is valid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -873,8 +875,8 @@ the queried coordinates.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.encoding_to_sequence">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">encoding_to_sequence</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.encoding_to_sequence">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">encoding_to_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an input one-hot encoding to its amino acid sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -892,8 +894,8 @@ input array.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.get_encoding_from_coords">
-<code class="sig-name descname"><span class="pre">get_encoding_from_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_encoding_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.get_encoding_from_coords">
+<span class="sig-name descname"><span class="pre">get_encoding_from_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_encoding_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_encoding_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the one-hot encoding of the protein’s sequence at the
 input coordinates.</p>
 <dl class="field-list simple">
@@ -916,8 +918,8 @@ sequence.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.get_prot_lens">
-<code class="sig-name descname"><span class="pre">get_prot_lens</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_prot_lens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_prot_lens" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.get_prot_lens">
+<span class="sig-name descname"><span class="pre">get_prot_lens</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_prot_lens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_prot_lens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the name and length of each protein sequence in the file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -930,8 +932,8 @@ sequence.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.get_prots">
-<code class="sig-name descname"><span class="pre">get_prots</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_prots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_prots" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.get_prots">
+<span class="sig-name descname"><span class="pre">get_prots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_prots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_prots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the list of protein names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -944,8 +946,8 @@ sequence.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.get_sequence_from_coords">
-<code class="sig-name descname"><span class="pre">get_sequence_from_coords</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_sequence_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.get_sequence_from_coords">
+<span class="sig-name descname"><span class="pre">get_sequence_from_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.get_sequence_from_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.get_sequence_from_coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the queried protein sequence at the input coordinates.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -967,8 +969,8 @@ coordinates, where <span class="math notranslate nohighlight">\(L = end - start\
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.sequences.Proteome.sequence_to_encoding">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">sequence_to_encoding</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.Proteome.sequence_to_encoding">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">sequence_to_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/proteome.html#Proteome.sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.Proteome.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an input sequence to its one-hot encoding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -986,12 +988,12 @@ the input sequence.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="sequence-to-encoding">
+</section>
+<section id="sequence-to-encoding">
 <h2>sequence_to_encoding<a class="headerlink" href="#sequence-to-encoding" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="selene_sdk.sequences.sequence_to_encoding">
-<code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">sequence_to_encoding</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_to_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.sequence_to_encoding">
+<span class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></span><span class="sig-name descname"><span class="pre">sequence_to_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_to_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#sequence_to_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.sequence_to_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts an input sequence to its one-hot encoding.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1019,12 +1021,12 @@ the size of the sequence alphabet.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="encoding-to-sequence">
+</section>
+<section id="encoding-to-sequence">
 <h2>encoding_to_sequence<a class="headerlink" href="#encoding-to-sequence" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="selene_sdk.sequences.encoding_to_sequence">
-<code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">encoding_to_sequence</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_base</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.encoding_to_sequence">
+<span class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></span><span class="sig-name descname"><span class="pre">encoding_to_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unk_base</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#encoding_to_sequence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.encoding_to_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a sequence one-hot encoding to its string sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1049,12 +1051,12 @@ input array.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="get-reverse-encoding">
+</section>
+<section id="get-reverse-encoding">
 <h2>get_reverse_encoding<a class="headerlink" href="#get-reverse-encoding" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="selene_sdk.sequences.get_reverse_encoding">
-<code class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></code><code class="sig-name descname"><span class="pre">get_reverse_encoding</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_to_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complementary_base_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#get_reverse_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.get_reverse_encoding" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.sequences.get_reverse_encoding">
+<span class="sig-prename descclassname"><span class="pre">selene_sdk.sequences.</span></span><span class="sig-name descname"><span class="pre">get_reverse_encoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_to_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complementary_base_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/sequences/sequence.html#get_reverse_encoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.sequences.get_reverse_encoding" title="Permalink to this definition">¶</a></dt>
 <dd><p>The Genome DNA bases encoding is created such that the reverse
 encoding can be quickly computed.</p>
 <dl class="field-list simple">
@@ -1075,8 +1077,8 @@ encoding can be quickly computed.</p>
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

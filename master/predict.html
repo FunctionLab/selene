@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>selene_sdk.predict &mdash; Selene 0.5.dev0 documentation</title>
@@ -23,10 +24,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -327,15 +329,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-selene_sdk.predict">
+  <section id="module-selene_sdk.predict">
 <span id="selene-sdk-predict"></span><h1>selene_sdk.predict<a class="headerlink" href="#module-selene_sdk.predict" title="Permalink to this headline">¶</a></h1>
 <p>This module contains classes and methods for making and analyzing
 predictions with models that have already been trained.</p>
-<div class="section" id="analyzesequences">
+<section id="analyzesequences">
 <h2>AnalyzeSequences<a class="headerlink" href="#analyzesequences" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="selene_sdk.predict.AnalyzeSequences">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">selene_sdk.predict.</span></code><code class="sig-name descname"><span class="pre">AnalyzeSequences</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">trained_model_path</span></em>, <em class="sig-param"><span class="pre">sequence_length</span></em>, <em class="sig-param"><span class="pre">features</span></em>, <em class="sig-param"><span class="pre">batch_size=64</span></em>, <em class="sig-param"><span class="pre">use_cuda=False</span></em>, <em class="sig-param"><span class="pre">data_parallel=False</span></em>, <em class="sig-param"><span class="pre">reference_sequence=&lt;class</span> <span class="pre">'selene_sdk.sequences.genome.Genome'&gt;</span></em>, <em class="sig-param"><span class="pre">write_mem_limit=1500</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.predict.</span></span><span class="sig-name descname"><span class="pre">AnalyzeSequences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">model</span></em>, <em class="sig-param"><span class="pre">trained_model_path</span></em>, <em class="sig-param"><span class="pre">sequence_length</span></em>, <em class="sig-param"><span class="pre">features</span></em>, <em class="sig-param"><span class="pre">batch_size=64</span></em>, <em class="sig-param"><span class="pre">use_cuda=False</span></em>, <em class="sig-param"><span class="pre">data_parallel=False</span></em>, <em class="sig-param"><span class="pre">reference_sequence=&lt;class</span> <span class="pre">'selene_sdk.sequences.genome.Genome'&gt;</span></em>, <em class="sig-param"><span class="pre">write_mem_limit=1500</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Score sequences and their variants using the predictions made
 by a trained model.</p>
@@ -387,7 +389,7 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitc797492 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
+<li><p><strong>~AnalyzeSequences.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitabca349 ))"><em>torch.nn.Module</em></a>) – A sequence-based model that has already been trained.</p></li>
 <li><p><strong>~AnalyzeSequences.sequence_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The length of sequences that the model is expecting.</p></li>
 <li><p><strong>~AnalyzeSequences.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the mini-batches to use.</p></li>
 <li><p><strong>~AnalyzeSequences.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – The names of the features that the model is predicting.</p></li>
@@ -398,8 +400,8 @@ using it on the CPU or a CUDA-enabled GPU (i.e. setting
 </dd>
 </dl>
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.get_predictions">
-<code class="sig-name descname"><span class="pre">get_predictions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.get_predictions">
+<span class="sig-name descname"><span class="pre">get_predictions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences specified as a raw sequence,
 FASTA, or BED file.</p>
 <dl class="field-list">
@@ -436,7 +438,7 @@ of the sequences in the input FASTA).</p></li>
 </li>
 <li><p><strong>strand_index</strong> (<em>int or None, optional</em>) – Default is None. If the trained model makes strand-specific
 predictions, your input BED file may include a column with strand
-information (strand must be one of {‘+’, ‘-‘, ‘.’}). Specify
+information (strand must be one of {‘+’, ‘-’, ‘.’}). Specify
 the index (0-based) to use it. Otherwise, by default ‘+’ is used.
 (This parameter is ignored if FASTA file is used as input.)</p></li>
 </ul>
@@ -454,8 +456,8 @@ or .tsv file will mark this sequence or region as <cite>contains_unk = True</cit
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file">
-<code class="sig-name descname"><span class="pre">get_predictions_for_bed_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_bed_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file">
+<span class="sig-name descname"><span class="pre">get_predictions_for_bed_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_bed_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_bed_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences specified as genome coordinates
 in a BED file. Coordinates do not need to be the same length as the
 model expected sequence input–predictions will be centered at the
@@ -492,7 +494,7 @@ of the sequences in the input FASTA).</p></li>
 </li>
 <li><p><strong>strand_index</strong> (<em>int or None, optional</em>) – Default is None. If the trained model makes strand-specific
 predictions, your input file may include a column with strand
-information (strand must be one of {‘+’, ‘-‘, ‘.’}). Specify
+information (strand must be one of {‘+’, ‘-’, ‘.’}). Specify
 the index (0-based) to use it. Otherwise, by default ‘+’ is used.</p></li>
 </ul>
 </dd>
@@ -507,8 +509,8 @@ match that specified in the filepath.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">
-<code class="sig-name descname"><span class="pre">get_predictions_for_fasta_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file">
+<span class="sig-name descname"><span class="pre">get_predictions_for_fasta_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.get_predictions_for_fasta_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.get_predictions_for_fasta_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions for sequences in a FASTA file.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -552,8 +554,8 @@ of the sequences in the input FASTA).</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis">
-<code class="sig-name descname"><span class="pre">in_silico_mutagenesis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ism'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutate_n_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis">
+<span class="sig-name descname"><span class="pre">in_silico_mutagenesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ism'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutate_n_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies <em>in silico</em> mutagenesis to a sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -597,8 +599,8 @@ model prediction for the original input sequence.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">
-<code class="sig-name descname"><span class="pre">in_silico_mutagenesis_from_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutate_n_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sequence_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file">
+<span class="sig-name descname"><span class="pre">in_silico_mutagenesis_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutate_n_bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sequence_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply <em>in silico</em> mutagenesis to all sequences in a FASTA file.</p>
 <p>Please note that we have not parallelized this function yet, so runtime
 increases exponentially when you increase <cite>mutate_n_bases</cite>.</p>
@@ -652,8 +654,8 @@ model prediction for the original input sequence.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict">
-<code class="sig-name descname"><span class="pre">in_silico_mutagenesis_predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutations_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reporters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict">
+<span class="sig-name descname"><span class="pre">in_silico_mutagenesis_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_preds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutations_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reporters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.in_silico_mutagenesis_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.in_silico_mutagenesis_predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the predictions for all specified mutations applied
 to a given sequence and, if applicable, compute the scores
 (“abs_diffs”, “diffs”, “logits”) for these mutations.</p>
@@ -684,8 +686,8 @@ sequence), and output these as a file at the end.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="selene_sdk.predict.AnalyzeSequences.variant_effect_prediction">
-<code class="sig-name descname"><span class="pre">variant_effect_prediction</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vcf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences.variant_effect_prediction">
+<span class="sig-name descname"><span class="pre">variant_effect_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vcf_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_strand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/model_predict.html#AnalyzeSequences.variant_effect_prediction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.AnalyzeSequences.variant_effect_prediction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get model predictions and scores for a list of variants.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -725,7 +727,7 @@ output as a separate .txt file.</p></li>
 <li><p><strong>strand_index</strong> (<em>int or None, optional.</em>) – Default is None. If applicable, specify the column index (0-based)
 in the VCF file that contains strand information for each variant.</p></li>
 <li><p><strong>require_strand</strong> (<em>bool, optional.</em>) – Default is False. Whether strand can be specified as ‘.’. If False,
-Selene accepts strand value to be ‘+’, ‘-‘, or ‘.’ and automatically
+Selene accepts strand value to be ‘+’, ‘-’, or ‘.’ and automatically
 treats ‘.’ as ‘+’. If True, Selene skips any variant with strand ‘.’.
 This parameter assumes that <cite>strand_index</cite> has been set.</p></li>
 </ul>
@@ -756,8 +758,8 @@ genome FASTA file.</p>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

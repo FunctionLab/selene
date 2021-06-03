@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Installation &mdash; Selene 0.5.dev0 documentation</title>
@@ -23,6 +24,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -326,27 +328,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
+  <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>Users can clone and build the repository locally or install Selene through conda/pip.</p>
 <p>Please use Selene with Python 3.6+.</p>
 <p>Install <a class="reference external" href="https://pytorch.org/get-started/locally/">PyTorch</a>. If you have an NVIDIA GPU, install a version of PyTorch that supports it—Selene will run much faster with a discrete GPU.</p>
-<div class="section" id="installing-with-anaconda">
+<section id="installing-with-anaconda">
 <h2>Installing with Anaconda<a class="headerlink" href="#installing-with-anaconda" title="Permalink to this headline">¶</a></h2>
 <p>To install with conda (recommended for Linux users), run the following command in your terminal:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">bioconda</span> <span class="n">selene</span><span class="o">-</span><span class="n">sdk</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="installing-selene-with-pip">
+</section>
+<section id="installing-selene-with-pip">
 <h2>Installing selene with pip:<a class="headerlink" href="#installing-selene-with-pip" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip install selene-sdk
 </pre></div>
 </div>
 <p>Note that we do not recommend pip-installing older versions of Selene (below 0.4.0), as these releases were less stable.</p>
 <p>We currently only have a source distribution available for pip-installation. We are looking into releasing wheels in the future.</p>
-</div>
-<div class="section" id="installing-from-source">
+</section>
+<section id="installing-from-source">
 <h2>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h2>
 <p>Selene can also be installed from source.
 First, download the latest commits from the source repository:</p>
@@ -363,13 +365,13 @@ First, download the latest commits from the source repository:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python setup.py install
 </pre></div>
 </div>
-</div>
-<div class="section" id="additional-dependency-for-running-the-cli-versions-0-4-8-and-below">
+</section>
+<section id="additional-dependency-for-running-the-cli-versions-0-4-8-and-below">
 <h2>Additional dependency for running the CLI (versions 0.4.8 and below)<a class="headerlink" href="#additional-dependency-for-running-the-cli-versions-0-4-8-and-below" title="Permalink to this headline">¶</a></h2>
 <p>Please install <code class="docutils literal notranslate"><span class="pre">docopt</span></code> before running the command-line script <code class="docutils literal notranslate"><span class="pre">selene_cli.py</span></code> provided in the repository.
 In newer versions of Selene, the CLI can be run by calling <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">selene_sdk</span></code> from anywhere in bash (assuming you have installed the library, through conda/pip/local install - <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code>).</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
