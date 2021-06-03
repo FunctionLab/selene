@@ -150,14 +150,15 @@ class EvaluateModel(object):
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
 
-        # remap indices
         self._use_testmat_ixs = self._use_ixs[:]
-        if self._all_test_targets.shape[1] == len(self._use_ixs) and \
-                sorted(self._use_ixs) != self._use_ixs:
-            subset_features = {features[ix]: i for (i, ix) in
+        # if the targets shape is the same as the subsetted features,
+        # reindex based on the subsetted list
+        if self._all_test_targets.shape[1] == len(self._use_ixs):
+            subset_features = {self.features[ix]: i for (i, ix) in
                                enumerate(sorted(self._use_ixs))}
             self._use_testmat_ixs = [
                 subset_features[f] for f in self.features[self._use_ixs]]
+
         self._all_test_targets = self._all_test_targets[
             :, self._use_testmat_ixs]
 
