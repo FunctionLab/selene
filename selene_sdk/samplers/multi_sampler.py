@@ -235,7 +235,7 @@ class MultiSampler(Sampler):
         n_samples : int or None, optional
             Default is None. The total number of samples to retrieve.
             If `n_samples` is None, if a FileSampler is specified for the
-            mode, the number of samplers returned is defined by the FileSample,
+            mode, the number of samplers returned is defined by the FileSampler,
             or if a Dataloader is specified, will set `n_samples` to 32000
             if the mode is `validate`, or 640000 if the mode is `test`.
             If the mode is `train` you must have specified a value for
