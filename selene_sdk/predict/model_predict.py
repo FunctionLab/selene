@@ -173,6 +173,8 @@ class AnalyzeSequences(object):
         self.batch_size = batch_size
         self.features = features
         self.reference_sequence = reference_sequence
+        if not self.reference_sequence._initialized:
+            self.reference_sequence._unpicklable_init()
         if type(self.reference_sequence) == Genome and \
                 _is_lua_trained_model(model):
             Genome.update_bases_order(['A', 'G', 'C', 'T'])
@@ -387,6 +389,7 @@ class AnalyzeSequences(object):
             information (strand must be one of {'+', '-', '.'}). Specify
             the index (0-based) to use it. Otherwise, by default '+' is used.
 
+
         Returns
         -------
         None
@@ -414,17 +417,16 @@ class AnalyzeSequences(object):
         batch_ids = []
         for i, (label, coords) in enumerate(zip(labels, seq_coords)):
             encoding, contains_unk = self.reference_sequence.get_encoding_from_coords_check_unk(
-                    *coords,
-                    pad=True)
+                    *coords, pad=True)
             if sequences is None:
                 sequences = np.zeros((self.batch_size, *encoding.shape))
             if i and i % self.batch_size == 0:
                 preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-                sequences = np.zeros((self.batch_size, *encoding.shape))
                 reporter.handle_batch_predictions(preds, batch_ids)
+                sequences = np.zeros((self.batch_size, *encoding.shape))
                 batch_ids = []
+            sequences[i % self.batch_size, :, :] = encoding
             batch_ids.append(label+(contains_unk,))
-            sequences[ i % self.batch_size, :, :] = encoding
             if contains_unk:
                 warnings.warn(("For region {0}, "
                                "reference sequence contains unknown "
@@ -432,12 +434,11 @@ class AnalyzeSequences(object):
                                "`contains_unk` column of the .tsv or "
                                "row_labels .txt file.").format(label))
 
-        if (batch_ids and i == 0) or i % self.batch_size != 0:
-            sequences = sequences[:i % self.batch_size + 1, :, :]
-            preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-            reporter.handle_batch_predictions(preds, batch_ids)
-
+        sequences = sequences[:i % self.batch_size + 1, :, :]
+        preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+        reporter.handle_batch_predictions(preds, batch_ids)
         reporter.write_to_file()
+
 
     def get_predictions_for_fasta_file(self,
                                        input_path,
@@ -513,10 +514,9 @@ class AnalyzeSequences(object):
             batch_ids.append([i, fasta_record.name])
             sequences[i % self.batch_size, :, :] = cur_sequence_encoding
 
-        if (batch_ids and i == 0) or i % self.batch_size != 0:
-            sequences = sequences[:i % self.batch_size + 1, :, :]
-            preds = predict(self.model, sequences, use_cuda=self.use_cuda)
-            reporter.handle_batch_predictions(preds, batch_ids)
+        sequences = sequences[:i % self.batch_size + 1, :, :]
+        preds = predict(self.model, sequences, use_cuda=self.use_cuda)
+        reporter.handle_batch_predictions(preds, batch_ids)
 
         fasta_file.close()
         reporter.write_to_file()

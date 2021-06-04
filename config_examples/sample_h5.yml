@@ -1,0 +1,21 @@
+--- 
+# example configuration for the `sampler_write_to_h5.py` script in `scripts`
+sampler: !obj:selene_sdk.samplers.RandomPositionsSampler {
+    target_path: /path/to/tabix/indexed/targets.bed.gz, 
+    reference_sequence: !obj:selene_sdk.sequences.Genome {
+         input_path: /path/to/reference_sequence.fa,
+         blacklist_regions: hg19  # only hg19 and hg38, remove if not applicable
+     },
+    features: !obj:selene_sdk.utils.load_features_list {
+        input_path:  /path/to/distinct_features.txt 
+    },
+    seed: 127,
+    output_dir: /path/to/output/, 
+    test_holdout: [chr8, chr9],
+    validation_holdout: [chr6, chr7],
+    sequence_length: 1000,
+    center_bin_to_predict: 200,
+    feature_thresholds: 0.5,
+}
+batch_size: 64
+...

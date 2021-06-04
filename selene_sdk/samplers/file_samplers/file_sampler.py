@@ -1,9 +1,6 @@
 """
 This module provides the `FileSampler` base class, which defines the
 interface for classes that draw samples from a particular file type.
-
-We recognize that there is confusion regarding the different samplers
-Selene implements and will resolve this issue soon.
 """
 from abc import ABCMeta
 from abc import abstractmethod

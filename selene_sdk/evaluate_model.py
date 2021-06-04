@@ -9,7 +9,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 from sklearn.metrics import average_precision_score, roc_auc_score
-from torch.autograd import Variable
 
 from .sequences import Genome
 from .utils import (PerformanceMetrics, _is_lua_trained_model,
@@ -223,9 +222,6 @@ class EvaluateModel(object):
                 inputs = inputs.cuda()
                 targets = targets.cuda()
             with torch.no_grad():
-                inputs = Variable(inputs)
-                targets = Variable(targets)
-
                 predictions = None
                 if _is_lua_trained_model(self.model):
                     predictions = self.model.forward(

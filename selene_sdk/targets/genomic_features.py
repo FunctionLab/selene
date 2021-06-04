@@ -16,6 +16,7 @@ import types
 import tabix
 import numpy as np
 
+from functools import wraps
 from .target import Target
 from ._genomic_features import _fast_get_feature_data
 
@@ -234,6 +235,14 @@ class GenomicFeatures(Target):
                                  input the feature name and returns\
                                  the feature's threshold.
 
+    init_unpicklable : bool, optional
+        Default is False. Delays initialization until a relevant method
+        is called. This enables the object to be pickled after instantiation.
+        `init_unpicklable` must be `False` when multi-processing is needed e.g.
+        DataLoader. Set `init_unpicklable` to True if you are using this class
+        directly through Selene's API and want to access class attributes
+        without having to call on a specific method in GenomicFeatures.
+
     Attributes
     ----------
     data : tabix.open
@@ -258,12 +267,11 @@ class GenomicFeatures(Target):
 
     """
 
-    def __init__(self, input_path, features, feature_thresholds=None):
+    def __init__(self, input_path, features, feature_thresholds=None, init_unpicklable=False):
         """
         Constructs a new `GenomicFeatures` object.
         """
-        self.data = tabix.open(input_path)
-
+        self.input_path = input_path
         self.n_features = len(features)
 
         self.feature_index_dict = dict(
@@ -277,6 +285,23 @@ class GenomicFeatures(Target):
         else:
             self.feature_thresholds, self._feature_thresholds_vec = \
                 _define_feature_thresholds(feature_thresholds, features)
+        self._initialized = False
+
+        if init_unpicklable:
+            self._unpicklable_init()
+
+    def _unpicklable_init(self):
+        if not self._initialized:
+            self.data = tabix.open(self.input_path)
+            self._initialized = True
+
+    def init(func):
+        # delay initialization to allow multiprocessing
+        @wraps(func)
+        def dfunc(self, *args, **kwargs):
+            self._unpicklable_init()
+            return func(self, *args, **kwargs)
+        return dfunc
 
     def _query_tabix(self, chrom, start, end):
         """
@@ -308,6 +333,7 @@ class GenomicFeatures(Target):
         except tabix.TabixError:
             return None
 
+    @init
     def is_positive(self, chrom, start, end):
         """
         Determines whether the query the `chrom` queried contains any
@@ -334,14 +360,10 @@ class GenomicFeatures(Target):
         rows = self._query_tabix(chrom, start, end)
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
+    @init
     def get_feature_data(self, chrom, start, end):
         """
-        For a sequence of length :math:`L = end - start`, return the
-        features' one-hot encoding corresponding to that region. For
-        instance, for `n_features`, each position in that sequence will
-        have a binary vector specifying whether the genomic feature's
-        coordinates overlap with that position.
-        @TODO: Clarify with an example, as this is hard to read right now.
+        Computes which features overlap with the given region.
 
         Parameters
         ----------
@@ -355,21 +377,23 @@ class GenomicFeatures(Target):
         Returns
         -------
         numpy.ndarray
-            :math:`L \\times N` array, where :math:`L = end - start`
-            and :math:`N =` `self.n_features`. Note that if we catch a
-            `tabix.TabixError`, we assume the error was the result of
-            there being no features present in the queried region and
-            return a `numpy.ndarray` of zeros.
+            A target vector of size `self.n_features` where the `i`th
+            position is equal to one if the `i`th feature is positive,
+            and zero otherwise.
+
+            NOTE: If we catch a `tabix.TabixError`, we assume the error was
+            the result of there being no features present in the queried region
+            and return a `numpy.ndarray` of zeros.
 
         """
         if self._feature_thresholds_vec is None:
-            features = np.zeros((end - start))
+            features = np.zeros(self.n_features)
             rows = self._query_tabix(chrom, start, end)
             if not rows:
                 return features
             for r in rows:
                 feature = r[3]
-                ix = self.feature_index_map[feature]
+                ix = self.feature_index_dict[feature]
                 features[ix] = 1
             return features
         return _get_feature_data(
