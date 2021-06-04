@@ -212,10 +212,6 @@ class _H5Dataset(Dataset):
                 targets = targets[:, :self.t_len]
             else:
                 targets = targets[:self.t_len]
-
-        assert np.array_equal(targets, targets.astype(bool)), \
-               np.unique(targets)
-
         return (torch.from_numpy(sequence.astype(np.float32)),
                 torch.from_numpy(targets.astype(np.float32)))
 
