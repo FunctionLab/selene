@@ -316,7 +316,8 @@ class PerformanceMetrics(object):
     def __init__(self,
                  get_feature_from_index_fn,
                  report_gt_feature_n_positives=10,
-                 metrics=dict(roc_auc=roc_auc_score, average_precision=average_precision_score)):
+                 metrics=dict(roc_auc=roc_auc_score,
+                              average_precision=average_precision_score)):
         """
         Creates a new object of the `PerformanceMetrics` class.
         """
