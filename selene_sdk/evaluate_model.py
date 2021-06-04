@@ -8,13 +8,11 @@ import warnings
 import numpy as np
 import torch
 import torch.nn as nn
+from sklearn.metrics import average_precision_score, roc_auc_score
 
 from .sequences import Genome
-from .utils import _is_lua_trained_model
-from .utils import initialize_logger
-from .utils import load_model_from_state_dict
-from .utils import PerformanceMetrics
-
+from .utils import (PerformanceMetrics, _is_lua_trained_model,
+                    initialize_logger, load_model_from_state_dict)
 
 logger = logging.getLogger("selene")
 
@@ -79,6 +77,11 @@ class EvaluateModel(object):
         If `True`, use a CUDA-enabled GPU. If `False`, use the CPU.
     data_parallel : bool
         Whether to use multiple GPUs or not.
+    metrics : dict
+        A dictionary that maps metric names (`str`) to metric functions.
+        By default, this contains `"roc_auc"`, which maps to
+        `sklearn.metrics.roc_auc_score`, and `"average_precision"`,
+        which maps to `sklearn.metrics.average_precision_score`.
 
     """
 
@@ -94,7 +97,9 @@ class EvaluateModel(object):
                  report_gt_feature_n_positives=10,
                  use_cuda=False,
                  data_parallel=False,
-                 use_features_ord=None):
+                 use_features_ord=None,
+                 metrics=dict(roc_auc=roc_auc_score,
+                              average_precision=average_precision_score)):
         self.criterion = criterion
 
         trained_model = torch.load(
@@ -147,7 +152,8 @@ class EvaluateModel(object):
 
         self._metrics = PerformanceMetrics(
             self._get_feature_from_index,
-            report_gt_feature_n_positives=report_gt_feature_n_positives)
+            report_gt_feature_n_positives=report_gt_feature_n_positives,
+            metrics=metrics)
 
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
