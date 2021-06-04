@@ -444,6 +444,8 @@
                 <span class="n">test_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="n">test_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">])</span> \
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
@@ -558,11 +560,11 @@
 <span class="sd">            The size of the batches to divide the data into.</span>
 <span class="sd">        n_samples : int or None, optional</span>
 <span class="sd">            Default is None. The total number of samples to retrieve.</span>
-<span class="sd">            If `n_samples` is None, if a FileSampler is specified for the </span>
-<span class="sd">            mode, the number of samplers returned is defined by the FileSample, </span>
-<span class="sd">            or if a Dataloader is specified, will set `n_samples` to 32000 </span>
-<span class="sd">            if the mode is `validate`, or 640000 if the mode is `test`. </span>
-<span class="sd">            If the mode is `train` you must have specified a value for </span>
+<span class="sd">            If `n_samples` is None, if a FileSampler is specified for the</span>
+<span class="sd">            mode, the number of samplers returned is defined by the FileSampler,</span>
+<span class="sd">            or if a Dataloader is specified, will set `n_samples` to 32000</span>
+<span class="sd">            if the mode is `validate`, or 640000 if the mode is `test`.</span>
+<span class="sd">            If the mode is `train` you must have specified a value for</span>
 <span class="sd">            `n_samples`.</span>
 <span class="sd">        mode : str, optional</span>
 <span class="sd">            Default is None. The operating mode that the object should run in.</span>
