@@ -338,26 +338,26 @@ In the following sections, we briefly discuss each submodule and top-level class
 <h2>Sampling<a class="headerlink" href="#sampling" title="Permalink to this headline">¶</a></h2>
 <p>We start with the modules for sampling data because both training and evaluting a model in Selene will require a user to specify the kind of sampler they want to use.</p>
 <section id="sequences-submodule-api">
-<h3><em>sequences</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/sequences.html">API</a>)<a class="headerlink" href="#sequences-submodule-api" title="Permalink to this headline">¶</a></h3>
+<h3><em>sequences</em> submodule (<a class="reference external" href="../sequences.html">API</a>)<a class="headerlink" href="#sequences-submodule-api" title="Permalink to this headline">¶</a></h3>
 <p>The <em>sequences</em> submodule defines the <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> type, and includes implementations for several sub-classes.
 These sub-classes–<code class="docutils literal notranslate"><span class="pre">Genome</span></code> and <code class="docutils literal notranslate"><span class="pre">Proteome</span></code>–represent different kinds of biological sequences (e.g. DNA, RNA, amino acid sequences), and implement the <code class="docutils literal notranslate"><span class="pre">Sequence</span></code> interface’s methods for reading the reference sequence from files (e.g. FASTA), querying subsequences of the reference sequence, and subsequently converting those queried subsequences into a numeric representation.
 Further, each sequence class specifies its own alphabet (e.g., nucleotides, amino acids) to represent query results as strings.</p>
 </section>
 <section id="targets-submodule-api">
-<h3><em>targets</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/targets.html">API</a>)<a class="headerlink" href="#targets-submodule-api" title="Permalink to this headline">¶</a></h3>
+<h3><em>targets</em> submodule (<a class="reference external" href="../targets.html">API</a>)<a class="headerlink" href="#targets-submodule-api" title="Permalink to this headline">¶</a></h3>
 <p>The <em>targets</em> submodule defines the <code class="docutils literal notranslate"><span class="pre">Target</span></code> class, which specifies the interface for classes to retrieve labels or “targets” for a given query sequence.
 At present, we supply a single implementation of this interface: <code class="docutils literal notranslate"><span class="pre">GenomicFeatures</span></code>.
 This class takes a tabix-indexed file of intervals for each label we want our model to predict, and uses this file to identify the labels for a given sequence drawn from the reference.</p>
 </section>
 <section id="samplers-submodule-api">
-<h3><em>samplers</em> submodule (<a class="reference external" href="http://selene.flatironinstitute.org/samplers.html">API</a>)<a class="headerlink" href="#samplers-submodule-api" title="Permalink to this headline">¶</a></h3>
+<h3><em>samplers</em> submodule (<a class="reference external" href="../samplers.html">API</a>)<a class="headerlink" href="#samplers-submodule-api" title="Permalink to this headline">¶</a></h3>
 <p>The <em>samplers</em> submodule provides methods and classes for randomly sampling and partitioning datasets for training and evaluation.
 The <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> interface defines the minimal requirements for a class fulfilling these functions.
 In particular, samplers must be able to partition data (i.e. into training, validation, and testing datasets), sample data from each partition, and, if needed, save the sampled data to a file.
 Further, a file of names must be provided for the features to be predicted.
 We provide several implementations adhering to the <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> interface: the <code class="docutils literal notranslate"><span class="pre">RandomPositionsSampler</span></code>, <code class="docutils literal notranslate"><span class="pre">IntervalsSampler</span></code>, and <code class="docutils literal notranslate"><span class="pre">MultiFileSampler</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">MultiFileSampler</span></code> draws samples from structured data files for each partition.
-There is currently support for loading either .bed or .mat files via the <code class="docutils literal notranslate"><span class="pre">FileSampler</span></code> classes <code class="docutils literal notranslate"><span class="pre">BedFileSampler</span></code> and <code class="docutils literal notranslate"><span class="pre">MatFileSampler</span></code>, respectively (see <a class="reference external" href="http://selene.flatironinstitute.org/samplers.file_samplers.html">API docs for file samplers</a>).
+There is currently support for loading either .bed or .mat files via the <code class="docutils literal notranslate"><span class="pre">FileSampler</span></code> classes <code class="docutils literal notranslate"><span class="pre">BedFileSampler</span></code> and <code class="docutils literal notranslate"><span class="pre">MatFileSampler</span></code>, respectively (see <a class="reference external" href="../samplers.file_samplers.html">API docs for file samplers</a>).
 It is worth noting that the .bed file used by <code class="docutils literal notranslate"><span class="pre">BedFileSampler</span></code> includes the coordinates of each sequence, and the indices corresponding to each feature for which said sequence is a positive example.
 We hope that users will request or contribute classes for other file samplers in the future.
 <code class="docutils literal notranslate"><span class="pre">MultiFileSampler</span></code> does not support saving the sampled data to a file, so calling the <code class="docutils literal notranslate"><span class="pre">save_dataset_to_file</span></code> method from this class will have no effect.</p>
@@ -369,7 +369,7 @@ This file can be subsequently loaded with the <code class="docutils literal notr
 </section>
 </section>
 <section id="training-a-model-api">
-<h2>Training a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#trainmodel">API</a>)<a class="headerlink" href="#training-a-model-api" title="Permalink to this headline">¶</a></h2>
+<h2>Training a model (<a class="reference external" href="../selene.html#trainmodel">API</a>)<a class="headerlink" href="#training-a-model-api" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> class may be used for training and testing of sequence-based models, and provides the core functionality of the CLI’s train command.
 It relies on an <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code> (or a subclass of <code class="docutils literal notranslate"><span class="pre">OnlineSampler</span></code>)  to automatically partition the dataset into subsets for training, validation, and testing.
 These subsets are then used to automatically train and validate performance for a user-specified number of steps.
@@ -379,13 +379,13 @@ The frequency of logging is provided by the user.
 At the end of evaluation, <code class="docutils literal notranslate"><span class="pre">TrainModel</span></code> logs the performance metrics for each feature predicted, and produces plots of the precision recall and receiver operating characteristic curves.</p>
 </section>
 <section id="evaluating-a-model-api">
-<h2>Evaluating a model (<a class="reference external" href="http://selene.flatironinstitute.org/selene.html#evaluatemodel">API</a>)<a class="headerlink" href="#evaluating-a-model-api" title="Permalink to this headline">¶</a></h2>
+<h2>Evaluating a model (<a class="reference external" href="../selene.html#evaluatemodel">API</a>)<a class="headerlink" href="#evaluating-a-model-api" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> class is used to test the performance of a trained model.
 <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> uses an instance of <code class="docutils literal notranslate"><span class="pre">Sampler</span></code> class or subclass to draw samples from a test set.
 After using the provided model to predict labels for said data, <code class="docutils literal notranslate"><span class="pre">EvaluateModel</span></code> logs the performance measures (as described in “Training a model”) and generates figures and a performance breakdown by feature.</p>
 </section>
 <section id="using-a-model-to-make-predictions-api">
-<h2>Using a model to make predictions (<a class="reference external" href="http://selene.flatironinstitute.org/predict.html">API</a>)<a class="headerlink" href="#using-a-model-to-make-predictions-api" title="Permalink to this headline">¶</a></h2>
+<h2>Using a model to make predictions (<a class="reference external" href="../predict.html">API</a>)<a class="headerlink" href="#using-a-model-to-make-predictions-api" title="Permalink to this headline">¶</a></h2>
 <p>Selene’s <code class="docutils literal notranslate"><span class="pre">predict</span></code> submodule includes a number of methods and classes for making predictions with sequence-based models.
 The <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> class is the main class to use.
 It leverages a user-specified trained model to make predictions for sequences sequences in a FASTA file, apply <em>in silico</em> mutagenesis to sequences in a FASTA file, or perform variant effect prediction on variants in a VCF file.
@@ -393,13 +393,13 @@ In each case, the user can specify what <code class="docutils literal notranslat
 Note that the aforementioned “scores” can only be computed for <em>in silico</em> mutagenesis and variant effect prediction.</p>
 </section>
 <section id="visualizing-model-predictions-api">
-<h2>Visualizing model predictions (<a class="reference external" href="http://selene.flatironinstitute.org/interpret.html">API</a>)<a class="headerlink" href="#visualizing-model-predictions-api" title="Permalink to this headline">¶</a></h2>
+<h2>Visualizing model predictions (<a class="reference external" href="../interpret.html">API</a>)<a class="headerlink" href="#visualizing-model-predictions-api" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">interpret</span></code> submodule of <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code> provides methods for visualizing a sequence-based model’s predictions made with <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code>.
 For example, <code class="docutils literal notranslate"><span class="pre">interpret</span></code> includes methods for processing variant effect predictions made with <code class="docutils literal notranslate"><span class="pre">AnalyzeSequences</span></code> and subsequently visualizing them with a heatmap or sequence logo.
 The functionality included in the <code class="docutils literal notranslate"><span class="pre">interpret</span></code> submodule is not heavily incorporated into the CLI, but is instead intended for incorporation into user code.</p>
 </section>
 <section id="the-utilities-submodule-api">
-<h2>The utilities submodule (<a class="reference external" href="http://selene.flatironinstitute.org/utils.html">API</a>)<a class="headerlink" href="#the-utilities-submodule-api" title="Permalink to this headline">¶</a></h2>
+<h2>The utilities submodule (<a class="reference external" href="../utils.html">API</a>)<a class="headerlink" href="#the-utilities-submodule-api" title="Permalink to this headline">¶</a></h2>
 <p>Unlike the aforementioned submodules designed around individual concepts, the <code class="docutils literal notranslate"><span class="pre">utils</span></code> submodule is a catch-all submodule intended to prevent cluttering of the <code class="docutils literal notranslate"><span class="pre">selene_sdk</span></code> top-level namespace.
 It provides diverse functionality at varying levels of flexibility.
 Some members of <code class="docutils literal notranslate"><span class="pre">utils</span></code> are general-purpose (e.g. configuration file parsing) while others have highly specific use cases (e.g. CLI logger initialization).</p>
