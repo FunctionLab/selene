@@ -26,12 +26,12 @@ Selene's CLI accepts configuration files in the `YAML <https://docs.ansible.com/
 We recommend you start off by using one of the `example configuration files <https://github.com/FunctionLab/selene/tree/master/config_examples>`_ provided in the repository as a template for your own configuration file:
 
 
-* `Training configuration <https://github.com/FunctionLab/selene/blob/master/config_examples/train.yml>`_
-* `Evaluate with test BED file <https://github.com/FunctionLab/selene/blob/master/config_examples/evaluate_test_bed.yml>`_
-* `Evaluate with test matrix file <https://github.com/FunctionLab/selene/blob/master/config_examples/evaluate_test_mat.yml>`_
-* `Get predictions from trained model <https://github.com/FunctionLab/selene/blob/master/config_examples/get_predictions.yml>`_
-* `\ *In silico* mutagenesis <https://github.com/FunctionLab/selene/blob/master/config_examples/in_silico_mutagenesis.yml>`_
-* `Variant effect prediction <https://github.com/FunctionLab/selene/blob/master/config_examples/variant_effect_prediction.yml>`_
+- `Training configuration <https://github.com/FunctionLab/selene/blob/master/config_examples/train.yml>`_
+- `Evaluate with test BED file <https://github.com/FunctionLab/selene/blob/master/config_examples/evaluate_test_bed.yml>`_
+- `Evaluate with test matrix file <https://github.com/FunctionLab/selene/blob/master/config_examples/evaluate_test_mat.yml>`_
+- `Get predictions from trained model <https://github.com/FunctionLab/selene/blob/master/config_examples/get_predictions.yml>`_
+- `\ *In silico* mutagenesis <https://github.com/FunctionLab/selene/blob/master/config_examples/in_silico_mutagenesis.yml>`_
+- `Variant effect prediction <https://github.com/FunctionLab/selene/blob/master/config_examples/variant_effect_prediction.yml>`_
 
 There are also various configuration files associated with the Jupyter notebook `tutorials <https://github.com/FunctionLab/selene/tree/master/tutorials>`_ and `manuscript <https://github.com/FunctionLab/selene/tree/master/manuscript>`_ case studies that you may use as a starting point.
 

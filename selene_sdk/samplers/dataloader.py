@@ -1,5 +1,5 @@
 """
-This module provides the `SamplerDataLoader` and  `SamplerDataSet` classes,
+This module provides the `SamplerDataLoader` and  `SamplerDataset` classes,
 which allow parallel sampling for any Sampler using
 torch DataLoader mechanism.
 """
