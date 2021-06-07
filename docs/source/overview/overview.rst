@@ -12,21 +12,21 @@ Sampling
 
 We start with the modules for sampling data because both training and evaluting a model in Selene will require a user to specify the kind of sampler they want to use. 
 
-*sequences* submodule (\ `API <http://selene.flatironinstitute.org/sequences.html>`_\ )
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*sequences* submodule (\ `API <../sequences.html>`_\ )
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The *sequences* submodule defines the ``Sequence`` type, and includes implementations for several sub-classes.
 These sub-classes--\ ``Genome`` and ``Proteome``\ --represent different kinds of biological sequences (e.g. DNA, RNA, amino acid sequences), and implement the ``Sequence`` interface’s methods for reading the reference sequence from files (e.g. FASTA), querying subsequences of the reference sequence, and subsequently converting those queried subsequences into a numeric representation.
 Further, each sequence class specifies its own alphabet (e.g., nucleotides, amino acids) to represent query results as strings.
 
-*targets* submodule (\ `API <http://selene.flatironinstitute.org/targets.html>`_\ )
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+*targets* submodule (\ `API <../targets.html>`_\ )
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The *targets* submodule defines the ``Target`` class, which specifies the interface for classes to retrieve labels or “targets” for a given query sequence.
 At present, we supply a single implementation of this interface: ``GenomicFeatures``.
 This class takes a tabix-indexed file of intervals for each label we want our model to predict, and uses this file to identify the labels for a given sequence drawn from the reference.
 
-*samplers* submodule (\ `API <http://selene.flatironinstitute.org/samplers.html>`_\ )
+*samplers* submodule (\ `API <../samplers.html>`_\ )
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The *samplers* submodule provides methods and classes for randomly sampling and partitioning datasets for training and evaluation.
@@ -36,7 +36,7 @@ Further, a file of names must be provided for the features to be predicted.
 We provide several implementations adhering to the ``Sampler`` interface: the ``RandomPositionsSampler``\ , ``IntervalsSampler``\ , and ``MultiFileSampler``.
 
 ``MultiFileSampler`` draws samples from structured data files for each partition.
-There is currently support for loading either .bed or .mat files via the ``FileSampler`` classes ``BedFileSampler`` and ``MatFileSampler``\ , respectively (see `API docs for file samplers <http://selene.flatironinstitute.org/samplers.file_samplers.html>`_\ ).
+There is currently support for loading either .bed or .mat files via the ``FileSampler`` classes ``BedFileSampler`` and ``MatFileSampler``\ , respectively (see `API docs for file samplers <../samplers.file_samplers.html>`_\ ).
 It is worth noting that the .bed file used by ``BedFileSampler`` includes the coordinates of each sequence, and the indices corresponding to each feature for which said sequence is a positive example.
 We hope that users will request or contribute classes for other file samplers in the future.
 ``MultiFileSampler`` does not support saving the sampled data to a file, so calling the ``save_dataset_to_file`` method from this class will have no effect.
@@ -47,7 +47,7 @@ These samplers automatically partition said data according to user-specified par
 Since ``OnlineSampler``\ ’s samples are randomly generated, we allow the user to save the sampled data to file.
 This file can be subsequently loaded with the ``BedFileSampler``. They rely on classes from the *sequences* and *targets* submodules for retrieving each sequence and its targets in the proper matrix format. 
 
-Training a model (\ `API <http://selene.flatironinstitute.org/selene.html#trainmodel>`_\ )
+Training a model (\ `API <../selene.html#trainmodel>`_\ )
 ------------------------------------------------------------------------------------------
 
 The ``TrainModel`` class may be used for training and testing of sequence-based models, and provides the core functionality of the CLI’s train command.
@@ -58,14 +58,14 @@ The model’s loss, area under the receiver operating characteristic curve (AUC)
 The frequency of logging is provided by the user.
 At the end of evaluation, ``TrainModel`` logs the performance metrics for each feature predicted, and produces plots of the precision recall and receiver operating characteristic curves.
 
-Evaluating a model (\ `API <http://selene.flatironinstitute.org/selene.html#evaluatemodel>`_\ )
+Evaluating a model (\ `API <../selene.html#evaluatemodel>`_\ )
 -----------------------------------------------------------------------------------------------
 
 The ``EvaluateModel`` class is used to test the performance of a trained model. 
 ``EvaluateModel`` uses an instance of ``Sampler`` class or subclass to draw samples from a test set.
 After using the provided model to predict labels for said data, ``EvaluateModel`` logs the performance measures (as described in "Training a model") and generates figures and a performance breakdown by feature.
 
-Using a model to make predictions (\ `API <http://selene.flatironinstitute.org/predict.html>`_\ )
+Using a model to make predictions (\ `API <../predict.html>`_\ )
 -------------------------------------------------------------------------------------------------
 
 Selene’s ``predict`` submodule includes a number of methods and classes for making predictions with sequence-based models. 
@@ -74,14 +74,14 @@ It leverages a user-specified trained model to make predictions for sequences se
 In each case, the user can specify what ``AnalyzeSequences`` should save: raw predictions, difference scores, absolute difference scores, and/or logit scores.
 Note that the aforementioned “scores” can only be computed for *in silico* mutagenesis and variant effect prediction. 
 
-Visualizing model predictions (\ `API <http://selene.flatironinstitute.org/interpret.html>`_\ )
+Visualizing model predictions (\ `API <../interpret.html>`_\ )
 -----------------------------------------------------------------------------------------------
 
 The ``interpret`` submodule of ``selene_sdk`` provides methods for visualizing a sequence-based model’s predictions made with ``AnalyzeSequences``.
 For example, ``interpret`` includes methods for processing variant effect predictions made with ``AnalyzeSequences`` and subsequently visualizing them with a heatmap or sequence logo.
 The functionality included in the ``interpret`` submodule is not heavily incorporated into the CLI, but is instead intended for incorporation into user code.
 
-The utilities submodule (\ `API <http://selene.flatironinstitute.org/utils.html>`_\ )
+The utilities submodule (\ `API <../utils.html>`_\ )
 -------------------------------------------------------------------------------------
 
 Unlike the aforementioned submodules designed around individual concepts, the ``utils`` submodule is a catch-all submodule intended to prevent cluttering of the ``selene_sdk`` top-level namespace. 

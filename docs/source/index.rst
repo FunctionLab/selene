@@ -10,7 +10,7 @@ Welcome! This is the documentation for Selene, a PyTorch-based deep learning lib
 The Github repository is located `here <https://github.com/FunctionLab/selene>`_.
 
 The documentation here corresponds to the latest version of Selene (i.e. up-to-date with `master`). 
-You can view the documentation for Selene `version 0.4.8 here <http://selene.flatironinstitute.org/0.4.8/>`,
+You can view the documentation for Selene `version 0.4.8 here <http://selene.flatironinstitute.org/0.4.8/>`_,
 and we will add other older versions of the library docs to the website soon. 
 
 .. toctree::
@@ -40,6 +40,6 @@ and we will add other older versions of the library docs to the website soon.
 Indices and tables
 ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+- :ref:`genindex`
+- :ref:`modindex`
+- :ref:`search`
