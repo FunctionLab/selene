@@ -431,8 +431,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_tgts_batch_axis</span> <span class="o">=</span> <span class="n">targets_batch_axis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_seqs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_seq_batch_axis</span><span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
@@ -464,7 +463,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sample_up_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">+</span> <span class="n">batch_size</span>
         <span class="n">use_indices</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">sample_up_to</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sample_up_to</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
                 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_indices</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sample_next</span> <span class="o">=</span> <span class="mi">0</span>
@@ -563,19 +562,18 @@
                 <span class="s2">&quot;initialization. Please use `get_data` instead.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">n_samples</span><span class="p">:</span>
             <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
+
         <span class="n">sequences_and_targets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">targets_mat</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">count</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">n_samples</span><span class="p">:</span>
-            <span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">sample_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_samples</span> <span class="o">-</span> <span class="n">count</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">sample_size</span><span class="p">)</span>
             <span class="n">sequences_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
             <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="n">batch_size</span>
-        <span class="n">remainder</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="o">-</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="n">n_samples</span><span class="p">)</span>
-        <span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">remainder</span><span class="p">)</span>
-        <span class="n">sequences_and_targets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">seqs</span><span class="p">,</span> <span class="n">tgts</span><span class="p">))</span>
-        <span class="n">targets_mat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tgts</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="n">sample_size</span>
+
         <span class="c1"># TODO: should not assume targets are always integers</span>
         <span class="n">targets_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">targets_mat</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sequences_and_targets</span><span class="p">,</span> <span class="n">targets_mat</span></div></div>

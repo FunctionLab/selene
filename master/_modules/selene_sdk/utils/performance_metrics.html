@@ -576,7 +576,7 @@
 
 <span class="k">def</span> <span class="nf">auc_u_test</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Outputs the area under the the ROC curve associated with a certain </span>
+<span class="sd">    Outputs the area under the the ROC curve associated with a certain</span>
 <span class="sd">    set of labels and the predictions given by the training model.</span>
 <span class="sd">    Computed from the U statistic.</span>
 
@@ -591,8 +591,8 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
-<span class="sd">        AUC value of given label, prediction pairs  </span>
-<span class="sd">   </span>
+<span class="sd">        AUC value of given label, prediction pairs</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">len_pos</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span>
     <span class="n">len_neg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="o">-</span> <span class="n">len_pos</span>
@@ -642,7 +642,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">get_feature_from_index_fn</span><span class="p">,</span>
                  <span class="n">report_gt_feature_n_positives</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                 <span class="n">metrics</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">average_precision</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">)):</span>
+                 <span class="n">metrics</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span>
+                              <span class="n">average_precision</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new object of the `PerformanceMetrics` class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -793,7 +794,7 @@
         <span class="n">cols</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;class&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">metric_cols</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
             <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">metric_scores</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">feature_scores</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">feature</span><span class="p">,</span> <span class="n">metric_scores</span> <span class="ow">in</span> <span class="n">feature_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_scores</span><span class="p">:</span>
                     <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\t</span><span class="si">{1}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;NA&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_cols</span><span class="p">))))</span>
                 <span class="k">else</span><span class="p">:</span>

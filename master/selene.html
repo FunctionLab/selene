@@ -431,10 +431,10 @@ with patience=16 and factor=0.8 is used.</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitba9b756 ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
+<li><p><strong>~TrainModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.10.0a0+gitf7bfc7b ))"><em>torch.nn.Module</em></a>) – The model to train.</p></li>
 <li><p><strong>~TrainModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
 <li><p><strong>~TrainModel.criterion</strong> (<em>torch.nn._Loss</em>) – The loss function to optimize.</p></li>
-<li><p><strong>~TrainModel.optimizer</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.9.0a0+gitba9b756 ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
+<li><p><strong>~TrainModel.optimizer</strong> (<a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (1.10.0a0+gitf7bfc7b ))"><em>torch.optim.Optimizer</em></a>) – The optimizer to minimize loss with.</p></li>
 <li><p><strong>~TrainModel.batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The size of the mini-batch to use during training.</p></li>
 <li><p><strong>~TrainModel.max_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The maximum number of mini-batches to iterate over.</p></li>
 <li><p><strong>~TrainModel.nth_step_report_stats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – The frequency with which to report summary statistics.</p></li>
@@ -544,12 +544,17 @@ for torch to use during training.</p></li>
 <li><p><strong>use_features_ord</strong> (<em>list(str) or None, optional</em>) – Default is None. Specify an ordered list of features for which to
 run the evaluation. The features in this list must be identical to or
 a subset of <cite>features</cite>, and in the order you want the resulting
-<cite>test_targets.npz</cite> and <cite>test_predictions.npz</cite> to be saved.</p></li>
+<cite>test_targets.npz</cite> and <cite>test_predictions.npz</cite> to be saved. If using
+a FileSampler or H5DataLoader for the evaluation, you can pass in
+a dataset with the targets matrix only containing these features, but
+note that this subsetted targets matrix MUST be ordered the same
+way as <cite>features</cite>, and the predictions and targets .npz output
+will be reordered according to <cite>use_features_ord</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.9.0a0+gitba9b756 ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
+<li><p><strong>~EvaluateModel.model</strong> (<a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch vmaster (1.10.0a0+gitf7bfc7b ))"><em>torch.nn.Module</em></a>) – The trained model.</p></li>
 <li><p><strong>~EvaluateModel.criterion</strong> (<em>torch.nn._Loss</em>) – The model was trained using this loss function.</p></li>
 <li><p><strong>~EvaluateModel.sampler</strong> (<a class="reference internal" href="samplers.html#selene_sdk.samplers.Sampler" title="selene_sdk.samplers.Sampler"><em>selene_sdk.samplers.Sampler</em></a>) – The example generator.</p></li>
 <li><p><strong>~EvaluateModel.features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>)</em>) – List of distinct features the model predicts.</p></li>
