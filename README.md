@@ -4,7 +4,7 @@
 
 Selene is a Python library and command line interface for training deep neural networks from biological sequence data such as genomes.
 
-Please review our [release notes](./RELEASE_NOTES.md) for the latest updates to Selene.
+Please see our [release notes](./RELEASE_NOTES.md) for the latest updates to Selene.
 
 ## Installation
 
