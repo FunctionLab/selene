@@ -17,7 +17,7 @@ To install with conda (recommended for Linux users), run the following command i
 
    conda install -c bioconda selene-sdk
 
-Installing selene with pip:
+Installing selene with pip
 ---------------------------
 
 .. code-block:: sh
