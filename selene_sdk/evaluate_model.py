@@ -59,7 +59,12 @@ class EvaluateModel(object):
         Default is None. Specify an ordered list of features for which to
         run the evaluation. The features in this list must be identical to or
         a subset of `features`, and in the order you want the resulting
-        `test_targets.npz` and `test_predictions.npz` to be saved.
+        `test_targets.npz` and `test_predictions.npz` to be saved. If using
+        a FileSampler or H5DataLoader for the evaluation, you can pass in
+        a dataset with the targets matrix only containing these features, but
+        note that this subsetted targets matrix MUST be ordered the same
+        way as `features`, and the predictions and targets .npz output
+        will be reordered according to `use_features_ord`.
 
     Attributes
     ----------
