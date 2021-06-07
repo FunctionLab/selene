@@ -250,7 +250,7 @@ def get_feature_specific_scores(data, get_feature_from_index_fn):
 
 def auc_u_test(labels, predictions):
     """
-    Outputs the area under the the ROC curve associated with a certain 
+    Outputs the area under the the ROC curve associated with a certain
     set of labels and the predictions given by the training model.
     Computed from the U statistic.
 
@@ -265,8 +265,8 @@ def auc_u_test(labels, predictions):
     Returns
     -------
     float
-        AUC value of given label, prediction pairs  
-   
+        AUC value of given label, prediction pairs
+
     """
     len_pos = int(np.sum(labels))
     len_neg = len(labels) - len_pos
@@ -316,7 +316,8 @@ class PerformanceMetrics(object):
     def __init__(self,
                  get_feature_from_index_fn,
                  report_gt_feature_n_positives=10,
-                 metrics=dict(roc_auc=roc_auc_score, average_precision=average_precision_score)):
+                 metrics=dict(roc_auc=roc_auc_score,
+                              average_precision=average_precision_score)):
         """
         Creates a new object of the `PerformanceMetrics` class.
         """
@@ -467,7 +468,7 @@ class PerformanceMetrics(object):
         cols = '\t'.join(["class"] + metric_cols)
         with open(output_path, 'w+') as file_handle:
             file_handle.write("{0}\n".format(cols))
-            for feature, metric_scores in sorted(feature_scores.items()):
+            for feature, metric_scores in feature_scores.items():
                 if not metric_scores:
                     file_handle.write("{0}\t{1}\n".format(feature, "\t".join(["NA"] * len(metric_cols))))
                 else:
