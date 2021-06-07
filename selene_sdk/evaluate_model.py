@@ -59,7 +59,12 @@ class EvaluateModel(object):
         Default is None. Specify an ordered list of features for which to
         run the evaluation. The features in this list must be identical to or
         a subset of `features`, and in the order you want the resulting
-        `test_targets.npz` and `test_predictions.npz` to be saved.
+        `test_targets.npz` and `test_predictions.npz` to be saved. If using
+        a FileSampler or H5DataLoader for the evaluation, you can pass in
+        a dataset with the targets matrix only containing these features, but
+        note that this subsetted targets matrix MUST be ordered the same
+        way as `features`, and the predictions and targets .npz output
+        will be reordered according to `use_features_ord`.
 
     Attributes
     ----------
@@ -117,17 +122,14 @@ class EvaluateModel(object):
         self.output_dir = output_dir
         os.makedirs(output_dir, exist_ok=True)
 
-        self.features = features
+        self.features = np.array(features)
         self._use_ixs = list(range(len(features)))
         if use_features_ord is not None:
             feature_ixs = {f: ix for (ix, f) in enumerate(features)}
             self._use_ixs = []
-            self.features = []
-
             for f in use_features_ord:
                 if f in feature_ixs:
                     self._use_ixs.append(feature_ixs[f])
-                    self.features.append(f)
                 else:
                     warnings.warn(("Feature {0} in `use_features_ord` "
                                    "does not match any features in the list "
@@ -157,11 +159,23 @@ class EvaluateModel(object):
 
         self._test_data, self._all_test_targets = \
             self.sampler.get_data_and_targets(self.batch_size, n_test_samples)
-        # TODO: we should be able to do this on the sampler end instead of
-        # here. the current workaround is problematic, since
-        # self._test_data still has the full featureset in it, and we
-        # select the subset during `evaluate`
-        self._all_test_targets = self._all_test_targets[:, self._use_ixs]
+
+        self._use_testmat_ixs = self._use_ixs[:]
+        # if the targets shape is the same as the subsetted features,
+        # reindex based on the subsetted list
+        if self._all_test_targets.shape[1] == len(self._use_ixs):
+            subset_features = {self.features[ix]: i for (i, ix) in
+                               enumerate(sorted(self._use_ixs))}
+            self._use_testmat_ixs = [
+                subset_features[f] for f in self.features[self._use_ixs]]
+
+        self._all_test_targets = self._all_test_targets[
+            :, self._use_testmat_ixs]
+
+        # save the targets dataset now
+        np.savez_compressed(
+            os.path.join(self.output_dir, "test_targets.npz"),
+            data=self._all_test_targets)
 
         # reset Genome base ordering when applicable.
         if (hasattr(self.sampler, "reference_sequence") and
@@ -179,7 +193,7 @@ class EvaluateModel(object):
         """
         fp = os.path.join(self.output_dir, 'use_features_ord.txt')
         with open(fp, 'w+') as file_handle:
-            for f in self.features:
+            for f in self.features[self._use_ixs]:
                 file_handle.write('{0}\n'.format(f))
 
     def _get_feature_from_index(self, index):
@@ -196,7 +210,7 @@ class EvaluateModel(object):
             The name of the feature/target at the specified index.
 
         """
-        return self.features[index]
+        return self.features[self._use_ixs][index]
 
     def evaluate(self):
         """
@@ -216,7 +230,7 @@ class EvaluateModel(object):
         all_predictions = []
         for (inputs, targets) in self._test_data:
             inputs = torch.Tensor(inputs)
-            targets = torch.Tensor(targets[:, self._use_ixs])
+            targets = torch.Tensor(targets[:, self._use_testmat_ixs])
 
             if self.use_cuda:
                 inputs = inputs.cuda()
@@ -245,10 +259,6 @@ class EvaluateModel(object):
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),
             data=all_predictions)
-
-        np.savez_compressed(
-            os.path.join(self.output_dir, "test_targets.npz"),
-            data=self._all_test_targets)
 
         loss = np.average(batch_losses)
         logger.info("test loss: {0}".format(loss))

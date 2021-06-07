@@ -105,8 +105,7 @@ class MatFileSampler(FileSampler):
             self._tgts_batch_axis = targets_batch_axis
         self.n_samples = self._sample_seqs.shape[self._seq_batch_axis]
 
-        self._sample_indices = np.arange(
-            self.n_samples).tolist()
+        self._sample_indices = np.arange(self.n_samples).tolist()
         self._sample_next = 0
 
         self._shuffle = shuffle
@@ -138,7 +137,7 @@ class MatFileSampler(FileSampler):
         """
         sample_up_to = self._sample_next + batch_size
         use_indices = None
-        if sample_up_to >= len(self._sample_indices):
+        if sample_up_to > len(self._sample_indices):
             if self._shuffle:
                 np.random.shuffle(self._sample_indices)
             self._sample_next = 0
@@ -237,19 +236,18 @@ class MatFileSampler(FileSampler):
                 "initialization. Please use `get_data` instead.")
         if not n_samples:
             n_samples = self.n_samples
+
         sequences_and_targets = []
         targets_mat = []
 
-        count = batch_size
+        count = 0
         while count < n_samples:
-            seqs, tgts = self.sample(batch_size=batch_size)
+            sample_size = min(n_samples - count, batch_size)
+            seqs, tgts = self.sample(batch_size=sample_size)
             sequences_and_targets.append((seqs, tgts))
             targets_mat.append(tgts)
-            count += batch_size
-        remainder = batch_size - (count - n_samples)
-        seqs, tgts = self.sample(batch_size=remainder)
-        sequences_and_targets.append((seqs, tgts))
-        targets_mat.append(tgts)
+            count += sample_size
+
         # TODO: should not assume targets are always integers
         targets_mat = np.vstack(targets_mat).astype(float)
         return sequences_and_targets, targets_mat
