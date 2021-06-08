@@ -14,5 +14,5 @@ COPY selene-cpu.yml /tmp/$CONDA_ENV.yml
 RUN conda env create -q -f /tmp/selene.yml -n $CONDA_ENV && \
     bash -c '\
     source activate $CONDA_ENV && \
-    conda install -q nose sphinx sphinx_rtd_theme && \
+    conda install -q nose sphinx==4.0.1 sphinx_rtd_theme==0.5.2 && \
     pip install recommonmark'
