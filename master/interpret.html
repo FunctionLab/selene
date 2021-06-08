@@ -1,26 +1,35 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>selene_sdk.interpret &mdash; Selene 0.5.0 documentation</title>
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,12 +42,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
-  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="selene_sdk.predict" href="predict.html" />
@@ -86,6 +89,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
 
@@ -270,6 +274,7 @@
           
 
         </div>
+        
       </div>
     </nav>
 
@@ -304,18 +309,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>selene_sdk.interpret</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/interpret.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -329,11 +336,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="module-selene_sdk.interpret">
+  <div class="section" id="module-selene_sdk.interpret">
 <span id="selene-sdk-interpret"></span><h1>selene_sdk.interpret<a class="headerlink" href="#module-selene_sdk.interpret" title="Permalink to this headline">¶</a></h1>
 <p>This module provides functions and classes for interpreting modules
 trained with Selene.</p>
-<section id="sequence-logo">
+<div class="section" id="sequence-logo">
 <h2>sequence_logo<a class="headerlink" href="#sequence-logo" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.sequence_logo">
@@ -400,8 +407,8 @@ plot below:</p>
 <img alt="_images/sequence_logo_example.png" src="_images/sequence_logo_example.png" />
 </dd></dl>
 
-</section>
-<section id="heatmap">
+</div>
+<div class="section" id="heatmap">
 <h2>heatmap<a class="headerlink" href="#heatmap" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.heatmap">
@@ -443,8 +450,8 @@ to remember are:</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="ismresult">
+</div>
+<div class="section" id="ismresult">
 <h2>ISMResult<a class="headerlink" href="#ismresult" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.interpret.ISMResult">
@@ -569,8 +576,8 @@ performed on.</p>
 
 </dd></dl>
 
-</section>
-<section id="rescale-score-matrix">
+</div>
+<div class="section" id="rescale-score-matrix">
 <h2>rescale_score_matrix<a class="headerlink" href="#rescale-score-matrix" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.rescale_score_matrix">
@@ -618,8 +625,8 @@ position, where <span class="math notranslate nohighlight">\(L\)</span> is the l
 </dl>
 </dd></dl>
 
-</section>
-<section id="load-variant-abs-diff-scores">
+</div>
+<div class="section" id="load-variant-abs-diff-scores">
 <h2>load_variant_abs_diff_scores<a class="headerlink" href="#load-variant-abs-diff-scores" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.load_variant_abs_diff_scores">
@@ -645,8 +652,8 @@ file output from variant effect prediction.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="variant-diffs-scatter-plot">
+</div>
+<div class="section" id="variant-diffs-scatter-plot">
 <h2>variant_diffs_scatter_plot<a class="headerlink" href="#variant-diffs-scatter-plot" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.variant_diffs_scatter_plot">
@@ -704,8 +711,8 @@ browser that displays the plotted HTML file.</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="ordered-variants-and-indices">
+</div>
+<div class="section" id="ordered-variants-and-indices">
 <h2>ordered_variants_and_indices<a class="headerlink" href="#ordered-variants-and-indices" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.ordered_variants_and_indices">
@@ -728,8 +735,8 @@ is the ordered list of label indices.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="sort-standard-chrs">
+</div>
+<div class="section" id="sort-standard-chrs">
 <h2>sort_standard_chrs<a class="headerlink" href="#sort-standard-chrs" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.interpret.sort_standard_chrs">
@@ -749,37 +756,37 @@ standard chromosomes can be sorted.</p>
 </dl>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="predict.html" class="btn btn-neutral float-right" title="selene_sdk.predict" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="selene.html" class="btn btn-neutral float-left" title="selene_sdk" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="predict.html" class="btn btn-neutral float-right" title="selene_sdk.predict" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="selene.html" class="btn btn-neutral float-left" title="selene_sdk" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Selene Contributors
+        &#169; Copyright 2018, Selene Contributors.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -787,7 +794,6 @@ standard chromosomes can be sorted.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

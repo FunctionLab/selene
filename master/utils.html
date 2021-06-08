@@ -1,26 +1,35 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>selene_sdk.utils &mdash; Selene 0.5.0 documentation</title>
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,12 +42,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
-  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="selene_sdk.targets" href="targets.html" /> 
@@ -85,6 +88,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
 
@@ -269,6 +273,7 @@
           
 
         </div>
+        
       </div>
     </nav>
 
@@ -303,18 +308,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>selene_sdk.utils</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/utils.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -328,13 +335,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="module-selene_sdk.utils">
+  <div class="section" id="module-selene_sdk.utils">
 <span id="selene-sdk-utils"></span><h1>selene_sdk.utils<a class="headerlink" href="#module-selene_sdk.utils" title="Permalink to this headline">¶</a></h1>
 <p>The <cite>utils</cite> module contains classes and methods that provide
 more general utilities that are used across the package. Most of this
 functionality cannot be appropriately confined to just one module, and
 thus is included here.</p>
-<section id="nonstrandspecific">
+<div class="section" id="nonstrandspecific">
 <h2>NonStrandSpecific<a class="headerlink" href="#nonstrandspecific" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.utils.NonStrandSpecific">
@@ -361,8 +368,8 @@ the non-strand specific prediction.</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="performancemetrics">
+</div>
+<div class="section" id="performancemetrics">
 <h2>PerformanceMetrics<a class="headerlink" href="#performancemetrics" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.utils.PerformanceMetrics">
@@ -567,8 +574,8 @@ less than 50 positive examples in <cite>target</cite>.</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="initialize-logger">
+</div>
+<div class="section" id="initialize-logger">
 <h2>initialize_logger<a class="headerlink" href="#initialize-logger" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.initialize_logger">
@@ -597,8 +604,8 @@ logger configurations.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="load-features-list">
+</div>
+<div class="section" id="load-features-list">
 <h2>load_features_list<a class="headerlink" href="#load-features-list" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.load_features_list">
@@ -633,8 +640,8 @@ and <span class="math notranslate nohighlight">\(YFG\)</span> might look like th
 </div>
 </dd></dl>
 
-</section>
-<section id="load-model-from-state-dict">
+</div>
+<div class="section" id="load-model-from-state-dict">
 <h2>load_model_from_state_dict<a class="headerlink" href="#load-model-from-state-dict" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.load_model_from_state_dict">
@@ -662,8 +669,8 @@ without/with torch.nn.DataParallel.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="get-indices-and-probabilities">
+</div>
+<div class="section" id="get-indices-and-probabilities">
 <h2>get_indices_and_probabilities<a class="headerlink" href="#get-indices-and-probabilities" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.get_indices_and_probabilities">
@@ -689,8 +696,8 @@ used to weight the indices proportionally to interval length.</p></li>
 </dl>
 </dd></dl>
 
-</section>
-<section id="load-path-for-config-yml">
+</div>
+<div class="section" id="load-path-for-config-yml">
 <h2>load_path (for config.yml)<a class="headerlink" href="#load-path-for-config-yml" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.load_path">
@@ -722,8 +729,8 @@ a Python object to instantiate), or a nested hierarchy of
 <p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
 </dd></dl>
 
-</section>
-<section id="instantiate-configuration-object">
+</div>
+<div class="section" id="instantiate-configuration-object">
 <h2>instantiate (configuration object)<a class="headerlink" href="#instantiate-configuration-object" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.instantiate">
@@ -749,8 +756,8 @@ to their instantiated values.</p></li>
 <p>Taken (with minor changes) from <a class="reference external" href="http://github.com/lisa-lab/pylearn2/blob/master/pylearn2/config/yaml_parse.py">Pylearn2</a>.</p>
 </dd></dl>
 
-</section>
-<section id="initialize-model">
+</div>
+<div class="section" id="initialize-model">
 <h2>initialize_model<a class="headerlink" href="#initialize-model" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.initialize_model">
@@ -786,8 +793,8 @@ True.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="parse-configs-and-run">
+</div>
+<div class="section" id="parse-configs-and-run">
 <h2>parse_configs_and_run<a class="headerlink" href="#parse-configs-and-run" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.parse_configs_and_run">
@@ -829,8 +836,8 @@ to the dirs specified in each operation’s configuration.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="execute-run-selene-operations">
+</div>
+<div class="section" id="execute-run-selene-operations">
 <h2>execute (run Selene operations)<a class="headerlink" href="#execute-run-selene-operations" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="selene_sdk.utils.execute">
@@ -861,35 +868,36 @@ to the dirs specified in each operation’s configuration.</p>
 </dl>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="targets.html" class="btn btn-neutral float-left" title="selene_sdk.targets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="targets.html" class="btn btn-neutral float-left" title="selene_sdk.targets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Selene Contributors
+        &#169; Copyright 2018, Selene Contributors.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -897,7 +905,6 @@ to the dirs specified in each operation’s configuration.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

@@ -1,26 +1,35 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>selene_sdk.predict &mdash; Selene 0.5.0 documentation</title>
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,12 +42,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
-  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="selene_sdk.samplers" href="samplers.html" />
@@ -86,6 +89,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
 
@@ -270,6 +274,7 @@
           
 
         </div>
+        
       </div>
     </nav>
 
@@ -304,18 +309,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>selene_sdk.predict</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/predict.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -329,11 +336,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="module-selene_sdk.predict">
+  <div class="section" id="module-selene_sdk.predict">
 <span id="selene-sdk-predict"></span><h1>selene_sdk.predict<a class="headerlink" href="#module-selene_sdk.predict" title="Permalink to this headline">¶</a></h1>
 <p>This module contains classes and methods for making and analyzing
 predictions with models that have already been trained.</p>
-<section id="analyzesequences">
+<div class="section" id="analyzesequences">
 <h2>AnalyzeSequences<a class="headerlink" href="#analyzesequences" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.AnalyzeSequences">
@@ -438,7 +445,7 @@ of the sequences in the input FASTA).</p></li>
 </li>
 <li><p><strong>strand_index</strong> (<em>int or None, optional</em>) – Default is None. If the trained model makes strand-specific
 predictions, your input BED file may include a column with strand
-information (strand must be one of {‘+’, ‘-’, ‘.’}). Specify
+information (strand must be one of {‘+’, ‘-‘, ‘.’}). Specify
 the index (0-based) to use it. Otherwise, by default ‘+’ is used.
 (This parameter is ignored if FASTA file is used as input.)</p></li>
 </ul>
@@ -494,7 +501,7 @@ of the sequences in the input FASTA).</p></li>
 </li>
 <li><p><strong>strand_index</strong> (<em>int or None, optional</em>) – Default is None. If the trained model makes strand-specific
 predictions, your input file may include a column with strand
-information (strand must be one of {‘+’, ‘-’, ‘.’}). Specify
+information (strand must be one of {‘+’, ‘-‘, ‘.’}). Specify
 the index (0-based) to use it. Otherwise, by default ‘+’ is used.</p></li>
 </ul>
 </dd>
@@ -727,7 +734,7 @@ output as a separate .txt file.</p></li>
 <li><p><strong>strand_index</strong> (<em>int or None, optional.</em>) – Default is None. If applicable, specify the column index (0-based)
 in the VCF file that contains strand information for each variant.</p></li>
 <li><p><strong>require_strand</strong> (<em>bool, optional.</em>) – Default is False. Whether strand can be specified as ‘.’. If False,
-Selene accepts strand value to be ‘+’, ‘-’, or ‘.’ and automatically
+Selene accepts strand value to be ‘+’, ‘-‘, or ‘.’ and automatically
 treats ‘.’ as ‘+’. If True, Selene skips any variant with strand ‘.’.
 This parameter assumes that <cite>strand_index</cite> has been set.</p></li>
 </ul>
@@ -758,37 +765,37 @@ genome FASTA file.</p>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="samplers.html" class="btn btn-neutral float-right" title="selene_sdk.samplers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="interpret.html" class="btn btn-neutral float-left" title="selene_sdk.interpret" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="samplers.html" class="btn btn-neutral float-right" title="selene_sdk.samplers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="interpret.html" class="btn btn-neutral float-left" title="selene_sdk.interpret" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Selene Contributors
+        &#169; Copyright 2018, Selene Contributors.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -796,7 +803,6 @@ genome FASTA file.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

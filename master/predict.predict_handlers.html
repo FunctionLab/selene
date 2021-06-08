@@ -1,26 +1,35 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>selene.predict.predict_handlers &mdash; Selene 0.5.0 documentation</title>
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
+  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
+
+  
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
+
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -33,12 +42,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway" type="text/css" />
-  <link rel="stylesheet" href="_static/css/selene_docs_theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
@@ -84,6 +87,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
 
@@ -268,6 +272,7 @@
           
 
         </div>
+        
       </div>
     </nav>
 
@@ -302,18 +307,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>selene.predict.predict_handlers</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/predict.predict_handlers.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -327,11 +334,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="module-selene_sdk.predict.predict_handlers">
+  <div class="section" id="module-selene_sdk.predict.predict_handlers">
 <span id="selene-predict-predict-handlers"></span><h1>selene.predict.predict_handlers<a class="headerlink" href="#module-selene_sdk.predict.predict_handlers" title="Permalink to this headline">¶</a></h1>
 <p>This module provides the classes and methods for prediction handlers,
 which generally are used for logging and saving outputs from models.</p>
-<section id="predictionshandler">
+<div class="section" id="predictionshandler">
 <h2>PredictionsHandler<a class="headerlink" href="#predictionshandler" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.predict_handlers.PredictionsHandler">
@@ -386,8 +393,8 @@ to compute the final output</p>
 
 </dd></dl>
 
-</section>
-<section id="diffscorehandler">
+</div>
+<div class="section" id="diffscorehandler">
 <h2>DiffScoreHandler<a class="headerlink" href="#diffscorehandler" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.predict_handlers.DiffScoreHandler">
@@ -462,8 +469,8 @@ features).</p></li>
 
 </dd></dl>
 
-</section>
-<section id="logitscorehandler">
+</div>
+<div class="section" id="logitscorehandler">
 <h2>LogitScoreHandler<a class="headerlink" href="#logitscorehandler" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.predict_handlers.LogitScoreHandler">
@@ -539,8 +546,8 @@ features).</p></li>
 
 </dd></dl>
 
-</section>
-<section id="writepredictionshandler">
+</div>
+<div class="section" id="writepredictionshandler">
 <h2>WritePredictionsHandler<a class="headerlink" href="#writepredictionshandler" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.predict_handlers.WritePredictionsHandler">
@@ -605,8 +612,8 @@ sequence.</p></li>
 
 </dd></dl>
 
-</section>
-<section id="writerefalthandler">
+</div>
+<div class="section" id="writerefalthandler">
 <h2>WriteRefAltHandler<a class="headerlink" href="#writerefalthandler" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.predict_handlers.WriteRefAltHandler">
@@ -679,31 +686,36 @@ features).</p></li>
 
 </dd></dl>
 
-</section>
-<section id="write-to-file">
+</div>
+<div class="section" id="write-to-file">
 <h2>write_to_file<a class="headerlink" href="#write-to-file" title="Permalink to this headline">¶</a></h2>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Selene Contributors
+        &#169; Copyright 2018, Selene Contributors.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -711,7 +723,6 @@ features).</p></li>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
