@@ -8,7 +8,9 @@ import importlib
 import sys
 from time import strftime
 import types
+import random
 
+import numpy as np
 import torch
 
 from . import _is_lua_trained_model
@@ -332,8 +334,12 @@ def parse_configs_and_run(configs,
 
     if "random_seed" in configs:
         seed = configs["random_seed"]
+        random.seed(seed)
+        np.random.seed(seed)
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
     else:
         print("Warning: no random seed specified in config file. "
               "Using a random seed ensures results are reproducible.")
