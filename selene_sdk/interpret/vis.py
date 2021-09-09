@@ -243,7 +243,7 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
     # Change ordering of things based on input arguments.
     if order == "alpha":
         for i in range(score_matrix.shape[0]):
-            bases[i, :] = sequence_type.BASES_ARR[i]
+            bases[i, :] = np.array(sequence_type.BASES_ARR)[i]
 
     elif order == "value":
         if np.sum(score_matrix < 0) != 0:
@@ -256,7 +256,7 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
                                                axis=None)
                 sorted_scores[:div, j] = score_matrix[
                     negative_idx[negative_sort_idx], j]
-                bases[:div, j] = sequence_type.BASES_ARR[
+                bases[:div, j] = np.array(sequence_type.BASES_ARR)[
                     negative_idx[negative_sort_idx]].flatten()
 
                 # Sort the positive values and stack atop the negatives.
@@ -265,13 +265,13 @@ def sequence_logo(score_matrix, order="value", width=1.0, ax=None,
                                                axis=None)
                 sorted_scores[div:, j] = score_matrix[
                     positive_idx[positive_sort_idx], j]
-                bases[div:, j] = sequence_type.BASES_ARR[
+                bases[div:, j] = np.array(sequence_type.BASES_ARR)[
                     positive_idx[positive_sort_idx]].flatten()
             score_matrix = sorted_scores
         else:
             for j in range(score_matrix.shape[1]):
                 sort_idx = np.argsort(score_matrix[:, j], axis=None)[::-1]
-                bases[:, j] = sequence_type.BASES_ARR[sort_idx]
+                bases[:, j] = np.array(sequence_type.BASES_ARR)[sort_idx]
                 score_matrix[:, j] = score_matrix[sort_idx, j]
 
     # Create offsets for each bar.
