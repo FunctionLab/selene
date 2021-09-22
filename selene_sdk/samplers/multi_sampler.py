@@ -8,6 +8,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 
 from .sampler import Sampler
+from .file_samplers import FileSampler
 
 
 def MultiFileSampler(*args, **kwargs):
@@ -88,11 +89,10 @@ class MultiSampler(Sampler):
             features,
             save_datasets=save_datasets,
             output_dir=output_dir)
-
         self._samplers = {
-            "train": train_sampler if isinstance(train_sampler, Sampler) \
+            "train": train_sampler if isinstance(train_sampler, FileSampler) \
                      else None,
-            "validate": validate_sampler if isinstance(validate_sampler, Sampler) \
+            "validate": validate_sampler if isinstance(validate_sampler, FileSampler) \
                         else None
         }
 
@@ -115,7 +115,7 @@ class MultiSampler(Sampler):
         if test_sampler is not None:
             self.modes.append("test")
             self._samplers["test"] = \
-                test_sampler if isinstance(test_sampler, Sampler) else None
+                test_sampler if isinstance(test_sampler, FileSampler) else None
             self._dataloaders["test"] = \
                 test_sampler if isinstance(test_sampler, DataLoader) else None
             self._iterators["test"] = iter(self._dataloaders["test"]) \
