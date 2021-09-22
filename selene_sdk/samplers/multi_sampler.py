@@ -90,9 +90,11 @@ class MultiSampler(Sampler):
             save_datasets=save_datasets,
             output_dir=output_dir)
         self._samplers = {
-            "train": train_sampler if isinstance(train_sampler, FileSampler) \
+            "train": train_sampler if (isinstance(train_sampler, FileSampler) or
+                                       isinstance(train_sampler, Sampler)) \
                      else None,
-            "validate": validate_sampler if isinstance(validate_sampler, FileSampler) \
+            "validate": validate_sampler if (isinstance(validate_sampler, FileSampler) or
+                                             isinstance(validate_sampler, Sampler)) \
                         else None
         }
 
@@ -115,7 +117,8 @@ class MultiSampler(Sampler):
         if test_sampler is not None:
             self.modes.append("test")
             self._samplers["test"] = \
-                test_sampler if isinstance(test_sampler, FileSampler) else None
+                test_sampler if (isinstance(test_sampler, FileSampler) or
+                                 isinstance(test_sampler, Sampler)) else None
             self._dataloaders["test"] = \
                 test_sampler if isinstance(test_sampler, DataLoader) else None
             self._iterators["test"] = iter(self._dataloaders["test"]) \
