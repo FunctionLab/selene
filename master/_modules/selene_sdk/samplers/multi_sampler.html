@@ -342,6 +342,7 @@
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
 <span class="kn">from</span> <span class="nn">.sampler</span> <span class="kn">import</span> <span class="n">Sampler</span>
+<span class="kn">from</span> <span class="nn">.file_samplers</span> <span class="kn">import</span> <span class="n">FileSampler</span>
 
 
 <div class="viewcode-block" id="MultiFileSampler"><a class="viewcode-back" href="../../../samplers.html#selene_sdk.samplers.MultiFileSampler">[docs]</a><span class="k">def</span> <span class="nf">MultiFileSampler</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -422,11 +423,12 @@
             <span class="n">features</span><span class="p">,</span>
             <span class="n">save_datasets</span><span class="o">=</span><span class="n">save_datasets</span><span class="p">,</span>
             <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> \
+            <span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="n">train_sampler</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">train_sampler</span><span class="p">,</span> <span class="n">FileSampler</span><span class="p">)</span> <span class="ow">or</span>
+                                       <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">))</span> \
                      <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;validate&quot;</span><span class="p">:</span> <span class="n">validate_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">validate_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> \
+            <span class="s2">&quot;validate&quot;</span><span class="p">:</span> <span class="n">validate_sampler</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">validate_sampler</span><span class="p">,</span> <span class="n">FileSampler</span><span class="p">)</span> <span class="ow">or</span>
+                                             <span class="nb">isinstance</span><span class="p">(</span><span class="n">validate_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">))</span> \
                         <span class="k">else</span> <span class="kc">None</span>
         <span class="p">}</span>
 
@@ -449,7 +451,8 @@
         <span class="k">if</span> <span class="n">test_sampler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_samplers</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="n">test_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">test_sampler</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">FileSampler</span><span class="p">)</span> <span class="ow">or</span>
+                                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">Sampler</span><span class="p">))</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="n">test_sampler</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_sampler</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_iterators</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataloaders</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">])</span> \
