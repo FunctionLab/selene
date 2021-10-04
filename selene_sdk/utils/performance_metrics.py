@@ -200,7 +200,12 @@ def compute_score(prediction, target, metric_fn,
         `(None, [])`.
     """
     feature_scores = np.ones(target.shape[1]) * np.nan
-    for index, feature_preds in enumerate(prediction.T):
+    # Deal with the case of multi-class classification, where each example only has one target value but multiple prediction values
+    if target.shape[1] == 1 and prediction.shape[1] > 1:
+        prediction = [prediction]
+    else:
+        prediction = prediction.T
+    for index, feature_preds in enumerate(prediction):
         feature_targets = target[:, index]
         if len(np.unique(feature_targets)) > 0 and \
                np.count_nonzero(feature_targets) > report_gt_feature_n_positives:
