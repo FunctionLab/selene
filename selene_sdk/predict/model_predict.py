@@ -173,7 +173,8 @@ class AnalyzeSequences(object):
         self.batch_size = batch_size
         self.features = features
         self.reference_sequence = reference_sequence
-        if not self.reference_sequence._initialized:
+        if type(self.reference_sequence) == Genome and \
+                not self.reference_sequence._initialized:
             self.reference_sequence._unpicklable_init()
         if type(self.reference_sequence) == Genome and \
                 _is_lua_trained_model(model):
