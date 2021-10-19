@@ -63,7 +63,7 @@ setup(name="selene-sdk",
         "scipy",
         "seaborn",
         "statsmodels",
-        "torch>=0.4.1, <=1.4.0",
+        "torch>=0.4.1, <=1.9",
     ],
     entry_points={
         'console_scripts': [
