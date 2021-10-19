@@ -201,6 +201,10 @@ class TrainModel(object):
         """
         Constructs a new `TrainModel` object.
         """
+        initialize_logger(
+            os.path.join(self.output_dir, "{0}.log".format(__name__)),
+            verbosity=logging_verbosity)
+
         if deterministic:
             logger.info("Setting deterministic = True for reproducibility.")
             torch.backends.cudnn.deterministic = True
@@ -247,10 +251,6 @@ class TrainModel(object):
 
         os.makedirs(output_dir, exist_ok=True)
         self.output_dir = output_dir
-
-        initialize_logger(
-            os.path.join(self.output_dir, "{0}.log".format(__name__)),
-            verbosity=logging_verbosity)
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
         self._metrics = metrics
