@@ -201,15 +201,6 @@ class TrainModel(object):
         """
         Constructs a new `TrainModel` object.
         """
-        initialize_logger(
-            os.path.join(self.output_dir, "{0}.log".format(__name__)),
-            verbosity=logging_verbosity)
-
-        if deterministic:
-            logger.info("Setting deterministic = True for reproducibility.")
-            torch.backends.cudnn.deterministic = True
-            torch.backends.cudnn.benchmark = False
-
         self.model = model
         self.sampler = data_sampler
         self.criterion = loss_criterion
@@ -227,6 +218,19 @@ class TrainModel(object):
             self.nth_step_save_checkpoint = save_checkpoint_every_n_steps
 
         self._save_new_checkpoints = save_new_checkpoints_after_n_steps
+
+        os.makedirs(output_dir, exist_ok=True)
+        self.output_dir = output_dir
+
+        initialize_logger(
+            os.path.join(self.output_dir, "{0}.log".format(__name__)),
+            verbosity=logging_verbosity)
+
+        if deterministic:
+            logger.info("Setting deterministic = True for reproducibility.")
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
 
         logger.info("Training parameters set: batch size {0}, "
                     "number of steps per 'epoch': {1}, "
@@ -248,9 +252,6 @@ class TrainModel(object):
             self.model.cuda()
             self.criterion.cuda()
             logger.debug("Set modules to use CUDA")
-
-        os.makedirs(output_dir, exist_ok=True)
-        self.output_dir = output_dir
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
         self._metrics = metrics
