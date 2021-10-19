@@ -343,7 +343,7 @@ which generally are used for logging and saving outputs from models.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="selene_sdk.predict.predict_handlers.PredictionsHandler">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">selene_sdk.predict.predict_handlers.</span></span><span class="sig-name descname"><span class="pre">PredictionsHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_for_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mem_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selene_sdk/predict/predict_handlers/handler.html#PredictionsHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#selene_sdk.predict.predict_handlers.PredictionsHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The abstract base class for handlers, which “handle” model
 predictions. Handlers are responsible for accepting predictions,
 storing these predictions or scores derived from the predictions,
@@ -375,7 +375,7 @@ row labels to an output file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
-<dd class="field-even"><p><strong>~PredictionsHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+<dd class="field-even"><p><strong>~PredictionsHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
 </dd>
 </dl>
@@ -429,7 +429,7 @@ row labels to an output file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
-<dd class="field-even"><p><strong>~DiffScoreHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+<dd class="field-even"><p><strong>~DiffScoreHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
 </dd>
 </dl>
@@ -509,7 +509,7 @@ row labels to an output file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
-<dd class="field-even"><p><strong>~LogitScoreHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+<dd class="field-even"><p><strong>~LogitScoreHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
 </dd>
 </dl>
@@ -580,7 +580,7 @@ row labels to an output file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
-<dd class="field-even"><p><strong>~WritePredictionsHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+<dd class="field-even"><p><strong>~WritePredictionsHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
 </dd>
 </dl>
@@ -649,7 +649,7 @@ row labels to an output file.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
-<dd class="field-even"><p><strong>~WriteRefAltHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
+<dd class="field-even"><p><strong>~WriteRefAltHandler.needs_base_pred</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether the handler needs the base (reference) prediction as input
 to compute the final output</p>
 </dd>
 </dl>

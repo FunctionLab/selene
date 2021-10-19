@@ -472,8 +472,14 @@
 <span class="sd">        using `torch.load`.</span>
 <span class="sd">    use_scheduler : bool, optional</span>
 <span class="sd">        Default is `True`. If `True`, learning rate scheduler is used to</span>
-<span class="sd">        reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler </span>
+<span class="sd">        reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler</span>
 <span class="sd">        with patience=16 and factor=0.8 is used.</span>
+<span class="sd">    deterministic : bool, optional</span>
+<span class="sd">        Default is `False`. If `True`, will set</span>
+<span class="sd">        `torch.backends.cudnn.deterministic` to True and</span>
+<span class="sd">        `torch.backends.cudnn.benchmark = False`. In Selene CLI,</span>
+<span class="sd">        if `random_seed` is set in the configuration YAML, Selene automatically</span>
+<span class="sd">        passes in `deterministic=True` to the TrainModel class.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -524,7 +530,8 @@
                  <span class="n">checkpoint_resume</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">metrics</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">roc_auc</span><span class="o">=</span><span class="n">roc_auc_score</span><span class="p">,</span>
                               <span class="n">average_precision</span><span class="o">=</span><span class="n">average_precision_score</span><span class="p">),</span>
-                 <span class="n">use_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                 <span class="n">use_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">deterministic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructs a new `TrainModel` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -546,6 +553,19 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_save_new_checkpoints</span> <span class="o">=</span> <span class="n">save_new_checkpoints_after_n_steps</span>
 
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
+
+        <span class="n">initialize_logger</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.log&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)),</span>
+            <span class="n">verbosity</span><span class="o">=</span><span class="n">logging_verbosity</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">deterministic</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting deterministic = True for reproducibility.&quot;</span><span class="p">)</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">False</span>
+
+
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Training parameters set: batch size </span><span class="si">{0}</span><span class="s2">, &quot;</span>
                     <span class="s2">&quot;number of steps per &#39;epoch&#39;: </span><span class="si">{1}</span><span class="s2">, &quot;</span>
                     <span class="s2">&quot;maximum number of steps: </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -566,13 +586,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Set modules to use CUDA&quot;</span><span class="p">)</span>
-
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
-
-        <span class="n">initialize_logger</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">.log&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)),</span>
-            <span class="n">verbosity</span><span class="o">=</span><span class="n">logging_verbosity</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_report_gt_feature_n_positives</span> <span class="o">=</span> <span class="n">report_gt_feature_n_positives</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metrics</span> <span class="o">=</span> <span class="n">metrics</span>
