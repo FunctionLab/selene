@@ -138,8 +138,14 @@ class TrainModel(object):
         using `torch.load`.
     use_scheduler : bool, optional
         Default is `True`. If `True`, learning rate scheduler is used to
-        reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler 
+        reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler
         with patience=16 and factor=0.8 is used.
+    deterministic : bool, optional
+        Default is `False`. If `True`, will set
+        `torch.backends.cudnn.deterministic` to True and
+        `torch.backends.cudnn.benchmark = False`. In Selene CLI,
+        if `random_seed` is set in the configuration YAML, Selene automatically
+        passes in `deterministic=True` to the TrainModel class.
 
     Attributes
     ----------
@@ -190,10 +196,16 @@ class TrainModel(object):
                  checkpoint_resume=None,
                  metrics=dict(roc_auc=roc_auc_score,
                               average_precision=average_precision_score),
-                 use_scheduler=True):
+                 use_scheduler=True,
+                 deterministic=False):
         """
         Constructs a new `TrainModel` object.
         """
+        if deterministic:
+            logger.info("Setting deterministic = True for reproducibility.")
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+
         self.model = model
         self.sampler = data_sampler
         self.criterion = loss_criterion
