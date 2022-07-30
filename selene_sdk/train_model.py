@@ -139,13 +139,24 @@ class TrainModel(object):
     use_scheduler : bool, optional
         Default is `True`. If `True`, learning rate scheduler is used to
         reduce learning rate on plateau. PyTorch ReduceLROnPlateau scheduler
-        with patience=16 and factor=0.8 is used.
+        with patience=16 and factor=0.8 is used. Different scheduler parameters
+        can be specified with `scheduler_kwargs`.
     deterministic : bool, optional
         Default is `False`. If `True`, will set
         `torch.backends.cudnn.deterministic` to True and
         `torch.backends.cudnn.benchmark = False`. In Selene CLI,
         if `random_seed` is set in the configuration YAML, Selene automatically
         passes in `deterministic=True` to the TrainModel class.
+    scheduler_kwargs : dict, optional
+        Default is patience=16, verbose=True, and factor=0.8. Set the parameters
+        for the PyTorch ReduceLROnPlateau scheduler.
+    stopping_criteria : list or None, optional
+        Default is `None`. If `stopping_criteria` is not None, it should be a
+        list specifying how to use early stopping. The first value should be
+        a str corresponding to one of `metrics`. The second value should be an
+        int indicating the patience. If the specified metric does not improve
+        in the given patience (usually corresponding to the number of epochs),
+        training stops early.
 
     Attributes
     ----------
@@ -197,7 +208,11 @@ class TrainModel(object):
                  metrics=dict(roc_auc=roc_auc_score,
                               average_precision=average_precision_score),
                  use_scheduler=True,
-                 deterministic=False):
+                 deterministic=False,
+                 scheduler_kwargs=dict(patience=16,
+                                       verbose=True,
+                                       factor=0.8),
+                 stopping_criteria=None):
         """
         Constructs a new `TrainModel` object.
         """
@@ -259,12 +274,25 @@ class TrainModel(object):
         self._n_test_samples = n_test_samples
         self._use_scheduler = use_scheduler
 
-        self._init_train()
+        self._init_train(scheduler_kwargs)
         self._init_validate()
         if "test" in self.sampler.modes:
             self._init_test()
         if checkpoint_resume is not None:
             self._load_checkpoint(checkpoint_resume)
+
+        if type(stopping_criteria) is list and len(stopping_criteria) == 2:
+            stopping_metric, stopping_patience = stopping_criteria
+            self._early_stopping = True
+            if stopping_metric in self._metrics:
+                self._stopping_metric = stopping_metric
+                self._stopping_patience = stopping_patience
+                self._stopping_reached = False
+            else:
+                logger.warning("Did not recognize stopping metric. Not performing early stopping.")
+                self._early_stopping = False
+        else:
+            self._early_stopping = False
 
     def _load_checkpoint(self, checkpoint_resume):
         checkpoint = torch.load(
@@ -297,7 +325,7 @@ class TrainModel(object):
             ("Resuming from checkpoint: step {0}, min loss {1}").format(
                 self._start_step, self._min_loss))
 
-    def _init_train(self):
+    def _init_train(self, scheduler_kwargs):
         self._start_step = 0
         self._train_logger = _metrics_logger(
                 "{0}.train".format(__name__), self.output_dir)
@@ -306,9 +334,7 @@ class TrainModel(object):
             self.scheduler = ReduceLROnPlateau(
                 self.optimizer,
                 'min',
-                patience=16,
-                verbose=True,
-                factor=0.8)
+                **scheduler_kwargs)
         self._time_per_step = []
         self._train_loss = []
 
@@ -433,9 +459,11 @@ class TrainModel(object):
                 self._checkpoint()
             if self.step and self.step % self.nth_step_report_stats == 0:
                 self.validate()
+            if self._early_stopping and self._stopping_reached:
+                logger.debug("Patience ran out. Stopping early.")
+                break
 
         self.sampler.save_dataset_to_file("train", close_filehandle=True)
-
 
     def train(self):
         """
@@ -564,6 +592,13 @@ class TrainModel(object):
                 "optimizer": self.optimizer.state_dict()}, True)
             logger.debug("Updating `best_model.pth.tar`")
         logger.info("validation loss: {0}".format(validation_loss))
+
+        # check for early stopping
+        if self._early_stopping:
+            stopping_metric = self._validation_metrics.metrics[self._stopping_metric].data
+            index = np.argmax(stopping_metric)
+            if self._stopping_patience - (len(stopping_metric) - index - 1) <= 0:
+                self._stopping_reached = True
 
     def evaluate(self):
         """
