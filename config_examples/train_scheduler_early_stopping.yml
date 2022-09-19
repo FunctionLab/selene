@@ -1,0 +1,46 @@
+---
+ops: [train]
+create_subdirectory: False
+lr: 0.0003
+model: {
+    path: ./Data/SeleneFiles/enhancer_resnet_regression.py,
+    class: EnhancerResnet,
+    class_args: {
+        sequence_length: 164,
+    },
+    #non_strand_specific: "mean",
+}
+sampler: !obj:selene_sdk.samplers.MultiSampler {
+    features: ["expression_log2_standardized"],
+    train_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+        filepath: ./Data/SeleneFiles/train_regression.mat,
+        sequence_key: sequence,
+        targets_key: activity,
+        shuffle: True,
+    },
+    validate_sampler: !obj:selene_sdk.samplers.file_samplers.MatFileSampler {
+        filepath: ./Data/SeleneFiles/validate_regression.mat,
+        sequence_key: sequence,
+        targets_key: activity,
+        shuffle: False,
+    },
+}
+train_model: !obj:selene_sdk.TrainModel {
+    batch_size: 128,  # 25757 training examples
+    report_stats_every_n_steps: 202,  # 201.23 steps for full epoch
+    max_steps: 10062,   # 50 epochs
+    use_cuda: True,
+    data_parallel: False,
+    logging_verbosity: 2,
+    metrics: {
+      pcc: !import metrics.pearson,
+      scc: !import metrics.spearman,
+    },
+    scheduler_kwargs: {
+      patience: 3,
+      factor: 0.2,
+      verbose: True,
+    },
+    stopping_criteria: ["scc", 10],
+}
+...
