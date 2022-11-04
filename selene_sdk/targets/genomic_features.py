@@ -54,7 +54,7 @@ def _any_positive_rows(rows, start, end, thresholds):
         return False
     for row in rows:  # features within [start, end)
         is_positive = _is_positive_row(
-            start, end, int(row[1]), int(row[2]), thresholds[row[3]])
+            start, end, int(row[1]), int(row[2]), thresholds[row[4]])
         if is_positive:
             return True
     return False
@@ -102,7 +102,7 @@ def _is_positive_row(start, end,
 
 
 def _get_feature_data(chrom, start, end,
-                      thresholds, feature_index_dict, get_feature_rows):
+                      thresholds, feature_index_dict, get_feature_rows, strand='+'):
     """
     Generates a target vector for the given query region.
 
@@ -125,6 +125,8 @@ def _get_feature_data(chrom, start, end,
     get_feature_rows : types.FunctionType
         A function that takes coordinates and returns rows
         (`list(tuple(int, int, str))`).
+    strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is treated
 
     Returns
     -------
@@ -133,7 +135,7 @@ def _get_feature_data(chrom, start, end,
         `i`th feature is positive, and zero otherwise.
 
     """
-    rows = get_feature_rows(chrom, start, end)
+    rows = get_feature_rows(chrom, start, end, strand)
     return _fast_get_feature_data(
         start, end, thresholds, feature_index_dict, rows)
 
@@ -303,7 +305,7 @@ class GenomicFeatures(Target):
             return func(self, *args, **kwargs)
         return dfunc
 
-    def _query_tabix(self, chrom, start, end, strand='+'):
+    def _query_tabix(self, chrom, start, end, strand):
         """
         Queries a tabix-indexed `*.bed` file for features falling into
         the specified region.
@@ -317,8 +319,8 @@ class GenomicFeatures(Target):
             The 0-based start position of the query coordinates.
         end : int
             One past the last position of the query coordinates.
-        strand : {'+', '-', '.'}, optional
-            Default is '+'. The strand the sequence is located on. '.' is treated
+        strand : {'+', '-', '.'}
+            The strand the sequence is located on. '.' is treated
 
 
         Returns
@@ -333,7 +335,7 @@ class GenomicFeatures(Target):
         """
         try:
             tabix_query = self.data.query(chrom, start, end)
-            return [line for line in tabix_query if str(line[4]) == strand] # strand specificity
+            return [line for line in tabix_query if str(line[3]) == strand] # strand specificity
         except tabix.TabixError:
             return None
 
@@ -394,15 +396,14 @@ class GenomicFeatures(Target):
         """
         if self._feature_thresholds_vec is None:
             features = np.zeros(self.n_features)
-            # TODO: modify query_tabix to add strand specificity
-            rows = self._query_tabix(chrom, start, end, strand)
+            rows = self._query_tabix(chrom, start, end, strand) # added strand specificity
             if not rows:
                 return features
             for r in rows:
-                feature = r[3]
+                feature = r[4]
                 ix = self.feature_index_dict[feature]
                 features[ix] = 1
             return features
         return _get_feature_data(
             chrom, start, end, self._feature_thresholds_vec,
-            self.feature_index_dict, self._query_tabix)
+            self.feature_index_dict, self._query_tabix, strand=strand)
