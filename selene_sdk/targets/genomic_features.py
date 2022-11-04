@@ -303,7 +303,7 @@ class GenomicFeatures(Target):
             return func(self, *args, **kwargs)
         return dfunc
 
-    def _query_tabix(self, chrom, start, end):
+    def _query_tabix(self, chrom, start, end, strand='+'):
         """
         Queries a tabix-indexed `*.bed` file for features falling into
         the specified region.
@@ -317,6 +317,9 @@ class GenomicFeatures(Target):
             The 0-based start position of the query coordinates.
         end : int
             One past the last position of the query coordinates.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is treated
+
 
         Returns
         -------
@@ -329,12 +332,13 @@ class GenomicFeatures(Target):
 
         """
         try:
-            return self.data.query(chrom, start, end)
+            tabix_query = self.data.query(chrom, start, end)
+            return [line for line in tabix_query if str(line[4]) == strand] # strand specificity
         except tabix.TabixError:
             return None
 
     @init
-    def is_positive(self, chrom, start, end):
+    def is_positive(self, chrom, start, end, strand):
         """
         Determines whether the query the `chrom` queried contains any
         genomic features within the :math:`[start, end)` region. If so,
@@ -357,11 +361,11 @@ class GenomicFeatures(Target):
             assume the error was the result of no features being present
             in the queried region and return `False`.
         """
-        rows = self._query_tabix(chrom, start, end)
+        rows = self._query_tabix(chrom, start, end, strand)
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
     @init
-    def get_feature_data(self, chrom, start, end):
+    def get_feature_data(self, chrom, start, end, strand='+'):
         """
         Computes which features overlap with the given region.
 
@@ -373,6 +377,8 @@ class GenomicFeatures(Target):
             The 0-based first position in the region.
         end : int
             One past the 0-based last position in the region.
+        strand : {'+', '-', '.'}, optional
+            Default is '+'. The strand the sequence is located on. '.' is treated
 
         Returns
         -------
@@ -388,7 +394,8 @@ class GenomicFeatures(Target):
         """
         if self._feature_thresholds_vec is None:
             features = np.zeros(self.n_features)
-            rows = self._query_tabix(chrom, start, end)
+            # TODO: modify query_tabix to add strand specificity
+            rows = self._query_tabix(chrom, start, end, strand)
             if not rows:
                 return features
             for r in rows:
