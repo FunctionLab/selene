@@ -1,11 +1,18 @@
+"""
+This module provides the `UpdateSeqweaver` class, which wraps the master bed file
+containing all of the features' binding sites parsed from CLIP-seq.
+It supports new dataset construction and training for Seqweaver.
+
+"""
 from sequences.genome import Genome
 from targets.genomic_features import GenomicFeatures
 import h5py
 import gzip
+import numpy as np
 
 class UpdateSeqweaver():
     """
-    Stores an updated dataset specifying sequence regions and features.
+    Stores a dataset specifying sequence regions and features.
     Accepts a tabix-indexed `*.bed` file with the following columns,
     in order:
         [chrom, start, end, strand, feature]
@@ -23,17 +30,18 @@ class UpdateSeqweaver():
         Path to a '\n'-delimited .txt file containing feature names.
 
     """
-    def __init__(self, input_path, output_path, feature_path, sequence_len=1000):
+    def __init__(self, input_path, output_path, feature_path, hg_fasta, sequence_len=1000):
         """
-        Constructs a new `GenomicFeatures` object.
+        Constructs a new `UpdateSeqweaver` object.
         """
         self.input_path = input_path
         self.output_path = output_path
         self.feature_path = feature_path
+        self.hg_fasta = hg_fasta
         self.sequence_len = sequence_len
 
         with open(self.feature_path, 'r') as handle:
-            self.feature_set = [line.split('\n') for line in handle.readlines()]
+            self.feature_set = [line.split('\n')[0] for line in handle.readlines()]
 
     def _from_midpoint(self, start, end):
         """
@@ -75,17 +83,19 @@ class UpdateSeqweaver():
         list_of_regions = []
         with gzip.open(self.input_path) as f:
             for line in f:
-                list_of_regions.append(line.strip().split())
+                line = [str(data,'utf-8') for data in line.strip().split()]
+                list_of_regions.append(line)
 
-        seqs = Genome(hg19_fasta, blacklist_regions = 'hg19')
-        targets = GenomicFeatures(bed_file,
+        seqs = Genome(self.hg_fasta, blacklist_regions = 'hg19')
+        targets = GenomicFeatures(self.input_path,
                   features = self.feature_set, feature_thresholds = 0.5)
 
-        with h5py.open(self.output_path) as fh:
+        with h5py.File(self.output_path, "w") as fh:
             training_seqs = []
             training_labels = []
             for r in list_of_regions:
                 chrom, start, end, strand, target = r
+                start, end = int(start), int(end)
                 sstart, ssend = self._from_midpoint(start, end)
 
                 # 1 x 4 x 1000 bp
