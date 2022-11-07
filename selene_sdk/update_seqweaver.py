@@ -109,5 +109,5 @@ class UpdateSeqweaver():
                 training_seqs.append(dna_seq)
                 training_labels.append(labels)
 
-            fh.write("sequences", data=np.vstack(training_seqs))
-            fh.write("targets", data=np.vstack(training_labels))
+            fh.create_dataset("sequences", data=np.vstack(training_seqs))
+            fh.create_dataset("targets", data=np.vstack(training_labels))
