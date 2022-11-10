@@ -4,11 +4,17 @@ containing all of the features' binding sites parsed from CLIP-seq.
 It supports new dataset construction and training for Seqweaver.
 
 """
-from sequences.genome import Genome
-from targets.genomic_features import GenomicFeatures
 import h5py
 import gzip
 import numpy as np
+import sys
+
+from sequences.genome import Genome
+from targets.genomic_features import GenomicFeatures
+from samplers.dataloader import H5DataLoader
+from train_model import TrainModel
+from utils.config import load_path
+from utils.config_utils import parse_configs_and_run
 
 class UpdateSeqweaver():
     """
@@ -28,16 +34,23 @@ class UpdateSeqweaver():
         Path to the output constructed-training data file.
     feature_path : str
         Path to a '\n'-delimited .txt file containing feature names.
+    hg_fasta : str
+        Path to an indexed FASTA file, that is, a `*.fasta` file with
+        a corresponding `*.fai` file in the same directory. This file
+        should contain the target organism's genome sequence.
 
     """
-    def __init__(self, input_path, output_path, feature_path, hg_fasta, sequence_len=1000):
+    def __init__(self, input_path, output_path, feature_path, hg_fasta, yaml_path, sequence_len=1000):
         """
         Constructs a new `UpdateSeqweaver` object.
         """
         self.input_path = input_path
         self.output_path = output_path
         self.feature_path = feature_path
+        self.yaml_path = yaml_path
+
         self.hg_fasta = hg_fasta
+
         self.sequence_len = sequence_len
 
         with open(self.feature_path, 'r') as handle:
@@ -66,7 +79,7 @@ class UpdateSeqweaver():
         seq_start = midpoint - np.floor(self.sequence_len / 2.)
         seq_end = midpoint + np.ceil(self.sequence_len / 2.)
 
-        return seq_start, seq_end
+        return int(seq_start), int(seq_end)
 
     def construct_training_data(self):
         """
@@ -101,7 +114,8 @@ class UpdateSeqweaver():
                 # 1 x 4 x 1000 bp
                 # get_encoding_from_coords : Converts sequence to one-hot-encoding for each of the 4 bases
                 dna_seq, has_unk = seqs.get_encoding_from_coords_check_unk(chrom, sstart, ssend, strand=strand)
-                if has_unk: continue
+                if has_unk:
+                    continue
 
                 # 1 x n_features
                 # get_feature_data: Computes which features overlap with the given region.
@@ -111,3 +125,18 @@ class UpdateSeqweaver():
 
             fh.create_dataset("sequences", data=np.vstack(training_seqs))
             fh.create_dataset("targets", data=np.vstack(training_labels))
+
+    def _load_yaml(self):
+        # load yaml configuration
+        return load_path(self.yaml_path)
+
+    def train_model(self):
+        yaml_config = self._load_yaml()
+        # train model
+        parse_configs_and_run(yaml_config)
+
+
+    '''
+    def _load_hdf5(self):
+        return H5DataLoader(self.output_path, in_memory=True)
+    '''
