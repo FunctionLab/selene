@@ -40,12 +40,13 @@ class UpdateSeqweaver():
         should contain the target organism's genome sequence.
 
     """
-    def __init__(self, input_path, output_path, feature_path, hg_fasta, yaml_path, sequence_len=1000):
+    def __init__(self, input_path, train_path, validate_path, feature_path, hg_fasta, yaml_path, sequence_len=1000):
         """
         Constructs a new `UpdateSeqweaver` object.
         """
         self.input_path = input_path
-        self.output_path = output_path
+        self.train_path = train_path
+        self.validate_path = validate_path
         self.feature_path = feature_path
         self.yaml_path = yaml_path
 
@@ -103,28 +104,38 @@ class UpdateSeqweaver():
         targets = GenomicFeatures(self.input_path,
                   features = self.feature_set, feature_thresholds = 0.5)
 
-        with h5py.File(self.output_path, "w") as fh:
-            training_seqs = []
-            training_labels = []
-            for r in list_of_regions:
-                chrom, start, end, strand, target = r
-                start, end = int(start), int(end)
-                sstart, ssend = self._from_midpoint(start, end)
+        data_seqs = []
+        data_labels = []
+        for r in list_of_regions:
+            chrom, start, end, strand, target = r
+            start, end = int(start), int(end)
+            sstart, ssend = self._from_midpoint(start, end)
 
-                # 1 x 4 x 1000 bp
-                # get_encoding_from_coords : Converts sequence to one-hot-encoding for each of the 4 bases
-                dna_seq, has_unk = seqs.get_encoding_from_coords_check_unk(chrom, sstart, ssend, strand=strand)
-                if has_unk:
-                    continue
+            # 1 x 4 x 1000 bp
+            # get_encoding_from_coords : Converts sequence to one-hot-encoding for each of the 4 bases
+            dna_seq, has_unk = seqs.get_encoding_from_coords_check_unk(chrom, sstart, ssend, strand=strand)
+            if has_unk:
+                continue
 
-                # 1 x n_features
-                # get_feature_data: Computes which features overlap with the given region.
-                labels = targets.get_feature_data(chrom, start, end, strand)
-                training_seqs.append(dna_seq)
-                training_labels.append(labels)
+            # 1 x n_features
+            # get_feature_data: Computes which features overlap with the given region.
+            labels = targets.get_feature_data(chrom, start, end, strand)
+            data_seqs.append(dna_seq)
+            data_labels.append(labels)
 
-            fh.create_dataset("sequences", data=np.vstack(training_seqs))
-            fh.create_dataset("targets", data=np.vstack(training_labels))
+        # partition some to validation before writing
+        validate_seqs = data_seqs[:10000]
+        validate_labels = data_labels[:10000]
+        training_seqs = data_seqs[10000:]
+        training_labels = data_labels[10000:]
+
+        with h5py.File(self.validate_path, "w") as fh:
+            fh.create_dataset("valid_sequences", data=np.vstack(validate_seqs))
+            fh.create_dataset("valid_targets", data=np.vstack(validate_labels))
+
+        with h5py.File(self.train_path, "w") as fh:
+            fh.create_dataset("train_sequences", data=np.vstack(training_seqs))
+            fh.create_dataset("train_targets", data=np.vstack(training_labels))
 
     def _load_yaml(self):
         # load yaml configuration
