@@ -116,10 +116,13 @@ class UpdateSeqweaver():
             dna_seq, has_unk = seqs.get_encoding_from_coords_check_unk(chrom, sstart, ssend, strand=strand)
             if has_unk:
                 continue
+            if len(dna_seq) != self.sequence_len:
+                continue
 
             # 1 x n_features
             # get_feature_data: Computes which features overlap with the given region.
             labels = targets.get_feature_data(chrom, start, end, strand)
+
             data_seqs.append(dna_seq)
             data_labels.append(labels)
 
@@ -130,24 +133,18 @@ class UpdateSeqweaver():
         training_labels = data_labels[10000:]
 
         with h5py.File(self.validate_path, "w") as fh:
-            fh.create_dataset("valid_sequences", data=np.vstack(validate_seqs))
-            fh.create_dataset("valid_targets", data=np.vstack(validate_labels))
+            fh.create_dataset("valid_sequences", data=np.array(validate_seqs, dtype=np.int64))
+            fh.create_dataset("valid_targets", data=np.array(validate_labels, dtype=np.int64))
 
         with h5py.File(self.train_path, "w") as fh:
-            fh.create_dataset("train_sequences", data=np.vstack(training_seqs))
-            fh.create_dataset("train_targets", data=np.vstack(training_labels))
+            fh.create_dataset("train_sequences", data=np.array(training_seqs, dtype=np.int64))
+            fh.create_dataset("train_targets", data=np.array(training_labels, dtype=np.int64))
 
     def _load_yaml(self):
         # load yaml configuration
         return load_path(self.yaml_path)
 
     def train_model(self):
+        # load config file and train model
         yaml_config = self._load_yaml()
-        # train model
         parse_configs_and_run(yaml_config)
-
-
-    '''
-    def _load_hdf5(self):
-        return H5DataLoader(self.output_path, in_memory=True)
-    '''
