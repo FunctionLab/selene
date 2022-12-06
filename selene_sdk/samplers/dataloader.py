@@ -55,12 +55,12 @@ class _SamplerDataset(Dataset):
             The shape of `targets` will be :math:`I \\times T`,
             where :math:`T` is the number of targets predicted.
         """
-        sequences, targets = self.sampler.sample(
+        sequences, targets, inds = self.sampler.sample(
             batch_size=1 if isinstance(index, int) else len(index))
         if sequences.shape[0] == 1:
             sequences = sequences[0,:]
             targets = targets[0,:]
-        return sequences, targets
+        return sequences, targets, inds
 
     def __len__(self):
         """

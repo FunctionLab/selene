@@ -67,11 +67,12 @@ class NonStrandSpecific(Module):
         else:
             reverse_input = _flip(_flip(input, 1), 2)
 
-        output = self.model.forward(input)
-        output_from_rev = self.model.forward(reverse_input)
+        output1, output2 = self.model.forward(input)
+        output_from_rev1, output_from_rev2 = self.model.forward(reverse_input)
 
         if self.mode == "mean":
-            return (output + output_from_rev) / 2
+            return ((output1 + output_from_rev1) / 2, (output2 + output_from_rev2) / 2)
         else:
-            return torch.max(output, output_from_rev)
+            return torch.max(output1, output_from_rev1), torch.max(output2, output_from_rev2)
+
 
