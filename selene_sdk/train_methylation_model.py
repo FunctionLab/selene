@@ -14,7 +14,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import average_precision_score
-from sklearn.metrics import f1_score
 from sklearn.metrics import roc_auc_score
 
 from .utils import initialize_logger
@@ -273,8 +272,7 @@ class TrainMethylationModel(object):
             logger.debug("Set modules to use CUDA")
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
-        self._metrics = dict(cls_average_precision=average_precision_score,
-                             cls_f1=f1_score)
+        self._metrics = dict(cls_average_precision=average_precision_score)
         self._n_validation_samples = n_validation_samples
         self._n_test_samples = n_test_samples
         self._use_scheduler = use_scheduler
