@@ -9,12 +9,14 @@ import sys
 from time import strftime
 import types
 import random
+import shutil, yaml
 
 import numpy as np
 import torch
 
 from . import _is_lua_trained_model
 from . import instantiate
+from . import load_path
 
 
 def class_instantiate(classobj):
@@ -111,6 +113,7 @@ def initialize_model(model_configs, train=True, lr=None):
 
     module = None
     if os.path.isdir(import_model_from):
+        import_model_from = import_model_from.rstrip(os.sep)
         module = module_from_dir(import_model_from)
     else:
         module = module_from_file(import_model_from)
@@ -251,7 +254,7 @@ def execute(operations, configs, output_dir):
                 analyze_seqs.get_predictions(**predict_info)
 
 
-def parse_configs_and_run(configs,
+def parse_configs_and_run(configs_file,
                           create_subdirectory=True,
                           lr=None):
     """
@@ -260,9 +263,9 @@ def parse_configs_and_run(configs,
 
     Parameters
     ----------
-    configs : dict
-        The dictionary of nested configuration parameters. Will look
-        for the following top-level parameters:
+    configs_file : str
+        The configuration YAML file of nested configuration parameters.
+        Will look for the following top-level parameters:
 
             * `ops`: A list of 1 or more of the values \
             {"train", "evaluate", "analyze"}. The operations specified\
@@ -305,7 +308,17 @@ def parse_configs_and_run(configs,
         to the dirs specified in each operation's configuration.
 
     """
+    if isinstance(configs_file, str):
+        configs = load_path(configs_file, instantiate=False)
+    else:
+        configs = configs_file
     operations = configs["ops"]
+
+    #print selene_sdk version
+    if "selene_sdk_version" not in configs:
+        from selene_sdk import version
+        configs["selene_sdk_version"] = version.__version__ 
+        print("Selene_sdk Version = {}".format(version.__version__))
 
     if "train" in operations and "lr" not in configs and lr != None:
         configs["lr"] = float(lr)
@@ -331,8 +344,9 @@ def parse_configs_and_run(configs,
         if "create_subdirectory" in configs:
             create_subdirectory = configs["create_subdirectory"]
         if create_subdirectory:
+            rand_str = str(random.random())[2:]
             current_run_output_dir = os.path.join(
-                current_run_output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+                current_run_output_dir, '{}-{}'.format(strftime("%Y-%m-%d-%H-%M-%S"), rand_str))
             os.makedirs(current_run_output_dir)
         print("Outputs and logs saved to {0}".format(
             current_run_output_dir))
@@ -343,9 +357,29 @@ def parse_configs_and_run(configs,
         np.random.seed(seed)
         torch.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
+        #torch.backends.cudnn.deterministic = True
+        #torch.backends.cudnn.benchmark = False
         print("Setting random seed = {0}".format(seed))
     else:
         print("Warning: no random seed specified in config file. "
               "Using a random seed ensures results are reproducible.")
+
+    if current_run_output_dir:
+        # write configs to output directory
+        if isinstance(configs_file, str):
+            config_out = '{0}_lr{1}.yml'.format(
+                os.path.basename(configs_file)[:-4], configs['lr'])
+            shutil.copyfile(configs_file,
+                     os.path.join(current_run_output_dir, config_out))
+        else:
+            with open('{}/{}'.format(current_run_output_dir,'configs.yaml'), 'w') as f:
+               yaml.dump(configs, f, default_flow_style=None)
+        # copy model file or directory to output
+        model_input = configs['model']['path']
+        if os.path.isdir(model_input): # copy the directory
+            shutil.copytree (model_input, os.path.join(current_run_output_dir, os.path.basename(import_model_from)), dirs_exist_ok=True)
+        else: 
+            shutil.copy     (model_input, current_run_output_dir)
+
 
     execute(operations, configs, current_run_output_dir)
