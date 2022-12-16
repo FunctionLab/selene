@@ -492,7 +492,14 @@ class TrainMethylationModel(object):
             targets = targets.cuda()
             inds = inds.cuda()
 
+        torch.cuda.synchronize()
+        mtime1 = time()
         cls_pred, reg_pred = self.model(inputs.transpose(1, 2))
+        torch.cuda.synchronize()
+        mtime2 = time()
+        print("model time: {0}".format(mtime2 - mtime1))
+
+        ltime1 = time()
         cls_loss = self.cls_criterion(cls_pred, inds)
 
         reg_loss = 0
@@ -506,6 +513,8 @@ class TrainMethylationModel(object):
             # TODO: write a custom loss fn based on this?
             #reg_loss = self.reg_criterion(
             #    subset_pred, subset_tgt, reduction='none').nanmean(dim=1).mean()
+        ltime2 = time()
+        print("loss computation time: {0}".format(ltime2 - ltime1))
 
         self.optimizer.zero_grad()
         total_loss = cls_loss
@@ -515,6 +524,9 @@ class TrainMethylationModel(object):
         #print("reg_loss", reg_loss)
         total_loss.backward()
         self.optimizer.step()
+        ltime3 = time()
+        print("backprop time: {0}".format(ltime3 - ltime2))
+
         self._train_loss.append(total_loss.item())
         t_f = time()
 
@@ -600,7 +612,7 @@ class TrainMethylationModel(object):
             self._validation_data)
         cls_valid_scores = self._validation_metrics.update(
             val_pred_inds, self._all_validation_inds.reshape(len(val_pred_inds), 1),
-            scores=['cls_average_precision', 'cls_f1'])
+            scores=['cls_average_precision'])
 
         #reg_valid_scores = self._validation_metrics.update(
         #    val_pred_tgts[self._all_validation_inds == 1],
@@ -668,7 +680,7 @@ class TrainMethylationModel(object):
 
         cls_test_scores = self._test_metrics.update(
             test_pred_inds, self._all_test_inds.reshape(len(val_pred_inds), 1),
-            scores=['cls_average_precision', 'cls_f1',])
+            scores=['cls_average_precision'])
 
         #reg_test_scores = self._test_metrics.update(
         #    test_pred_tgts[self._all_test_inds == 1],
