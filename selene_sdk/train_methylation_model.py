@@ -10,11 +10,13 @@ from time import time
 
 import numpy as np
 import torch
+import torch.autograd.profiler as profiler
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import mean_squared_error
 
 from .utils import initialize_logger
 from .utils import load_model_from_state_dict
@@ -272,7 +274,8 @@ class TrainMethylationModel(object):
             logger.debug("Set modules to use CUDA")
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
-        self._metrics = dict(cls_average_precision=average_precision_score)
+        self._metrics = dict(cls_average_precision=average_precision_score,)
+                            #reg_mse=mean_squared_error)
         self._n_validation_samples = n_validation_samples
         self._n_test_samples = n_test_samples
         self._use_scheduler = use_scheduler
@@ -351,7 +354,7 @@ class TrainMethylationModel(object):
         self._validation_logger = _metrics_logger(
                 "{0}.validation".format(__name__), self.output_dir)
 
-        self._validation_logger.info("\t".join(["loss"] +
+        self._validation_logger.info("\t".join(["loss", "mse", "bce"] +
             sorted([x for x in self._validation_metrics.metrics.keys()])))
 
     def _init_test(self):
@@ -492,15 +495,22 @@ class TrainMethylationModel(object):
             targets = targets.cuda()
             inds = inds.cuda()
 
-        torch.cuda.synchronize()
-        mtime1 = time()
-        cls_pred, reg_pred = self.model(inputs.transpose(1, 2))
-        torch.cuda.synchronize()
-        mtime2 = time()
-        print("model time: {0}".format(mtime2 - mtime1))
+        start = torch.cuda.Event(enable_timing=True)
+        end = torch.cuda.Event(enable_timing=True)
 
-        ltime1 = time()
-        cls_loss = self.cls_criterion(cls_pred, inds)
+        #with profiler.profile(with_stack=True, profile_memory=True) as prof:
+        #cls_pred, reg_pred = self.model(inputs.transpose(1, 2))
+        start.record()
+        pred = self.model(inputs.transpose(1, 2))
+        end.record()
+        torch.cuda.synchronize()
+        print("model time: {0}".format(start.elapsed_time(end)))
+        #print("model time: {0}".format(mtime2 - mtime1))
+
+        #print(prof.key_averages(group_by_stack_n=5).table(sort_by='self_cpu_time_total', row_limit=5))
+        cls_pred = pred[:, 0]
+        reg_pred = pred[:, 1:]
+        cls_loss = self.cls_criterion(cls_pred, inds.squeeze())
 
         reg_loss = 0
         inds = inds.ravel()
@@ -513,19 +523,13 @@ class TrainMethylationModel(object):
             # TODO: write a custom loss fn based on this?
             #reg_loss = self.reg_criterion(
             #    subset_pred, subset_tgt, reduction='none').nanmean(dim=1).mean()
-        ltime2 = time()
-        print("loss computation time: {0}".format(ltime2 - ltime1))
 
         self.optimizer.zero_grad()
         total_loss = cls_loss
         if torch.is_tensor(reg_loss):
             total_loss += reg_loss
-        #print("cls_loss", cls_loss)
-        #print("reg_loss", reg_loss)
         total_loss.backward()
         self.optimizer.step()
-        ltime3 = time()
-        print("backprop time: {0}".format(ltime3 - ltime2))
 
         self._train_loss.append(total_loss.item())
         t_f = time()
@@ -559,7 +563,7 @@ class TrainMethylationModel(object):
         """
         self.model.eval()
 
-        batch_losses = []
+        batch_bce, batch_mse, batch_losses = [], [], []
         all_predictions = []
         all_ind_predictions = []
         for (seqs, targets, inds) in data_in_batches:
@@ -572,29 +576,48 @@ class TrainMethylationModel(object):
                 inds = inds.cuda()
 
             with torch.no_grad():
-                cls_pred, reg_pred = self.model(seqs.transpose(1, 2))
-                cls_loss = self.cls_criterion(cls_pred, inds.reshape((len(inds), 1)))
+                #cls_pred, reg_pred = self.model(seqs.transpose(1, 2))
+                pred = self.model(seqs.transpose(1, 2))
+                cls_pred = pred[:, 0]
+                reg_pred = pred[:, 1:]
+                cls_loss = self.cls_criterion(cls_pred, inds)
 
                 reg_loss = 0
                 if len(inds[inds == 1]) != 0:
                     subset_pred = reg_pred[inds == 1]
                     subset_tgt = targets[inds == 1]
-
+                    mask = torch.isnan(subset_tgt)
                     reg_loss = self.reg_criterion(
-                        subset_pred, subset_tgt, reduction='none').nanmean(dim=1).mean()
+                        subset_pred[~mask], subset_tgt[~mask])
+                    #subset_pred = reg_pred[inds == 1]
+                    #subset_tgt = targets[inds == 1]
+                    #reg_loss = self.reg_criterion(
+                    #    subset_pred, subset_tgt, reduction='none').nanmean(dim=1).mean()
 
-                all_predictions.append(
-                    reg_pred.data.cpu().numpy())
-                all_ind_predictions.append(
-                    cls_pred.data.cpu().numpy())
+                all_predictions.append(reg_pred)
+                all_ind_predictions.append(cls_pred)
+                #all_predictions.append(
+                #    reg_pred.data.cpu().numpy())
+                #all_ind_predictions.append(
+                #    cls_pred.data.cpu().numpy())
 
+                batch_bce.append(cls_loss.item())
                 total_loss = cls_loss
                 if torch.is_tensor(reg_loss):
                     total_loss += reg_loss
+                    batch_mse.append(reg_loss.item())
                 batch_losses.append(total_loss.item())
-        all_predictions = np.vstack(all_predictions)
-        all_ind_predictions = np.vstack(all_ind_predictions)
-        return np.average(batch_losses), all_ind_predictions, all_predictions
+        all_predictions = torch.vstack(all_predictions)
+        all_ind_predictions = torch.hstack(all_ind_predictions)[:, None]
+        all_predictions = all_predictions.data.cpu().numpy()
+        all_ind_predictions = all_ind_predictions.data.cpu().numpy()
+
+        loss_breakdown = {
+            'bce': np.average(batch_bce),
+            'mse': np.average(batch_mse),
+            'loss': np.average(batch_losses)
+        }
+        return loss_breakdown, all_ind_predictions, all_predictions
 
     def validate(self):
         """
@@ -608,35 +631,30 @@ class TrainMethylationModel(object):
             the validation set.
 
         """
-        validation_loss, val_pred_inds, val_pred_tgts = self._evaluate_on_data(
+        lossdict, val_pred_inds, val_pred_tgts = self._evaluate_on_data(
             self._validation_data)
         cls_valid_scores = self._validation_metrics.update(
             val_pred_inds, self._all_validation_inds.reshape(len(val_pred_inds), 1),
             scores=['cls_average_precision'])
-
         #reg_valid_scores = self._validation_metrics.update(
         #    val_pred_tgts[self._all_validation_inds == 1],
         #    self._all_validation_targets[self._all_validation_inds == 1],
-        #    scores=['reg_roc_auc', 'reg_average_precision'])
-
-        valid_scores = {}
+        #    scores=['reg_mse'])
         for name, score in cls_valid_scores.items():
             logger.info("validation {0}: {1}".format(name, score))
-            valid_scores[name] = score
+            lossdict[name] = score
         #for name, score in reg_valid_scores.items():
         #    logger.info("validation {0}: {1}".format(name, score))
-        #    valid_scores[name] = score
+        #    lossdict[name] = score
 
-        valid_scores["loss"] = validation_loss
-
-        to_log = [str(validation_loss)]
+        to_log = [lossdict['loss'], lossdict['mse'], lossdict['bce']]
         for k in sorted(self._validation_metrics.metrics.keys()):
-            if k in valid_scores and valid_scores[k]:
-                to_log.append(str(valid_scores[k]))
+            if k in lossdict and lossdict[k]:
+                to_log.append(lossdict[k])
             else:
                 to_log.append("NA")
-        self._validation_logger.info("\t".join(to_log))
-
+        self._validation_logger.info('\t'.join([str(s) for s in to_log]))
+        validation_loss = lossdict['loss']
         # scheduler update
         if self._use_scheduler:
             self.scheduler.step(
@@ -675,17 +693,17 @@ class TrainMethylationModel(object):
         """
         if self._test_data is None:
             self.create_test_set()
-        average_loss, test_pred_inds, test_pred_tgts = self._evaluate_on_data(
+        losdict, test_pred_inds, test_pred_tgts = self._evaluate_on_data(
             self._test_data)
 
-        cls_test_scores = self._test_metrics.update(
-            test_pred_inds, self._all_test_inds.reshape(len(val_pred_inds), 1),
+        test_scores = self._test_metrics.update(
+            test_pred_inds, self._all_test_inds.reshape(len(test_pred_inds), 1),
             scores=['cls_average_precision'])
 
         #reg_test_scores = self._test_metrics.update(
         #    test_pred_tgts[self._all_test_inds == 1],
         #    self._all_test_targets[self._all_test_inds == 1],
-        #    scores=['reg_roc_auc', 'reg_average_precision'])
+        #    scores=['reg_mse'])
 
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),
@@ -694,19 +712,19 @@ class TrainMethylationModel(object):
             os.path.join(self.output_dir, "test_predictions.indicator.npz"),
             data=test_pred_inds)
 
-        for name, score in cls_test_scores.items():
+        for name, score in test_scores.items():
             logger.info("test {0}: {1}".format(name, score))
+            lossdict[name] = score
         #for name, score in reg_test_scores.items():
         #    logger.info("test {0}: {1}".format(name, score))
+        #    lossdict[name] = score
 
         test_performance = os.path.join(
             self.output_dir, "test_performance.txt")
         feature_scores_dict = self._test_metrics.write_feature_scores_to_file(
             test_performance)
 
-        average_scores["loss"] = average_loss
-
-        return (average_scores, feature_scores_dict)
+        return (lossdict, feature_scores_dict)
 
     def _save_checkpoint(self,
                          state,
