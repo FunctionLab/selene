@@ -498,16 +498,13 @@ class TrainMethylationModel(object):
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
 
-        #with profiler.profile(with_stack=True, profile_memory=True) as prof:
         #cls_pred, reg_pred = self.model(inputs.transpose(1, 2))
-        start.record()
+        #start.record()
         pred = self.model(inputs.transpose(1, 2))
-        end.record()
-        torch.cuda.synchronize()
-        print("model time: {0}".format(start.elapsed_time(end)))
-        #print("model time: {0}".format(mtime2 - mtime1))
+        #end.record()
+        #torch.cuda.synchronize()
+        #print("model time: {0}".format(start.elapsed_time(end)))
 
-        #print(prof.key_averages(group_by_stack_n=5).table(sort_by='self_cpu_time_total', row_limit=5))
         cls_pred = pred[:, 0]
         reg_pred = pred[:, 1:]
         cls_loss = self.cls_criterion(cls_pred, inds.squeeze())
@@ -596,10 +593,6 @@ class TrainMethylationModel(object):
 
                 all_predictions.append(reg_pred)
                 all_ind_predictions.append(cls_pred)
-                #all_predictions.append(
-                #    reg_pred.data.cpu().numpy())
-                #all_ind_predictions.append(
-                #    cls_pred.data.cpu().numpy())
 
                 batch_bce.append(cls_loss.item())
                 total_loss = cls_loss
@@ -670,7 +663,8 @@ class TrainMethylationModel(object):
                 "min_loss": self._min_loss,
                 "optimizer": self.optimizer.state_dict()}, True)
             logger.debug("Updating `best_model.pth.tar`")
-        logger.info("validation loss: {0}".format(validation_loss))
+        logger.info("validation loss: {0} (bce: {1}, mse: {2})".format(
+            validation_loss, lossdict['bce'], lossdict['mse']))
 
         # check for early stopping
         if self._early_stopping:

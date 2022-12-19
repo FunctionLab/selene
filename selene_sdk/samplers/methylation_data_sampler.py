@@ -244,9 +244,9 @@ class MethylationDataSampler(OnlineSampler):
     def _retrieve(self, chrom, position):
         bin_start = position - self._start_radius
         bin_end = position + self._end_radius
-        indicator = self.target.is_positive(
-            chrom, bin_start, bin_end)
-        retrieved_targets = self.target.get_feature_data(
+        #indicator = self.target.is_positive(
+        #    chrom, bin_start, bin_end)
+        indicator, retrieved_targets = self.target.get_feature_data(
             chrom, bin_start, bin_end)
         window_start = position - self._start_window_radius
         window_end = position + self._end_window_radius
