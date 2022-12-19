@@ -245,12 +245,12 @@ class GenomicFeaturesH5(Target):
         """
         nans = np.zeros(self.n_targets) * np.nan
         rows = self._query_tabix(chrom, start, end)
-        if not rows:
+        if rows is None:
             return False, nans
         row_targets = []
         for r in rows:
             target = int(r[3])
             row_targets.append(self.data[target])
-        if len(row_targets) == 0:
-            return True, nans
+        if len(row_targets) == 0:  # query was empty
+            return False, nans
         return True, np.average(np.vstack(row_targets), axis=0)
