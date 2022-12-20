@@ -495,11 +495,11 @@ class TrainMethylationModel(object):
             targets = targets.cuda()
             inds = inds.cuda()
 
-        start = torch.cuda.Event(enable_timing=True)
-        end = torch.cuda.Event(enable_timing=True)
+        #start = torch.cuda.Event(enable_timing=True)
+        #end = torch.cuda.Event(enable_timing=True)
 
-        #cls_pred, reg_pred = self.model(inputs.transpose(1, 2))
         #start.record()
+        #cls_pred, reg_pred = self.model(inputs.transpose(1, 2))
         pred = self.model(inputs.transpose(1, 2))
         #end.record()
         #torch.cuda.synchronize()
