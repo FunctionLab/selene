@@ -171,7 +171,7 @@ class MethylationDataSampler(OnlineSampler):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
             if '_' in chrom:
                 continue
-            if 'X' in chrom or 'Y' in chrom:
+            if 'X' in chrom or 'Y' in chrom or 'M' in chrom:
                 continue
             self.sample_from_intervals.append(
                 (chrom,
@@ -214,7 +214,7 @@ class MethylationDataSampler(OnlineSampler):
         for (chrom, len_chrom) in self.reference_sequence.get_chr_lens():
             if '_' in chrom:
                 continue
-            if 'X' in chrom or 'Y' in chrom:
+            if 'X' in chrom or 'Y' in chrom or 'M' in chrom:
                 continue
             if chrom in self.validation_holdout:
                 self._sample_from_mode["validate"].indices.append(
