@@ -200,7 +200,7 @@ class _H5Dataset(Dataset):
         sequence = self.sequences[index, :, :]
         targets = self.targets[index, :]
         if self.unpackbits:
-            sequence = np.unpackbits(sequence, axis=-2)
+            sequence = np.unpackbits(sequence.astype(np.uint8), axis=-2)
             nulls = np.sum(sequence, axis=-1) == sequence.shape[-1]
             sequence = sequence.astype(float)
             sequence[nulls, :] = 1.0 / sequence.shape[-1]
