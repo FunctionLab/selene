@@ -18,6 +18,7 @@ from . import _is_lua_trained_model
 from . import instantiate
 from . import load_path
 
+from selene_sdk import version
 
 def class_instantiate(classobj):
     """Not used currently, but might be useful later for recursive
@@ -254,7 +255,7 @@ def execute(operations, configs, output_dir):
                 analyze_seqs.get_predictions(**predict_info)
 
 
-def parse_configs_and_run(configs_file,
+def parse_configs_and_run(configs,
                           create_subdirectory=True,
                           lr=None):
     """
@@ -263,8 +264,10 @@ def parse_configs_and_run(configs_file,
 
     Parameters
     ----------
-    configs_file : str
-        The configuration YAML file of nested configuration parameters.
+    configs : str or dict
+        If it is a str,  then configs is the name of the configuration YAML file, from which we will read 
+                         nested configuration parameters.
+        If it is a dict, then configs is a dict storing nested configuration parameters.
         Will look for the following top-level parameters:
 
             * `ops`: A list of 1 or more of the values \
@@ -308,17 +311,18 @@ def parse_configs_and_run(configs_file,
         to the dirs specified in each operation's configuration.
 
     """
-    if isinstance(configs_file, str):
+    if isinstance(configs, str):
+        configs_file = configs
+        if not os.path.isfile(configs_file):
+            print("The configuration YAML file {} does not exist!".format(configs_file))
+            return
         configs = load_path(configs_file, instantiate=False)
-    else:
-        configs = configs_file
     operations = configs["ops"]
 
     #print selene_sdk version
     if "selene_sdk_version" not in configs:
-        from selene_sdk import version
         configs["selene_sdk_version"] = version.__version__ 
-        print("Selene_sdk Version = {}".format(version.__version__))
+        print("Running with selene_sdk version {0}".format(version.__version__))
 
     if "train" in operations and "lr" not in configs and lr != None:
         configs["lr"] = float(lr)
@@ -366,18 +370,14 @@ def parse_configs_and_run(configs_file,
 
     if current_run_output_dir:
         # write configs to output directory
-        if isinstance(configs_file, str):
-            config_out = '{0}_lr{1}.yml'.format(
-                os.path.basename(configs_file)[:-4], configs['lr'])
-            shutil.copyfile(configs_file,
-                     os.path.join(current_run_output_dir, config_out))
-        else:
-            with open('{}/{}'.format(current_run_output_dir,'configs.yaml'), 'w') as f:
-               yaml.dump(configs, f, default_flow_style=None)
+        with open('{}/{}'.format(current_run_output_dir,'configs.yaml'), 'w') as f:
+             yaml.dump(configs, f, default_flow_style=None)
         # copy model file or directory to output
         model_input = configs['model']['path']
         if os.path.isdir(model_input): # copy the directory
-            shutil.copytree (model_input, os.path.join(current_run_output_dir, os.path.basename(import_model_from)), dirs_exist_ok=True)
+            shutil.copytree (model_input, 
+                             os.path.join(current_run_output_dir, os.path.basename(import_model_from)), 
+                             dirs_exist_ok=True)
         else: 
             shutil.copy     (model_input, current_run_output_dir)
 
