@@ -335,7 +335,10 @@ class GenomicFeatures(Target):
         """
         try:
             tabix_query = self.data.query(chrom, start, end)
-            return [line for line in tabix_query if str(line[3]) == strand] # strand specificity
+            if strand:
+                return [line for line in tabix_query if str(line[4]) == strand] # strand specificity
+            else: # not strand specific
+                return tabix_query
         except tabix.TabixError:
             return None
 
@@ -367,7 +370,7 @@ class GenomicFeatures(Target):
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
     @init
-    def get_feature_data(self, chrom, start, end, strand='+'):
+    def get_feature_data(self, chrom, start, end, strand=None):
         """
         Computes which features overlap with the given region.
 
@@ -380,7 +383,8 @@ class GenomicFeatures(Target):
         end : int
             One past the 0-based last position in the region.
         strand : {'+', '-', '.'}, optional
-            Default is '+'. The strand the sequence is located on. '.' is treated
+            Default is None (no strand provided).
+            The strand the sequence is located on. '.' is treated
 
         Returns
         -------
@@ -396,11 +400,11 @@ class GenomicFeatures(Target):
         """
         if self._feature_thresholds_vec is None:
             features = np.zeros(self.n_features)
-            rows = self._query_tabix(chrom, start, end, strand) # added strand specificity
+            rows = self._query_tabix(chrom, start, end, strand) # strand specificity
             if not rows:
                 return features
             for r in rows:
-                feature = r[4]
+                feature = r[3]
                 ix = self.feature_index_dict[feature]
                 features[ix] = 1
             return features

@@ -31,7 +31,7 @@ def _fast_get_feature_data(int start,
         feature_end = int(row[2])
         index_start = max(0, feature_start - start)
         index_end = min(feature_end - start, query_length)
-        index_feat = feature_index_dict[row[4]]
+        index_feat = feature_index_dict[row[3]]
         if index_start == index_end:
             index_end += 1
         encoding[index_start:index_end, index_feat] = 1

@@ -35,12 +35,12 @@ class UpdateSeqweaver():
     feature_path : str
         Path to a '\n'-delimited .txt file containing feature names.
     hg_fasta : str
-        Path to an indexed FASTA file, that is, a `*.fasta` file with
+        Path to an indexed FASTA file -- a `*.fasta` file with
         a corresponding `*.fai` file in the same directory. This file
         should contain the target organism's genome sequence.
 
     """
-    def __init__(self, input_path, train_path, validate_path, feature_path, hg_fasta, yaml_path, sequence_len=1000):
+    def __init__(self, input_path, train_path, validate_path, feature_path, hg_fasta, yaml_path, VAL_PROP=0.01, sequence_len=1000):
         """
         Constructs a new `UpdateSeqweaver` object.
         """
@@ -49,6 +49,7 @@ class UpdateSeqweaver():
         self.validate_path = validate_path
         self.feature_path = feature_path
         self.yaml_path = yaml_path
+        self.VAL_PROP = VAL_PROP
 
         self.hg_fasta = hg_fasta
 
@@ -107,7 +108,7 @@ class UpdateSeqweaver():
         data_seqs = []
         data_labels = []
         for r in list_of_regions:
-            chrom, start, end, strand, target = r
+            chrom, start, end, target, strand = r
             start, end = int(start), int(end)
             sstart, ssend = self._from_midpoint(start, end)
 
@@ -127,10 +128,11 @@ class UpdateSeqweaver():
             data_labels.append(labels)
 
         # partition some to validation before writing
-        validate_seqs = data_seqs[:10000]
-        validate_labels = data_labels[:10000]
-        training_seqs = data_seqs[10000:]
-        training_labels = data_labels[10000:]
+        val_count = floor(VAL_PROP * len(data_seqs))
+        validate_seqs = data_seqs[:val_count]
+        validate_labels = data_labels[:val_count]
+        training_seqs = data_seqs[val_count:]
+        training_labels = data_labels[val_count:]
 
         with h5py.File(self.validate_path, "w") as fh:
             fh.create_dataset("valid_sequences", data=np.array(validate_seqs, dtype=np.int64))
