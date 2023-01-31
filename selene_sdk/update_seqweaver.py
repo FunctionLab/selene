@@ -128,7 +128,7 @@ class UpdateSeqweaver():
             data_labels.append(labels)
 
         # partition some to validation before writing
-        val_count = floor(VAL_PROP * len(data_seqs))
+        val_count = int(np.floor(self.VAL_PROP * len(data_seqs)))
         validate_seqs = data_seqs[:val_count]
         validate_labels = data_labels[:val_count]
         training_seqs = data_seqs[val_count:]
