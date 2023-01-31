@@ -54,7 +54,7 @@ def _any_positive_rows(rows, start, end, thresholds):
         return False
     for row in rows:  # features within [start, end)
         is_positive = _is_positive_row(
-            start, end, int(row[1]), int(row[2]), thresholds[row[4]])
+            start, end, int(row[1]), int(row[2]), thresholds[row[3]])
         if is_positive:
             return True
     return False
@@ -102,7 +102,7 @@ def _is_positive_row(start, end,
 
 
 def _get_feature_data(chrom, start, end,
-                      thresholds, feature_index_dict, get_feature_rows, strand='+'):
+                      thresholds, feature_index_dict, get_feature_rows, strand=None):
     """
     Generates a target vector for the given query region.
 
@@ -135,7 +135,7 @@ def _get_feature_data(chrom, start, end,
         `i`th feature is positive, and zero otherwise.
 
     """
-    rows = get_feature_rows(chrom, start, end, strand)
+    rows = get_feature_rows(chrom, start, end, strand=strand)
     return _fast_get_feature_data(
         start, end, thresholds, feature_index_dict, rows)
 
