@@ -305,7 +305,7 @@ class GenomicFeatures(Target):
             return func(self, *args, **kwargs)
         return dfunc
 
-    def _query_tabix(self, chrom, start, end, strand):
+    def _query_tabix(self, chrom, start, end, strand=None):
         """
         Queries a tabix-indexed `*.bed` file for features falling into
         the specified region.
@@ -343,7 +343,7 @@ class GenomicFeatures(Target):
             return None
 
     @init
-    def is_positive(self, chrom, start, end, strand):
+    def is_positive(self, chrom, start, end, strand=None):
         """
         Determines whether the query the `chrom` queried contains any
         genomic features within the :math:`[start, end)` region. If so,
@@ -366,7 +366,7 @@ class GenomicFeatures(Target):
             assume the error was the result of no features being present
             in the queried region and return `False`.
         """
-        rows = self._query_tabix(chrom, start, end, strand)
+        rows = self._query_tabix(chrom, start, end, strand=strand)
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
     @init
@@ -400,7 +400,7 @@ class GenomicFeatures(Target):
         """
         if self._feature_thresholds_vec is None:
             features = np.zeros(self.n_features)
-            rows = self._query_tabix(chrom, start, end, strand) # strand specificity
+            rows = self._query_tabix(chrom, start, end, strand=strand) # strand specificity
             if not rows:
                 return features
             for r in rows:

@@ -122,7 +122,7 @@ class UpdateSeqweaver():
 
             # 1 x n_features
             # get_feature_data: Computes which features overlap with the given region.
-            labels = targets.get_feature_data(chrom, start, end, strand)
+            labels = targets.get_feature_data(chrom, start, end, strand=strand)
 
             data_seqs.append(dna_seq)
             data_labels.append(labels)
