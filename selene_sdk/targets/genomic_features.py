@@ -126,7 +126,7 @@ def _get_feature_data(chrom, start, end,
         A function that takes coordinates and returns rows
         (`list(tuple(int, int, str))`).
     strand : {'+', '-', '.'}, optional
-            Default is '+'. The strand the sequence is located on. '.' is treated
+            Default is '+'. The strand the sequence is located on. '.' is treated as '.'.
 
     Returns
     -------
@@ -320,7 +320,7 @@ class GenomicFeatures(Target):
         end : int
             One past the last position of the query coordinates.
         strand : {'+', '-', '.'}
-            The strand the sequence is located on. '.' is treated
+            The strand the sequence is located on. '.' is treated as '.'.
 
 
         Returns
@@ -384,7 +384,7 @@ class GenomicFeatures(Target):
             One past the 0-based last position in the region.
         strand : {'+', '-', '.'}, optional
             Default is None (no strand provided).
-            The strand the sequence is located on. '.' is treated
+            The strand the sequence is located on. '.' is treated as '.'.
 
         Returns
         -------

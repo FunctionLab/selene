@@ -21,7 +21,7 @@ class UpdateSeqweaver():
     Stores a dataset specifying sequence regions and features.
     Accepts a tabix-indexed `*.bed` file with the following columns,
     in order:
-        [chrom, start, end, strand, feature]
+        [chrom, start, end, feature, strand]
 
     Parameters
     ----------
@@ -40,7 +40,7 @@ class UpdateSeqweaver():
         should contain the target organism's genome sequence.
 
     """
-    def __init__(self, input_path, train_path, validate_path, feature_path, hg_fasta, yaml_path, VAL_PROP=0.01, sequence_len=1000):
+    def __init__(self, input_path, train_path, validate_path, feature_path, hg_fasta, yaml_path, val_prop=0.1, sequence_len=1000):
         """
         Constructs a new `UpdateSeqweaver` object.
         """
@@ -49,7 +49,7 @@ class UpdateSeqweaver():
         self.validate_path = validate_path
         self.feature_path = feature_path
         self.yaml_path = yaml_path
-        self.VAL_PROP = VAL_PROP
+        self.val_prop = val_prop
 
         self.hg_fasta = hg_fasta
 
@@ -128,7 +128,7 @@ class UpdateSeqweaver():
             data_labels.append(labels)
 
         # partition some to validation before writing
-        val_count = int(np.floor(self.VAL_PROP * len(data_seqs)))
+        val_count = int(np.floor(self.val_prop * len(data_seqs)))
         validate_seqs = data_seqs[:val_count]
         validate_labels = data_labels[:val_count]
         training_seqs = data_seqs[val_count:]

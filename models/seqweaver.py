@@ -1,3 +1,6 @@
+"""
+Seqweaver architecture (Park & Troyanskaya, 2021).
+"""
 import torch
 import torch.nn as nn
 
@@ -53,11 +56,8 @@ class Seqweaver(nn.Module):
 
     def forward(self, x):
         x = x.unsqueeze(2)
-        #print('forward', x.shape)
         x = self.model(x)
-        #print('model', x.shape)
         x = self.fc(x)
-        #print('fc', x.shape)
         return x
 
 
