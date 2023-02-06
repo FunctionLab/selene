@@ -9,12 +9,12 @@ import gzip
 import numpy as np
 import sys
 
-from sequences.genome import Genome
-from targets.genomic_features import GenomicFeatures
-from samplers.dataloader import H5DataLoader
-from train_model import TrainModel
-from utils.config import load_path
-from utils.config_utils import parse_configs_and_run
+from selene_sdk.sequences.genome import Genome
+from selene_sdk.targets.genomic_features import GenomicFeatures
+from selene_sdk.samplers.dataloader import H5DataLoader
+from selene_sdk.train_model import TrainModel
+from selene_sdk.utils.config import load_path
+from selene_sdk.utils.config_utils import parse_configs_and_run
 
 class UpdateSeqweaver():
     """
