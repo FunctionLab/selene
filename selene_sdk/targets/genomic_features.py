@@ -125,8 +125,9 @@ def _get_feature_data(chrom, start, end,
     get_feature_rows : types.FunctionType
         A function that takes coordinates and returns rows
         (`list(tuple(int, int, str))`).
-    strand : {'+', '-', '.'}, optional
-            Default is '+'. The strand the sequence is located on. '.' is treated as '.'.
+    strand : {'+', '-'}, optional
+            The strand the sequence is located on. Default is None (no strand provided).
+            If '+' or '-' is passed in, only retrieve rows with the correct matching strand.
 
     Returns
     -------
@@ -319,9 +320,9 @@ class GenomicFeatures(Target):
             The 0-based start position of the query coordinates.
         end : int
             One past the last position of the query coordinates.
-        strand : {'+', '-', '.'}
-            The strand the sequence is located on. '.' is treated as '.'.
-
+        strand : {'+', '-'}, optional
+            The strand the sequence is located on. Default is None (no strand provided).
+            If '+' or '-' is passed in, only retrieve rows with the correct matching strand.
 
         Returns
         -------
@@ -335,7 +336,7 @@ class GenomicFeatures(Target):
         """
         try:
             tabix_query = self.data.query(chrom, start, end)
-            if strand:
+            if strand == '+' or strand == '-':
                 return [line for line in tabix_query if str(line[4]) == strand] # strand specificity
             else: # not strand specific
                 return tabix_query
@@ -382,9 +383,9 @@ class GenomicFeatures(Target):
             The 0-based first position in the region.
         end : int
             One past the 0-based last position in the region.
-        strand : {'+', '-', '.'}, optional
-            Default is None (no strand provided).
-            The strand the sequence is located on. '.' is treated as '.'.
+        strand : {'+', '-'}, optional
+            The strand the sequence is located on. Default is None (no strand provided).
+            If '+' or '-' is passed in, only retrieve rows with the correct matching strand.
 
         Returns
         -------
