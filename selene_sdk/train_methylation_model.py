@@ -524,7 +524,7 @@ class TrainMethylationModel(object):
         self.optimizer.zero_grad()
         total_loss = cls_loss
         if torch.is_tensor(reg_loss):
-            total_loss += reg_loss
+            total_loss += 2*reg_loss
         total_loss.backward()
         self.optimizer.step()
 
@@ -597,7 +597,7 @@ class TrainMethylationModel(object):
                 batch_bce.append(cls_loss.item())
                 total_loss = cls_loss
                 if torch.is_tensor(reg_loss):
-                    total_loss += reg_loss
+                    total_loss += 2*reg_loss
                     batch_mse.append(reg_loss.item())
                 batch_losses.append(total_loss.item())
         all_predictions = torch.vstack(all_predictions)
