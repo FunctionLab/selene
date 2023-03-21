@@ -14,6 +14,7 @@ import torch.autograd.profiler as profiler
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from scipy.stats import pearsonr
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import mean_squared_error
@@ -274,7 +275,8 @@ class TrainMethylationModel(object):
             logger.debug("Set modules to use CUDA")
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
-        self._metrics = dict(cls_average_precision=average_precision_score,)
+        self._metrics = dict(cls_average_precision=average_precision_score,
+                             pearsonr=pearsonr)
                             #reg_mse=mean_squared_error)
         self._n_validation_samples = n_validation_samples
         self._n_test_samples = n_test_samples
@@ -629,16 +631,16 @@ class TrainMethylationModel(object):
         cls_valid_scores = self._validation_metrics.update(
             val_pred_inds, self._all_validation_inds.reshape(len(val_pred_inds), 1),
             scores=['cls_average_precision'])
-        #reg_valid_scores = self._validation_metrics.update(
-        #    val_pred_tgts[self._all_validation_inds == 1],
-        #    self._all_validation_targets[self._all_validation_inds == 1],
-        #    scores=['reg_mse'])
+        reg_valid_scores = self._validation_metrics.update(
+            val_pred_tgts[self._all_validation_inds == 1],
+            self._all_validation_targets[self._all_validation_inds == 1],
+            scores=['pearsonr'])
         for name, score in cls_valid_scores.items():
             logger.info("validation {0}: {1}".format(name, score))
             lossdict[name] = score
-        #for name, score in reg_valid_scores.items():
-        #    logger.info("validation {0}: {1}".format(name, score))
-        #    lossdict[name] = score
+        for name, score in reg_valid_scores.items():
+            logger.info("validation {0}: {1}".format(name, score))
+            lossdict[name] = score
 
         to_log = [lossdict['loss'], lossdict['mse'], lossdict['bce']]
         for k in sorted(self._validation_metrics.metrics.keys()):

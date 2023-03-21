@@ -253,4 +253,7 @@ class GenomicFeaturesH5(Target):
             row_targets.append(self.data[target])
         if len(row_targets) == 0:  # query was empty
             return False, nans
-        return True, np.average(np.vstack(row_targets), axis=0)
+        row_targets = np.vstack(row_targets)
+        if len(row_targets) == 1:
+            return True, row_targets[0]
+        return True, np.average(row_targets, axis=0)
