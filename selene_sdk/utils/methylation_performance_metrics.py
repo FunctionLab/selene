@@ -74,8 +74,8 @@ def compute_score(prediction, target, metric_fn,
         prediction = prediction.T
     for index, feature_preds in enumerate(prediction):
         feature_targets = target[:, index]
+        feature_preds = feature_preds[~np.isnan(feature_targets)]
         feature_targets = feature_targets[~np.isnan(feature_targets)]
-        feature_preds = feature_preds[~np.isnan(feature_preds)]
         if len(np.unique(feature_targets)) > 0 and \
                np.count_nonzero(feature_targets) > report_gt_feature_n_positives:
             try:
