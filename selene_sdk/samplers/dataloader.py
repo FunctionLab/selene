@@ -3,6 +3,7 @@ This module provides the `SamplerDataLoader` and  `SamplerDataset` classes,
 which allow parallel sampling for any Sampler using
 torch DataLoader mechanism.
 """
+import random
 import  sys
 
 import h5py
@@ -162,7 +163,8 @@ class _H5Dataset(Dataset):
                  in_memory=False,
                  unpackbits=False,
                  sequence_key="sequences",
-                 targets_key="targets"):
+                 targets_key="targets",
+                 indicators_key=False):
         super(_H5Dataset, self).__init__()
         self.file_path = file_path
         self.in_memory = in_memory
@@ -171,6 +173,7 @@ class _H5Dataset(Dataset):
         self._initialized = False
         self._sequence_key = sequence_key
         self._targets_key = targets_key
+        self._indicators_key = indicators_key
 
     def init(func):
         # delay initialization to allow multiprocessing
@@ -178,17 +181,24 @@ class _H5Dataset(Dataset):
         def dfunc(self, *args, **kwargs):
             if not self._initialized:
                 self.db = h5py.File(self.file_path, 'r')
+                key = 'indicator'
+                if key not in self.db and self._indicators_key:
+                    key = 'indicators'
                 if self.unpackbits:
                     self.s_len = self.db['{0}_length'.format(self._sequence_key)][()]
                     #self.t_len = self.db['{0}_length'.format(self._targets_key)][()]
                 if self.in_memory:
                     self.sequences = np.asarray(self.db[self._sequence_key])
                     self.targets = np.asarray(self.db[self._targets_key])
-                    self.indicators = np.asarray(self.db['indicators'])
+                    self.indicators = None
+                    if self._indicators_key:
+                        self.indicators = np.asarray(self.db[key])
                 else:
                     self.sequences = self.db[self._sequence_key]
                     self.targets = self.db[self._targets_key]
-                    self.indicators = self.db['indicators']
+                    self.indicators = None
+                    if self._indicators_key:
+                        self.indicators = self.db[key]
                 self._initialized = True
             return func(self, *args, **kwargs)
         return dfunc
@@ -214,9 +224,14 @@ class _H5Dataset(Dataset):
             #    targets = targets[:, :self.t_len]
             #else:
             #    targets = targets[:self.t_len]
-        return (torch.from_numpy(sequence.astype(np.float32)),
-                torch.from_numpy(targets.astype(np.float32)),
-                self.indicators[index])
+        if self.indicators is not None:
+            return (torch.from_numpy(sequence.astype(np.float32)),
+                    torch.from_numpy(targets.astype(np.float32)),
+                    self.indicators[index])
+        else:
+            return (torch.from_numpy(sequence.astype(np.float32)),
+                    torch.from_numpy(targets.astype(np.float32)),)
+
 
     @init
     def __len__(self):
@@ -299,16 +314,23 @@ class H5DataLoader(DataLoader):
                  sampler=None,
                  batch_sampler=None,
                  shuffle=True):
+        g = torch.Generator()
+        g.manual_seed(seed)
+
         def worker_init_fn(worker_id):
-            np.random.seed(seed + worker_id)
+            worker_seed = torch.initial_seed() % 2**32
+            print("Worker seed", worker_seed)
+            np.random.seed(worker_seed)
+            random.seed(worker_seed)
+            torch.manual_seed(worker_seed)
 
         args = {
             "batch_size": batch_size,
-            #"num_workers": 0 if in_memory else num_workers,
             "pin_memory": True,
             "worker_init_fn": worker_init_fn,
             "sampler": sampler,
-            "batch_sampler": batch_sampler
+            "batch_sampler": batch_sampler,
+            "generator": g,
         }
 
         if hasattr(dataset, 'in_memory'):
