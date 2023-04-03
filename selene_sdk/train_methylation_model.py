@@ -524,7 +524,7 @@ class TrainMethylationModel(object):
             #    subset_pred, subset_tgt, reduction='none').nanmean(dim=1).mean()
 
         self.optimizer.zero_grad()
-        total_loss = cls_loss #*0
+        total_loss = cls_loss #* 0.01
         if torch.is_tensor(reg_loss):
             total_loss += reg_loss
         total_loss.backward()
@@ -597,7 +597,7 @@ class TrainMethylationModel(object):
                 all_ind_predictions.append(cls_pred)
 
                 batch_bce.append(cls_loss.item())
-                total_loss = cls_loss #*0
+                total_loss = cls_loss #* 0.01
                 if torch.is_tensor(reg_loss):
                     total_loss += reg_loss
                     batch_mse.append(reg_loss.item())
