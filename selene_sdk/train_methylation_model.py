@@ -15,6 +15,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from scipy.stats import pearsonr
+from scipy.stats import spearmanr
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import mean_squared_error
@@ -276,7 +277,7 @@ class TrainMethylationModel(object):
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
         self._metrics = dict(cls_average_precision=average_precision_score,
-                             pearsonr=pearsonr)
+                             pearsonr=pearsonr, spearmanr=spearmanr)
                             #reg_mse=mean_squared_error)
         self._n_validation_samples = n_validation_samples
         self._n_test_samples = n_test_samples
@@ -634,7 +635,7 @@ class TrainMethylationModel(object):
         reg_valid_scores = self._validation_metrics.update(
             val_pred_tgts[self._all_validation_inds == 1],
             self._all_validation_targets[self._all_validation_inds == 1],
-            scores=['pearsonr'])
+            scores=['pearsonr', 'spearmanr'])
         for name, score in cls_valid_scores.items():
             logger.info("validation {0}: {1}".format(name, score))
             lossdict[name] = score
