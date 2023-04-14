@@ -80,7 +80,7 @@ def compute_score(prediction, target, metric_fn,
                np.count_nonzero(feature_targets) > report_gt_feature_n_positives:
             try:
                 output = metric_fn(feature_targets, feature_preds)
-                if type(output) != float:
+                if type(output) != float and (metric_fn.__name__ == 'spearmanr' or metric_fn.__name__ == 'pearsonr'):
                     output = output[0]
                 feature_scores[index] = output
             except ValueError:  # do I need to make this more generic?
