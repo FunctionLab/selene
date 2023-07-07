@@ -208,7 +208,7 @@ class _H5Dataset(Dataset):
         if isinstance(index, int):
             index = index % self.sequences.shape[0]
         sequence = self.sequences[index, :, :]
-        targets = self.targets[index, :]
+        targets = self.targets[index]
         if self.unpackbits:
             sequence = np.unpackbits(sequence.astype(np.uint8), axis=-2)
             nulls = np.sum(sequence, axis=-1) == sequence.shape[-1]
@@ -224,6 +224,9 @@ class _H5Dataset(Dataset):
             #    targets = targets[:, :self.t_len]
             #else:
             #    targets = targets[:self.t_len]
+        #if np.random.randint(2) == 1:  # ONLY for unet
+        #    sequence = np.flip(sequence, axis=-1)
+        #    targets = np.flip(targets, axis=-1)
         if self.indicators is not None:
             return (torch.from_numpy(sequence.astype(np.float32)),
                     torch.from_numpy(targets.astype(np.float32)),
