@@ -126,6 +126,27 @@ class SamplerDataLoader(DataLoader):
         self.seed = seed
 
 
+def unpackbits_sequence(sequence, s_len):
+    sequence = np.unpackbits(sequence.astype(np.uint8), axis=-2)
+    nulls = np.sum(sequence, axis=-1) == sequence.shape[-1]
+    sequence = sequence.astype(float)
+    sequence[nulls, :] = 1.0 / sequence.shape[-1]
+    if sequence.ndim == 3:
+        sequence = sequence[:, :s_len, :]
+    else:
+        sequence = sequence[:s_len, :]
+    return sequence
+
+
+def unpackbits_targets(targets, t_len):
+    targets = np.unpackbits(targets, axis=-1).astype(float)
+    if targets.ndim == 2:
+        targets = targets[:, :t_len]
+    else:
+        targets = targets[:self.t_len]
+    return targets
+
+
 class _H5Dataset(Dataset):
     """
     This class provides a Dataset that directly loads sequences and targets
@@ -161,14 +182,23 @@ class _H5Dataset(Dataset):
     def __init__(self,
                  file_path,
                  in_memory=False,
-                 unpackbits=False,
+                 unpackbits=False,  # implies unpackbits for both
+                 unpackbits_seq=False,
+                 unpackbits_tgt=False,
                  sequence_key="sequences",
                  targets_key="targets",
-                 indicators_key=False):
+                 indicators_key=False,
+                 use_seq_len=None):
         super(_H5Dataset, self).__init__()
         self.file_path = file_path
         self.in_memory = in_memory
+
         self.unpackbits = unpackbits
+        self.unpackbits_seq = unpackbits_seq
+        self.unpackbits_tgt = unpackbits_tgt
+
+        self.use_seq_len = use_seq_len
+        self._seq_start, self._seq_end = None, None
 
         self._initialized = False
         self._sequence_key = sequence_key
@@ -184,9 +214,15 @@ class _H5Dataset(Dataset):
                 key = 'indicator'
                 if key not in self.db and self._indicators_key:
                     key = 'indicators'
+
                 if self.unpackbits:
                     self.s_len = self.db['{0}_length'.format(self._sequence_key)][()]
-                    #self.t_len = self.db['{0}_length'.format(self._targets_key)][()]
+                    self.t_len = self.db['{0}_length'.format(self._targets_key)][()]
+                elif self.unpackbits_seq:
+                    self.s_len = self.db['{0}_length'.format(self._sequence_key)][()]
+                elif self.unpackbits_tgt:
+                    self.t_len = self.db['{0}_length'.format(self._targets_key)][()]
+
                 if self.in_memory:
                     self.sequences = np.asarray(self.db[self._sequence_key])
                     self.targets = np.asarray(self.db[self._targets_key])
@@ -207,23 +243,27 @@ class _H5Dataset(Dataset):
     def __getitem__(self, index):
         if isinstance(index, int):
             index = index % self.sequences.shape[0]
-        sequence = self.sequences[index, :, :]
+        sequence = self.sequences[index]
         targets = self.targets[index]
+
         if self.unpackbits:
-            sequence = np.unpackbits(sequence.astype(np.uint8), axis=-2)
-            nulls = np.sum(sequence, axis=-1) == sequence.shape[-1]
-            sequence = sequence.astype(float)
-            sequence[nulls, :] = 1.0 / sequence.shape[-1]
-            #targets = np.unpackbits(
-            #    targets, axis=-1).astype(float)
-            if sequence.ndim == 3:
-                sequence = sequence[:, :self.s_len, :]
-            else:
-                sequence = sequence[:self.s_len, :]
-            #if targets.ndim == 2:
-            #    targets = targets[:, :self.t_len]
-            #else:
-            #    targets = targets[:self.t_len]
+            sequence = unpackbits_sequence(sequence, self.s_len)
+            targets = unpackbits_targets(targets, self.t_len)
+        elif self.unpackbits_seq:
+            sequence = unpackbits_sequence(sequence, self.s_len)
+        elif self.unpackbits_tgt:
+            targets = unpackbits_targets(targets, self.t_len)
+
+        if self._seq_start is None:
+            self._seq_start = 0
+            self._seq_end = len(sequence)
+
+            if self.use_seq_len is not None:
+                mid = (self._seq_end - self._seq_start) // 2
+                self._seq_start = mid - self.use_seq_len // 2
+                self._seq_end = int(mid + np.ceil(self.use_seq_len / 2))
+        sequence = sequence[self._seq_start:self._seq_end]
+
         #if np.random.randint(2) == 1:  # ONLY for unet
         #    sequence = np.flip(sequence, axis=-1)
         #    targets = np.flip(targets, axis=-1)
@@ -351,3 +391,4 @@ class H5DataLoader(DataLoader):
         else:
             args["shuffle"] = shuffle
         super(H5DataLoader, self).__init__(dataset, **args)
+
