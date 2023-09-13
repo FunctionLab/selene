@@ -134,8 +134,8 @@ class NonStrandSpecificInteract(Module):
             return ((output1 + output_from_rev1) / 2, (output2 + output_from_rev2) / 2)
         else:
             if self.mode == "mean":
-                return (output + output_from_rev) / 2
+                return ((output + output_from_rev) / 2,)
             else:
-                return torch.max(output, output_from_rev)
+                return (torch.max(output, output_from_rev),)
 
 
