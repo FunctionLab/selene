@@ -188,7 +188,8 @@ class _H5Dataset(Dataset):
                  sequence_key="sequences",
                  targets_key="targets",
                  indicators_key=False,
-                 use_seq_len=None):
+                 use_seq_len=None,
+                 shift=False):
         super(_H5Dataset, self).__init__()
         self.file_path = file_path
         self.in_memory = in_memory
@@ -198,6 +199,7 @@ class _H5Dataset(Dataset):
         self.unpackbits_tgt = unpackbits_tgt
 
         self.use_seq_len = use_seq_len
+        self.shift = shift
         self._seq_start, self._seq_end = None, None
 
         self._initialized = False
@@ -262,11 +264,19 @@ class _H5Dataset(Dataset):
                 mid = (self._seq_end - self._seq_start) // 2
                 self._seq_start = mid - self.use_seq_len // 2
                 self._seq_end = int(mid + np.ceil(self.use_seq_len / 2))
+                if self.shift:
+                    diff = (len(sequence) - self.use_seq_len) // 2
+                    direction = np.random.choice([-1, 1])
+                    shift = np.random.choice(np.arange(diff+1))
+                    print(direction, shift)
+                    self._seq_start = self._seq_start + direction * shift
+                    self._seq_end = self._seq_end + direction * shift
+        print(self._seq_start, self._seq_end)
         sequence = sequence[self._seq_start:self._seq_end]
 
-        #if np.random.randint(2) == 1:  # ONLY for unet
-        #    sequence = np.flip(sequence, axis=-1)
-        #    targets = np.flip(targets, axis=-1)
+        if np.random.randint(2) == 1:  # ONLY for unet
+            sequence = np.flip(sequence, axis=-1)
+            targets = np.flip(targets, axis=-1)
         if self.indicators is not None:
             return (torch.from_numpy(sequence.astype(np.float32)),
                     torch.from_numpy(targets.astype(np.float32)),
