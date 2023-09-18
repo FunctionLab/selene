@@ -268,10 +268,8 @@ class _H5Dataset(Dataset):
                     diff = (len(sequence) - self.use_seq_len) // 2
                     direction = np.random.choice([-1, 1])
                     shift = np.random.choice(np.arange(diff+1))
-                    print(direction, shift)
                     self._seq_start = self._seq_start + direction * shift
                     self._seq_end = self._seq_end + direction * shift
-        print(self._seq_start, self._seq_end)
         sequence = sequence[self._seq_start:self._seq_end]
 
         # UNET ONLY #
