@@ -258,11 +258,10 @@ class EvaluateMethylationOnly(object):
                 reg_loss = self.reg_criterion(
                     predictions[~mask], targets[~mask])
 
-                all_predictions.append(predictions)
+                all_predictions.append(predictions.data.cpu().numpy())
                 batch_losses.append(reg_loss.item())
 
-        all_predictions = torch.vstack(all_predictions)
-        all_predictions = all_predictions.data.cpu().numpy()
+        all_predictions = np.vstack(all_predictions)
 
         reg_scores = self._metrics.update(
             all_predictions, self._all_test_targets, scores=['pearsonr', 'spearmanr'])
