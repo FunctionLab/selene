@@ -273,10 +273,10 @@ class _H5Dataset(Dataset):
         sequence = sequence[self._seq_start:self._seq_end]
 
         # UNET ONLY #
-        targets = targets[:, self._seq_start:self._seq_end]
-        if np.random.randint(2) == 1:
-            sequence = np.flip(sequence, axis=-1)
-            targets = np.flip(targets, axis=-1)
+        #targets = targets[:, self._seq_start:self._seq_end]
+        #if np.random.randint(2) == 1:
+        #    sequence = np.flip(sequence, axis=-1)
+        #    targets = np.flip(targets, axis=-1)
         # UNET ONLY #
         if self.indicators is not None:
             return (torch.from_numpy(sequence.astype(np.float32)),
