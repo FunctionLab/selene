@@ -189,7 +189,7 @@ class _H5Dataset(Dataset):
                  targets_key="targets",
                  indicators_key=False,
                  use_seq_len=None,
-                 shift=False):
+                 shift=None):
         super(_H5Dataset, self).__init__()
         self.file_path = file_path
         self.in_memory = in_memory
@@ -262,14 +262,19 @@ class _H5Dataset(Dataset):
 
             if self.use_seq_len is not None:
                 mid = (self._seq_end - self._seq_start) // 2
+                mid = mid - 1  # specific to methylation
+                # adding some sort of shift, debug this??
                 self._seq_start = mid - self.use_seq_len // 2
                 self._seq_end = int(mid + np.ceil(self.use_seq_len / 2))
-                if self.shift:
-                    diff = (len(sequence) - self.use_seq_len) // 2
-                    direction = np.random.choice([-1, 1])
-                    shift = np.random.choice(np.arange(diff+1))
-                    self._seq_start = self._seq_start + direction * shift
-                    self._seq_end = self._seq_end + direction * shift
+                if self.shift is not None:
+                    self._seq_start += self.shift
+                    self._seq_end += self.shift
+                    # randomness for UNET
+                    #diff = (len(sequence) - self.use_seq_len) // 2
+                    #direction = np.random.choice([-1, 1])
+                    #shift = np.random.choice(np.arange(diff+1))
+                    #self._seq_start = self._seq_start + direction * shift
+                    #self._seq_end = self._seq_end + direction * shift
         sequence = sequence[self._seq_start:self._seq_end]
 
         # UNET ONLY #
@@ -401,5 +406,6 @@ class H5DataLoader(DataLoader):
             args["sampler"] = SubsetRandomSampler(use_subset)
         else:
             args["shuffle"] = shuffle
+
         super(H5DataLoader, self).__init__(dataset, **args)
 
