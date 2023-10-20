@@ -261,11 +261,11 @@ class _H5Dataset(Dataset):
             self._seq_end = len(sequence)
 
             if self.use_seq_len is not None:
-                mid = (self._seq_end - self._seq_start) // 2
-                mid = mid - 1  # specific to methylation
-                # adding some sort of shift, debug this??
-                self._seq_start = mid - self.use_seq_len // 2
-                self._seq_end = int(mid + np.ceil(self.use_seq_len / 2))
+                mid = len(sequence) // 2
+                self._seq_start = int(mid - np.ceil(self.use_seq_len / 2))
+                self._seq_end = mid + self.use_seq_len // 2
+                #- self.use_seq_len // 2
+                #self._seq_end = int(mid + np.ceil(self.use_seq_len / 2))
                 if self.shift is not None:
                     self._seq_start += self.shift
                     self._seq_end += self.shift
