@@ -102,7 +102,7 @@ def _is_positive_row(start, end,
 
 
 def _get_feature_data(chrom, start, end,
-                      thresholds, feature_index_dict, get_feature_rows):
+                      thresholds, feature_index_dict, get_feature_rows, strand=None):
     """
     Generates a target vector for the given query region.
 
@@ -125,6 +125,9 @@ def _get_feature_data(chrom, start, end,
     get_feature_rows : types.FunctionType
         A function that takes coordinates and returns rows
         (`list(tuple(int, int, str))`).
+    strand : {'+', '-'}, optional
+            The strand the sequence is located on. Default is None (no strand provided).
+            If '+' or '-' is passed in, only retrieve rows with the correct matching strand.
 
     Returns
     -------
@@ -133,7 +136,7 @@ def _get_feature_data(chrom, start, end,
         `i`th feature is positive, and zero otherwise.
 
     """
-    rows = get_feature_rows(chrom, start, end)
+    rows = get_feature_rows(chrom, start, end, strand=strand)
     return _fast_get_feature_data(
         start, end, thresholds, feature_index_dict, rows)
 
@@ -303,7 +306,7 @@ class GenomicFeatures(Target):
             return func(self, *args, **kwargs)
         return dfunc
 
-    def _query_tabix(self, chrom, start, end):
+    def _query_tabix(self, chrom, start, end, strand=None):
         """
         Queries a tabix-indexed `*.bed` file for features falling into
         the specified region.
@@ -317,6 +320,9 @@ class GenomicFeatures(Target):
             The 0-based start position of the query coordinates.
         end : int
             One past the last position of the query coordinates.
+        strand : {'+', '-'}, optional
+            The strand the sequence is located on. Default is None (no strand provided).
+            If '+' or '-' is passed in, only retrieve rows with the correct matching strand.
 
         Returns
         -------
@@ -329,12 +335,16 @@ class GenomicFeatures(Target):
 
         """
         try:
-            return self.data.query(chrom, start, end)
+            tabix_query = self.data.query(chrom, start, end)
+            if strand == '+' or strand == '-':
+                return [line for line in tabix_query if str(line[4]) == strand] # strand specificity
+            else: # not strand specific
+                return tabix_query
         except tabix.TabixError:
             return None
 
     @init
-    def is_positive(self, chrom, start, end):
+    def is_positive(self, chrom, start, end, strand=None):
         """
         Determines whether the query the `chrom` queried contains any
         genomic features within the :math:`[start, end)` region. If so,
@@ -357,11 +367,11 @@ class GenomicFeatures(Target):
             assume the error was the result of no features being present
             in the queried region and return `False`.
         """
-        rows = self._query_tabix(chrom, start, end)
+        rows = self._query_tabix(chrom, start, end, strand=strand)
         return _any_positive_rows(rows, start, end, self.feature_thresholds)
 
     @init
-    def get_feature_data(self, chrom, start, end):
+    def get_feature_data(self, chrom, start, end, strand=None):
         """
         Computes which features overlap with the given region.
 
@@ -373,6 +383,9 @@ class GenomicFeatures(Target):
             The 0-based first position in the region.
         end : int
             One past the 0-based last position in the region.
+        strand : {'+', '-'}, optional
+            The strand the sequence is located on. Default is None (no strand provided).
+            If '+' or '-' is passed in, only retrieve rows with the correct matching strand.
 
         Returns
         -------
@@ -388,7 +401,7 @@ class GenomicFeatures(Target):
         """
         if self._feature_thresholds_vec is None:
             features = np.zeros(self.n_features)
-            rows = self._query_tabix(chrom, start, end)
+            rows = self._query_tabix(chrom, start, end, strand=strand) # strand specificity
             if not rows:
                 return features
             for r in rows:
@@ -398,4 +411,4 @@ class GenomicFeatures(Target):
             return features
         return _get_feature_data(
             chrom, start, end, self._feature_thresholds_vec,
-            self.feature_index_dict, self._query_tabix)
+            self.feature_index_dict, self._query_tabix, strand=strand)
