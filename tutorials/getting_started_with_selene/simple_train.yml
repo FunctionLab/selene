@@ -47,6 +47,6 @@ train_model: !obj:selene_sdk.TrainModel {
 }
 random_seed: 1447
 output_dir: ./training_outputs
-create_subdirectory: False
+create_subdirectory: True
 load_test_set: False
 ...
