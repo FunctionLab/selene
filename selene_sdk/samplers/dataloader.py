@@ -288,8 +288,9 @@ class _H5Dataset(Dataset):
                     torch.from_numpy(targets.astype(np.float32)),
                     self.indicators[index])
         else:
-            return (torch.from_numpy(sequence.astype(np.float32)),
-                    torch.from_numpy(targets.astype(np.float32)),)
+            s = sequence.astype(np.float32)
+            #t = targets.astype(np.float32)
+            return (torch.from_numpy(s), torch.from_numpy(targets))
 
 
     @init
