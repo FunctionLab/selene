@@ -275,6 +275,8 @@ class EvaluateMethylationOnly(object):
 
         with h5py.File(os.path.join(self.output_dir, 'test_dataset.N={0}.h5'.format(
                 self.n_test_samples)), 'a') as fh:
+            if 'sequences' in fh:
+                del fh['sequences']
             fh.create_dataset('sequences', data=np.vstack(sequences))
 
         lossdict = {

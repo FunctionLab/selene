@@ -236,7 +236,7 @@ class RandomPositionsSampler(OnlineSampler):
                 self._sample_from_mode[mode]._replace(
                     indices=indices, weights=weights)
 
-    def _retrieve(self, chrom, position):
+    def _retrieve(self, chrom, position, strand=None):
         bin_start = position - self._start_radius
         bin_end = position + self._end_radius
         retrieved_targets = self.target.get_feature_data(
@@ -248,7 +248,8 @@ class RandomPositionsSampler(OnlineSampler):
                   self._start_radius, self._end_radius,
                   self._start_window_radius, self._end_window_radius,)
             return None
-        strand = self.STRAND_SIDES[random.randint(0, 1)]
+        if strand is None:
+            strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)
