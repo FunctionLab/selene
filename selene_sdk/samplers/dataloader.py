@@ -56,12 +56,12 @@ class _SamplerDataset(Dataset):
             The shape of `targets` will be :math:`I \\times T`,
             where :math:`T` is the number of targets predicted.
         """
-        sequences, targets, inds = self.sampler.sample(
+        sequences, targets = self.sampler.sample(
             batch_size=1 if isinstance(index, int) else len(index))
         if sequences.shape[0] == 1:
             sequences = sequences[0,:]
             targets = targets[0,:]
-        return sequences, targets, inds
+        return sequences, targets
 
     def __len__(self):
         """
@@ -187,7 +187,6 @@ class _H5Dataset(Dataset):
                  unpackbits_tgt=False,
                  sequence_key="sequences",
                  targets_key="targets",
-                 indicators_key=False,
                  use_seq_len=None,
                  shift=None):
         super(_H5Dataset, self).__init__()
@@ -205,7 +204,6 @@ class _H5Dataset(Dataset):
         self._initialized = False
         self._sequence_key = sequence_key
         self._targets_key = targets_key
-        self._indicators_key = indicators_key
 
     def init(func):
         # delay initialization to allow multiprocessing
@@ -213,9 +211,6 @@ class _H5Dataset(Dataset):
         def dfunc(self, *args, **kwargs):
             if not self._initialized:
                 self.db = h5py.File(self.file_path, 'r')
-                key = 'indicator'
-                if key not in self.db and self._indicators_key:
-                    key = 'indicators'
 
                 if self.unpackbits:
                     self.s_len = self.db['{0}_length'.format(self._sequence_key)][()]
@@ -228,15 +223,10 @@ class _H5Dataset(Dataset):
                 if self.in_memory:
                     self.sequences = np.asarray(self.db[self._sequence_key])
                     self.targets = np.asarray(self.db[self._targets_key])
-                    self.indicators = None
-                    if self._indicators_key:
-                        self.indicators = np.asarray(self.db[key])
                 else:
                     self.sequences = self.db[self._sequence_key]
                     self.targets = self.db[self._targets_key]
-                    self.indicators = None
-                    if self._indicators_key:
-                        self.indicators = self.db[key]
+
                 self._initialized = True
             return func(self, *args, **kwargs)
         return dfunc
@@ -277,20 +267,9 @@ class _H5Dataset(Dataset):
                     #self._seq_end = self._seq_end + direction * shift
         sequence = sequence[self._seq_start:self._seq_end]
 
-        # UNET ONLY #
-        #targets = targets[:, self._seq_start:self._seq_end]
-        #if np.random.randint(2) == 1:
-        #    sequence = np.flip(sequence, axis=-1)
-        #    targets = np.flip(targets, axis=-1)
-        # UNET ONLY #
-        if self.indicators is not None:
-            return (torch.from_numpy(sequence.astype(np.float32)),
-                    torch.from_numpy(targets.astype(np.float32)),
-                    self.indicators[index])
-        else:
-            s = sequence.astype(np.float32)
-            #t = targets.astype(np.float32)
-            return (torch.from_numpy(s), torch.from_numpy(targets))
+        s = sequence.astype(np.float32)
+        #t = targets.astype(np.float32)
+        return (torch.from_numpy(s), torch.from_numpy(targets))
 
 
     @init

@@ -7,10 +7,6 @@ import logging
 import os
 
 import numpy as np
-from sklearn.metrics import average_precision_score
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import roc_curve
 from scipy.stats import rankdata
 
 
@@ -124,34 +120,6 @@ def get_feature_specific_scores(data, get_feature_from_index_fn):
     return feature_score_dict
 
 
-def auc_u_test(labels, predictions):
-    """
-    Outputs the area under the the ROC curve associated with a certain
-    set of labels and the predictions given by the training model.
-    Computed from the U statistic.
-
-    Parameters
-    ----------
-    labels: numpy.ndarray
-        Known labels of values predicted by model. Must be one dimensional.
-    predictions: numpy.ndarray
-        Value predicted by user model. Must be one dimensional, with matching
-        dimension to `labels`
-
-    Returns
-    -------
-    float
-        AUC value of given label, prediction pairs
-
-    """
-    len_pos = int(np.sum(labels))
-    len_neg = len(labels) - len_pos
-    rank_sum = np.sum(rankdata(predictions)[labels == 1])
-    u_value = rank_sum - (len_pos * (len_pos + 1)) / 2
-    auc = u_value / (len_pos * len_neg)
-    return auc
-
-
 class MethylationPerformanceMetrics(object):
     """
     Tracks and calculates metrics to evaluate how closely a model's
@@ -191,9 +159,8 @@ class MethylationPerformanceMetrics(object):
 
     def __init__(self,
                  get_feature_from_index_fn,
-                 report_gt_feature_n_positives=10,
-                 metrics=dict(roc_auc=roc_auc_score,
-                              average_precision=average_precision_score)):
+                 metrics,
+                 report_gt_feature_n_positives=10):
         """
         Creates a new object of the `PerformanceMetrics` class.
         """
