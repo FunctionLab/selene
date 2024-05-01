@@ -265,30 +265,12 @@ class MultiSampler(Sampler):
             self._set_batch_size(batch_size, mode=mode)
             data_and_targets = []
             targets_mat = []
-            #ind_mat = []
-            count = batch_size
-            while count < n_samples:
-                #data, tgts, ind = self.sample(batch_size=batch_size, mode=mode)
-                #data_and_targets.append((data, tgts, ind))
-
-                output = self.sample(batch_size=batch_size, mode=mode)
+            for s in range(0, n_samples, batch_size):
+                e = min(n_samples, s+batch_size)
+                output = self.sample(batch_size=e-s, mode=mode)
                 data_and_targets.append(output)
                 targets_mat.append(output[1])
-                #ind_mat.append(output[2])
-                count += batch_size
-            remainder = batch_size - (count - n_samples)
-            #data, tgts, ind = self.sample(batch_size=remainder, mode=mode)
-            #data_and_targets.append((data, tgts, ind))
-            #targets_mat.append(tgts)
-            #ind_mat.append(ind)
-            output = self.sample(batch_size=remainder, mode=mode)
-            data_and_targets.append(output)
-            targets_mat.append(output[1])
             targets_mat = np.vstack(targets_mat)
-
-            #ind_mat.append(output[2])
-            #ind_mat = np.hstack(ind_mat)
-            #return data_and_targets, targets_mat, ind_mat
             return data_and_targets, targets_mat
 
     def get_validation_set(self, batch_size, n_samples=None):
