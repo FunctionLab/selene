@@ -254,21 +254,12 @@ class _H5Dataset(Dataset):
                 mid = len(sequence) // 2
                 self._seq_start = int(mid - np.ceil(self.use_seq_len / 2))
                 self._seq_end = mid + self.use_seq_len // 2
-                #- self.use_seq_len // 2
-                #self._seq_end = int(mid + np.ceil(self.use_seq_len / 2))
                 if self.shift is not None:
                     self._seq_start += self.shift
                     self._seq_end += self.shift
-                    # randomness for UNET
-                    #diff = (len(sequence) - self.use_seq_len) // 2
-                    #direction = np.random.choice([-1, 1])
-                    #shift = np.random.choice(np.arange(diff+1))
-                    #self._seq_start = self._seq_start + direction * shift
-                    #self._seq_end = self._seq_end + direction * shift
         sequence = sequence[self._seq_start:self._seq_end]
 
         s = sequence.astype(np.float32)
-        #t = targets.astype(np.float32)
         return (torch.from_numpy(s), torch.from_numpy(targets))
 
 
