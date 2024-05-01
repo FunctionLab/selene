@@ -218,16 +218,12 @@ class MultiSampler(Sampler):
             try:
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()
-                #data, targets, ind = next(self._iterators[mode])
-                #return data.numpy(), targets.numpy(), ind.numpy()
             except StopIteration:
                 #If DataLoader iterator reaches its length, reinitialize
                 self._iterators[mode] = iter(self._dataloaders[mode])
 
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()
-                #data, targets, ind = next(self._iterators[mode])
-                #return data.numpy(), targets.numpy(), ind.numpy()
 
     def get_data_and_targets(self, batch_size, n_samples=None, mode=None):
         """
