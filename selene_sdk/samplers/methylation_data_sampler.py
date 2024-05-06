@@ -1,8 +1,5 @@
 """
 This module provides the RandomPositionsSampler class.
-
-TODO: Currently, only works with sequences from `selene_sdk.sequences.Genome`.
-We would like to generalize this to `selene_sdk.sequences.Sequence` if possible.
 """
 from collections import namedtuple
 import logging
