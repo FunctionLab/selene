@@ -98,29 +98,22 @@ class GenomicFeaturesH5(Target):
 
     Attributes
     ----------
-    data : tabix.open
-        The data stored in a tabix-indexed `*.bed` file.
+    coords : tabix.open
+        The coordinates and row index stored in a tabix-indexed `*.bed` file.
+    data : h5py.File
+        The matrix of target data corresponding to the coordinates in `coords`.
     n_targets : int
         The number of distinct targets.
     target_index_dict : dict
         A dictionary mapping target names (`str`) to indices (`int`),
         where the index is the position of the target in `targets`.
-    index_target_dict : dict
-        A dictionary mapping indices (`int`) to target names (`str`),
-        where the index is the position of the target in the input
-        targets.
-    target_thresholds : dict or None
-
-        * `dict` - A dictionary mapping target names (`str`) to thresholds\
-        (`float`), where the threshold is the minimum overlap that a\
-        target annotation must have with a query region to be\
-        considered a positive example of that target.
-        * `None` - No threshold specifications. Assumes that all targets\
-        returned by a tabix query are annotated to the query region.
-
     """
 
-    def __init__(self, tabix_path, h5_path, targets, init_unpicklable=False):
+    def __init__(self,
+                 tabix_path,
+                 h5_path,
+                 targets,
+                 init_unpicklable=False):
         """
         Constructs a new `GenomicFeaturesH5` object.
         """
@@ -246,14 +239,18 @@ class GenomicFeaturesH5(Target):
         nans = np.zeros(self.n_targets) * np.nan
         rows = self._query_tabix(chrom, start, end)
         if rows is None:
-            return False, nans
+            return nans
+
         row_targets = []
         for r in rows:
-            target = int(r[3])
-            row_targets.append(self.data[target])
-        if len(row_targets) == 0:  # query was empty
-            return False, nans
+            ix = int(r[3])
+            row_targets.append(self.data[ix])
+
+        if len(row_targets) == 0:
+            return nans
+
         row_targets = np.vstack(row_targets)
         if len(row_targets) == 1:
-            return True, row_targets[0]
-        return True, np.average(row_targets, axis=0)
+            return row_targets[0]
+
+        return np.average(row_targets, axis=0)
