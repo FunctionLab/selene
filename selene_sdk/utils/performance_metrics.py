@@ -371,7 +371,7 @@ class PerformanceMetrics(object):
         del self.metrics[name]
         return data
 
-    def update(self, prediction, target):
+    def update(self, prediction, target, scores=None):
         """
         Evaluates the tracked metrics on a model prediction and its
         target value, and adds this to the metric histories.
@@ -382,6 +382,8 @@ class PerformanceMetrics(object):
             Value predicted by user model.
         target : numpy.ndarray
             True value that the user model was trying to predict.
+        scores : list(str), optional
+            Default is None. Specify only a subset of metrics to update.
 
         Returns
         -------
@@ -391,8 +393,12 @@ class PerformanceMetrics(object):
             (`float`).
 
         """
+        if scores is None:
+             scores = list(self.metrics.keys())
+
         metric_scores = {}
-        for name, metric in self.metrics.items():
+        for name in scores:
+            metric = self.metrics[name]
             avg_score, feature_scores = compute_score(
                 prediction, target, metric.fn,
                 report_gt_feature_n_positives=self.skip_threshold)
