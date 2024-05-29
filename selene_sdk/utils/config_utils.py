@@ -9,12 +9,16 @@ import sys
 from time import strftime
 import types
 import random
+import shutil
+import yaml
 
 import numpy as np
 import torch
 
 from . import _is_lua_trained_model
 from . import instantiate
+
+from .. import version
 
 
 def class_instantiate(classobj):
@@ -111,6 +115,7 @@ def initialize_model(model_configs, train=True, lr=None):
 
     module = None
     if os.path.isdir(import_model_from):
+        import_model_from = import_model_from.rstrip(os.sep)
         module = module_from_dir(import_model_from)
     else:
         module = module_from_file(import_model_from)
@@ -307,6 +312,9 @@ def parse_configs_and_run(configs,
     """
     operations = configs["ops"]
 
+    configs["selene_sdk_version"] = version.__version__
+    print("Running with selene_sdk version {0}".format(version.__version__))
+
     if "train" in operations and "lr" not in configs and lr != None:
         configs["lr"] = float(lr)
     elif "train" in operations and "lr" in configs and lr != None:
@@ -331,11 +339,26 @@ def parse_configs_and_run(configs,
         if "create_subdirectory" in configs:
             create_subdirectory = configs["create_subdirectory"]
         if create_subdirectory:
+            res = ''.join(random.choices(string.ascii_uppercase +
+                                         string.digits, k=8))
             current_run_output_dir = os.path.join(
-                current_run_output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
+                current_run_output_dir,
+                '{0}-{1}'.format(strftime("%Y-%m-%d-%H-%M-%S"), res))
             os.makedirs(current_run_output_dir)
         print("Outputs and logs saved to {0}".format(
             current_run_output_dir))
+        configs['output_dir'] = current_run_output_dir
+        config_out = os.path.join(current_run_output_dir, 'configuration.yaml')
+        with open(config_out, 'w') as f:
+            yaml.dump(configs, f, default_flow_style=None)
+        model_input = configs['model']['path']
+        if os.path.isdir(model_input):
+            shutil.copytree(model_input,
+                            os.path.join(current_run_output_dir,
+                                         os.path.basename(import_model_from)),
+                            dirs_exist_ok=True)
+        else:
+            shutil.copy(model_input, current_run_output_dir)
 
     if "random_seed" in configs:
         seed = configs["random_seed"]
