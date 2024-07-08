@@ -27,7 +27,7 @@ def class_instantiate(classobj):
     """
     for attr, obj in classobj.__dict__.items():
         is_module = getattr(obj, '__module__', None)
-        if is_module and "selene_sdk" in is_module and attr is not "model":
+        if is_module and "selene_sdk" in is_module and attr != "model":
             class_instantiate(obj)
     classobj.__init__(**classobj.__dict__)
 
@@ -355,10 +355,12 @@ def parse_configs_and_run(configs,
         if os.path.isdir(model_input):
             shutil.copytree(model_input,
                             os.path.join(current_run_output_dir,
-                                         os.path.basename(import_model_from)),
+                                         os.path.basename(model_input)),
                             dirs_exist_ok=True)
         else:
-            shutil.copy(model_input, current_run_output_dir)
+            shutil.copyfile(model_input,
+                            os.path.join(current_run_output_dir,
+                                         os.path.basename(model_input)))
 
     if "random_seed" in configs:
         seed = configs["random_seed"]
