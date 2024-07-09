@@ -8,11 +8,11 @@ Please see our [release notes](./RELEASE_NOTES.md) for the latest updates to Sel
 
 ## Installation
 
-We recommend using Selene with Python 3.6 or above. 
+We recommend using Selene with Python 3.9 or above. 
 Package installation should only take a few minutes (less than 10 minutes, typically ~2-3 minutes) with any of these methods (conda, pip, source). 
 
 **First, install [PyTorch](https://pytorch.org/get-started/locally/).** If you have an NVIDIA GPU, install a version of PyTorch that supports it--Selene will run much faster with a discrete GPU. 
-The library is currently compatible with PyTorch versions between 0.4.1 and 1.9.
+The library is currently compatible with PyTorch versions between 1.0.0 and 2.3.1.
 We will continue to update Selene to be compatible with the latest version of PyTorch.
 
 ### Installing selene with [Anaconda](https://www.anaconda.com/download/) (for Linux):
@@ -73,6 +73,10 @@ Join our [Google group](https://groups.google.com/forum/#!forum/selene-sdk) if y
 The documentation for Selene is available [here](https://selene.flatironinstitute.org/).
 If you are interested in running Selene through the command-line interface (CLI), [this document](https://selene.flatironinstitute.org/overview/cli.html) describes how the configuration file format (used by the CLI) works and details all the possible configuration parameters you may need to build your own configuration file. 
 
+**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated substantially and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) are NOT compatible with newer versions of PyTorch. If you run into errors loading trained model weights files, it is likely the result of differences in PyTorch or CUDA toolkit versions. 
+
+We recommend referring to the API documentation linked above, along with more current usages of Selene in related papers (e.g. [Sei framework code](https://github.com/FunctionLab/sei-framework)) as the easiest starting point as of right now.
+
 ## Examples
 
 We provide 2 sets of examples: Jupyter notebook tutorials and case studies that we've described in our manuscript. 
@@ -87,8 +91,6 @@ These examples reflect how we most often use Selene in our own projects, whereas
 
 We recommend that the examples be run on a machine with a CUDA-enabled GPU. All examples take significantly longer when run on a CPU machine.
 (See the following sections for time estimates.)
-
-**Important**: The tutorials and manuscript examples were originally run on Selene version 0.1.3---and later with Selene 0.2.0 (PyTorch version 0.4.1). Selene has since been updated and files such as `selene-gpu.yml` specify PyTorch version 1.0.0. Please note that models created with an older version of PyTorch (such as those downloadable with the manuscript case studies) are NOT compatible with newer versions of PyTorch. If you run into errors loading trained model weights files, it is likely the result of differences in PyTorch or CUDA toolkit versions.  
 
 ### Tutorials
 

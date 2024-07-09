@@ -4,11 +4,11 @@ import numpy as np
 cimport cython
 cimport numpy as np
 
-ctypedef np.int_t DTYPE_t
+ctypedef np.int64_t DTYPE_t
 ctypedef np.float32_t FDTYPE_t
 
 @cython.boundscheck(False)
-@cython.wraparound(False) 
+@cython.wraparound(False)
 def _fast_get_feature_data(int start,
                            int end,
                            np.ndarray[FDTYPE_t, ndim=1] thresholds,
@@ -18,14 +18,14 @@ def _fast_get_feature_data(int start,
     cdef int query_length = end - start
     cdef int feature_start, feature_end, index_start, index_end, index_feat
     cdef np.ndarray[DTYPE_t, ndim=2] encoding = np.zeros(
-        (query_length, n_features), dtype=np.int)
+        (query_length, n_features), dtype=np.int64)
     cdef np.ndarray[DTYPE_t, ndim=1] targets = np.zeros(
-        n_features, dtype=np.int)
+        n_features, dtype=np.int64)
     cdef list row
 
     if rows is None:
         return np.zeros((n_features,))
-    
+
     for row in rows:
         feature_start = int(row[1])
         feature_end = int(row[2])
@@ -37,6 +37,6 @@ def _fast_get_feature_data(int start,
         encoding[index_start:index_end, index_feat] = 1
 
     thresholds = (thresholds * query_length - 1).clip(min=0)
-    targets = (np.sum(encoding, axis=0) > thresholds.astype(int)).astype(int)
+    targets = (np.sum(encoding, axis=0) > thresholds.astype(np.int64)).astype(np.int64)
     return targets
 
