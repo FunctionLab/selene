@@ -25,7 +25,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext}
 
 setup(name="selene-sdk",
-      version="0.5.2",
+      version="0.5.3",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
@@ -50,11 +50,11 @@ setup(name="selene-sdk",
       cmdclass=cmdclass,
       python_requires='>=3.9',
       install_requires=[
-        "cython>=3.0.10",
+        "cython>=0.29.24",
         'click',
         "h5py",
         "matplotlib>=2.2.3",
-        "numpy>=1.26.4",
+        "numpy>=1.21.4",
         "pandas",
         "plotly",
         "pyfaidx",
