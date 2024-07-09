@@ -19,7 +19,7 @@ dependencies:
   - seaborn=0.8.1
   - setuptools=27.2.0
   - statsmodels=0.8.0
-  - pytorch=1.9.0
+  - pytorch=1.11.0
   - plotly=2.7.0
   - pyfaidx=0.5.5.2
   - pytabix=0.0.2
