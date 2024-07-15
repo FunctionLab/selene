@@ -1,2 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "numpy", "cython"]
+requires = ["setuptools", "wheel", "numpy>=1.21.4", "cython>=0.29.24"]
+
+[tool.poetry.dependencies]
+python = ">=3.9"  

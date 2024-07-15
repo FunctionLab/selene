@@ -2,6 +2,15 @@
 
 This is a document describing new functionality, bug fixes, breaking changes, etc. associated with Selene version releases from v0.5.0 onwards. 
 
+## Version 0.5.3
+- Adjust dependency requirements 
+
+## Version 0.5.2
+- Fix Cython type error causing build issues with Python 3.9+
+
+## Version 0.5.1
+- PyTorch<=1.9 compatibility 
+
 ## Version 0.5.0
 
 ### New functionality
