@@ -125,6 +125,7 @@ class RandomPositionsSampler(OnlineSampler):
                  seed=436,
                  validation_holdout=['chr6', 'chr7'],
                  test_holdout=['chr8', 'chr9'],
+                 exclude_chrs=['_'],
                  sequence_length=1000,
                  center_bin_to_predict=200,
                  feature_thresholds=0.5,
@@ -155,6 +156,8 @@ class RandomPositionsSampler(OnlineSampler):
         self.interval_lengths = []
         self._initialized = False
 
+        self.exclude_chrs = exclude_chrs
+
     def init(func):
         # delay initialization to allow  multiprocessing
         @wraps(func)
@@ -174,6 +177,14 @@ class RandomPositionsSampler(OnlineSampler):
 
     def _partition_genome_by_proportion(self):
         for chrom, len_chrom in self.reference_sequence.get_chr_lens():
+            skip = False
+            for excl in self.exclude_chrs:
+                if excl in chrom:
+                    skip = True
+                    break
+            if skip:
+                logger.debug('Skipping chromosome {0}'.format(chrom))
+                continue
             self.sample_from_intervals.append(
                 (chrom,
                  self.sequence_length,
@@ -212,6 +223,14 @@ class RandomPositionsSampler(OnlineSampler):
         for mode in self.modes:
             self._sample_from_mode[mode] = SampleIndices([], [])
         for index, (chrom, len_chrom) in enumerate(self.reference_sequence.get_chr_lens()):
+            skip = False
+            for excl in self.exclude_chrs:
+                if excl in chrom:
+                    skip = True
+                    break
+            if skip:
+                logger.debug('Skipping chromosome {0}'.format(chrom))
+                continue
             if chrom in self.validation_holdout:
                 self._sample_from_mode["validate"].indices.append(
                     index)
@@ -236,7 +255,7 @@ class RandomPositionsSampler(OnlineSampler):
                 self._sample_from_mode[mode]._replace(
                     indices=indices, weights=weights)
 
-    def _retrieve(self, chrom, position):
+    def _retrieve(self, chrom, position, strand=None):
         bin_start = position - self._start_radius
         bin_end = position + self._end_radius
         retrieved_targets = self.target.get_feature_data(
@@ -248,7 +267,8 @@ class RandomPositionsSampler(OnlineSampler):
                   self._start_radius, self._end_radius,
                   self._start_window_radius, self._end_window_radius,)
             return None
-        strand = self.STRAND_SIDES[random.randint(0, 1)]
+        if strand is None:
+            strand = self.STRAND_SIDES[random.randint(0, 1)]
         retrieved_seq = \
             self.reference_sequence.get_encoding_from_coords(
                 chrom, window_start, window_end, strand)

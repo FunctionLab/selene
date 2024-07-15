@@ -265,7 +265,6 @@ class TrainModel(object):
 
         if self.use_cuda:
             self.model.cuda()
-            self.criterion.cuda()
             logger.debug("Set modules to use CUDA")
 
         self._report_gt_feature_n_positives = report_gt_feature_n_positives
@@ -311,6 +310,7 @@ class TrainModel(object):
         self._start_step = checkpoint["step"]
         if self._start_step >= self.max_steps:
             self.max_steps += self._start_step
+        self.step = self._start_step
 
         self._min_loss = checkpoint["min_loss"]
         self.optimizer.load_state_dict(
@@ -327,6 +327,7 @@ class TrainModel(object):
 
     def _init_train(self, scheduler_kwargs):
         self._start_step = 0
+        self.step = self._start_step
         self._train_logger = _metrics_logger(
                 "{0}.train".format(__name__), self.output_dir)
         self._train_logger.info("loss")
@@ -348,7 +349,7 @@ class TrainModel(object):
         self._validation_logger = _metrics_logger(
                 "{0}.validation".format(__name__), self.output_dir)
 
-        self._validation_logger.info("\t".join(["loss"] +
+        self._validation_logger.info("\t".join(["loss",] +
             sorted([x for x in self._validation_metrics.metrics.keys()])))
 
     def _init_test(self):
@@ -484,8 +485,8 @@ class TrainModel(object):
         targets = torch.Tensor(targets)
 
         if self.use_cuda:
-            inputs = inputs.cuda()
-            targets = targets.cuda()
+            inputs = inputs.to('cuda', non_blocking=True)
+            targets = targets.to('cuda', non_blocking=True)
 
         predictions = self.model(inputs.transpose(1, 2))
         loss = self.criterion(predictions, targets)
@@ -632,10 +633,6 @@ class TrainModel(object):
             test_performance)
 
         average_scores["loss"] = average_loss
-
-        self._test_metrics.visualize(
-            all_predictions, self._all_test_targets, self.output_dir)
-
         return (average_scores, feature_scores_dict)
 
     def _save_checkpoint(self,
