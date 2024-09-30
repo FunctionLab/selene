@@ -1,10 +1,8 @@
 name: selene-gpu
 channels:
 - pytorch
-- anaconda
 - bioconda
 - conda-forge
-- defaults
 dependencies:
 - cython=0.29.3
 - click==7.1.2
