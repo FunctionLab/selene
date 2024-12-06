@@ -37,7 +37,7 @@ class GenomicFeaturesH5(Target):
     Note that `chrom` is interchangeable with any sort of region (e.g.
     a protein in a FAA file). Further, `start` is 0-based. The `index`
     corresponds to the row index of the targets in the HDF5 file. Lastly, any
-    addition columns following the five shown above will be ignored.
+    addition columns following those shown above will be ignored.
 
     Parameters
     ----------
@@ -146,6 +146,7 @@ class GenomicFeaturesH5(Target):
             The 0-based first position in the region.
         end : int
             One past the 0-based last position in the region.
+
         Returns
         -------
         bool
