@@ -72,7 +72,12 @@ class NonStrandSpecific(Module):
         if type(output) == tuple:
             output1, output2 = output
             output_from_rev1, output_from_rev2 = output_from_rev
-            return ((output1 + output_from_rev1) / 2, (output2 + output_from_rev2) / 2)
+            if self.mode == "mean":
+                return ((output1 + output_from_rev1) / 2,
+                        (output2 + output_from_rev2) / 2)
+            else:
+                return (torch.max(output1, output_from_rev1),
+                        torch.max(output2, output_from_rev2))
         else:
             if self.mode == "mean":
                 return (output + output_from_rev) / 2
