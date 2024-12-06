@@ -201,10 +201,14 @@ class GenomicFeatures(Target):
     ::
         [chrom, start, end, strand, feature]
 
+    or, if the targets (genomic features) to predict are strand-agnostic:
+    ::
+        [chrom, start, end, feature]
+
 
     Note that `chrom` is interchangeable with any sort of region (e.g.
     a protein in a FAA file). Further, `start` is 0-based. Lastly, any
-    addition columns following the five shown above will be ignored.
+    addition columns following those shown above will be ignored.
 
     Parameters
     ----------
@@ -337,7 +341,7 @@ class GenomicFeatures(Target):
         try:
             tabix_query = self.data.query(chrom, start, end)
             if strand == '+' or strand == '-':
-                return [line for line in tabix_query if str(line[4]) == strand] # strand specificity
+                return [line for line in tabix_query if str(line[3]) == strand] # strand specificity
             else: # not strand specific
                 return tabix_query
         except tabix.TabixError:
@@ -405,7 +409,7 @@ class GenomicFeatures(Target):
             if not rows:
                 return features
             for r in rows:
-                feature = r[3]
+                feature = r[-1]
                 ix = self.feature_index_dict[feature]
                 features[ix] = 1
             return features
