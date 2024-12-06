@@ -5,8 +5,8 @@ in the sequence.
 
 It accepts the path to a tabix-indexed .bed.gz file of genomic coordinates.
 
-This .tsv/.bed file must contain the following columns, in order:
-    chrom ('1', '2', ..., 'X', 'Y'), start (0-based), end, feature
+This .bed file must contain the following columns, in order:
+    chrom, start (0-based), end, feature (target)
 Additionally, the column names should be omitted from the file itself
 (i.e. there is no header and the first line in the file is the first
 row of genome coordinates for a feature).

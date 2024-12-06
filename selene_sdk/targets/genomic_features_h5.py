@@ -6,8 +6,8 @@ in the sequence.
 It accepts the path to a tabix-indexed .bed.gz file of genomic coordinates and
 the path to an HDF5 file containing the continuous-valued targets as a matrix.
 
-This .tsv/.bed file must contain the following columns, in order:
-    chrom ('1', '2', ..., 'X', 'Y'), start (0-based), end, index
+This .bed file must contain the following columns, in order:
+    chrom, start (0-based), end, index
 where the index is the index of the corresponding row in the HDF5 file.
 
 Additionally, the column names should be omitted from the file itself
