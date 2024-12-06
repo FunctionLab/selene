@@ -24,50 +24,13 @@ from functools import wraps
 from .target import Target
 
 
-def _get_target_data(chrom, start, end,
-                      thresholds, target_index_dict, get_target_rows):
-    """
-    Generates a target vector for the given query region.
-
-    Parameters
-    ----------
-     chrom : str
-        The name of the region (e.g. 'chr1', 'chr2', ..., 'chrX',
-        'chrY') to query inside of.
-    start : int
-        The 0-based start coordinate of the region to query.
-    end : int
-        One past the last coordinate of the region to query.
-    thresholds : np.ndarray, dtype=numpy.float32
-        An array of target thresholds, where the value in position
-        `i` corresponds to the threshold for the target name that is
-        mapped to index `i` by `target_index_dict`.
-    target_index_dict : dict
-        A dictionary mapping target names (`str`) to indices (`int`),
-        where the index is the position of the target in `targets`.
-    get_target_rows : types.FunctionType
-        A function that takes coordinates and returns rows
-        (`list(tuple(int, int, str))`).
-
-    Returns
-    -------
-    numpy.ndarray, dtype=int
-        A target vector where the `i`th position is equal to one if the
-        `i`th target is positive, and zero otherwise.
-
-    """
-    rows = get_target_rows(chrom, start, end)
-    return _fast_get_target_data(
-        start, end, thresholds, target_index_dict, rows)
-
-
 class GenomicFeaturesH5(Target):
     """
     Stores the dataset specifying sequence regions and targets.
     Accepts a tabix-indexed `*.bed` file with the following columns,
     in order:
     ::
-        [chrom, start, end, strand, index]
+        [chrom, start, end, index]
 
     and an HDF5 file of the target values in a matrix with key `targets`.
 
@@ -104,9 +67,6 @@ class GenomicFeaturesH5(Target):
         The matrix of target data corresponding to the coordinates in `coords`.
     n_targets : int
         The number of distinct targets.
-    target_index_dict : dict
-        A dictionary mapping target names (`str`) to indices (`int`),
-        where the index is the position of the target in `targets`.
     """
 
     def __init__(self,
@@ -121,10 +81,6 @@ class GenomicFeaturesH5(Target):
         self.h5_path = h5_path
 
         self.n_targets = len(targets)
-
-        self.target_index_dict = dict(
-            [(feat, index) for index, feat in enumerate(targets)])
-        self.index_target_dict = dict(list(enumerate(targets)))
 
         self._initialized = False
 
@@ -243,7 +199,7 @@ class GenomicFeaturesH5(Target):
 
         row_targets = []
         for r in rows:
-            ix = int(r[3])
+            ix = int(r[-1])
             row_targets.append(self.data[ix])
 
         if len(row_targets) == 0:
