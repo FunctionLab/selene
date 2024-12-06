@@ -54,9 +54,13 @@ class RandomPositionsSampler(OnlineSampler):
     ----------
     reference_sequence : selene_sdk.sequences.Genome
         A reference sequence from which to create examples.
-    target_path : str
+    target_path : str or selene_sdk.targets.Target
         Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
         coordinates mapped to the genomic features we want to predict.
+        `target_path` will be loaded as a `GenomicFeatures` object.
+        Currently, `target_path` is also overloaded to accept a
+        `selene_sdk.targets.Target` object directly, either `GenomicFeatures`
+        or `GenomicFeaturesH5`.
     features : list(str)
         List of distinct features that we aim to predict.
     seed : int, optional
@@ -222,7 +226,8 @@ class RandomPositionsSampler(OnlineSampler):
     def _partition_genome_by_chromosome(self):
         for mode in self.modes:
             self._sample_from_mode[mode] = SampleIndices([], [])
-        for index, (chrom, len_chrom) in enumerate(self.reference_sequence.get_chr_lens()):
+        index = 0
+        for (chrom, len_chrom) in self.reference_sequence.get_chr_lens():
             skip = False
             for excl in self.exclude_chrs:
                 if excl in chrom:
@@ -246,6 +251,7 @@ class RandomPositionsSampler(OnlineSampler):
                  self.sequence_length,
                  len_chrom - self.sequence_length))
             self.interval_lengths.append(len_chrom - 2 * self.sequence_length)
+            index += 1
 
         for mode in self.modes:
             sample_indices = self._sample_from_mode[mode].indices

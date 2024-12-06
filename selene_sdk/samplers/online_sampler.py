@@ -25,9 +25,13 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
     ----------
     reference_sequence : selene_sdk.sequences.Sequence
         A reference sequence from which to create examples.
-    target_path : str
+    target_path : str or selene_sdk.targets.Target
         Path to tabix-indexed, compressed BED file (`*.bed.gz`) of genomic
         coordinates mapped to the genomic features we want to predict.
+        `target_path` will be loaded as a `GenomicFeatures` object.
+        Currently, `target_path` is also overloaded to accept a
+        `selene_sdk.targets.Target` object directly, either `GenomicFeatures`
+        or `GenomicFeaturesH5`.
     features : list(str)
         List of distinct features that we aim to predict.
     seed : int, optional
@@ -213,9 +217,12 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
 
         self.reference_sequence = reference_sequence
         self.n_features = len(self._features)
-        self.target = GenomicFeatures(
-            target_path, self._features,
-            feature_thresholds=feature_thresholds)
+        if isinstance(target_path, str):
+            self.target = GenomicFeatures(
+                target_path, self._features,
+                feature_thresholds=feature_thresholds)
+        else:
+            self.target = target_path
         self._save_filehandles = {}
 
     def get_feature_from_index(self, index):
