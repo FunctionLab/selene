@@ -444,6 +444,10 @@ def parse_configs_and_run(configs,
         to the dirs specified in each operation's configuration.
 
     """
+    print("Running `parse_configs_and_run`. For improved reproducibility "
+          "we would recommend using `load_and_parse_configs_and_run` which "
+          "will save a format-preserving copy of your input configuration "
+          "file.")
     keys, configs = add_config_keys(configs, lr=lr)
     current_run_output_dir = get_output_dir(
         configs, create_subdirectory=create_subdirectory)

@@ -25,7 +25,7 @@ ext_modules = [genome_module, genomic_features_module]
 cmdclass = {'build_ext': build_ext}
 
 setup(name="selene-sdk",
-      version="0.5.3",
+      version="0.6.0",
       long_description=long_description,
       long_description_content_type='text/markdown',
       description=("framework for developing sequence-level "
@@ -60,6 +60,7 @@ setup(name="selene-sdk",
         "pyfaidx",
         "pytabix",
         "pyyaml>=5.1",
+        "ruamel.yaml",
         "scikit-learn",
         "scipy",
         "seaborn",
