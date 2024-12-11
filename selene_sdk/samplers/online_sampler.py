@@ -343,9 +343,10 @@ class OnlineSampler(Sampler, metaclass=ABCMeta):
         elif n_samples is None and mode == "test":
             n_samples = 640000
 
-        n_batches = int(n_samples / batch_size)
-        for _ in range(n_batches):
-            inputs, targets = self.sample(batch_size)
+        for ix in range(0, n_samples, batch_size):
+            s = ix
+            e = min(ix+batch_size, n_samples)
+            inputs, targets = self.sample(e-s)
             sequences_and_targets.append((inputs, targets))
         targets_mat = np.vstack([t for (s, t) in sequences_and_targets])
         if mode in self._save_datasets:
