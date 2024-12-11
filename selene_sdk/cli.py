@@ -14,7 +14,7 @@ later, but that will cause problems--the code will get executed twice:
 import click
 
 from selene_sdk import __version__
-from selene_sdk.utils import load_path, parse_configs_and_run
+from selene_sdk.utils import load_and_parse_configs_and_run
 
 
 @click.command()
@@ -23,8 +23,7 @@ from selene_sdk.utils import load_path, parse_configs_and_run
 @click.option('--lr', type=float, help='If training, the optimizer learning rate', show_default=True)
 def main(path, lr):
     """Build the model and trains it using user-specified input data."""
-    configs = load_path(path, instantiate=False)
-    parse_configs_and_run(configs, lr=lr)
+    load_and_parse_configs_and_run(path, lr=lr)
 
 
 if __name__ == "__main__":
