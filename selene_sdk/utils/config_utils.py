@@ -298,6 +298,7 @@ def output_config_yaml(input_file, output_file, new_keys):
     with open(output_file, 'w') as f:
         yaml.dump(data, f)
 
+
 def add_config_keys(configs, lr=None):
     keys = {}
     operations = configs["ops"]
