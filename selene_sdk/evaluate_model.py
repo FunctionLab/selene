@@ -253,9 +253,6 @@ class EvaluateModel(object):
         average_scores = self._metrics.update(
             all_predictions, self._all_test_targets)
 
-        self._metrics.visualize(
-            all_predictions, self._all_test_targets, self.output_dir)
-
         np.savez_compressed(
             os.path.join(self.output_dir, "test_predictions.npz"),
             data=all_predictions)
@@ -269,5 +266,8 @@ class EvaluateModel(object):
             self.output_dir, "test_performance.txt")
         feature_scores_dict = self._metrics.write_feature_scores_to_file(
             test_performance)
+
+        self._metrics.visualize(
+            all_predictions, self._all_test_targets, self.output_dir)
 
         return feature_scores_dict

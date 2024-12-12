@@ -263,9 +263,9 @@ class MultiSampler(Sampler):
             targets_mat = []
             for s in range(0, n_samples, batch_size):
                 e = min(n_samples, s+batch_size)
-                output = self.sample(batch_size=e-s, mode=mode)
-                data_and_targets.append(output)
-                targets_mat.append(output[1])
+                data, targets = self.sample(batch_size=batch_size, mode=mode)
+                data_and_targets.append((data[:e-s], targets[:e-s]))
+                targets_mat.append(targets[:e-s])
             targets_mat = np.vstack(targets_mat)
             return data_and_targets, targets_mat
 
