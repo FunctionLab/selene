@@ -21,7 +21,7 @@ class UpdateSeqweaver():
     Stores a dataset specifying sequence regions and features.
     Accepts a tabix-indexed `*.bed` file with the following columns,
     in order:
-        [chrom, start, end, feature, strand]
+        [chrom, start, end, strand, feature]
 
     Parameters
     ----------
