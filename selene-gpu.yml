@@ -4,7 +4,7 @@ channels:
 - bioconda
 - conda-forge
 dependencies:
-- cython=0.29.3
+- cython=0.29.24
 - click==7.1.2
 - docopt=0.6.2
 - h5py=2.9.0
@@ -15,11 +15,12 @@ dependencies:
 - statsmodels=0.9.0
 - pytabix=0.0.2
 - matplotlib=2.2.2
-- python=3.6.5
-- numpy=1.15.1
+- python=3.9
+- ruamel.yaml=0.18.6
+- numpy=1.21.4
 - plotly=2.7.0
 - cudatoolkit=10.0.130=0
-- pytorch=1.0.1=py3.6_cuda10.0.130_cudnn7.4.2_2
-- torchvision=0.2.2=py_3
+- pytorch=2.4.1=py3.9_cuda11.8_cudnn9.1.0_0
+- torchvision=0.20.0=py39_cu118
 - pyfaidx=0.5.5.2
 - seaborn=0.8.1

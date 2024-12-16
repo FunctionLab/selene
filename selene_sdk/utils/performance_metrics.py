@@ -207,11 +207,17 @@ def compute_score(prediction, target, metric_fn,
         prediction = prediction.T
     for index, feature_preds in enumerate(prediction):
         feature_targets = target[:, index]
+        feature_preds = feature_preds[~np.isnan(feature_targets)]
+        feature_targets = feature_targets[~np.isnan(feature_targets)]
         if len(np.unique(feature_targets)) > 0 and \
                np.count_nonzero(feature_targets) > report_gt_feature_n_positives:
             try:
-                feature_scores[index] = metric_fn(
-                    feature_targets, feature_preds)
+                output = metric_fn(feature_targets, feature_preds)
+                if type(output) != float and \
+                        (metric_fn.__name__ == 'spearmanr' or
+                         metric_fn.__name__ == 'pearsonr'):
+                    output = output[0]
+                feature_scores[index] = output
             except ValueError:  # do I need to make this more generic?
                 continue
     valid_feature_scores = [s for s in feature_scores if not np.isnan(s)] # Allow 0 or negative values.
@@ -367,7 +373,7 @@ class PerformanceMetrics(object):
         del self.metrics[name]
         return data
 
-    def update(self, prediction, target):
+    def update(self, prediction, target, scores=None):
         """
         Evaluates the tracked metrics on a model prediction and its
         target value, and adds this to the metric histories.
@@ -378,6 +384,8 @@ class PerformanceMetrics(object):
             Value predicted by user model.
         target : numpy.ndarray
             True value that the user model was trying to predict.
+        scores : list(str), optional
+            Default is None. Specify only a subset of metrics to update.
 
         Returns
         -------
@@ -387,8 +395,12 @@ class PerformanceMetrics(object):
             (`float`).
 
         """
+        if scores is None:
+             scores = list(self.metrics.keys())
+
         metric_scores = {}
-        for name, metric in self.metrics.items():
+        for name in scores:
+            metric = self.metrics[name]
             avg_score, feature_scores = compute_score(
                 prediction, target, metric.fn,
                 report_gt_feature_n_positives=self.skip_threshold)

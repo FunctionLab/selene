@@ -13,15 +13,14 @@ from selene_sdk.sequences.genome import Genome
 from selene_sdk.targets.genomic_features import GenomicFeatures
 from selene_sdk.samplers.dataloader import H5DataLoader
 from selene_sdk.train_model import TrainModel
-from selene_sdk.utils.config import load_path
-from selene_sdk.utils.config_utils import parse_configs_and_run
+from selene_sdk.utils import load_and_parse_configs_and_run
 
 class UpdateSeqweaver():
     """
     Stores a dataset specifying sequence regions and features.
     Accepts a tabix-indexed `*.bed` file with the following columns,
     in order:
-        [chrom, start, end, feature, strand]
+        [chrom, start, end, strand, feature]
 
     Parameters
     ----------
@@ -40,7 +39,15 @@ class UpdateSeqweaver():
         should contain the target organism's genome sequence.
 
     """
-    def __init__(self, input_path, train_path, validate_path, feature_path, hg_fasta, yaml_path, val_prop=0.1, sequence_len=1000):
+    def __init__(self,
+                 input_path,
+                 train_path,
+                 validate_path,
+                 feature_path,
+                 hg_fasta,
+                 yaml_path,
+                 val_prop=0.1,
+                 sequence_len=1000):
         """
         Constructs a new `UpdateSeqweaver` object.
         """
@@ -142,11 +149,6 @@ class UpdateSeqweaver():
             fh.create_dataset("train_sequences", data=np.array(training_seqs, dtype=np.int64))
             fh.create_dataset("train_targets", data=np.array(training_labels, dtype=np.int64))
 
-    def _load_yaml(self):
-        # load yaml configuration
-        return load_path(self.yaml_path)
-
-    def train_model(self):
+    def train_model(self, lr):
         # load config file and train model
-        yaml_config = self._load_yaml()
-        parse_configs_and_run(yaml_config)
+        load_and_parse_configs_and_run(self.yaml_path, lr=lr)

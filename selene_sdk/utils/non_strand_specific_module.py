@@ -69,9 +69,19 @@ class NonStrandSpecific(Module):
 
         output = self.model.forward(input)
         output_from_rev = self.model.forward(reverse_input)
-
-        if self.mode == "mean":
-            return (output + output_from_rev) / 2
+        if type(output) == tuple:
+            output1, output2 = output
+            output_from_rev1, output_from_rev2 = output_from_rev
+            if self.mode == "mean":
+                return ((output1 + output_from_rev1) / 2,
+                        (output2 + output_from_rev2) / 2)
+            else:
+                return (torch.max(output1, output_from_rev1),
+                        torch.max(output2, output_from_rev2))
         else:
-            return torch.max(output, output_from_rev)
+            if self.mode == "mean":
+                return (output + output_from_rev) / 2
+            else:
+                return torch.max(output, output_from_rev)
+
 

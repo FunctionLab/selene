@@ -5,16 +5,23 @@ running operations in _Selene_.
 """
 import os
 import importlib
+import string
 import sys
 from time import strftime
 import types
 import random
+import shutil
+import yaml
 
+import ruamel.yaml
 import numpy as np
 import torch
 
 from . import _is_lua_trained_model
 from . import instantiate
+from . import load_path
+
+from .. import version
 
 
 def class_instantiate(classobj):
@@ -23,7 +30,7 @@ def class_instantiate(classobj):
     """
     for attr, obj in classobj.__dict__.items():
         is_module = getattr(obj, '__module__', None)
-        if is_module and "selene_sdk" in is_module and attr is not "model":
+        if is_module and "selene_sdk" in is_module and attr != "model":
             class_instantiate(obj)
     classobj.__init__(**classobj.__dict__)
 
@@ -111,6 +118,7 @@ def initialize_model(model_configs, train=True, lr=None):
 
     module = None
     if os.path.isdir(import_model_from):
+        import_model_from = import_model_from.rstrip(os.sep)
         module = module_from_dir(import_model_from)
     else:
         module = module_from_file(import_model_from)
@@ -251,6 +259,138 @@ def execute(operations, configs, output_dir):
                 analyze_seqs.get_predictions(**predict_info)
 
 
+def output_config_yaml(input_file, output_file, new_keys):
+    # Initialize YAML handler with ruamel.yaml to preserve formatting
+    yaml = ruamel.yaml.YAML()
+    # More aggressive formatting settings
+    yaml.preserve_quotes = True
+    yaml.default_flow_style = False
+    yaml.indent(mapping=2, sequence=4, offset=2)
+    yaml.width = 1000  # Prevent automatic wrapping
+    yaml.allow_unicode = True
+    yaml.explicit_start = True  # Will start document with '---'
+    yaml.explicit_end = True    # Will end document with '...'
+    # This is important - it tells ruamel.yaml to format block style
+    yaml.old_indent = True
+
+    # Read the input file
+    with open(input_file, 'r') as f:
+        data = yaml.load(f)
+
+    def convert_to_block_style(data):
+        if isinstance(data, dict):
+            for k, v in data.items():
+                if isinstance(v, (dict, list)):
+                    if isinstance(v, dict):
+                        v.fa.set_block_style()
+                    convert_to_block_style(v)
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, (dict, list)):
+                    convert_to_block_style(item)
+    convert_to_block_style(data)
+
+    # Add new keys
+    for key, value in new_keys.items():
+        data[key] = value
+
+    # Write to output file
+    with open(output_file, 'w') as f:
+        yaml.dump(data, f)
+
+
+def add_config_keys(configs, lr=None):
+    keys = {}
+    operations = configs["ops"]
+    keys["selene_sdk_version"] = version.__version__
+    print("Running with selene_sdk version {0}".format(version.__version__))
+
+    if "train" in operations and "lr" not in configs and lr != None:
+        keys["lr"] = float(lr)
+    elif "train" in operations and "lr" in configs and lr != None:
+        print("Warning: learning rate specified in both the "
+              "configuration dict and this method's `lr` parameter. "
+              "Using the `lr` value input to `parse_configs_and_run` "
+              "({0}, not {1}).".format(lr, configs["lr"]))
+    elif "train" in operations and "lr" not in configs and lr == None:
+        raise ValueError("Learning rate not specified, cannot "
+                         "fit model. Exiting.")
+    for k, v in keys.items():
+        configs[k] = v
+    return keys, configs
+
+
+def get_output_dir(configs, create_subdirectory=True):
+    operations = configs["ops"]
+    current_run_output_dir = None
+    if "output_dir" not in configs and \
+            ("train" in operations or "evaluate" in operations):
+        print("No top-level output directory specified. All constructors "
+              "to be initialized (e.g. Sampler, TrainModel) that require "
+              "this parameter must have it specified in their individual "
+              "parameter configuration.")
+    elif "output_dir" in configs:
+        current_run_output_dir = configs["output_dir"]
+        os.makedirs(current_run_output_dir, exist_ok=True)
+        if "create_subdirectory" in configs:
+            create_subdirectory = configs["create_subdirectory"]
+        if create_subdirectory:
+            res = ''.join(random.choices(string.ascii_uppercase +
+                                         string.digits, k=8))
+            current_run_output_dir = os.path.join(
+                current_run_output_dir,
+                '{0}-{1}'.format(strftime("%Y-%m-%d-%H-%M-%S"), res))
+            os.makedirs(current_run_output_dir)
+        print("Outputs and logs saved to {0}".format(
+            current_run_output_dir))
+    return current_run_output_dir
+
+
+def copy_model(configs, output_dir):
+    model_input = configs['model']['path']
+    if os.path.isdir(model_input):
+        shutil.copytree(model_input,
+                        os.path.join(output_dir,
+                                     os.path.basename(model_input)),
+                        dirs_exist_ok=True)
+    else:
+        shutil.copyfile(model_input,
+                        os.path.join(output_dir,
+                                     os.path.basename(model_input)))
+
+
+def set_random_seeds(configs):
+    if "random_seed" in configs:
+        seed = configs["random_seed"]
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        print("Setting random seed = {0}".format(seed))
+    else:
+        print("Warning: no random seed specified in config file. "
+              "Using a random seed ensures results are reproducible.")
+
+
+def load_and_parse_configs_and_run(path, create_subdirectory=True, lr=None):
+    configs = load_path(path, instantiate=False)
+    keys, configs = add_config_keys(configs, lr=lr)
+    current_run_output_dir = get_output_dir(
+        configs,
+        create_subdirectory=create_subdirectory)
+
+    if current_run_output_dir is not None:
+        keys['output_dir'] = current_run_output_dir
+        output_config_yaml(
+            path,
+            os.path.join(current_run_output_dir, 'configuration.yml'),
+            keys)
+        copy_model(configs, current_run_output_dir)
+
+    set_random_seeds(configs)
+    execute(configs['ops'], configs, current_run_output_dir)
+
+
 def parse_configs_and_run(configs,
                           create_subdirectory=True,
                           lr=None):
@@ -305,47 +445,20 @@ def parse_configs_and_run(configs,
         to the dirs specified in each operation's configuration.
 
     """
-    operations = configs["ops"]
+    print("Running `parse_configs_and_run`. For improved reproducibility "
+          "we would recommend using `load_and_parse_configs_and_run` which "
+          "will save a format-preserving copy of your input configuration "
+          "file.")
+    keys, configs = add_config_keys(configs, lr=lr)
+    current_run_output_dir = get_output_dir(
+        configs, create_subdirectory=create_subdirectory)
 
-    if "train" in operations and "lr" not in configs and lr != None:
-        configs["lr"] = float(lr)
-    elif "train" in operations and "lr" in configs and lr != None:
-        print("Warning: learning rate specified in both the "
-              "configuration dict and this method's `lr` parameter. "
-              "Using the `lr` value input to `parse_configs_and_run` "
-              "({0}, not {1}).".format(lr, configs["lr"]))
-    elif "train" in operations and "lr" not in configs and lr == None:
-        raise ValueError("Learning rate not specified, cannot "
-                         "fit model. Exiting.")
+    if current_run_output_dir is not None:
+        configs['output_dir'] = current_run_output_dir
+        config_out = os.path.join(current_run_output_dir, 'configuration.yaml')
+        with open(config_out, 'w') as f:
+            yaml.dump(configs, f, default_flow_style=False)
+        copy_model(configs, current_run_output_dir)
 
-    current_run_output_dir = None
-    if "output_dir" not in configs and \
-            ("train" in operations or "evaluate" in operations):
-        print("No top-level output directory specified. All constructors "
-              "to be initialized (e.g. Sampler, TrainModel) that require "
-              "this parameter must have it specified in their individual "
-              "parameter configuration.")
-    elif "output_dir" in configs:
-        current_run_output_dir = configs["output_dir"]
-        os.makedirs(current_run_output_dir, exist_ok=True)
-        if "create_subdirectory" in configs:
-            create_subdirectory = configs["create_subdirectory"]
-        if create_subdirectory:
-            current_run_output_dir = os.path.join(
-                current_run_output_dir, strftime("%Y-%m-%d-%H-%M-%S"))
-            os.makedirs(current_run_output_dir)
-        print("Outputs and logs saved to {0}".format(
-            current_run_output_dir))
-
-    if "random_seed" in configs:
-        seed = configs["random_seed"]
-        random.seed(seed)
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-        print("Setting random seed = {0}".format(seed))
-    else:
-        print("Warning: no random seed specified in config file. "
-              "Using a random seed ensures results are reproducible.")
-
-    execute(operations, configs, current_run_output_dir)
+    set_random_seeds(configs)
+    execute(configs['ops'], configs, current_run_output_dir)

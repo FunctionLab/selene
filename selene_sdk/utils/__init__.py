@@ -19,6 +19,7 @@ from .config import load_path
 from .config import instantiate
 from .config_utils import initialize_model
 from .config_utils import execute
+from .config_utils import load_and_parse_configs_and_run
 from .config_utils import parse_configs_and_run
 from .multi_model_wrapper import MultiModelWrapper
 from .non_strand_specific_module import NonStrandSpecific
@@ -31,6 +32,7 @@ __all__ = ["_is_lua_trained_model",
            "PerformanceMetrics",
            "load",
            "load_path",
+           "load_and_parse_configs_and_run",
            "instantiate",
            "get_indices_and_probabilities",
            "visualize_roc_curves",

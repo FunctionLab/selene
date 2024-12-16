@@ -221,6 +221,7 @@ class MultiSampler(Sampler):
             except StopIteration:
                 #If DataLoader iterator reaches its length, reinitialize
                 self._iterators[mode] = iter(self._dataloaders[mode])
+
                 data, targets = next(self._iterators[mode])
                 return data.numpy(), targets.numpy()
 
@@ -260,16 +261,11 @@ class MultiSampler(Sampler):
             self._set_batch_size(batch_size, mode=mode)
             data_and_targets = []
             targets_mat = []
-            count = batch_size
-            while count < n_samples:
-                data, tgts = self.sample(batch_size=batch_size, mode=mode)
-                data_and_targets.append((data, tgts))
-                targets_mat.append(tgts)
-                count += batch_size
-            remainder = batch_size - (count - n_samples)
-            data, tgts = self.sample(batch_size=remainder)
-            data_and_targets.append((data, tgts))
-            targets_mat.append(tgts)
+            for s in range(0, n_samples, batch_size):
+                e = min(n_samples, s+batch_size)
+                data, targets = self.sample(batch_size=batch_size, mode=mode)
+                data_and_targets.append((data[:e-s], targets[:e-s]))
+                targets_mat.append(targets[:e-s])
             targets_mat = np.vstack(targets_mat)
             return data_and_targets, targets_mat
 

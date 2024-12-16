@@ -240,13 +240,12 @@ class MatFileSampler(FileSampler):
         sequences_and_targets = []
         targets_mat = []
 
-        count = 0
-        while count < n_samples:
-            sample_size = min(n_samples - count, batch_size)
-            seqs, tgts = self.sample(batch_size=sample_size)
-            sequences_and_targets.append((seqs, tgts))
-            targets_mat.append(tgts)
-            count += sample_size
+        for ix in range(0, n_samples, batch_size):
+            s = ix
+            e = min(ix+batch_size, n_samples)
+            seqs, tgts = self.sample(batch_size=batch_size)
+            sequences_and_targets.append((seqs[:e-s], tgts[:e-s]))
+            targets_mat.append(tgts[:e-s])
 
         # TODO: should not assume targets are always integers
         targets_mat = np.vstack(targets_mat).astype(float)
