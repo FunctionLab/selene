@@ -211,11 +211,11 @@ def _process_alt(chrom,
         lhs = reference_sequence.get_sequence_from_coords(
             chrom,
             start - ref_len // 2 + alt_len // 2,
-            pos + 1,
+            pos - 1,
             pad=True)
         rhs = reference_sequence.get_sequence_from_coords(
             chrom,
-            pos + 1 + ref_len,
+            pos - 1 + ref_len,
             end + math.ceil(ref_len / 2.) - math.ceil(alt_len / 2.),
             pad=True)
         sequence = lhs + alt + rhs
