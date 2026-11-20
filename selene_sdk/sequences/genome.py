@@ -5,7 +5,7 @@ parts of the sequence and converting these parts into their one-hot
 encodings.
 
 """
-import pkg_resources
+import importlib.resources
 import pyfaidx
 import tabix
 
@@ -293,15 +293,13 @@ class Genome(Sequence):
             self._blacklist_tabix = None
 
             if self.blacklist_regions == "hg19":
-                self._blacklist_tabix = tabix.open(
-                    pkg_resources.resource_filename(
-                        "selene_sdk",
-                        "sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz"))
+                self._blacklist_tabix = tabix.open(str(
+                    importlib.resources.files("selene_sdk").joinpath(
+                        "sequences/data/hg19_blacklist_ENCFF001TDO.bed.gz")))
             elif self.blacklist_regions == "hg38":
-                self._blacklist_tabix = tabix.open(
-                    pkg_resources.resource_filename(
-                        "selene_sdk",
-                        "sequences/data/hg38.blacklist.bed.gz"))
+                self._blacklist_tabix = tabix.open(str(
+                    importlib.resources.files("selene_sdk").joinpath(
+                        "sequences/data/hg38.blacklist.bed.gz")))
             elif self.blacklist_regions is not None:  # user-specified file
                 self._blacklist_tabix = tabix.open(
                     self.blacklist_regions)
