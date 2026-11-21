@@ -5,6 +5,7 @@ from selene analysis methods.
 """
 from collections import defaultdict
 from copy import deepcopy
+import importlib.resources
 import os
 import re
 import warnings
@@ -16,7 +17,6 @@ from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 import matplotlib.patheffects
 from matplotlib.text import TextPath
-import pkg_resources
 from plotly.offline import download_plotlyjs, plot
 import plotly.graph_objs as go
 import seaborn as sns
@@ -662,14 +662,11 @@ def _load_chrs_gene_intervals(gene_intervals_bed):
 
 
 def _variants_closest_protein_coding_gene(labels, version="hg38"):
-    gene_intervals_tabix = pkg_resources.resource_filename(
-        "selene_sdk",
-        ("interpret/data/gencode_v28_{0}/"
-         "protein_coding_l12_genes.bed.gz").format(version))
-    gene_intervals_bed = pkg_resources.resource_filename(
-        "selene_sdk",
-        ("interpret/data/gencode_v28_{0}/"
-         "protein_coding_l12_genes.bed").format(version))
+    data_dir = importlib.resources.files("selene_sdk").joinpath(
+        "interpret/data/gencode_v28_{0}".format(version))
+    gene_intervals_tabix = str(
+        data_dir.joinpath("protein_coding_l12_genes.bed.gz"))
+    gene_intervals_bed = str(data_dir.joinpath("protein_coding_l12_genes.bed"))
 
     tabix_fh = tabix.open(gene_intervals_tabix)
     chrs_gene_intervals = _load_chrs_gene_intervals(gene_intervals_bed)

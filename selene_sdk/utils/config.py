@@ -10,7 +10,6 @@ import os
 import re
 import warnings
 import yaml
-import six
 from collections import namedtuple
 
 SCIENTIFIC_NOTATION_REGEXP = r"^[\-\+]?(\d+\.?\d*|\d*\.?\d+)?[eE][\-\+]?\d+$"
@@ -140,7 +139,7 @@ def _instantiate_proxy_tuple(proxy, bindings=None):
                 raise NotImplementedError('positional arguments not yet '
                                           'supported in proxy instantiation')
             kwargs = dict((k, instantiate(v, bindings))
-                          for k, v in six.iteritems(proxy.keywords))
+                          for k, v in proxy.keywords.items())
             obj = proxy.callable(**kwargs)
         try:
             obj.yaml_src = proxy.yaml_src
@@ -241,12 +240,12 @@ def instantiate(proxy, bindings=None):
         # Recurse on the keys too, for backward compatibility.
         # Is the key instantiation feature ever actually used, by anyone?
         return dict((instantiate(k, bindings), instantiate(v, bindings))
-                    for k, v in six.iteritems(proxy))
+                    for k, v in proxy.items())
     elif isinstance(proxy, list):
         return [instantiate(v, bindings) for v in proxy]
     # In the future it might be good to consider a dict argument that provides
     # a type->callable mapping for arbitrary transformations like this.
-    elif isinstance(proxy, six.string_types):
+    elif isinstance(proxy, str):
         return _preprocess(proxy)
     else:
         return proxy
@@ -289,7 +288,7 @@ def load(stream, environ=None, instantiate=True, **kwargs):
     if not IS_INITIALIZED:
         _initialize()
 
-    if isinstance(stream, six.string_types):
+    if isinstance(stream, str):
         string = stream
     else:
         string = stream.read()
@@ -452,7 +451,7 @@ def _multi_constructor_obj(loader, tag_suffix, node):
     assert hasattr(mapping, 'values')
 
     for key in mapping.keys():
-        if not isinstance(key, six.string_types):
+        if not isinstance(key, str):
             raise TypeError(
                 "Received non string object ({0}) as key in mapping.".format(
                     str(key)
